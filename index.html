@@ -30,7 +30,7 @@
   <main class="shell">
     <header>
       <div class="brand"><img class="brand-icon" src="images/system-portal/app-icon-192.png?v=20260720" alt="STEPシステム資産管理台帳"><div><h1>STEPシステム資産管理台帳</h1><p class="lead">本番システム・旧システム・GitHub・Apps Script・Google Sheet・Supabaseの統合管理</p><span class="former-name">旧称：STEP総合管理ポータル</span></div></div>
-      <div class="top-actions"><a class="btn" href="index.html">スタッフ用アプリへ戻る</a><button class="btn" id="logoutBtn" type="button">ログアウト</button></div>
+      <div class="top-actions"><a class="btn" href="https://stepkobetsu-hub.github.io/seiseki-kanri/">スタッフ用アプリへ戻る</a><button class="btn" id="logoutBtn" type="button">ログアウト</button></div>
     </header>
     <section id="denied" class="notice hidden" role="alert"></section>
     <section id="loginPanel" class="login-card hidden" aria-labelledby="loginTitle">
@@ -102,7 +102,7 @@ function searchableText(item){return normalizeSearch(Object.entries(applyAssetIn
 function render(){const q=normalizeSearch(document.getElementById('search').value);const c=document.getElementById('category').value;const st=document.getElementById('status').value;const investigation=document.getElementById('investigationFilter').value;const list=systems.filter(x=>(!c||x['分類']===c)&&(!st||effectiveStatus(x)===st)&&(!q||searchableText(x).includes(q))&&matchesInvestigationFilter(x,investigation));const root=document.getElementById('cards');root.replaceChildren(...list.map(card));document.getElementById('count').textContent=`${list.length}件表示`;const researchCount=list.reduce((sum,item)=>sum+investigationItems(applyAssetInfo(applyConfirmedInfo(item))).filter(x=>x.level==='important'||x.level==='required').length,0);document.getElementById('investigationCount').textContent=`要調査：${researchCount}件`}
 function isQrRegister(item){return item['ID']==='qr-register'||item['システム名']==='出退くんQR作成・読取'}
 function isJukuCard(item){return item['ID']==='juku-card'||item['システム名']==='受付カード読み取り'}
-const HOME_NEWS_CARD={'ID':'homepage-news','システム名':'ホームページニュース表示・更新システム'…6646 tokens truncated…'),el('p','','講師提出・授業枠設定の正本。Google Sheetは管理画面から転記する出力先。'));body.append(storage);
+const HOME_NEWS_CARD={'ID':'homepage-news','システム名':'ホームページニ…6655 tokens truncated…'),el('p','','講師提出・授業枠設定の正本。Google Sheetは管理画面から転記する出力先。'));body.append(storage);
   const gas=el('section','group');gas.append(el('h3','','【Apps Script情報】'),el('p','meta','現行入力画面はApps Scriptを保存経路に使用しません。校舎別Apps Scriptは、管理画面の転記操作時に各校舎の全体時間割へ書き込むAPIとして使用します。'));body.append(gas);
   const old=el('section','group');old.append(el('h3','','【旧システム・過去世代】'));
   const generations=[
