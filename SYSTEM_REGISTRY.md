@@ -12,7 +12,7 @@
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| 学習進捗管理 | 一部使用中 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（詳細要確認） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-28 | 旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタの講師向け管理は別システム |
+| 学習進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-28 | 旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタの講師向け管理は別システム |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html`を現行入口とする |
 | 成績管理 | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`admin.html`、`gas_code.js` | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-07-22 | 一般入口 `index.html`、管理入口 `admin.html` |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
@@ -34,8 +34,8 @@
 - ID: `learning-progress`
 - 正式名称: 学習進捗管理
 - 旧称・参考名: フォレスタステップ進捗管理／夏休み進捗管理
-- 分類: 要確認（Google Sheet「システム台帳」で使用中の生徒管理・学習管理系分類へ合わせる）
-- 状態: 一部使用中（GitHub Pages公開画面とApps Script API接続を確認）
+- 分類: 生徒・指導管理
+- 状態: 本番（正本で使用中の正式値。GitHub Pages公開画面とApps Script API接続を確認）
 - 利用者: 生徒、講師、管理者
 - 運用担当: 管理者
 - 概要: 生徒がフォレスタステップとフォレスタゴールの学習進捗、宿題、目標範囲、LCT等を入力・確認する、自主学習・講習・受験勉強用の進捗管理アプリ。通常授業用フォレスタの講師向け進捗管理は対象外。
@@ -47,12 +47,12 @@
 - 最新版の場所: `stepkobetsu-hub/foresta-step-progress` の `main` 直下
 - 通信方法: GitHub Pagesの `index.html` からApps Script WebアプリへJSON API通信。Apps Script HTML Service／iframeは不使用。
 - 認証方式: アプリ独自認証、期限付きセッション、サーバー側権限確認、本人studentId一致確認。Googleアカウントは不要。
-- Apps Scriptプロジェクト名・編集URL・デプロイID・バージョン・実行ユーザー・アクセス設定: 要確認
-- 保存先Spreadsheet名・Spreadsheet ID・Google Sheet URL・使用シート名・各シートの役割: 要確認
-- 主要機能（公開コードで確認）: 生徒本人の進捗入力、教科別・全体進捗、今日の学習、次回の宿題、進捗入力、目標範囲、宿題チェック、Point／WARM UP／TRY／Exercise、TRY赤×直し、LCT、学習日自動記録、自動保存、講師の宿題確認、達成率・励まし表示、スマートフォン対応、ステップ／ゴール並行利用、ゴール5教科。
+- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、編集画面と公開Webアプリ接続を確認、公開API version 31。実行ユーザー・アクセス設定は要確認
+- 保存先Spreadsheet名・Spreadsheet ID・Google Sheet URL・使用シート名・各シートの役割: 管理者確認待ち
+- 現在確認済みの機能: 生徒本人による進捗入力、教科別進捗率表示、学年別進捗表示、今日の学習集計、次回の宿題、進捗入力、目標範囲管理、Point／WARM UP／TRY／Exercise管理、TRY赤×直し、Exercise、LCT入力・集計、学習日の自動記録、自動保存、宿題確認、達成率・励まし表示、スマートフォン対応、本人IDとstudentId一致によるアクセス制御、他生徒データの閲覧・更新拒否。
 - セキュリティ設計（公開コード・READMEで確認）: 本人データ限定、講師・管理者権限のサーバー側処理、未ログイン・他生徒データ・権限外操作の拒否。
-- 今後の改良予定・要確認: アプリ専用アイコン、スマートフォン版タブ文字、ステップ英語の暗記マーク、ゴール英語のMy単語帳、教材別表示・宿題項目の追加整理、通常授業用フォレスタの別アプリ化。
-- 台帳正本への反映: 要確認。公開ポータルの `getSystemRegistry` は、`seiseki-kanri` のApps Scriptが接続先Google Sheetの「システム台帳」シートを読み込む。このGitHub変更だけでは公開カードは追加されないため、同じ内容を正本Sheetへ登録後に検索・表示確認する。
+- 今後の改良予定: アプリ用アイコンの差し替え、スマートフォン版タブ文字の拡大、「夏期範囲」から「目標範囲」への名称整理、フォレスタゴール5教科追加、ステップ英語の暗記マーク対応、ゴール英語のMy単語帳対応、ゴール英語でLCTを非表示・集計対象外にする処理、教材別設定による表示・宿題項目の切り替え、通常授業用フォレスタの別アプリ化。
+- 台帳正本への反映: 2026-07-28登録済み。公開カードの正本はGoogle Sheet「システム台帳」であり、本Markdownは構成確認・保守用の台帳文書。`getSystemRegistry` は正本Sheetを読み込む。登録前14件、登録後15件、ID `learning-progress` の重複なしを確認。
 - 調査根拠: Issue #1、対象GitHub `main`、GitHub Pages公開画面、公開コード。
 - 確認日: 2026-07-28
 
