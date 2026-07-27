@@ -246,6 +246,56 @@ applyAssetInfo=function(item){
   if(name.includes('請求管理'))Object.assign(patch,{'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit'});
   return Object.assign({},base,patch);
 };
+const applyQrDeliveryCorrectionsBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyQrDeliveryCorrectionsBase(item);
+  const name=String(base['システム名']||'');
+  if(name.includes('出退くん')){
+    return Object.assign({},base,{
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html',
+      '読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      '正本ファイル':'student_qr_register.html（QR登録・管理）／tablet_checkin.html（入退室読み取り）',
+      '最新版の場所':'stepkobetsu-hub/student-QR（main）',
+      '確認日':'2026年7月28日',
+      '確認根拠':'本番HTML、manifest.json、manifest-qr.json、およびスタッフ用アプリ index.html をGitHub上で再取得して確認。',
+      '作業メモ':'2026年7月27日〜28日：スタッフ用アプリの「管理者QR登録」を student_qr_register.html へ修正。Androidで不達メール管理を開く際に「入退室」起動画面が一瞬表示される事象を解消するため、manifest.json の scope を tablet_checkin.html のみに、manifest-qr.json の scope を student_qr_register.html のみに限定。不達メール管理はQRアプリの対象外とした。',
+      '仕様メモ':'QR登録・管理と入退室読み取りは同じGitHubリポジトリ内の別画面。PWA設定も各画面だけを対象とし、/student-QR/ 配下全体を対象にしない。',
+      '確認済み事項':['QR登録の正しいURL：student_qr_register.html','読み取り画面：tablet_checkin.html','スタッフ用アプリ「管理者QR登録」のリンク修正','manifest.json scope：tablet_checkin.html のみ','manifest-qr.json scope：student_qr_register.html のみ','不達メール管理をQRアプリの対象外へ分離','GitHub：stepkobetsu-hub/student-QR'],
+      '確認状況':'正しいURL・スタッフ用入口・Android PWA範囲を確認済み'
+    });
+  }
+  if(name.includes('不達メール')){
+    return Object.assign({},base,{
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html',
+      '管理者向けURL':'https://stepkobetsu-hub.github.io/student-QR/archive_delivery_failures.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      '正本ファイル':'delivery_failures.html／archive_delivery_failures.html／icons/delivery-failure-icon.svg',
+      '最新版の場所':'stepkobetsu-hub/student-QR（main）',
+      '確認日':'2026年7月28日',
+      '確認根拠':'本番HTML、専用SVGアイコン、スタッフ用アプリ index.html、およびQR用manifestのscopeをGitHub上で再取得して確認。',
+      '作業メモ':'2026年7月27日〜28日：不達メール専用アイコン（封筒・警告マーク・再確認矢印）を作成。スタッフ用アプリのカード、delivery_failures.html のfavicon、archive_delivery_failures.html のfaviconへ設定。スタッフ用アプリから別画面で開くよう変更し、QRアプリの広すぎたmanifest scopeから除外した。',
+      '仕様メモ':'不達メール管理はQR読み取りアプリではない。/student-QR/ リポジトリ内に保存されるが、QR読み取り・QR登録のPWA対象範囲には含めない。',
+      '関連カード':['STEPメッセージ','出退くんQR作成・読取'],
+      '確認済み事項':['本番画面：delivery_failures.html','非表示データ管理：archive_delivery_failures.html','専用アイコン：icons/delivery-failure-icon.svg','スタッフ用アプリのカードへ専用アイコン設定','両管理画面のfaviconへ専用アイコン設定','QRの「入退室」起動画面が表示されないようPWA範囲から分離','保存先：入退室ログ２／不達メール管理'],
+      '確認状況':'本番URL・専用アイコン・スタッフ用入口・Android起動画面対策を確認済み'
+    });
+  }
+  return base;
+};
+const linkLabelQrDeliveryBase=linkLabel;
+linkLabel=function(item,field,fallback){
+  const name=String(item['システム名']||'');
+  if(name.includes('出退くん')){
+    if(field==='利用者向けURL')return '管理者QR登録を開く';
+    if(field==='読み取りURL')return '入退室QR読み取りを開く';
+  }
+  if(name.includes('不達メール')){
+    if(field==='利用者向けURL')return '不達メール管理を開く';
+    if(field==='管理者向けURL')return '非表示データの管理を開く';
+  }
+  return linkLabelQrDeliveryBase(item,field,fallback);
+};
 const linkLabelBase=linkLabel;
 linkLabel=function(item,field,fallback){const name=String(item['システム名']||'');if(name.includes('生徒マスタ')){if(field==='Apps Script編集URL')return 'Apps Script（生徒名簿）を開く';if(field==='Apps Script WebアプリURL')return 'Apps Script Webアプリ v15（有効デプロイ）';if(field.startsWith('WebアプリURL '))return `Apps Script Webアプリ ${field.replace('WebアプリURL ','')}`}if(name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')){const timetable=TEACHER_TIMETABLE_LINKS.find(link=>link.field===field);if(timetable)return timetable.label;if(field==='Google Sheet URL 3')return 'Google Sheet（旧GAS版：講師出勤可否データ）を開く';if(field==='旧Apps Script編集URL')return 'Apps Script（旧GAS：スタンドアロン版）を開く';if(field==='旧Apps Script編集URL 2')return 'Apps Script（旧GAS：バインド型候補）を開く';if(field==='旧Apps Script編集URL 3')return 'Apps Script（旧GAS：先生出勤登録アプリ2）を開く';if(field==='旧WebアプリURL')return '旧Webアプリ（スタンドアロン版）を開く';if(field==='旧WebアプリURL 2')return '旧Webアプリ（バインド型候補）を開く'}return linkLabelBase(item,field,fallback)};
 </script>
