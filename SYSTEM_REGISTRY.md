@@ -47,7 +47,7 @@
 - 最新版の場所: `stepkobetsu-hub/foresta-step-progress` の `main` 直下
 - 通信方法: GitHub Pagesの `index.html` からApps Script WebアプリへJSON API通信。Apps Script HTML Service／iframeは不使用。
 - 認証方式: アプリ独自認証、期限付きセッション、サーバー側権限確認、本人studentId一致確認。Googleアカウントは不要。
-- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、編集画面と公開Webアプリ接続を確認、公開API version 34。実行ユーザー・アクセス設定は要確認
+- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、編集画面と公開Webアプリ接続を確認、公開API version 35。実行ユーザー・アクセス設定は要確認
 - 保存先Spreadsheet名・Spreadsheet ID・Google Sheet URL・使用シート名・各シートの役割: 管理者確認待ち
 - 現在確認済みの機能: 生徒本人による進捗入力、教科別進捗率表示、学年別進捗表示、今日の学習集計、次回の宿題、進捗入力、目標範囲管理、Point／WARM UP／TRY／Exercise管理、TRY赤×直し、Exercise、LCT入力・集計、学習日の自動記録、自動保存、宿題確認、達成率・励まし表示、スマートフォン対応、本人IDとstudentId一致によるアクセス制御、他生徒データの閲覧・更新拒否。
 - セキュリティ設計（公開コード・READMEで確認）: 本人データ限定、講師・管理者権限のサーバー側処理、未ログイン・他生徒データ・権限外操作の拒否。
