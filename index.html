@@ -418,6 +418,26 @@ applyAssetInfo=function(item){
     '確認状況':'Apps Script v42・Spreadsheet・既存デプロイ・GitHub main・差分一括保存・最新保存UI・ログイン復元を確認済み'
   });
 };
+
+const applyLearningProgress20260730RecoveryBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260730RecoveryBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。2026年7月30日の重大表示不具合を復旧し、Apps Script本番はv45。既存デプロイIDを維持している。',
+    'Webアプリ一覧':['v45（2026/07/30） 初期データ背景取得の重大表示不具合を復旧／既存デプロイID AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg を維持'],
+    '確認日':'2026年7月30日',
+    '確認根拠':'公開版で宿題、進捗入力、目標範囲、達成率・グラフ、再読み込み、ログアウトを実画面確認。GitHub Pages最終コミット 0671528365a2ff44dad4de6c6bbbf804eeb7fc45、Apps Script正本コミット d7e3199ea9f1f4bbd247adf10e54e0d62ddabbaa、Apps Script本番v45、既存デプロイID維持を確認。',
+    '作業メモ':'2026年7月30日：ログイン後に進捗データの読み込みが終わらず、進捗入力・目標範囲・達成率グラフが表示されない重大障害を復旧。原因はApps Script本番コードから filterUnitsForProfile_ が欠落してダッシュボードAPIが失敗していたこと、背景取得成功後の再描画がなかったこと、およびブラウザー側15秒タイムアウトが正常な応答より先に切れていたこと。欠落関数を復元し、成功後の再描画、失敗・中断を含む読込み表示の確実な解除、明示的な再試行表示、旧形式・破損キャッシュの安全な破棄、ダッシュボード取得上限45秒を実装した。',
+    '仕様メモ':'ダッシュボード背景取得は成功時に必ず通常画面を再描画する。失敗またはタイムアウト時も進捗入力・目標範囲タブ自体は隠さず、永続的な読込み表示を残さず「読み込みに失敗しました。再試行」を表示する。旧形式または破損した生徒別キャッシュは生徒ID単位で安全に破棄して再取得する。ログアウト用の世代管理・中断処理は通常ログイン時の初期取得と分離する。',
+    '本番反映前確認項目':['参照される関数がApps Script本番ソースに欠落していないこと','背景取得成功後に再描画関数が実行されること','タイムアウト・失敗・中断のすべてで読込み表示が解除され、失敗表示と再試行が出ること','旧形式または破損キャッシュが安全に破棄されること','公開実画面で進捗入力タブを開きデータ表示を確認すること','公開実画面で目標範囲タブを開きデータ表示を確認すること','公開実画面で達成率・グラフ表示を確認すること'],
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script v45・既存デプロイID維持','GitHub Pagesコミット 0671528365a2ff44dad4de6c6bbbf804eeb7fc45','Apps Script正本コミット d7e3199ea9f1f4bbd247adf10e54e0d62ddabbaa','宿題・進捗入力・目標範囲・達成率グラフの公開実画面表示','永続的な読込み表示の解消','再読み込み後の正常表示','ログアウト約0.41秒・古い画面へ戻らないこと'],
+    '未確認項目':[],
+    '確認状況':'重大表示不具合の復旧完了。公開版、GitHub Pages、Apps Script正本、本番v45、既存デプロイID維持を確認済み'
+  });
+};
 </script>
 
 </body>
