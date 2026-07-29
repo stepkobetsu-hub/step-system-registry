@@ -313,5 +313,45 @@ linkLabel=function(item,field,fallback){
 const linkLabelBase=linkLabel;
 linkLabel=function(item,field,fallback){const name=String(item['システム名']||'');if(name.includes('生徒マスタ')){if(field==='Apps Script編集URL')return 'Apps Script（生徒名簿）を開く';if(field==='Apps Script WebアプリURL')return 'Apps Script Webアプリ v15（有効デプロイ）';if(field.startsWith('WebアプリURL '))return `Apps Script Webアプリ ${field.replace('WebアプリURL ','')}`}if(name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')){const timetable=TEACHER_TIMETABLE_LINKS.find(link=>link.field===field);if(timetable)return timetable.label;if(field==='Google Sheet URL 3')return 'Google Sheet（旧GAS版：講師出勤可否データ）を開く';if(field==='旧Apps Script編集URL')return 'Apps Script（旧GAS：スタンドアロン版）を開く';if(field==='旧Apps Script編集URL 2')return 'Apps Script（旧GAS：バインド型候補）を開く';if(field==='旧Apps Script編集URL 3')return 'Apps Script（旧GAS：先生出勤登録アプリ2）を開く';if(field==='旧WebアプリURL')return '旧Webアプリ（スタンドアロン版）を開く';if(field==='旧WebアプリURL 2')return '旧Webアプリ（バインド型候補）を開く'}return linkLabelBase(item,field,fallback)};
 </script>
+
+<script>
+const applyLearningProgressV36Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressV36Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/foresta-step-progress/',
+    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/foresta-step-progress/',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/foresta-step-progress',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB/edit',
+    'Apps Scriptプロジェクト名':'フォレスタステップ進捗管理【開発】',
+    'Apps Script種別':'スタンドアロンWebアプリ',
+    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。v36で生徒別行取得、セッション短期キャッシュ、単元マスタ分割キャッシュへ高速化。',
+    'GASファイル一覧':['コード.gs','Index.html','DevelopmentRepair.gs','appsscript.json'],
+    '主要関数':['routePublicApi_','listHomework_','getStudentDashboard_','studentLogin','authenticateStudent_','getStudentAuthRecord_','verifySession_','getRowsByFieldValue_','cacheGetLargeJson_'],
+    'Webアプリ設定':'実行ユーザー：デプロイ実行者／アクセス権：全員（匿名ユーザーを含む）／アプリ独自認証と本人照合あり',
+    'Webアプリ一覧':['v36（2026/07/29） 生徒別読込・セッション検証・単元マスタ分割キャッシュ高速化／既存デプロイID維持'],
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg/exec',
+    '保存基盤':'Google Sheet',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI/edit',
+    'Google Sheet名':'フォレスタステップ進捗管理DB【開発】',
+    '正式Spreadsheet名':'フォレスタステップ進捗管理DB【開発】',
+    '保存先Spreadsheet ID':'1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI',
+    '使用シート名':'設定／単元マスタ／生徒プロフィール／標準範囲／生徒別目標／学習進捗／宿題／セッション／操作履歴／学年要確認／エラーログ／達成節目',
+    '正本ファイル':'index.html／apps-script/code.gs／apps-script/appsscript.json／apps-script/README.md',
+    '最新版の場所':'stepkobetsu-hub/foresta-step-progress（main）',
+    'バックアップ場所':'https://github.com/stepkobetsu-hub/foresta-step-progress/tree/main/apps-script',
+    'GitHubドキュメント':'https://github.com/stepkobetsu-hub/foresta-step-progress/blob/main/apps-script/README.md',
+    '確認日':'2026年7月29日',
+    '確認根拠':'Apps Script v36、既存デプロイID、公開アプリ、進捗管理DB、GitHub正本を実画面と実行ログで確認。',
+    '作業メモ':'更新時はGitHub正本とApps Script Headを同期し、開発用テスト生徒で認証・宿題・ダッシュボード・権限制御を確認後、既存デプロイIDを新バージョンへ更新する。Script Propertiesの値や個人情報はGitHubへ保存しない。',
+    '確認済み事項':['Apps Scriptプロジェクト名・ID・編集URL','本番v36・既存デプロイID・WebアプリURL','実行ユーザー・アクセス設定','進捗管理DB名・ID・URL','使用シート一覧と役割','GitHub正本・バックアップ・更新方法','本人studentId照合・他生徒拒否','宿題先行表示3〜5秒台'],
+    '未確認項目':[],
+    '確認状況':'Apps Script・Spreadsheet・デプロイ・GitHub正本・運用手順を確認済み'
+  });
+};
+</script>
 </body>
 </html>
