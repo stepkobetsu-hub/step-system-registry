@@ -353,5 +353,28 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script>
+const applyStepMessageAbsenceUxBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageAbsenceUxBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEPメッセージ')||name.includes('STEP配信')))return base;
+  return Object.assign({},base,{
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/step-message-center/',
+    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/step-message-center/',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/step-message-center',
+    '正本ファイル':'index.html／style.css／app.js／api.js',
+    '最新版の場所':'stepkobetsu-hub/step-message-center（main）',
+    '確認日':'2026年7月29日',
+    '確認根拠':'GitHub mainの index.html・style.css・app.js と公開画面を確認。注意書きの計算済みスタイル（赤・13px）も公開画面で確認。',
+    '作業メモ':'2026年7月29日：欠席連絡の手動更新ボタンを目立つ緑色へ変更。「※送信前に必ず更新」を最終確認時刻の右横へ配置し、自動更新表示と同じ13pxの赤字に調整。欠席連絡は更新後、新しい連絡が上に表示される新着順へ変更。CSSの改行記述不備を修正し、公開画面で反映を再確認。',
+    '仕様メモ':'送信前に「欠席連絡を手動更新」を実行する運用。欠席連絡一覧は新しい連絡を上、古い連絡を下に表示する。',
+    '確認済み事項':['公開画面：index.html','通信処理：api.js','Apps Script Webアプリ接続','欠席連絡の手動更新ボタン：緑色で強調','送信前の更新注意書き：最終確認時刻の右横・赤字13px','欠席連絡一覧：新着順（新しい連絡が上）','公開画面で注意書きの色・文字サイズを確認'],
+    '未確認項目':['Spreadsheet ID','Apps Scriptバインド先'],
+    '確認状況':'公開画面・通信処理・欠席連絡の手動更新導線・新着順表示を確認済み / 保存先は継続調査'
+  });
+};
+</script>
 </body>
 </html>
