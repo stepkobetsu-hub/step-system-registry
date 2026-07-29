@@ -43,12 +43,17 @@
 - GitHub URL: https://github.com/stepkobetsu-hub/foresta-step-progress
 - 本番ブランチ: `main`
 - 調査時main: `e3d76a80593e2a309f91ee210dcbcbb703c48bd0`
-- 正本ファイル: `index.html`、`README.md`、`package.json`、`tests/`
+- 正本ファイル: `index.html`、`README.md`、`package.json`、`tests/`、`apps-script/code.gs`、`apps-script/appsscript.json`、`apps-script/README.md`
 - 最新版の場所: `stepkobetsu-hub/foresta-step-progress` の `main` 直下
 - 通信方法: GitHub Pagesの `index.html` からApps Script WebアプリへJSON API通信。Apps Script HTML Service／iframeは不使用。
 - 認証方式: アプリ独自認証、期限付きセッション、サーバー側権限確認、本人studentId一致確認。Googleアカウントは不要。
-- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、編集画面と公開Webアプリ接続を確認、公開API version 35。実行ユーザー・アクセス設定は要確認
-- 保存先Spreadsheet名・Spreadsheet ID・Google Sheet URL・使用シート名・各シートの役割: 管理者確認待ち
+- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、プロジェクトID `1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB`、編集URL https://script.google.com/home/projects/1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB/edit、公開API version 36、既存デプロイID `AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg`、WebアプリURL https://script.google.com/macros/s/AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg/exec。実行ユーザーはデプロイ実行者（stepkobetsu@gmail.com）、アクセス設定は全員（匿名ユーザーを含む）。アプリ独自認証・期限付きセッション・本人studentId照合を維持
+- 保存先Spreadsheet: 「フォレスタステップ進捗管理DB【開発】」、Spreadsheet ID `1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI`、URL https://docs.google.com/spreadsheets/d/1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI/edit
+- 使用シートと役割: `設定`（アプリ設定）、`単元マスタ`（教材・科目・単元設定）、`生徒プロフィール`（表示用プロフィール）、`標準範囲`（学年別標準範囲）、`生徒別目標`（個別目標範囲）、`学習進捗`（Point・WARM UP・TRY・LCT・学習日・周回）、`宿題`（宿題項目・本人申告・講師確認）、`セッション`（ハッシュ化トークン・期限・失効）、`操作履歴`（監査ログ）、`学年要確認`（生徒マスタ学年競合）、`エラーログ`（予期しない内部エラー）、`達成節目`（達成メッセージ・キャラクター）
+- 参照マスタ: 生徒マスタSpreadsheet ID `1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk` の `☆マスタ`、講師マスタSpreadsheet ID `1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E` の `講師マスター`。認証用パスワードや秘密値はScript Propertiesで管理し、台帳・GitHubへ記載しない
+- Apps Script正本のGitHub保存先: https://github.com/stepkobetsu-hub/foresta-step-progress/tree/main/apps-script
+- バックアップ方法: デプロイ前にApps Script各ファイルとマニフェストを `apps-script/` へ保存し、取得日・元バージョン・デプロイIDを `apps-script/README.md` に記録。Script Propertiesの値と個人情報は保存しない
+- 更新方法: GitHub正本とApps Script Headを同期し、開発用テスト生徒で認証・宿題・ダッシュボード・権限制御を確認後、新バージョンを作成して既存デプロイIDを更新する。新規デプロイIDは作成しない
 - 現在確認済みの機能: 生徒本人による進捗入力、教科別進捗率表示、学年別進捗表示、今日の学習集計、次回の宿題、進捗入力、目標範囲管理、Point／WARM UP／TRY／Exercise管理、TRY赤×直し、Exercise、LCT入力・集計、学習日の自動記録、自動保存、宿題確認、達成率・励まし表示、スマートフォン対応、本人IDとstudentId一致によるアクセス制御、他生徒データの閲覧・更新拒否。
 - セキュリティ設計（公開コード・READMEで確認）: 本人データ限定、講師・管理者権限のサーバー側処理、未ログイン・他生徒データ・権限外操作の拒否。
 - 今後の改良予定: アプリ用アイコンの差し替え、スマートフォン版タブ文字の拡大、「夏期範囲」から「目標範囲」への名称整理、フォレスタゴール5教科追加、ステップ英語の暗記マーク対応、ゴール英語のMy単語帳対応、ゴール英語でLCTを非表示・集計対象外にする処理、教材別設定による表示・宿題項目の切り替え、通常授業用フォレスタの別アプリ化。
