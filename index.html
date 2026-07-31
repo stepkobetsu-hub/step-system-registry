@@ -489,5 +489,32 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const applyLearningProgress20260731FinalOptimizationBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260731FinalOptimizationBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps Script概要':'生徒・講師・管理者認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。Google Sheetを復旧用原本として維持しながら、Supabaseを進捗・目標範囲・宿題・ログイン関連データの本番保存先として段階導入。生徒単位の絞り込み取得、差分一括保存、読込の並列化、短時間キャッシュを実装。',
+    '保存基盤':'Supabase（学習進捗・生徒別目標・宿題・生徒プロフィール・生徒認証）／Google Sheet（単元等のマスタ・監査・復旧用原本）',
+    'データベース名':'Supabase learning-progress（Northeast Asia / Tokyo）',
+    'Supabase URL':'https://wisedgcgwaebtkprdhth.supabase.co',
+    '使用シート名':'Supabase：learning_progress／student_targets／homework／student_profiles／student_auth。Google Sheet：単元・標準範囲等のマスタ、操作履歴、エラーログ、達成節目および復旧用データ。Supabase切替フラグをfalseに戻すことでGoogle Sheet経路へ復旧可能。',
+    '正本ファイル':'stepkobetsu-hub/foresta-step-progress：index.html／apps-script/code.gs／apps-script/SupabaseStorage.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json',
+    '最新版の場所':'stepkobetsu-hub/foresta-step-progress。高速化の最終Apps Script候補はブランチ agent/supabase-login-homework、code.gs commit e35f46c0c2f1432c2e295f9d33f5f1e541bc3db7。PR #3は未統合のため、mainとの差異を解消してから正本確定する。',
+    '確認日':'2026年7月31日',
+    '確認根拠':'Supabase移行・件数照合、差分書込み試験、既存デプロイ更新後の公開画面保存、再読込後の保持を確認。最終実画面計測は進捗入力 通信約5.0秒・処理約2.8秒（最長homework約1.2秒）、目標範囲 通信約4.3秒・処理約2.1秒。トップ宿題ページと達成率グラフはキャッシュ小型化後に正常速度へ復旧。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年7月31日：Supabase移行後の保存失敗と速度問題を段階修正。student_id等の一意キーでupsertし、同一リクエスト内の重複行を排除。生徒別に対象行だけ取得・更新し、Supabase利用時はGoogle Sheet用の全体ロックを回避。進捗・目標範囲は連続変更を差分一括送信する。ダッシュボードでは進捗・目標・宿題を並列取得し、同一APIの重複読込を抑止。目標IDと選択可能単元を10分キャッシュし、保存後の目標範囲全体再計算を廃止。保存用単元キャッシュをunitId・subject・series・hasLctだけに小型化し、既存キャッシュがある場合は再作成しないことでトップ画面のグラフ表示遅延を解消。保存結果には通信時間・サーバー処理時間・最長処理区間を表示する。移行関数はSUPABASE_ENABLED=trueでは再実行を拒否し、誤った再移行を防止。Google Sheetの復旧用データは削除していない。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'現在の保存経路は GitHub Pages → Apps Script → Supabase。サービスロールキーはApps ScriptのScript Propertiesだけで管理し、GitHub・台帳・画面へ保存しない。SupabaseはRLSを有効化し、anon/authenticatedの直接アクセスを許可しない。進捗保存では宿題の自動生成と監査記録を同期して行う。目標範囲の複数選択は800msの待機後、変更行を1回のAPIでまとめて保存する。現構成ではApps Script経由の通信固定費があるため、通常保存4～5秒程度を実用上の到達点とする。1～2秒台を目指す場合はSupabase Auth・RLS・RPCを含む直接保存方式の別設計が必要。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Supabaseへの進捗・目標範囲・宿題・生徒プロフィール・生徒認証の段階移行','生徒単位の絞り込み読込と差分一括保存','ダッシュボードの並列取得と重複API抑止','進捗・目標範囲の保存時間表示','進捗入力 通信約5.0秒・処理約2.8秒','目標範囲 通信約4.3秒・処理約2.1秒','トップ宿題ページ・グラフ表示の速度復旧','Google Sheet復旧経路の維持','移行関数の本番再実行防止','秘密鍵をScript Propertiesだけで管理'],
+    '未確認項目':['PR #3をmainへ統合し、Apps Script本番コードとGitHub正本を完全一致させる作業'],
+    '確認状況':'Supabase移行と保存高速化を本番で確認。トップ画面は正常、進捗・目標範囲は約4～5秒。復旧経路とセキュリティを維持。GitHub PR #3のmain統合のみ正本整理として残る。'
+  });
+};
+</script>
+
 </body>
 </html>
