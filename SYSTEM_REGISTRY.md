@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-07-31  
+最終更新: 2026-08-01
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -23,11 +23,30 @@
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | リポジトリ内一式 | GitHub Pages | `main`へ反映してPages確認 | 2026-07-20 | 空の `eacher-portal` は正本ではない |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `student_qr_register.html`、`tablet_checkin.html`、入退室ログ2 | GitHub＋Google Sheet | Pages更新後、`tablet_checkin`保存を確認 | 2026-07-21 | 上記2ファイルを現行入口として扱う |
+| 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`tablet_checkin.html`、`gas/MyQrApi.js`、入退室ログ2 | GitHub＋Apps Script＋Google Sheet | Pagesと既存Apps Scriptデプロイを更新し、塾生本人QR・スタッフ登録・タブレット読取を確認 | 2026-08-01 | 塾生用 `my_qr.html` とスタッフ用 `student_qr_register.html` を分離。塾生は期限付きセッションのみ端末保存 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1 | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Spreadsheet `請求書202608_請求 NEW`、Apps Script project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | Sheetの「拡張機能→Apps Script」で編集し、新バージョンを作成して既存デプロイIDを更新 | 2026-07-22 | 上記プロジェクトと本番デプロイIDを現行正本とし、旧版・試作を変更しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
+
+## 登録詳細：出退くんQR作成・読取
+
+- ID: `qr-register`
+- 状態: 本番使用中
+- 塾生用URL: https://stepkobetsu-hub.github.io/student-QR/my_qr.html
+- スタッフ用QR登録・発行URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html
+- タブレット読取URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+- GitHub: https://github.com/stepkobetsu-hub/student-QR （本番ブランチ `main`）
+- Apps Script: 非公開の本番プロジェクト、バージョン18
+- デプロイ: 既存デプロイIDを維持。具体的なIDと `/exec` URLは非公開の運用記録で管理
+- 生徒マスタ: 非公開の本番スプレッドシートを参照。認証列・QR保存列・列構成は非公開
+- 本人認証: 初回は生徒ID・パスワード。在籍中のみ許可し、パスワードは端末保存しない。端末には6時間の期限付きセッショントークンだけを保存
+- アクセス制御: サーバーはトークンに紐づく生徒IDから本人のQRデータを取得し、クライアント指定の生徒IDを使用しない。他生徒のQR取得を禁止
+- QR生成: 本人のQRデータをブラウザ内でQR画像化。未登録の場合は自動発行せず、教室への案内を表示
+- スタッフ機能: 既存のQR登録・発行・確認ページと既存スタッフ認証経路は維持
+- 変更前バックアップ: 2026-08-01取得。Apps Script Head、マニフェスト、既存デプロイ（v15）を保存してから更新
+- 検証: 自動テスト10件、APIヘルスチェック、未認証管理API拒否、改ざん・失効・期限切れ拒否、既存入退室API応答を確認（バージョン18）
+- 確認日: 2026-08-01
 
 ## 登録詳細：学習進捗管理
 
