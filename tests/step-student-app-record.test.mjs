@@ -20,10 +20,18 @@ test('the record preserves the confirmed pre-design functional scope', () => {
 });
 
 test('design work is explicitly separated from the confirmed specification record', () => {
-  assert.match(page, /デザイン変更開始前までの確定仕様/);
-  assert.match(page, /別の変更履歴として管理/);
+  assert.match(page, /デザイン変更開始前までに確定した仕様/);
+  assert.match(page, /別管理履歴/);
   assert.match(registry, /デザイン変更開始前までに確定したシステム仕様/);
   assert.match(registry, /採用デザイン実装は本記録に含めず/);
+});
+
+test('the rejected design and stable restoration are recorded separately', () => {
+  for (const text of ['デザイン全面変更の採用撤回','2f55e36','a85e3bd','step-student-v15-rollback','not planned']) {
+    assert.match(page, new RegExp(text));
+    assert.match(registry, new RegExp(text));
+  }
+  assert.match(registry, /確定仕様を上書きせず/);
 });
 
 test('the new record contains no private deployment identifiers or backend URLs', () => {
