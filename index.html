@@ -461,6 +461,33 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyLearningProgress20260731SupabaseBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260731SupabaseBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。2026年7月31日に学習進捗と生徒別目標の本番保存先をSupabaseへ切り替えた。その他のデータと復旧用原本はGoogle Sheetに維持。',
+    'GASファイル一覧':['コード.gs','Index.html','DevelopmentRepair.gs','SupabaseStorage.gs','appsscript.json（GitHub正本では apps-script/required-textbook.gs を分離保管）'],
+    'Webアプリ一覧':['v53（2026/07/31） Supabase保存先切替／既存デプロイID AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg を維持'],
+    '保存基盤':'Supabase（学習進捗・生徒別目標）／Google Sheet（その他データ・復旧用）',
+    'データベース名':'Supabase learning-progress（Northeast Asia / Tokyo）',
+    'Supabase URL':'https://wisedgcgwaebtkprdhth.supabase.co',
+    '使用シート名':'Google Sheet：設定／単元マスタ／生徒プロフィール／標準範囲／宿題／セッション／操作履歴／学年要確認／エラーログ／達成節目。Supabase：learning_progress／student_targets。Google Sheetの生徒別目標・学習進捗も復旧用に保持。',
+    '正本ファイル':'index.html／apps-script/code.gs／apps-script/SupabaseStorage.gs／apps-script/required-textbook.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json／apps-script/README.md',
+    '最新版の場所':'stepkobetsu-hub/foresta-step-progress（main） commit d508bdb7547ebe9bb22f9f0c4cdeea2bd61cc622',
+    '確認日':'2026年7月31日',
+    '確認根拠':'Supabase移行実行ログで学習進捗429件・生徒別目標3,761件が一致。SUPABASE_ENABLED=trueで検証関数を実行し、既存デプロイIDを新バージョンへ更新。公開画面で管理者ログイン、テスト生徒表示、進捗保存、再読込後の保持を確認。GitHub PR #2をmainへsquash merge。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年7月31日：Supabaseプロジェクト learning-progress を東京リージョンで作成。public.learning_progress と public.student_targets を作成し、RLS有効・anon/authenticated権限なし・service_roleのみApps Scriptから利用。接続情報はScript Properties（SUPABASE_URL／SUPABASE_SERVICE_ROLE_KEY／SUPABASE_ENABLED）で管理し、秘密鍵をGitHubへ保存しない。SUPABASE_ENABLED=falseでGoogle Sheetへ即時復旧可能。移行件数は429件／3,761件。未使用の重複デプロイ AKfycbx-J_MyY-vOHNhRldgOE85sHN_K7wuIeOcWkZcmehL7juficJqtyRHN5S1XKKWmO_W6Ew が作成されたが、公開画面は従来デプロイIDを継続使用。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'学習進捗と生徒別目標の読込・保存はSUPABASE_ENABLED=trueの場合にSupabase RESTを使用する。生徒別目標は1,000件単位でページ分割取得し、全件取得漏れを防ぐ。進捗は student_id＋unit_id＋school_year＋round_number、生徒別目標は student_id＋unit_id を一意キーとしてupsertする。Google Sheetは削除せず復旧経路として保持する。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Supabase learning-progress 東京リージョン','learning_progress 429件の移行・件数一致','student_targets 3,761件の移行・件数一致','SUPABASE_ENABLED=trueで読込成功','テスト生徒の進捗保存・再読込保持','Google Sheetへの復旧フラグを維持','既存公開デプロイID維持','GitHub main commit d508bdb7547ebe9bb22f9f0c4cdeea2bd61cc622'],
+    '未確認項目':['管理者一覧・宿題チェックなどGoogle Sheet継続部分の追加高速化'],
+    '確認状況':'Supabaseへの学習進捗・生徒別目標移行と本番切替を完了。公開画面で読込・保存・再読込保持を確認。Google Sheet復旧経路を維持。'
+  });
+};
+</script>
 
 </body>
 </html>
