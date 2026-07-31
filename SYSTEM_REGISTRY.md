@@ -7,7 +7,7 @@
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（17件）
+## 登録システム（18件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +28,62 @@
 | 請求管理システムV3.1 | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Spreadsheet `請求書202608_請求 NEW`、Apps Script project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | Sheetの「拡張機能→Apps Script」で編集し、新バージョンを作成して既存デプロイIDを更新 | 2026-07-22 | 上記プロジェクトと本番デプロイIDを現行正本とし、旧版・試作を変更しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
+| STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## 登録詳細：STEP塾生アプリ（step-hub）開発記録
+
+- ID: `step-student-app`
+- 更新日・仕様基準日: 2026年8月1日
+- 状態: 本番使用中
+- 目的: 既存の塾生向けシステムを一つにまとめ、スマートフォンのホーム画面から利用できる塾生専用PWAとして運用する。ホームページのリンク集ではなく、塾生専用アプリを正本とする。
+- 利用者向けURL: https://stepkobetsu-hub.github.io/step-hub/
+- GitHub: https://github.com/stepkobetsu-hub/step-hub （本番ブランチ `main`）
+- 正本ファイル: `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js`
+
+### 採用対象
+
+- 成績管理: 塾生本人用ページ。共通ログイン対応
+- 学習進捗管理: 塾生本人ページ。共通ログイン対応
+- フォレスタプラス: 森塾システムへの入口。外部サービスのため従来のログイン方式を継続
+- お知らせ・リンク集: 年間予定、休み講習、その他案内
+- 自分のQR: 入退室用QR表示
+
+### 確定した共通ログイン仕様
+
+- 初回のみ生徒ID・パスワードを入力する。
+- 以降は、自分のQR・成績管理・学習進捗管理を再入力なしで利用できる。
+- フォレスタプラスは共通ログイン対象外。
+- パスワードは端末へ保存せず、期限付きセッショントークンだけを利用する。
+
+### 自分のQR・高速化・権限制御
+
+- 塾生専用ページで本人専用QRだけを表示する。
+- 他人のQR取得、URL改ざん、他生徒ID指定を拒否する。
+- セッション失効・期限切れ時は再ログインを要求する。
+- キャッシュ、共通ログイン、即時表示、ログアウト時のキャッシュ削除、セッション期限管理を実装済み。
+- 塾生アプリから管理者画面へ入れてしまう重大不具合を修正済み。API側でも本人確認を行い、本人だけにアクセスを許可する。
+
+### デザイン変更前に完了していた画面改善
+
+- QR画面: ログアウトを右上へ移動、戻るボタンを大型化、生徒ID・氏名・校舎名を表示、QRデザインを改善。
+- STEP塾生アプリ: フォレスタプラス・学習進捗・成績管理の用途別アイコンへ変更し、STEPカラーへ統一。
+
+### 追加済みメニュー
+
+- 愛知全県模試: 全県模試日程、全県模試範囲、高校コード表
+- 愛知県入試制度: 高校入試情報、マークシート方式、入試制度変更
+- 学習資料: 年間カレンダー、休み講習、高校入試過去問
+
+### PWA・完了済み機能
+
+- ホーム画面追加、manifest、Service Worker、キャッシュ管理に対応済み。
+- 共通ログイン、QR、QR高速化、本人限定アクセス、成績管理、学習進捗管理、フォレスタプラス入口、愛知県入試制度、愛知全県模試、学習資料、PWAを完了済み機能として扱う。
+
+### 記録範囲
+
+- 本記録は、2026年8月1日時点でデザイン変更開始前までに確定したシステム仕様を保存するもの。
+- 以後のデザイン試作、画像作成、画面レイアウト検討、アイコン画像の試作および採用デザイン実装は本記録に含めず、別の変更履歴として管理する。
+- 公開台帳には非公開のSpreadsheet ID、Apps ScriptプロジェクトID、デプロイID、バックエンドURL、認証列構成を記載しない。
 
 ## 登録詳細：出退くんQR作成・読取
 
