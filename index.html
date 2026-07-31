@@ -516,5 +516,28 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const applyLearningProgress20260801StudentAuthRecoveryBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260801StudentAuthRecoveryBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps Script概要':'生徒認証はGoogle Sheetの生徒マスタ正本を使用。講師・管理者認証は従来どおり。進捗・目標範囲・宿題はApps Script経由でSupabaseへ保存する。期限付きセッション、本人studentId照合、差分一括保存、読込の並列化、短時間キャッシュを維持。',
+    '保存基盤':'認証：Google Sheet（生徒マスタ）／Supabase：学習進捗・生徒別目標・宿題・生徒プロフィール／Google Sheet：単元等のマスタ・監査・復旧用原本',
+    '使用シート名':'Supabase：learning_progress／student_targets／homework／student_profiles。student_authテーブルは削除せず保持するが、本番の生徒ログインには使用しない。Google Sheet：生徒マスタ認証、単元・標準範囲等のマスタ、操作履歴、エラーログ、達成節目および復旧用データ。',
+    '確認日':'2026年8月1日',
+    '確認根拠':'Supabase生徒認証経路で複数生徒が正しいID・パスワードでもINTERNAL_ERRORとなる障害を確認。SupabaseStorage.gsを修正し、生徒認証をGoogle Sheet正本へ戻した既存デプロイを更新。更新後、生徒IDでログイン成功を実画面確認。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月1日：講師・管理者はログイン可能だが、生徒のみ複数IDで「処理に失敗しました」となる障害が発生。Supabaseのstudent_auth認証経路を本番既定から外し、生徒ログインをGoogle Sheetの生徒マスタ正本へ復旧した。進捗・目標範囲・宿題のSupabase保存は継続し、速度改善・保存データには影響なし。SupabaseStorage.gs修正コミット 9530bda4b9655e226e78a1fc98026856f3d4322c。student_authテーブルは将来調査用に保持し、削除・再移行は行わない。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'本番ではSUPABASE_AUTH_ENABLEDを設定しない。未設定のまま生徒認証はGoogle Sheetを使用する。SUPABASE_ENABLED=trueは維持し、進捗・目標範囲・宿題のSupabase運用を継続する。SUPABASE_URLとSUPABASE_SERVICE_ROLE_KEYも変更しない。student_authテーブルを本番認証へ戻す場合は、別途原因調査と複数生徒での事前検証が完了するまでSUPABASE_AUTH_ENABLED=trueにしない。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'生徒認証をGoogle Sheet正本へ復旧','更新後の生徒IDログイン成功','講師・管理者ログイン経路は変更なし','進捗・目標範囲・宿題のSupabase保存を維持','SUPABASE_ENABLED=trueを維持','SUPABASE_AUTH_ENABLEDは未設定','student_authテーブルは保持・本番未使用','SupabaseStorage.gs commit 9530bda4b9655e226e78a1fc98026856f3d4322c'],
+    '未確認項目':['Supabase student_auth経路の障害原因調査（本番運用には使用せず保留）','PR #3をmainへ統合し、Apps Script本番コードとGitHub正本を完全一致させる作業'],
+    '確認状況':'生徒ログイン障害を復旧済み。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabaseの構成で本番動作を確認。Supabase認証は停止したまま保留。'
+  });
+};
+</script>
+
 </body>
 </html>
