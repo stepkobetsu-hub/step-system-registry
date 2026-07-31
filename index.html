@@ -539,5 +539,29 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const applyLearningProgress20260801CanonicalMainBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260801CanonicalMainBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  const unresolved=(Array.isArray(base['未確認項目'])?base['未確認項目']:[]).filter(value=>
+    !String(value).includes('PR #3') && !String(value).includes('GitHub正本を完全一致')
+  );
+  return Object.assign({},base,{
+    '状態':'本番',
+    '最新版の場所':'stepkobetsu-hub/foresta-step-progress main commit af603f5f3c449d39a0b0f36a89ea06aba383bade。PR #4で本番相当コードとmain後発変更を統合済み。',
+    '確認日':'2026年8月1日',
+    '確認根拠':'main最新版 af603f5f3c449d39a0b0f36a89ea06aba383bade を再取得し、apps-script/code.gsとapps-script/SupabaseStorage.gsのJavaScript構文確認、保存アクション名、Google Sheet生徒認証既定、秘密情報非混入を確認。PR #4をsquash mergeし、競合した旧PR #3は参照用として閉鎖。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月1日：GitHub mainの後発8コミットと旧PR #3の21コミットを新しい統合ブランチで競合なく統合。現行のsaveStudentProgressBatch、setOwnTargetChanges、saveVocabularyProgress、saveVocabularyTargets、confirmHomework、confirmHomeworkGroup、setStudentTargetをSAVE_ACTIONS_へ追加し、ログアウト時に保存通信を読取通信として中断する事故を防止。PR #4をsquash mergeし、main commit af603f5f3c449d39a0b0f36a89ea06aba383bade を正本化。旧PR #3はPR #4へ移行した旨を記録して閉鎖。Apps Script本番デプロイとSupabaseデータには今回変更なし。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'GitHub正本はmainを使用する。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabase。保存中断防止のSAVE_ACTIONS_には現行の書込API名を必ず含める。今後の修正はmain commit af603f5f3c449d39a0b0f36a89ea06aba383bade 以降を基準とし、閉鎖済みPR #3を直接基準にしない。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'本番相当コードとGitHub mainの正本化','PR #4 squash merge','main commit af603f5f3c449d39a0b0f36a89ea06aba383bade','現行保存アクションのログアウト中断防止','main上のApps Script 2ファイル構文確認','旧PR #3の閉鎖'],
+    '未確認項目':unresolved,
+    '確認状況':'GitHub mainを本番相当コードの正本として確定。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabase。保存中断防止を統合済み。Apps Script本番・Supabaseデータは変更なし。'
+  });
+};
+</script>
+
 </body>
 </html>
