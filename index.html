@@ -673,6 +673,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyPointManager20260802MigrationBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManager20260802MigrationBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    'GitHub正本':'stepkobetsu-hub/student-QR（main）',
+    '主要ファイル':'points_manager.html / gas/PointManager.js / gas/コード.js',
+    'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '公開URL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+    '正本スプレッドシート':'入退室ログ２（1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A）',
+    '最新版の場所':'student-QR main。ポイント管理画面最新 commit 1077a912b79c07c276c4b5397ba0fd81d53f6b01、Apps Script v37、既存デプロイIDを維持。',
+    '確認日':'2026年8月2日',
+    '確認根拠':'公開画面とGitHub正本を照合。生徒マスタは☆マスタB列の1を在籍、0を退塾予定、空欄を退塾として扱う。旧ポイント移行元Excelは生徒コード・氏名を☆マスタと照合し、重複・未登録・氏名不一致なしを確認。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月2日：ポイント管理画面を運用向けに改善。コード順、ひらがな検索、検索ボタン、表示数表記、全生徒の特別ポイント履歴・使用履歴、一覧の全選択、学年複数選択（全学年・全小学生・全中学生・全高校・全解除）、外側クリックで学年選択を閉じる動作、詳細画面右上の閉じるボタン、ポイント管理専用アイコンを追加。旧ポイント制度から正数88名・合計6,942ポイントを2026年8月2日付で「ポイント履歴」へ移行し、「ポイント操作ログ」に88件の監査記録を保存。0ポイント3名は0登録禁止仕様により対象外。既存履歴は変更していない。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'在籍表示は☆マスタB列を正本とし、1=在籍、0=退塾予定（在籍生の初期表示に含む）、空欄=退塾。学年選択の「全解除」はチェックを全て外し、学年指定なしとして全学年を表示する。ポイント管理ページは専用の青いポイントアイコンを指定し、QR読取画面の緑色アイコンを継承しない。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'ポイント管理画面 commit 1077a912b79c07c276c4b5397ba0fd81d53f6b01','Apps Script v37・既存デプロイID維持','☆マスタB列による在籍・退塾予定・退塾判定','旧ポイント移行88名・合計6,942ポイント','移行監査ログ88件','移行時の重複・未登録・氏名不一致なし','0ポイント3名を仕様により未登録']
+  });
+};
+</script>
 
 </body>
 </html>
