@@ -648,5 +648,31 @@ organizeEntryImport=function(items){
 };
 </script>
 
+<script>
+const applyPointManager20260802AuthFinalBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManager20260802AuthFinalBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理')&&!name.includes('生徒QR'))return base;
+  const isPoint=name.includes('ポイント管理');
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    'GitHub正本':'stepkobetsu-hub/student-QR（main）',
+    '正本スプレッドシート':'入退室ログ２（1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A）',
+    '旧ファイル':'入退室ログ（1zNK...）。今後使用しない旧ファイル。削除せず保管。',
+    '接続関係':'QR入退室→入退室ログ２「ログ」、自動ポイント・特別ポイント・ポイント使用→同「ポイント履歴」、STEP塾生アプリ残高→ポイント履歴の生徒番号別合計。',
+    '運用開始日':'2026年8月3日',
+    '認証':isPoint?'スタッフ用アプリのsystemPortalSessionTokenをポイント管理APIが正式認証元のverifySystemPortalへサーバー間照会。localStorageの氏名・AK・期限は認可に使用しない。AK=2・3・4、基本設定変更はAK=4。別プロジェクトのCacheServiceは共有しない。':base['認証'],
+    '最新版の場所':'student-QR main：PointManager 96109e8、画面 6316bfc、自動ポイント 505d852、不達処理 85222d3。スタッフ用アプリ認証終了処理：seiseki-kanri 80394d2。',
+    '確認日':'2026年8月2日',
+    '確認根拠':'スタッフ用アプリから再ログインなしで遷移。正式認証元による未認証・改変・権限拒否、AK=2/3/4許可・AK=1拒否を確認。ダミー1001で特別+5、残高超過使用-5、二重送信防止、入室のみ0、9分0、11分+1、同日再来+0を確認。不達イベント1件のみ記録し正常配信は不達未記録。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月2日：期限切れ原因は、スタッフ用systemPortalSessionTokenを生徒QR用studentQrVerify／別プロジェクトのセッション領域で照合していたこと。verifySystemPortalへ統一し、別Apps ScriptのCacheServiceを共有しない構成へ修正。Apps Script v33を既存デプロイIDへ反映。全試験後、ログ・不達メール管理・ポイント履歴・ポイント操作ログの試験データを値だけ削除し、各0件、見出し・構造維持を確認。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'スタッフ共通認証のサーバー検証','AK=2・3・4許可／AK=1拒否','未認証・期限切れ・改変トークン拒否','特別ポイント・使用・残高下限0','二重送信防止','自動ポイント10分・同日1回制限','不達と正常配信の振り分け','最終初期化4シート各0件','Apps Script v33・既存デプロイID維持']
+  });
+};
+</script>
+
 </body>
 </html>
