@@ -698,5 +698,40 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const organizeYuuchoEmployeeMaster20260802Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeYuuchoEmployeeMaster20260802Base(items);
+  if(!out.some(x=>String(x['システム名']||'').includes('ゆうちょBIZ新規登録用従業員マスタ'))){
+    out.push({
+      'システム名':'ゆうちょBIZ新規登録用従業員マスタ',
+      '正式名称':'ゆうちょBIZ新規登録用従業員マスタ',
+      '分類':'給与・従業員管理',
+      '状態':'本番',
+      '概要':'給与明細ファイルの「講師マスター」から、ゆうちょBIZへ新規従業員を登録するための13列CSVを作成するスタッフ用Webアプリ。対象者を選択し、銀行・支店・口座情報を確認または修正してShift_JIS形式で出力する。',
+      'GitHub正本':'stepkobetsu-hub/seiseki-kanri（main）',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/seiseki-kanri',
+      '主要ファイル':'apps-script/yuucho_employee_master.gs',
+      'Apps ScriptプロジェクトID':'12-7cuP4lYxLIFlVfRZTCCSL4MoEzU2j_CR6Ab_PrIHYhYlOI9aH9o1dS',
+      'Apps Script編集URL':'https://script.google.com/home/projects/12-7cuP4lYxLIFlVfRZTCCSL4MoEzU2j_CR6Ab_PrIHYhYlOI9aH9o1dS/edit',
+      'デプロイID':'AKfycbwYzQ1tM1mWRLG6jOxBirAuSUCMb41bkDsn5vviGUjDPmFKjJNCl5jdz7NFa4L45J8yvQ',
+      '公開URL':'https://script.google.com/macros/s/AKfycbwYzQ1tM1mWRLG6jOxBirAuSUCMb41bkDsn5vviGUjDPmFKjJNCl5jdz7NFa4L45J8yvQ/exec',
+      '利用者向けURL':'https://script.google.com/macros/s/AKfycbwYzQ1tM1mWRLG6jOxBirAuSUCMb41bkDsn5vviGUjDPmFKjJNCl5jdz7NFa4L45J8yvQ/exec',
+      '正本スプレッドシート':'給与明細2026-6-（1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E）',
+      '使用シート名':'講師マスター。A=講師コード、B=氏名、C=読み仮名、H=金融機関、I=記号・支店、J=預金種目、K=口座番号。',
+      '認証':'STEPスタッフ共通認証。正式認証APIのstaffLogin／verifySystemPortalをサーバー側で使用。AK=2・3・4のみ許可。',
+      '出力仕様':'ゆうちょBIZ登録CSVと同じ13列。Shift_JIS（CP932）、CSV引用符処理、従業員コード1=講師コード、従業員コード2=空欄。ゆうちょは記号から店番へ変換し、8桁口座番号は末尾1桁を除いて7桁化。',
+      '個人情報範囲':'アプリへ返すのは講師コード・氏名・読み仮名・銀行・支店／記号・預金種目・口座番号のみ。マイナンバー、住所、生年月日、電話、メール等は取得・返却しない。',
+      '更新方法':'GitHub mainの正本コードをApps Scriptへ反映し、新しいバージョンで既存デプロイIDを更新する。スタッフ用アプリのカードURLも同じ公開URLを維持する。',
+      '確認日':'2026年8月2日',
+      '確認根拠':'添付の郵貯BIZ登録.csv（13列・CP932）と給与明細2026-6-.xlsxの講師マスターを比較して列対応を確定。Apps Script v1を「全員」アクセスで公開し、公開URLでログイン画面の表示を確認。',
+      '確認済み事項':['添付CSVの13列見出し照合','講師マスターの列対応','ゆうちょ記号12000→店番200、12010→201の変換','Shift_JIS CSV生成','CSV対象者は初期未選択','銀行情報の画面修正','AK=2・3・4のスタッフ認証','個人番号等の不要情報を返さない','Apps Script v1公開','スタッフ用アプリへカード追加']
+    });
+  }
+  return out;
+};
+</script>
+
 </body>
 </html>
