@@ -733,5 +733,22 @@ organizeEntryImport=function(items){
 };
 </script>
 
+
+<script>
+const applyYuuchoEmployeeMaster20260802V3Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyYuuchoEmployeeMaster20260802V3Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ゆうちょBIZ新規登録用従業員マスタ'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    '最新版の場所':'Apps Script v3。既存デプロイIDを維持。GitHub正本はstepkobetsu-hub/seiseki-kanri mainのapps-script/yuucho_employee_master.gs。',
+    '確認日':'2026年8月2日',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月2日：ゆうちょ口座番号が7桁の場合にも末尾チェック番号を除くよう修正。CSVダウンロード直前に「全銀ファイルではなくCSVファイルを選択してアップロード」と確認表示を追加。講師マスターA2:B2へ公開アプリの起動リンクを追加。Apps Script v3へ更新し、既存URLを維持。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'7桁ゆうちょ口座の末尾チェック番号除外','CSVファイル選択の注意確認','講師マスター上部の起動リンク','Apps Script v3・既存デプロイID維持']
+  });
+};
+</script>
+
 </body>
 </html>
