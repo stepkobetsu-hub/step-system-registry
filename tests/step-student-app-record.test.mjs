@@ -9,7 +9,13 @@ test('the student app development record is registered in the portal and ledger'
   assert.match(page, /'ID':'step-student-app'/);
   assert.match(page, /STEP塾生アプリ（step-hub）開発記録/);
   assert.match(registry, /## 登録詳細：STEP塾生アプリ（step-hub）開発記録/);
-  assert.match(registry, /登録システム（18件）/);
+  assert.match(registry, /登録システム（19件）/);
+});
+
+test('the STEP invoice PDF system is registered without production sending', () => {
+  assert.match(page, /'ID':'step-invoice-pdf'/);
+  assert.match(page, /PRODUCTION_SEND_APPROVED=false/);
+  assert.match(registry, /STEP請求書PDF作成・配信システム/);
 });
 
 test('the record preserves the confirmed pre-design functional scope', () => {

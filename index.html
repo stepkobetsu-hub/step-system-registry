@@ -799,5 +799,43 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script>
+const organizeStepInvoicePdf20260802Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeStepInvoicePdf20260802Base(items);
+  if(!out.some(item=>item['ID']==='step-invoice-pdf'))out.push({
+    'ID':'step-invoice-pdf',
+    'システム名':'STEP請求書PDF作成・配信システム',
+    '正式名称':'STEP請求書PDF作成・配信システム',
+    '分類':'請求書・配信',
+    '状態':'テスト運用',
+    '利用者':'STEPスタッフ',
+    '運用担当':'管理者',
+    '概要':'請求書CSVと取引先CSVを読み込み、10円単位の四捨五入、PDF作成、非公開Drive保存、期限付きトークン配信、送信・取得状態管理を行う。',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/invoice-pdf/',
+    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/invoice-pdf/',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/invoice-pdf',
+    'GitHub正本':'stepkobetsu-hub/invoice-pdf（main）',
+    'ブランチ':'main',
+    'コミットSHA':'99dfdbf',
+    '主要ファイル':'index.html / assets/app.js / assets/core.js / assets/invoice-pdf.js / apps-script/Code.gs / apps-script/Download.html',
+    'Apps Scriptバージョン':'6（v0.1.5、2026年8月2日）',
+    'Google Sheet名':'STEP請求書PDF作成・配信システム',
+    '使用シート名':'取引先マスタ／基本設定／メール定型文／請求書データ／請求書明細／請求書配信履歴／ダウンロード履歴／操作ログ／ユーザー権限／送信キュー',
+    '非公開資産':'Spreadsheet、PDF保存フォルダ、Apps Script編集・デプロイ識別子は公開台帳へ記載しない。管理者の非公開台帳で管理。',
+    '認証':'管理APIキー＋Apps Script権限。API応答は要求ごとの暗号学的一時値で相互検証。',
+    '配信仕様':'推測困難なトークン、既定45日有効、手動無効化、再送時の旧URL無効化。PDFフォルダは非公開。',
+    '丸め仕様':'最終金額の1円の位を四捨五入して10円単位。小計・消費税・合計を一致させる。',
+    'メール運用':'本番メール送信はPRODUCTION_SEND_APPROVED=falseで無効。別途承認まで有効化しない。',
+    '更新方法':'GitHub mainを更新してPagesを確認後、Apps Scriptは同じデプロイIDの新バージョンへ更新する。個人情報・CSV・請求書PDFはGitHubへ保存しない。',
+    '確認日':'2026年8月2日',
+    '確認状況':'公開画面、CSV読込、金額、PNGロゴ、PDF作成・非公開保存、API接続、無効トークン案内画面を確認済み。本番メール送信は未承認のため未実施。',
+    '確認済み事項':['GitHub Pages公開','Apps Script v6・既存デプロイID維持','Google Sheet 10シート','請求書CSV 2件読込','取引先CSV 3件読込','202608001：28,550円','202608002：小計25,045円・消費税2,505円・合計27,550円','高解像度PNGロゴ','新ロゴ入りPDF 2件を非公開保存','API応答の一時値検証','無効トークン案内画面','本番メール送信無効'],
+    '未確認項目':['有効トークンによる実ダウンロード','テスト宛先へのメール送信','本番メール送信承認']
+  });
+  return out;
+};
+</script>
+
 </body>
 </html>
