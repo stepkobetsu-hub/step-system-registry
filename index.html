@@ -750,5 +750,54 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script>
+const organizeTeacherPayrollYuucho20260802FinalBase=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeTeacherPayrollYuucho20260802FinalBase(items);
+  return out.filter(item=>!String(item['システム名']||item['正式名称']||'').includes('ゆうちょBIZ新規登録用従業員マスタ'));
+};
+
+const applyTeacherPayrollYuucho20260802FinalBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyTeacherPayrollYuucho20260802FinalBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('講師マスター')&&!name.includes('給与明細'))return base;
+  const operationNote='2026年8月2日：Google Sheet内の「講師給与処理」メニューへ「6. ゆうちょBIZ新規従業員登録」を追加し、「7. ゆうちょBIZ振込データ出力」と並べて運用。別Webアプリやログイン画面は使用せず、講師マスターから直接ダイアログを開く。';
+  const specificationNote='ゆうちょBIZ新規従業員登録：講師No.の新しい順で講師No.・氏名を一覧表示し、検索、複数チェック、表示中の一括選択・解除に対応。画面上部と下部に「選択した講師のCSVを作成」を配置し、作成後は上部と下部からダウンロード可能。出力は添付の登録用CSVに合わせた13列・Shift_JIS（CP932）。ゆうちょ口座番号は末尾のチェック番号を除き、7桁になるよう先頭を0で補完する。ダウンロード時は「ゆうちょBIZへの登録時は「全銀ファイル」ではなく「CSVファイル」を選択してアップロードしてください。」と表示し、「CSVファイル」を赤字で強調する。';
+  const existingConfirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  const addedConfirmed=[
+    'Apps Script編集URLを登録',
+    'Google Sheetバインド型・別Webアプリ不要',
+    '講師給与処理メニュー6：ゆうちょBIZ新規従業員登録',
+    '講師給与処理メニュー7：ゆうちょBIZ振込データ出力',
+    '講師No.の新しい順・複数選択・検索',
+    '上部と下部のCSV作成・ダウンロード導線',
+    '13列・Shift_JIS（CP932）CSV',
+    'ゆうちょ口座番号の末尾チェック番号除外と7桁0補完',
+    'CSVファイル選択の注意書き・赤字強調'
+  ];
+  const unresolved=(Array.isArray(base['未確認項目'])?base['未確認項目']:[]).filter(value=>!String(value).includes('Apps Script編集URL'));
+  return Object.assign({},base,{
+    'Apps ScriptプロジェクトID':'1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn',
+    'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn/edit',
+    'Apps Script種別':'Google Sheetバインド型',
+    'Apps Script概要':'講師給与処理メニュー、給与明細作成、ゆうちょBIZ振込データ出力、ゆうちょBIZ新規従業員登録用CSV出力。',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit?gid=2020620808#gid=2020620808',
+    'Google Sheet名':'給与明細2026-6-',
+    '使用シート名':'講師マスター',
+    '操作場所':'講師マスター → 講師給与処理 → 6. ゆうちょBIZ新規従業員登録',
+    '出力仕様':'ゆうちょBIZ新規従業員登録用13列CSV。Shift_JIS（CP932）。ゆうちょ口座番号は末尾チェック番号を除き、7桁へ先頭0補完。',
+    '更新方法':'Google SheetにバインドされたApps Scriptを上記編集URLで修正・保存する。別Webアプリの公開・デプロイは不要。',
+    '確認日':'2026年8月2日',
+    '確認根拠':'給与明細Google Sheet上で、講師給与処理メニュー、講師選択ダイアログ、CSV作成・ダウンロード、注意書き、講師No.表記を実画面確認。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+operationNote,
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+specificationNote,
+    '確認済み事項':[...new Set([...existingConfirmed,...addedConfirmed])],
+    '未確認項目':unresolved,
+    '確認状況':'Google Sheet内の講師給与処理メニューと新規従業員CSV出力を確認済み'
+  });
+};
+</script>
+
 </body>
 </html>
