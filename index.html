@@ -872,5 +872,31 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyQrReliability20260804Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyQrReliability20260804Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('生徒QR')&&!name.includes('出退くんQR'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'本番',
+    'GitHub正本':'stepkobetsu-hub/student-QR（main）',
+    'コミットSHA':'f88560e8df68a9de4c84ec8ad00561d6c9ee6366（PR #4 merge）',
+    'Apps Scriptバージョン':'42（2026年8月4日）',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    '正本スプレッドシート':'入退室ログ２（ログ／講師勤怠ログ／メール送信キュー）',
+    'QRライブラリ':'jsQR 1.4.0。背面カメラ優先、1280×720、12fps（最大20fps）、連続オートフォーカス対応端末、読取枠最大480×260px。',
+    '重複防止':'受付IDをログへ保存し、同じ受付IDは既処理として返却。同一QRは5秒間再送禁止、通信中は解析停止。タイムアウト時は受付IDで保存状態を照会し、未保存時のみ同じIDで再送。',
+    '性能計測':'v42ダミー成功系20回：保存20、平均5,311.1ms、中央値4,787.5ms、最大11,503.3ms、タイムアウト0、エラー0、二重記録0、二重メール0。',
+    'メール処理':'入退室保存後に非同期キューへ分離。送信待ち／送信済み／送信失敗を保存し受付IDを冪等性キーに使用。送信設定不備は受付成功・通知失敗として応答し、入退室記録を保持。実在宛先への試験送信なし。',
+    '確認日':'2026年8月4日',
+    '確認根拠':'ダミー生徒・講師の入退室／出退勤を各5回、同一受付ID20回再送、通知設定失敗、GitHub Pages配信、Apps Script本番v42と既存デプロイIDを確認。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月4日：QR未検出フレームを利用者向けエラーにしないよう整理し、4秒後に穏やかな案内、10秒後に認識案内を表示。読取成功直後に解析停止、保存完了後に解析のみ再開。受付ID冪等性、状態照会付きタイムアウト再送、マスタ索引・当日状態キャッシュ、1回書込み、区間計測、メール非同期キューを本番反映。Apps Script v37からv42へ更新し既存デプロイIDを維持。',
+    '確認済み事項':[...new Set([...confirmed,'GitHub Pages main f88560e8','Apps Script v42・既存デプロイID維持','読取画面と台帳のデプロイID一致','ダミー成功系20/20・タイムアウト0','同一受付ID再送20/20を既処理判定','二重記録0・二重メール0','保存成功・通知失敗を受付成功表示','実在生徒・講師・保護者へのメール試験なし','メールキュートリガー1件'])]
+  });
+};
+</script>
 </body>
 </html>
