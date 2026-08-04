@@ -998,5 +998,21 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyPointManagerReeditProgress20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManagerReeditProgress20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理'))return base;
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Apps Scriptバージョン':'52',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '最新版の場所':'student-QR main：PointManager.js commit 4c86fbf4c5c11e4605eb12e5f26e633a02013b38、points_manager.html commit fcc56e8d703e3acb265f261349962416f521182a。Apps Script v52。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：訂正後の0ポイント記録も履歴から除外せず、編集・取消ボタンを表示して再訂正可能に変更。更新・取消・特別付与・ポイント使用・基本設定の保存時に、ボタンと通知へ保存中表示を出し、再読込完了後に保存完了を5秒表示。通知タイマーの競合も解消。Apps Script v52を既存デプロイIDへ反映。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'訂正後0ポイント履歴を表示','訂正後履歴の再編集・取消','保存中通知を継続表示','保存完了通知を5秒表示','更新・取消・付与・使用・設定へ適用','通知タイマー競合防止','GitHub JavaScript構文検査合格','Apps Script v52・既存デプロイID維持']
+  });
+};
+</script>
 </body>
 </html>
