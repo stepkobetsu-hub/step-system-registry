@@ -1030,5 +1030,37 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script>
+const applyDeliveryHistoryUpdate20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryHistoryUpdate20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  return Object.assign({},base,{
+    '状態':'本番',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22/edit',
+    'Apps Scriptプロジェクト名':'生徒QR',
+    'Apps Script種別':'スタンドアロン型・Webアプリ',
+    'Apps Script概要':'DeliveryHistory.gsで、対象メールアドレスについてエラー当日の全送信、エラー日より前の送信5回分、過去の全エラーを取得。DeliveryFailures.gsのdeliveryFailureDetail応答へhistoryを追加し、画面の送信履歴ダイアログへ返す。',
+    'GASファイル一覧':['DeliveryHistory.gs（送信履歴取得）','DeliveryFailures.gs（詳細APIへhistory追加）'],
+    'Webアプリ一覧':['v53（2026/08/05 04:01） 不達メール送信履歴表示／既存デプロイIDを維持'],
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec',
+    'WebアプリデプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '現在のApps Script版':'バージョン53（2026年8月5日）',
+    '正本ファイル':'delivery_failures.html（GitHub）／DeliveryHistory.gs・DeliveryFailures.gs（Apps Script）',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main）／Apps Script「生徒QR」v53',
+    '確認日':'2026年8月5日',
+    '確認根拠':'GitHub mainのコミット 2f3c0e5e4ef8bded53081769dd9b04fdfbd627c7、f1cdb8acd1342770dd528c472b7e9e1001c71dbb、fa9775d59fbab1c08850492eb86f5b76055f7a6b、公開HTML、Apps Script v53、匿名化した実データ履歴テストを照合。',
+    '作業メモ':'2026年8月5日：各不達行へ大きな青色の「送信履歴」ボタンを追加。履歴画面の閉じるボタンを右上へ移動してスクロール時も見えるよう固定。検索・全体状況エリアは高さを抑え、デスクトップでは確認状態、各絞り込み、検索・更新を1行に整理（モバイル配置は維持）。実データ確認では、対象アドレスの2026年8月4日入室メールは一時遅延後に最終「配信完了」、同日退室メールも「配信完了」（送信2件・エラー1件・履歴表示3件）。個人メールアドレスは台帳へ記載しない。',
+    '仕様メモ':'履歴は、選択したエラー当日の全送信と、そのエラー日より前の送信5回分を表示する。過去に発生したエラーは非表示データを含めて全件表示する。入室・退室、送信時刻、最終結果、エラー理由、件名、生徒、最終更新を確認できる。「配信完了」は受信側サーバーが受け付けたことを示し、開封・閲覧済みまでは保証しない。',
+    '確認済み事項':['送信履歴ボタン追加','エラー当日の全送信＋エラー日より前5回分','過去の全エラー表示','入室・退室と最終配信結果の表示','送信履歴ボタンの大型・青色化','履歴画面の閉じるボタンを右上へ移動・固定','検索・全体状況エリアを低く1行化','Apps Script v53へ更新・既存デプロイID維持','匿名化した実データで入室・退室メールの配信完了を確認','GitHub Pages公開ソースとJavaScript構文を確認'],
+    '未確認項目':[],
+    '確認状況':'送信履歴API・画面表示・実データ結果・公開反映を確認済み'
+  });
+};
+</script>
 </body>
 </html>
