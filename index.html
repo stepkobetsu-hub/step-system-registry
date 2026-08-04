@@ -1062,5 +1062,41 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="delivery-report-settings-20260805">
+const applyDeliveryReportSettings20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryReportSettings20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(name.includes('不達メール')){
+    const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+    return Object.assign({},base,{
+      'Apps Script概要':'DeliveryFailures.gsで不達イベント発生時の管理者報告メールを送信。報告先はAK2・AK3・AK4が管理画面上部の「報告メール設定」から1～4件まで変更できる。未配信イベントを種類にかかわらず通知し、同一イベントの重複通知は防止する。DeliveryHistory.gsによる送信履歴表示も継続。',
+      'GASファイル一覧':['DeliveryFailures.gs（報告先設定API・不達発生時の複数宛先通知・重複防止）','DeliveryHistory.gs（送信履歴取得）'],
+      'Webアプリ一覧':['v54（2026/08/05 04:50） 不達メール報告先設定・最大4件通知／既存デプロイIDを維持'],
+      '現在のApps Script版':'バージョン54（2026年8月5日）',
+      '正本ファイル':'delivery_failures.html・gas/DeliveryFailures.js・gas/DeliveryHistory.js（GitHub）／DeliveryFailures.gs・DeliveryHistory.gs（Apps Script）',
+      '最新版の場所':'stepkobetsu-hub/student-QR（main）／Apps Script「生徒QR」v54',
+      '確認日':'2026年8月5日',
+      '確認根拠':'GitHub main commits 70518a090c5f14e4d7c2259179945f12662051f3、9534c40651bac27a3f914d96d58208c7d774ca1c、92adedee196b5223c44cdc5bd6551b99d210bac2、f743c3dd092ef91ef11e1a6adfcbf7e122770c43、a979162495b9332612170b28d5635cd4e7549825。Apps Script v54、既存デプロイID維持、公開HTMLで報告メール設定ボタン・4入力欄・設定API呼出を確認。対象テスト16件合格、JavaScript構文検査合格。',
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：不達メール管理の最上部へ目立つ「報告メール設定」ボタンを追加。AK2・AK3・AK4のみ設定可能で、報告先は1～4アドレスを登録・変更できる。不達イベントが新規発生した際は設定先ごとに個別送信し、同一イベントの二重通知を防止。指定の初期報告先1件は公開コードに含めず、Apps Scriptの非公開Script Propertyに設定済み。従来の重大エラー限定を廃止し、不達として記録される全イベントを報告対象へ変更。Apps Script作業中に検出したDeliveryFailures.gsとPointManager.gsの重複コードはGitHub正本から復旧し、構文エラー解消後にv54へ更新。実メールのテスト送信は行っていない。',
+      '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'報告メール仕様：報告先は最大4件。設定画面とAPIは管理権限AK2・AK3・AK4のみ利用可能。未設定時は送信をスキップ。移行時は従来のDELIVERY_FAILURE_ADMIN_EMAILを初期値として自動継承し、画面保存後はDELIVERY_FAILURE_REPORT_EMAILSへJSON配列で保存する。宛先ごとに個別送信し、管理ID・Message ID・イベント種別の組み合わせで重複報告を抑止する。',
+      '確認済み事項':[...new Set([...confirmed,'報告メール設定ボタンを画面最上部へ追加','報告先1～4件の登録・変更','AK2・AK3・AK4のみ設定可能','指定の初期報告先1件を非公開設定','不達として記録される全イベントを通知対象化','宛先ごとの個別送信','同一イベントの重複報告防止','公開コードへ個人メールアドレスを記載しない','DeliveryHistory送信履歴機能を維持','Apps Script構文エラー解消','Apps Script v54・既存デプロイID維持','公開HTML反映確認','対象テスト16件合格'])],
+      '未確認項目':['実メールを発生させる本番通知試験（不要なメール送信を避けるため未実施）'],
+      '確認状況':'設定UI・権限・保存API・通知ロジック・重複防止・公開反映・Apps Script v54を確認済み'
+    });
+  }
+  if(name.includes('ポイント管理')){
+    const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+    return Object.assign({},base,{
+      '現在のApps Script版':'バージョン54（2026年8月5日）',
+      '確認日':'2026年8月5日',
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：不達メール報告設定のv54更新前に、Apps Script編集途中で発生していたPointManager.gs末尾の重複コードを検出。GitHub正本 gas/PointManager.js から全文復旧し、ポイント管理の仕様変更を伴わず構文エラーのみ解消。既存デプロイIDを維持してv54へ更新。',
+      '確認済み事項':[...new Set([...confirmed,'PointManager.gs重複コード除去・GitHub正本復旧','ポイント管理の仕様変更なし','Apps Script構文エラー解消','Apps Script v54・既存デプロイID維持'])]
+    });
+  }
+  return base;
+};
+</script>
 </body>
 </html>
