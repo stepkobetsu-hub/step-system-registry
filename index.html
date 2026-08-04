@@ -976,7 +976,7 @@ applyAssetInfo=function(item){
   if(!name.includes('スタッフ用アプリ'))return base;
   return Object.assign({},base,{
     '確認日':'2026年8月5日',
-    '最新版の場所':'seiseki-kanri main：index.html commit 00d2b486db503633c052c69ec8d70c33c834fce1。',
+    '最新版の場所':'seiseki-kanri main：index.html commit 53334e422b534bb3f01c51927de7340899837a53。',
     '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：前回のパスワード非保存仕様を利用者要望により変更。「この端末にID・パスワードを記憶する」を追加し、ブラウザ内保存から次回自動ログインへ接続。明示的なログアウト時は保存ID・パスワードを削除。',
     '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'端末内ID保存','端末内パスワード保存','保存情報による次回自動ログイン','明示ログアウト時の保存情報削除','GitHub JavaScript構文検査合格']
   });
