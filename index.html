@@ -1014,5 +1014,21 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyPointManagerDirectCancel20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManagerDirectCancel20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理'))return base;
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Apps Scriptバージョン':'52',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '最新版の場所':'student-QR main：points_manager.html commit 2e2004931ec174ad79a23cbc8b87def050c28481。Apps Script v52維持。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：訂正版を含む編集可能履歴の操作を「編集」と「削除・取消」の2ボタンへ分離。削除・取消は確認画面と理由入力を経て、既存の相殺・監査方式で実行。保存中・保存完了などの通知を18px太字、余白・影付きの大きな表示へ変更。Apps Script側は変更せずv52と既存デプロイIDを維持。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'訂正版の削除・取消ボタン','削除・取消の確認画面','取消理由入力','監査履歴維持','保存通知を大型化','GitHub JavaScript構文検査合格','Apps Script v52維持・デプロイ変更なし']
+  });
+};
+</script>
 </body>
 </html>
