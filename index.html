@@ -921,5 +921,22 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script>
+const applyPointManager20260805HistoryFixBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManager20260805HistoryFixBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理'))return base;
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Apps Scriptバージョン':'49',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '最新版の場所':'student-QR main commit e174623fb2bce7b83b4dd976b05d61e218d5f580（points_manager.html）。Apps Script PointManager.gsはGitHub正本 gas/PointManager.jsへ全文復旧。Apps Script v49。',
+    '確認根拠':'PointManager.gs保存後全文再取得：PM_MASTER_SS_ID、PM_AUDIT_SHEET、handlePointManagerApiAction_、pmGlobalHistory_各1件。構文エラーなし。attendance/special/use/all対応と日付・行番号降順を確認。points_manager.htmlはderivedGlobalHistoryを削除し、pointManagerHistoryを1回だけ呼ぶ構成。Apps Script実行履歴でv49 doPost完了を確認。クラウドブラウザーではApps Scriptリダイレクト先がHTML応答となり、4ボタンの最終画面試験は未完了。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：PointManager.gsの作業途中重複コードをGitHub正本全文で復旧。全体履歴API4種、フロントの単一API呼出、上部3ボタン一列、右上の小型・通常色ログアウトを反映。Apps Script v49を既存デプロイIDへ更新。GitHub main commit e174623fb2bce7b83b4dd976b05d61e218d5f580。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'PointManager.gs全文復旧・再取得','重複定数なし','重複主要関数なし','Apps Script構文エラーなし','全体履歴4モード実装','日付・行番号降順','derivedGlobalHistory削除','pointManagerHistory単一呼出','上部3ボタン一列','ログアウト右上小型通常色','Apps Script v49・既存デプロイID維持','student-QR main e174623fb2bce7b83b4dd976b05d61e218d5f580']
+  });
+};
+</script>
 </body>
 </html>
