@@ -901,5 +901,25 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="point-manager-session-recovery-20260805">
+const applyPointManagerSessionRecovery20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyPointManagerSessionRecovery20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'本番',
+    '最新版の場所':'student-QR main：ポイント管理セッション復旧 a2c2bdc1aa38872372c7e850ab8c7bc5659d2672。seiseki-kanri main：ログイン後のポイント管理自動復帰 671a0d9f22c6fae3aacce4f68302eb3426aa6c92。',
+    '確認日':'2026年8月5日',
+    '確認状況':'セッションなし・期限切れ時に古い認証情報を削除してスタッフ用ログイン画面へ戻ること、ログイン後にポイント管理へ自動復帰する処理の公開反映を確認済み。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：ポイント管理でセッション切れ後に「ログインしてください」と表示されたまま、ログアウトも再ログインもできない不具合を修正。原因は、API認証エラー時にメッセージを表示するだけで、期限切れの stepStaffAppAuth を削除せず、スタッフ用ログイン画面へ戻す処理がなかったこと。期限日時のクライアント判定、API認証エラー判定、古い認証情報の削除、スタッフ用ログイン画面への自動遷移、ポイント管理画面のログアウトボタンを追加。スタッフ用アプリ側は next=points を受け取り、ログイン成功後にポイント管理へ自動復帰するよう変更。GitHub Pages公開版でログイン画面への復帰と、ログイン後の復帰処理が配信済みであることを確認。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'認証復旧仕様：stepStaffAppAuth が未登録・不正・権限外・期限切れ、またはAPIがセッション／期限切れ／認証／ログイン／権限エラーを返した場合は、ローカルの古い認証情報を削除し、seiseki-kanri/?next=points へ戻す。ログイン成功後は points_manager.html へ自動復帰する。ポイント管理画面から明示的なログアウトも可能。',
+    '関連コミット':'student-QR a2c2bdc1（セッション復旧・ログアウト）／seiseki-kanri 671a0d9f（ログイン後の自動復帰）',
+    '確認済み事項':[...new Set([...confirmed,'期限切れ認証情報の自動削除','認証エラー時のスタッフ用ログイン画面への自動復帰','ポイント管理画面のログアウトボタン','ログイン成功後のポイント管理への自動復帰','GitHub Pages公開反映','student-QR commit a2c2bdc1','seiseki-kanri commit 671a0d9f'])]
+  });
+};
+</script>
 </body>
 </html>
