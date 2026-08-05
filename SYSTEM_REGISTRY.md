@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-04
+最終更新: 2026-08-06
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -21,7 +21,7 @@
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
 | STEP配信システム | 本番使用中 | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main` | `index.html`、`api.js`、Apps Script Webアプリ | GitHub＋Apps Script＋Brevo | Pages更新。API変更時は既存GASと配信基盤も確認 | 2026-07-20 | `step-message-center`を現行正本とする |
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
-| 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | リポジトリ内一式 | GitHub Pages | `main`へ反映してPages確認 | 2026-07-20 | 空の `eacher-portal` は正本ではない |
+| 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
 | 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`tablet_checkin.html`、`gas/MyQrApi.js`、入退室ログ2 | GitHub＋Apps Script＋Google Sheet | Pagesと既存Apps Scriptデプロイを更新し、塾生本人QR・スタッフ登録・タブレット読取を確認 | 2026-08-01 | 塾生用 `my_qr.html` とスタッフ用 `student_qr_register.html` を分離。塾生は期限付きセッションのみ端末保存 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
@@ -30,6 +30,24 @@
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## 登録詳細：講師ポータル
+
+- ID: `teacher-portal`
+- 状態: 本番使用中
+- 利用者向けURL: https://stepkobetsu-hub.github.io/teacher-portal/
+- GitHub: https://github.com/stepkobetsu-hub/teacher-portal （本番ブランチ `main`）
+- 正本ファイル: `index.html`（画面）、`script.js`（画面遷移・端末保存・API呼出）、`Code.gs`（Apps Script側）
+- 次回の調査開始点: 出退くんQRの講師コード入力・QR表示・ログアウト・自動遷移は、最初に `teacher-portal/script.js` の `showNyutaikun`、`loadNyutaikunQr`、`saveTeacherSession`、`clearTeacherSession`、`logoutNyutaikun` を確認する。API接続先は同ファイル先頭の `API_URL` を確認する
+- 画面構成: 1枚目は講師ポータルトップ、2枚目は講師コード入力、3枚目は講師コード・氏名・出退くんQR表示
+- 2026-08-06確定仕様: 保存済みの講師コードとQRデータがある場合、2枚目を表示せず3枚目を即時表示する。毎回のAPI応答待ちは行わない
+- 既存端末の初回移行: 講師コードだけが保存され、QRデータがまだ保存されていない端末でも2枚目は表示しない。3枚目を先に表示し、その画面内で初回だけAPIからQRデータを取得して端末へ保存する。以後は即時表示する
+- 端末保存キー: `teacherCode`（講師コード）、`teacherName`（氏名）、`teacherQrCode`（QRデータに対応する講師コード）、`teacherQrData`（QRデータ）
+- ログアウト仕様: 3枚目の「ログアウト」で上記4キーをすべて削除する。次回は必ず2枚目で講師コードの入力が必要。授業報告側のログアウトも同じ保存情報を削除する
+- キャッシュ更新: `index.html` の読込URLを `script.js?v=20260806-instant-qr` に更新し、旧JavaScriptが残らないようにした
+- GitHub本番コミット: `7d3326169ef5ab2f8c95b4ee46baec5bc16fe4e2`（`script.js`）、`16502435428ac051f3476dd2fe9d388382f383cf`（`index.html`・公開確定）
+- 検証: JavaScript構文検査合格。保存済みQRの即時表示、ログアウト後の入力画面復帰、旧端末の3枚目先行表示と初回QR保存の3経路を自動確認。GitHub Pages公開HTMLのキャッシュ更新値と公開 `script.js` の新処理を確認
+- 確認日: 2026-08-06
 
 ## 登録詳細：STEP塾生アプリ（step-hub）開発記録
 
