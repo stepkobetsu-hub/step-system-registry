@@ -1206,5 +1206,21 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="delivery-resolved-blue-operation-confirmed-20260805">
+const applyDeliveryResolvedBlueOperationConfirmed20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryResolvedBlueOperationConfirmed20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日 運用確認：解決済みの一時エラーを青色で表示し、「途中で一時エラーがありましたが、その後配信完了しました。」と案内する修正について、利用者が実画面で正常に動作したことを確認。未解決エラーは引き続き赤色で区別する。',
+    '確認済み事項':[...new Set([...confirmed,'利用者による実画面確認完了（解決済み一時エラーの青色表示）','利用者による実画面確認完了（その後配信完了の案内）'])],
+    '確認状況':'解決済み一時エラーの青色表示を本番実画面で利用者確認済み'
+  });
+};
+</script>
+
 </body>
 </html>
