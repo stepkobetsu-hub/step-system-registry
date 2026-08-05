@@ -1173,5 +1173,22 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="delivery-history-queue-v59-20260805">
+const applyDeliveryHistoryQueueV5920260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryHistoryQueueV5920260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Webアプリ一覧':[...new Set([...(Array.isArray(base['Webアプリ一覧'])?base['Webアプリ一覧']:[]),'Apps Script v59（送信キュー宛先照合・全送信ログリンク・既存デプロイID維持）'])],
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：正常送信が履歴画面へ出ない原因を実ログで調査。入室・退室の2件はいずれも送信完了・配信完了だったが、「ログ」シートの送信先メール列が空欄で、メールアドレスによる照合から漏れていた。「メール送信キュー」の送信先JSONを受付IDで照合するよう修正し、最新エラー後の正常な退室メールを履歴へ表示可能にした。不達メール管理上部へ「全送信ログを見る」ボタンを追加し、入退室ログ2のログタブへ直接移動できるようにした。Apps Scriptは既存デプロイIDのままv59へ更新。',
+    '確認済み事項':[...new Set([...confirmed,'実ログで入室・退室の2件を確認','2件とも送信完了・配信完了を確認','ログの送信先メール空欄が未表示原因と特定','受付IDでメール送信キューの宛先JSONと照合','最新エラー後の正常送信表示を復旧','画面上部へ全送信ログリンクを追加','Apps Script v59へ更新','既存デプロイID・公開URLを維持','対象自動テスト11件合格'])],
+    '確認状況':'実ログ2件の送信成功を確認し、メール送信キュー照合と全送信ログリンクをApps Script v59へ本番反映済み'
+  });
+};
+</script>
 </body>
 </html>
