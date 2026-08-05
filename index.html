@@ -1121,5 +1121,23 @@ applyAssetInfo=function(item){
   return Object.assign({},base,common);
 };
 </script>
+
+<script id="delivery-latest-link-login-20260805">
+const applyDeliveryLatestLinkLogin20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryLatestLinkLogin20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main） delivery_failures.html commit 392d682426d2cf92a635853d81b9d0396adbf07b／スタッフ用アプリのリンク修正 commit 5876d190a2b63afe1fcd5b9e9aeef2eaadaf9449',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：スタッフ用アプリの「不達メール管理」カードが、最新版のstudent-QRではなくseiseki-kanri内に残った2026年7月28日の古いコピーを参照していたため、送信履歴ボタン・報告メール設定・最大4件登録などが表示されなかった。カードのリンクをstudent-QRの最新版URLへ修正。最新版のログイン画面は注意書きを削除し、講師番号・パスワード・記憶チェック・ログインボタンだけの通常構成へ変更。この端末にID・パスワードを保存し、次回は自動認証後に不達メール一覧を直接表示する。Enterキーでのログイン、保存情報だけを消す操作も追加。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'不達メール管理の公開正本はstudent-QR/delivery_failures.html。seiseki-kanri配下の旧コピーは利用しない。ログイン情報はdeliveryFailuresSavedLoginとして利用端末内に保存し、認証APIで有効性を確認してから一覧を表示する。認証失敗時は保存パスワードを削除して通常ログイン画面へ戻す。',
+    '確認済み事項':[...new Set([...confirmed,'スタッフ用アプリの旧コピー参照を解消','不達メール管理カードをstudent-QR最新版へ変更','大きな送信履歴ボタンを公開版で確認','報告メール設定ボタンと最大4入力欄を公開版で確認','ログイン注意書きを削除','講師番号を直接入力可能','ID・パスワードの端末保存','次回の自動ログイン','Enterキーでログイン','保存情報を消すボタン','公開画面のDOM確認','自動テスト8件合格'])],
+    '確認状況':'最新版画面・通常ログイン画面・記憶設定・自動ログイン処理・スタッフ用アプリのリンク修正を確認済み'
+  });
+};
+</script>
 </body>
 </html>
