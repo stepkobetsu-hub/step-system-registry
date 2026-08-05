@@ -1156,5 +1156,22 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="delivery-history-window-v58-20260805">
+const applyDeliveryHistoryWindowV5820260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryHistoryWindowV5820260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Webアプリ一覧':[...new Set([...(Array.isArray(base['Webアプリ一覧'])?base['Webアプリ一覧']:[]),'Apps Script v58（不達履歴の前後5件表示・報告メールURL固定・既存デプロイID維持）'])],
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：不達メールの送信状況履歴を、最初のエラー前の正常送信5件・対象アドレスの全エラー・最新エラー後の正常送信5件に分けて表示するよう更新。最新エラー後に正常送信があれば復旧状況として明示。不達報告メールには不達メール管理URL（https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html）を必ず記載。既存デプロイIDのままApps Script v58へ更新。',
+    '確認済み事項':[...new Set([...confirmed,'対象アドレスの全エラーを表示','最初のエラー前の正常送信を直前5件表示','最新エラー後の正常送信を最大5件表示','最新エラー後の復旧状況を明示','不達報告メールへ管理画面URLを固定記載','Apps Script v58へ更新','既存デプロイID・公開URLを維持','対象自動テスト9件合格'])],
+    '確認状況':'送信履歴の全エラー・前後各5件表示と報告メールURL固定をApps Script v58へ本番反映済み'
+  });
+};
+</script>
 </body>
 </html>
