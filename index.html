@@ -1098,5 +1098,28 @@ applyAssetInfo=function(item){
   return base;
 };
 </script>
+
+<script id="apps-script-routing-recovery-20260805">
+const applyAppsScriptRoutingRecovery20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyAppsScriptRoutingRecovery20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('ポイント管理')&&!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  const deployments=Array.isArray(base['Webアプリ一覧'])?base['Webアプリ一覧']:[];
+  const common={
+    '現在のApps Script版':'バージョン56（2026年8月5日）',
+    'Apps Scriptバージョン':'56',
+    '確認日':'2026年8月5日',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main）／Apps Script「生徒QR」v56',
+    'Webアプリ一覧':[...deployments,'v56（2026/08/05 11:57） ポイント管理・不達管理復旧／API振り分け保護（既存デプロイIDを維持）'],
+    '確認根拠':'本番Apps Script再読込、公開Webアプリへの匿名・非個人情報リクエスト、GitHub main commits b1f9e435f1cf1ada781cd0b0ffe2a077bd544bc6・000fd5b610eed6586e73b4a530f1d51b5f494931、対象テスト17件合格を照合。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日 障害復旧：Apps Script v54でPointManager.gsとDeliveryFailures.gsの正本コード全体が初期関数 myFunction の内側へ入った状態になり、外部からAPI振り分け関数を呼べなくなった。doPost先頭がPointManagerの振り分け関数を無条件に呼んでいたため、ポイント管理だけでなく同じWebアプリのPOST処理全体が「処理中にエラーが発生しました」で停止。PointManager.gs・DeliveryFailures.gsをGitHub正本から再作成し、コード.gsへ各追加モジュールの存在確認ガードを追加。1機能の読込異常で他のQR受付・受付状況・不達管理まで全停止しない構成へ変更。v55でポイント管理を復旧し、v56で不達管理も復旧。既存デプロイIDと公開URLは維持。',
+    '確認済み事項':[...new Set([...confirmed,'PointManager.gsの不要なmyFunction包み込みを除去','DeliveryFailures.gsの不要なmyFunction包み込みを除去','GitHub正本から両ファイルを全文復旧','doPostへ追加モジュール存在確認ガードを追加','ポイント管理APIがスタッフ認証処理まで到達','受付状況APIが固有のRECEIPT_NOT_FOUNDを返却','QR受付APIが固有のINVALID_RECEIPT_IDを返却','不達管理API振り分け関数を復旧','対象テスト17件合格','Apps Script v56・既存デプロイID維持']]),
+    '確認状況':'本番v56への更新、公開API振り分け、ポイント管理復旧、QR受付系の独立動作を確認済み'
+  };
+  return Object.assign({},base,common);
+};
+</script>
 </body>
 </html>
