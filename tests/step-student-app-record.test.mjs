@@ -54,3 +54,25 @@ test('the new record contains no private deployment identifiers or backend URLs'
   ];
   for (const value of forbidden) assert.doesNotMatch(record.toLowerCase(), new RegExp(value.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
+
+test('the persistent student login implementation is recorded for the next investigation', () => {
+  for (const text of [
+    'student-persistent-login-20260806',
+    '明示的ログアウトまで共通ログインを維持',
+    'STUDENT_SESSION_EXPIRES_AT',
+    'makeStudentSessionPersistent_',
+    'requireActiveStudentSession_',
+    'stepCommonStudentSessionToken',
+    'Service Worker v21',
+    'Apps Scriptバージョン84'
+  ]) assert.match(page, new RegExp(text));
+
+  for (const text of [
+    '明示的ログアウトまで共通ログインを維持',
+    'パスワードは端末へ保存しない',
+    'STUDENT_INACTIVE',
+    'step-student-v21-persistent-login',
+    '公開API version 84',
+    '次回ここから確認'
+  ]) assert.match(registry, new RegExp(text));
+});
