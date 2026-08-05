@@ -141,29 +141,23 @@ function isJukuCard(item){return item['ID']==='juku-card'||item['システム名
 const HOME_NEWS_CARD={'ID':'homepage-news','システム名':'ホームページニュース表示・更新システム','分類':'広報・ホームページ','状態':'本番','利用者':'ホームページ閲覧者','運用担当':'管理者','概要':'Google Bloggerの記事をGitHub Pages経由で個別指導STEP公式ホームページへ写真付きカード表示するニュース表示コンポーネント。','利用者向けURL':'https://www.step-edu.net/line用お知らせページ','GitHub Pages URL':'https://stepkobetsu-hub.github.io/step-news/','入力フォームURL':'https://stepkobetsublog.blogspot.com/','管理者向けURL':'https://www.blogger.com/blog/posts/6591817176544299052?hl=ja','GitHub URL':'https://github.com/stepkobetsu-hub/step-news','保存基盤':'Google Blogger＋GitHub Pages＋Wix','正本ファイル':['index.html','styles.css','app.js','README.md'],'最新版の場所':'stepkobetsu-hub/step-news（main / root）','作業メモ':'通常運用はGoogle Bloggerへの記事投稿のみ。公開中コードはVersion 2（index.htmlとstyles.cssはv2.0.0、READMEはVersion 2）。Bloggerの/feeds/posts/defaultをalt=json-in-script・callback指定で読み込む。PCは3列、タブレットは2列、スマートフォンは1列のレスポンシブ表示。2026年7月22日、Wixの「LINE用お知らせページ」でstep-newsを直接読み込むiframeを確認。','注意事項':'Version 2.1のスマホ専用UI（固定タイトル・記事アイコン・アイコン切替）は不採用。LINE用お知らせページはstep-newsを使用中。一方、公式トップページのお知らせ欄にはFeedWind（feed.mikle.com/widget/v2/158529）が残り、step-newsは公式トップページには未組み込み。今後は段階的にstep-newsへ切り替え、FeedWindは将来廃止する方針。','確認済み事項':['GitHub Pages公開URLが正常表示','Blogger記事を写真付きカードとして表示','取得方式：Blogger JSON-in-script（callback方式）','main直下はindex.html・styles.css・app.js・README.mdのみ','Version 2.1相当の残存ファイルなし','公開中コードはVersion 2','スマートフォンはVersion 2の1列レスポンシブ','LINE用お知らせページはWixのHTML埋め込み部品を使用','埋め込みiframeの参照先はstep-newsのGitHub Pages','公式トップページにはFeedWindが残存','step-newsは公式トップページには未組み込み','段階的にstep-newsへ切り替え、FeedWindは将来廃止予定'],'未確認項目':[],'確認状況':'GitHub Pages版・Version 2・LINE用お知らせページへの本番組み込みを確認済み'};
 const STEP_STUDENT_APP_RECORD={
   'ID':'step-student-app','システム名':'STEP塾生アプリ（step-hub）開発記録','分類':'塾生・統合アプリ','状態':'本番','利用者':'塾生','運用担当':'管理者',
-  '概要':'塾生向けの共通ログイン、自分のQR、学習進捗、成績管理、フォレスタプラス、資料メニューをまとめたPWA。トップ画面で本日の入塾・退塾時刻と累計ポイントを表示する。',
+  '概要':'塾生向けの共通ログイン、自分のQR、学習進捗、成績管理、フォレスタプラス、愛知県入試制度、愛知全県模試、学習資料をまとめたPWA。トップ画面で本日の入塾・退塾時刻と累計ポイントを表示する。',
   '利用者向けURL':'https://stepkobetsu-hub.github.io/step-hub/',
   'GitHub URL':'https://github.com/stepkobetsu-hub/step-hub',
   '関連GitHub':'https://github.com/stepkobetsu-hub/student-QR',
   '保存基盤':'GitHub Pages（PWA）＋Google Apps Script Webアプリ＋Google Sheet「入退室ログ２」',
   '正本ファイル':['step-hub/index.html','step-hub/sw.js','student-QR/my_qr.html','student-QR/my_qr_sw.js','student-QR/gas/MyQrApi.js','student-QR/gas/コード.js'],
   '最新版の場所':'画面：stepkobetsu-hub/step-hub（main）／QR画面・QRバックエンド：stepkobetsu-hub/student-QR（main）',
-  'Apps Scriptプロジェクト名':'生徒QR',
-  'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
-  'Apps Script編集URL':'https://script.google.com/home/projects/1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22/edit',
-  'WebアプリURL':'https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec',
-  'WebアプリデプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
-  '現在のApps Script版':'バージョン28（2026年8月1日）',
-  'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A/edit',
-  'Google Sheet名':'入退室ログ２','保存先Spreadsheet ID':'1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A',
+  'Apps Scriptプロジェクト名':'生徒QR（内部の編集URL・ID・デプロイIDは公開台帳へ記載しない）',
+  'Google Sheet名':'入退室ログ２（内部のURL・Spreadsheet IDは公開台帳へ記載しない）',
   '使用シート名':'ログ（入退室）／ポイント履歴（累計ポイント）',
   '確認日':'2026年8月1日',
   '確認根拠':'Apps Script編集画面、デプロイ管理画面、GitHub正本、入退室ログ２の実データを照合。プロジェクトID、WebアプリURL、GitHub gasフォルダーの対応を確認。',
-  '仕様メモ':'共通ログイン：初回のみ生徒ID・パスワードを入力し、共通セッショントークンで本人のQR・成績管理・学習進捗を利用する。パスワードは端末へ保存しない。\n\nトップ画面：自分のQRカード内に「本日の入塾」「本日の退塾」「ポイント」を3列表示。最大10秒ごとに自動更新する。QR表示画面には入退塾表示を置かない。\n\n時刻・ポイントAPI：student-QR/gas/MyQrApi.js の myQrBuildResponse_ が attendance と points を返す。attendance は入退室ログ２の「ログ」シートから当日の1回目の読取を入塾、当日の最終読取を退塾として取得。points は「ポイント履歴」シートの累計。\n\n本人限定アクセス：myQrCommonGet / myQrGet はセッションから本人IDを確定し、任意の生徒ID指定を受け付けない。\n\nPWA：step-hub/sw.js と student-QR/my_qr_sw.js のキャッシュ名・登録URLを変更して更新を反映する。',
-  '作業メモ':'【次回ここから確認】Apps Scriptを探す場合は、上記「Apps Script編集URL」を直接開く。対象ファイルは MyQrApi.gs と コード.gs。GitHub正本は student-QR/gas/MyQrApi.js と student-QR/gas/コード.js。既存Webアプリを更新するときは「デプロイ」→「デプロイを管理」→「編集」→「新バージョン」を選び、同じデプロイIDのまま公開する。\n\nQR読取で時刻が表示されない場合：①入退室ログ２の「ログ」シートに対象生徒ID・当日・種別（入室/退室）があるか、②Apps Scriptが上記Webアプリの最新バージョンか、③step-hub/index.htmlの MY_QR_API_URL が同じURLか、④PWAキャッシュ版を確認する。',
+  '仕様メモ':'共通ログイン：初回のみ生徒ID・パスワードを入力し、共通セッショントークンで本人専用QR・成績管理・学習進捗を利用する。パスワードは端末へ保存しない。\n\nトップ画面：自分のQRカード内に「本日の入塾」「本日の退塾」「ポイント」を3列表示。最大10秒ごとに自動更新する。QR表示画面には入退塾表示を置かない。\n\n時刻・ポイントAPI：student-QR/gas/MyQrApi.js の myQrBuildResponse_ が attendance と points を返す。attendance は入退室ログ２の「ログ」シートから当日の1回目の読取を入塾、当日の最終読取を退塾として取得。points は「ポイント履歴」シートの累計。\n\n本人限定アクセス：myQrCommonGet / myQrGet はセッションから本人IDを確定し、任意の生徒ID指定を受け付けない。\n\nPWA：step-hub/sw.js と student-QR/my_qr_sw.js のキャッシュ名・登録URLを変更して更新を反映する。\n\n記録範囲：デザイン変更開始前までに確定した仕様を保存し、その後のデザイン作業は別管理履歴とする。',
+  '作業メモ':'【次回ここから確認】QRバックエンドのGitHub正本は student-QR/gas/MyQrApi.js と student-QR/gas/コード.js。Apps Scriptの編集URL・デプロイIDは公開台帳ではなく、権限のある運用記録から確認する。既存Webアプリを更新するときは新規デプロイを作らず、同じデプロイIDで新バージョンを公開する。\n\nQR読取で時刻が表示されない場合：①入退室ログ２の「ログ」シートに対象生徒ID・当日・種別（入室/退室）があるか、②Apps Scriptが最新バージョンか、③step-hub/index.htmlのQR API接続先が運用記録と一致するか、④PWAキャッシュ版を確認する。\n\n別管理履歴：デザイン全面変更の採用撤回。機能安定基準 2f55e36、本番復元 a85e3bd、キャッシュ step-student-v15-rollback。Issue #14は not planned。確定仕様を上書きせず履歴を保持する。',
   '注意事項':'スクリプトプロパティ、認証トークン、パスワード、APIキーは台帳へ記載しない。Webアプリを新規作成せず、原則として既存デプロイIDを新バージョンへ更新する。',
   '関連カード':['出退くんQR作成・読取','生徒マスタ','成績管理','学習進捗管理'],
-  '確認済み事項':['Apps ScriptプロジェクトIDと編集URL','WebアプリURLとデプロイID','Apps Scriptバージョン26','GitHub正本 student-QR/gas','Google Sheet 入退室ログ２','使用シート：ログ・ポイント履歴','トップ画面の入塾・退塾・ポイント3列表示（1回目＝入塾、最終読取＝退塾）','QR画面から入退塾表示を削除','10秒自動更新','PWAキャッシュ更新','本人限定QR・共通ログイン'],
+  '確認済み事項':['GitHub正本 student-QR/gas','Google Sheet 入退室ログ２','使用シート：ログ・ポイント履歴','トップ画面の入塾・退塾・ポイント3列表示（1回目＝入塾、最終読取＝退塾）','QR画面から入退塾表示を削除','10秒自動更新','PWAキャッシュ更新','本人限定QR・共通ログイン','デザイン全面変更の採用撤回と安定版復元履歴'],
   '未確認項目':[],'確認状況':'2026年8月1日のApps Script・GitHub・Google Sheet・公開URLの対応関係を確認済み'
 };
 function organizeEntryImport(items){const list=items.map(item=>Object.assign({},item));const grade=list.find(isGradeSystem);const juku=list.find(isJukuCard);if(grade&&juku){const entryUrl=(grade['読み取りURL']||'').trim();if(entryUrl)juku['読み取りURL']=entryUrl;delete grade['読み取りURL'];grade['システム名']='成績管理';grade['概要']='テスト成績・通知表・志望校・面談メモを管理';juku['システム名']='受付カード・エントリーシート読み取り';juku['概要']='受付カードの登録・一覧管理・印刷・エントリーシート読み取り'}if(!list.some(item=>item['ID']===HOME_NEWS_CARD['ID']||String(item['システム名']||'').includes('ホームページニュース表示・更新システム')))list.push(Object.assign({},HOME_NEWS_CARD));const stepIndex=list.findIndex(item=>item['ID']===STEP_STUDENT_APP_RECORD['ID']||String(item['システム名']||'').includes('STEP塾生アプリ（step-hub）'));if(stepIndex>=0)list[stepIndex]=Object.assign({},list[stepIndex],STEP_STUDENT_APP_RECORD);else list.push(Object.assign({},STEP_STUDENT_APP_RECORD));return list}
@@ -1259,6 +1253,27 @@ applyAssetInfo=function(item){
     '関連カード':['出退くんQR作成・読取','講師予定・夏休み出勤登録'],
     '確認済み事項':[...new Set([...confirmed,'講師ポータル正本はstepkobetsu-hub/teacher-portal（main）','出退くんQRの通常時は2枚目を省略して3枚目を即時表示','旧端末も2枚目を表示せず3枚目内で初回取得','講師コード・氏名・QRデータを対応付けて端末保存','3枚目ログアウトで4つの保存キーを削除','ログアウト後は次回に講師コード入力が必要','script.jsのキャッシュ更新','画面遷移自動試験3件合格','GitHub Pages公開反映確認'])],
     '確認状況':'出退くんQRの2枚目省略・3枚目即時表示・ログアウト後の入力復帰を本番反映済み'
+  });
+};
+</script>
+
+<script id="student-persistent-login-20260806">
+const applyStudentPersistentLogin20260806Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentPersistentLogin20260806Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-student-app'||name.includes('STEP塾生アプリ（step-hub）')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月6日',
+    '正本ファイル':['step-hub/index.html','step-hub/sw.js','step-hub/tests/common-login.test.mjs','foresta-step-progress/index.html','foresta-step-progress/apps-script/code.gs','foresta-step-progress/tests/common-session.test.mjs','student-QR/my_qr.html','student-QR/gas/MyQrApi.js'],
+    '最新版の場所':'塾生ホーム：stepkobetsu-hub/step-hub（main）／共通認証API：stepkobetsu-hub/foresta-step-progress（main）のapps-script/code.gs／本人QR：stepkobetsu-hub/student-QR（main）',
+    '確認根拠':'step-hub・foresta-step-progressのGitHub main、共通ログイン対象試験、Apps Scriptデプロイ管理画面のバージョン84を照合。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月6日 継続ログイン：同一端末・同一ブラウザーでは、一度ログインした後、本人が右上のログアウトを押すまで生徒ID・パスワードの再入力を求めない。パスワードは端末へ保存せず、ランダムで取り消し可能な共通セッショントークン・有効期限表示値・プロフィールだけを保存する。明示的ログアウトではサーバー側トークンを失効し、端末側の共通セッションを削除するため、次回はログイン画面へ戻る。生徒用のみ継続ログインとし、講師・管理者用は従来どおり8時間。退塾・無効化された生徒は生徒マスタの最新状態をサーバー側で確認して拒否する。変更前の8時間トークンがまだ有効なら、次回検証時に自動移行する。すでに期限切れの場合は一度だけ再ログインが必要。自分のQR側の短期セッションは、共通トークンが有効なら自動再発行し、認証情報の再入力を求めない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：継続ログイン】画面は step-hub/index.html の readCommonSession・validateCommonSession・logout と sw.js?v=21。認証APIは foresta-step-progress/apps-script/code.gs の STUDENT_SESSION_EXPIRES_AT・createSession_・makeStudentSessionPersistent_・requireActiveStudentSession_・verifySession_・logout_・getCommonStudentSession。再ログインが出る場合は、①端末の stepCommonStudentSessionToken、② getCommonStudentSession の応答コード、③生徒マスタの在籍状態、④Service Worker v21、⑤Apps Scriptバージョン84、の順に確認する。パスワード保存を回避策にしない。GitHub：step-hub index 85ae15d6eac639ce7902bac42dc0004726a8d74c、sw 3831019de288af67e8f35af5949fb17b8453378d、tests 8c103c89e2badfb629593c735f8e022c4cffbe02。foresta-step-progress code.gs 01286ac689ac5e9a3f03f5cdf01073bf6f4ea4ed、index 22cef7ecdd8be3638a09cb13cadd23054bcedd56、tests 383f0dd201ec64ecaa0f15ecab7461ecc34fd093。Apps Scriptは既存URLのままバージョン84（2026年8月6日 01:44 JST）へ更新。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'生徒ID・パスワード、セッショントークンの実値、Script Propertiesは台帳へ記載しない。ログイン維持は認証情報の保存ではなく、サーバーで失効できるランダムトークンで行う。',
+    '確認済み事項':[...new Set([...confirmed,'同一端末では明示的ログアウトまで共通ログインを維持','生徒ID・パスワードは端末へ保存しない','明示的ログアウトでサーバー側トークンを失効','ログアウト後は次回に生徒ID・パスワード入力が必要','旧8時間生徒セッションを次回検証時に自動移行','無効・退塾生徒を最新マスタ状態で拒否','講師・管理者用セッションは8時間を維持','自分のQR短期セッションを共通トークンから自動再発行','step-hub Service Worker v21','step-hub対象試験9件合格','認証APIの継続ログイン対象試験合格','Apps Scriptバージョン84へ既存URLのまま更新'])],
+    '確認状況':'明示的ログアウトまでの共通ログイン維持・パスワード非保存・無効生徒拒否を本番反映済み'
   });
 };
 </script>
