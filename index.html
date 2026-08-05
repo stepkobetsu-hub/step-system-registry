@@ -1239,5 +1239,29 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="teacher-portal-instant-qr-20260806">
+const applyTeacherPortalInstantQr20260806Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyTeacherPortalInstantQr20260806Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('講師ポータル'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'本番',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/teacher-portal/',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/teacher-portal',
+    '正本ファイル':'index.html（画面・キャッシュ更新）／script.js（画面遷移・端末保存・API呼出）／Code.gs（Apps Script側）',
+    '最新版の場所':'stepkobetsu-hub/teacher-portal（main）／公開確定 commit 16502435428ac051f3476dd2fe9d388382f383cf／script.js commit 7d3326169ef5ab2f8c95b4ee46baec5bc16fe4e2',
+    '確認日':'2026年8月6日',
+    '確認根拠':'teacher-portalのGitHub main、GitHub Pages公開index.html・script.js、保存済みQR即時表示・ログアウト・旧端末移行の自動試験3件を照合。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認】講師ポータルの出退くんQRに関する依頼は、stepkobetsu-hub/teacher-portal の script.js を最初に確認する。対象関数は showNyutaikun（入口と自動遷移）、loadNyutaikunQr（API取得）、saveTeacherSession（端末保存）、clearTeacherSession・logoutNyutaikun（ログアウト）。API接続先はscript.js先頭のAPI_URL。画面はindex.htmlの nyutaikunLoginPage（2枚目）と nyutaikunQrPage（3枚目）。空のeacher-portalは正本ではない。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'画面遷移：初回またはログアウト後だけ2枚目で講師コードを入力する。保存済みの講師コード・氏名・QRデータがそろっている通常時は、2枚目を一瞬も表示せず3枚目を即時表示する。旧端末で講師コードのみ保存済みの場合も3枚目を先に表示し、初回だけ画面内でAPI取得してQRデータを保存する。端末保存キーはteacherCode・teacherName・teacherQrCode・teacherQrData。3枚目のログアウトおよび授業報告側ログアウトで4キーをすべて削除し、次回は2枚目へ戻す。index.htmlはscript.js?v=20260806-instant-qrを読み込む。',
+    '関連カード':['出退くんQR作成・読取','講師予定・夏休み出勤登録'],
+    '確認済み事項':[...new Set([...confirmed,'講師ポータル正本はstepkobetsu-hub/teacher-portal（main）','出退くんQRの通常時は2枚目を省略して3枚目を即時表示','旧端末も2枚目を表示せず3枚目内で初回取得','講師コード・氏名・QRデータを対応付けて端末保存','3枚目ログアウトで4つの保存キーを削除','ログアウト後は次回に講師コード入力が必要','script.jsのキャッシュ更新','画面遷移自動試験3件合格','GitHub Pages公開反映確認'])],
+    '確認状況':'出退くんQRの2枚目省略・3枚目即時表示・ログアウト後の入力復帰を本番反映済み'
+  });
+};
+</script>
+
 </body>
 </html>
