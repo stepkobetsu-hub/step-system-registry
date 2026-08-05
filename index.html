@@ -1222,5 +1222,22 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="delivery-history-retention-v60-20260805">
+const applyDeliveryHistoryRetentionV6020260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryHistoryRetentionV6020260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Webアプリ一覧':[...new Set([...(Array.isArray(base['Webアプリ一覧'])?base['Webアプリ一覧']:[]),'Apps Script v60（送信履歴2年保持・年度別自動保管・既存デプロイID維持）'])],
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\\n\\n':'')+'2026年8月5日：送信履歴が増え続けて画面や処理が重くなることを防ぐため、通常のログ・メール送信キューは直近2年を保持し、2年を超えた行を「入退室メール履歴保管（年度別）」フォルダ内の年別スプレッドシートへ自動保管する仕組みを追加。コピー後に保管元行キーで件数を照合できた行だけ元シートから整理し、重複保管も防止する。日次トリガーで確認し、実際の整理は30日間隔で月1回まで自動実行。初回処理は正常完了し、現在は2年超の対象がないため移動・削除0件。Apps Scriptは既存URLのままv60へ更新。',
+    '確認済み事項':[...new Set([...confirmed,'通常画面は直近2年を保持','2年超の送信履歴を年別スプレッドシートへ保管','ログとメール送信キューの両方を対象','コピー・照合後に元行を整理','保管元行キーで重複防止','日次確認・30日間隔の自動整理トリガー登録','初回処理正常完了（移動・削除0件）','Apps Script v60へ更新','既存デプロイID・公開URLを維持','対象自動テスト16件合格'])],
+    '確認状況':'直近2年保持・2年超の年度別自動保管をApps Script v60へ本番反映済み'
+  });
+};
+</script>
+
 </body>
 </html>
