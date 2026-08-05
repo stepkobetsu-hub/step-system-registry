@@ -1139,5 +1139,22 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="delivery-history-runtime-fix-20260805">
+const applyDeliveryHistoryRuntimeFix20260805Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDeliveryHistoryRuntimeFix20260805Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('不達メール'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月5日',
+    'Webアプリ一覧':[...new Set([...(Array.isArray(base['Webアプリ一覧'])?base['Webアプリ一覧']:[]),'Apps Script v57（不達メール送信履歴の実行範囲を修復・既存デプロイID維持）'])],
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日：最新版画面へ復旧後、送信履歴ボタンで「処理中にエラーが発生しました」と表示される障害を修復。Apps ScriptのDeliveryHistory.gs全体が誤ってmyFunction内へ入っており、getDeliveryAddressHistory_を外部から呼べないことが原因。GitHub正本と照合して独立したグローバル関数へ戻し、既存デプロイIDのままv57へ更新。',
+    '確認済み事項':[...new Set([...confirmed,'DeliveryHistory.gsのmyFunction包み込みを除去','送信履歴関数をグローバル実行可能な状態へ復旧','Apps Script v57へ更新','既存デプロイID・公開URLを維持','GitHub正本とコード照合','対象自動テスト8件合格'])],
+    '確認状況':'送信履歴エラーの原因を特定し、Apps Script v57へ本番修復済み'
+  });
+};
+</script>
 </body>
 </html>
