@@ -52,7 +52,7 @@
 ## 登録詳細：STEP塾生アプリ（step-hub）開発記録
 
 - ID: `step-student-app`
-- 更新日・仕様基準日: 2026年8月1日
+- 更新日・仕様基準日: 2026年8月6日
 - 状態: 本番使用中
 - 目的: 既存の塾生向けシステムを一つにまとめ、スマートフォンのホーム画面から利用できる塾生専用PWAとして運用する。ホームページのリンク集ではなく、塾生専用アプリを正本とする。
 - 利用者向けURL: https://stepkobetsu-hub.github.io/step-hub/
@@ -72,14 +72,17 @@
 - 初回のみ生徒ID・パスワードを入力する。
 - 以降は、自分のQR・成績管理・学習進捗管理を再入力なしで利用できる。
 - フォレスタプラスは共通ログイン対象外。
-- パスワードは端末へ保存せず、期限付きセッショントークンだけを利用する。
+- 同一端末・同一ブラウザーでは、一度ログインした後、本人が右上の「ログアウト」を押すまで生徒ID・パスワードの再入力を求めない。
+- パスワードは端末へ保存しない。端末に保存するのは、ランダムで取り消し可能な共通セッショントークン、有効期限表示値、表示用プロフィールだけとする。
+- 変更前の8時間セッションがまだ有効な場合は、次回のサーバー検証時に継続ログイン方式へ自動移行する。すでに期限切れの場合だけ、一度再ログインが必要。
 
 ### 自分のQR・高速化・権限制御
 
 - 塾生専用ページで本人専用QRだけを表示する。
 - 他人のQR取得、URL改ざん、他生徒ID指定を拒否する。
-- セッション失効・期限切れ時は再ログインを要求する。
-- キャッシュ、共通ログイン、即時表示、ログアウト時のキャッシュ削除、セッション期限管理を実装済み。
+- 明示的なログアウト時はサーバー側でトークンを失効し、端末側の共通セッション・プロフィールを削除するため、次回は生徒ID・パスワード入力へ戻る。
+- 退塾・無効化された生徒は、保存済みトークンがあっても生徒マスタの最新状態をサーバー側で確認して拒否する。
+- キャッシュ、共通ログイン、即時表示、ログアウト時のキャッシュ削除、継続ログイン、旧セッションの自動移行を実装済み。
 - 塾生アプリから管理者画面へ入れてしまう重大不具合を修正済み。API側でも本人確認を行い、本人だけにアクセスを許可する。
 
 ### デザイン変更前に完了していた画面改善
@@ -111,11 +114,24 @@
 - 機能安定基準: `step-hub` コミット `2f55e36`
 - 本番復元コミット: `a85e3bd`
 - 復元方法: Git履歴は残したまま、`index.html`、`manifest.webmanifest`、`sw.js`、関連自動試験を機能安定基準へ戻した。PWA端末へ確実に復元版を配信するため、Service Workerのキャッシュ名だけを `step-student-v15-rollback` へ更新した。
-- 維持した機能: 共通ログイン、期限付きセッション、パスワード非保存、本人限定QR、QR高速化、アプリ内QR表示、成績管理・学習進捗管理への共通ログイン接続、フォレスタプラス入口、愛知全県模試、愛知県入試制度、学習資料、QR画面の生徒ID・氏名・校舎名表示とログアウト時キャッシュ削除。
+- 維持した機能: 共通ログイン、パスワード非保存、本人限定QR、QR高速化、アプリ内QR表示、成績管理・学習進捗管理への共通ログイン接続、フォレスタプラス入口、愛知全県模試、愛知県入試制度、学習資料、QR画面の生徒ID・氏名・校舎名表示とログアウト時キャッシュ削除。
 - 非対象: QR本体ページ、本人限定API、認証API、成績管理、学習進捗管理、フォレスタプラス外部ログイン方式には復元による変更を加えていない。
 - 検証: 自動試験6件合格、インラインJavaScript・manifest構文検査合格、375px・390px・412pxで横方向のはみ出しなし、公開版の各リンク・資料・PWAキャッシュ・QR iframe・未ログイン保護を確認。ブラウザー警告・エラーなし。
 - Issue記録: `step-hub` Issue #14へ採用撤回と復元結果を記録し、クローズ理由を `not planned` へ変更。
 - 管理上の扱い: 上記はデザイン変更前の確定仕様を上書きせず、その後の方針変更・復元履歴として分離して保存する。
+
+### 2026年8月6日：明示的ログアウトまで共通ログインを維持
+
+- 要望: STEP塾生アプリで生徒ID・パスワードを何度も聞かれないようにし、本人がログアウトするまでログイン状態を維持する。
+- 画面側正本: `step-hub/index.html` の `readCommonSession`、`validateCommonSession`、`logout`、および `step-hub/sw.js`（キャッシュ `step-student-v21-persistent-login`）。ブラウザー内の期限だけでログイン画面へ戻さず、保存済みトークンをサーバーへ送って有効性を判定する。
+- 認証API正本: `foresta-step-progress/apps-script/code.gs` の `STUDENT_SESSION_EXPIRES_AT`、`createSession_`、`makeStudentSessionPersistent_`、`requireActiveStudentSession_`、`verifySession_`、`logout_`、`getCommonStudentSession`。
+- 連携画面: `foresta-step-progress/index.html` も、サーバー検証で返された有効期限を保存し、移行後の共通セッションを引き継ぐ。
+- 安全設計: 生徒用のみ継続ログイン。講師・管理者用セッションは従来どおり8時間。認証情報は保存せず、失効可能なトークンだけを保存する。生徒マスタで無効・退塾になったIDは `STUDENT_INACTIVE` として拒否する。
+- QR内部セッション: 自分のQR側の短期セッションが更新時期になっても、共通セッショントークンが有効なら自動再発行し、生徒ID・パスワードの再入力は求めない。
+- Apps Script本番反映: プロジェクト「フォレスタステップ進捗管理【開発】」をバージョン84（2026年8月6日 01:44 JST）へ更新。既存デプロイIDとWebアプリURLを維持。
+- GitHub反映: `step-hub` は `index.html` commit `85ae15d6eac639ce7902bac42dc0004726a8d74c`、`sw.js` commit `3831019de288af67e8f35af5949fb17b8453378d`、試験 commit `8c103c89e2badfb629593c735f8e022c4cffbe02`。`foresta-step-progress` は `apps-script/code.gs` commit `01286ac689ac5e9a3f03f5cdf01073bf6f4ea4ed`、`index.html` commit `22cef7ecdd8be3638a09cb13cadd23054bcedd56`、試験 commit `383f0dd201ec64ecaa0f15ecab7461ecc34fd093`。
+- 検証: `step-hub` の共通ログイン試験9件合格。認証API側の継続ログイン・旧セッション移行・無効生徒拒否・明示的ログアウトの対象試験合格。
+- 【次回ここから確認】再ログインが出る場合は、① `stepCommonStudentSessionToken` が端末にあるか、② `getCommonStudentSession` の応答コード、③生徒マスタの在籍状態、④ `step-hub/index.html` のService Worker読込版 `sw.js?v=21`、⑤Apps Scriptがバージョン84か、の順で確認する。パスワード保存を回避策にしない。
 
 ## 登録詳細：出退くんQR作成・読取
 
@@ -164,8 +180,8 @@
 - 正本ファイル: `index.html`、`README.md`、`package.json`、`tests/`、`apps-script/code.gs`、`apps-script/appsscript.json`、`apps-script/README.md`
 - 最新版の場所: `stepkobetsu-hub/foresta-step-progress` の `main` 直下
 - 通信方法: GitHub Pagesの `index.html` からApps Script WebアプリへJSON API通信。Apps Script HTML Service／iframeは不使用。
-- 認証方式: アプリ独自認証、期限付きセッション、サーバー側権限確認、本人studentId一致確認。Googleアカウントは不要。
-- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、プロジェクトID `1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB`、編集URL https://script.google.com/home/projects/1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB/edit、公開API version 47、既存デプロイID `AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg`、WebアプリURL https://script.google.com/macros/s/AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg/exec。実行ユーザーはデプロイ実行者（stepkobetsu@gmail.com）、アクセス設定は全員（匿名ユーザーを含む）。アプリ独自認証・期限付きセッション・本人studentId照合を維持
+- 認証方式: アプリ独自認証。生徒用は明示的ログアウトまで維持する失効可能な共通セッション、講師・管理者用は8時間セッション。サーバー側権限確認、在籍状態確認、本人studentId一致確認を行う。Googleアカウントは不要。
+- Apps Script: プロジェクト名「フォレスタステップ進捗管理【開発】」、プロジェクトID `1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB`、編集URL https://script.google.com/home/projects/1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB/edit、公開API version 84（2026年8月6日 01:44 JST）、既存デプロイID `AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg`、WebアプリURL https://script.google.com/macros/s/AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg/exec。実行ユーザーはデプロイ実行者（stepkobetsu@gmail.com）、アクセス設定は全員（匿名ユーザーを含む）。生徒用継続ログイン、明示的ログアウトによる失効、在籍状態確認、本人studentId照合を維持
 - 保存先Spreadsheet: 「フォレスタステップ進捗管理DB【開発】」、Spreadsheet ID `1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI`、URL https://docs.google.com/spreadsheets/d/1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI/edit
 - 使用シートと役割: `設定`（アプリ設定）、`単元マスタ`（教材・科目・単元設定）、`生徒プロフィール`（表示用プロフィール）、`標準範囲`（学年別標準範囲）、`生徒別目標`（個別目標範囲）、`学習進捗`（Point・WARM UP・TRY・LCT・学習日・周回）、`宿題`（宿題項目・本人申告・講師確認）、`セッション`（ハッシュ化トークン・期限・失効）、`操作履歴`（監査ログ）、`学年要確認`（生徒マスタ学年競合）、`エラーログ`（予期しない内部エラー）、`達成節目`（達成メッセージ・キャラクター）
 - 参照マスタ: 非公開の本番生徒マスタと講師マスタ。具体的なSpreadsheet ID・シート名・列構成・認証情報は非公開の運用記録およびScript Propertiesで管理し、台帳・GitHubへ記載しない
