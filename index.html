@@ -1278,5 +1278,36 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script id="system-registry-persistent-login-step-message-notice-20260806">
+const applySystemRegistryPersistentLoginStepMessageNotice20260806Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applySystemRegistryPersistentLoginStepMessageNotice20260806Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  if(name.includes('STEP配信')){
+    return Object.assign({},base,{
+      '確認日':'2026年8月6日',
+      '最新版の場所':'stepkobetsu-hub/step-message-center（main）／index.html',
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月6日：欠席連絡欄右上の注意書きを「※送信前に必ず更新してくださいね！」へ変更。機能・自動更新間隔・手動更新ボタンは変更なし。',
+      '確認済み事項':[...new Set([...confirmed,'送信前の更新注意書きを指定文言へ変更','STEP配信の機能・更新処理は変更なし'])],
+      '確認状況':'送信前の更新注意書き変更をGitHub Pagesへ反映'
+    });
+  }
+  if(base['ID']==='system-registry'||name.includes('システム資産管理台帳')||name.includes('総合管理ポータル')){
+    return Object.assign({},base,{
+      '確認日':'2026年8月6日',
+      '認証仕様':'同一端末・同一ブラウザーでは、明示的にログアウトするまでスタッフ用ログインを維持。ランダムなセッショントークンをサーバー側へ保持し、パスワードは端末へ保存しない。各API呼出時に講師マスタの最新権限を再確認する。',
+      '正本ファイル':'stepkobetsu-hub/seiseki-kanri の gas_code.js（認証API）／stepkobetsu-hub/step-system-registry の index.html（公開台帳）',
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月6日：従来はCacheServiceの6時間上限により「セッションが切れました」と再ログインを求めていた。認証正本をScript Propertiesの失効可能なランダムトークンへ変更し、ログアウトするまで維持する。高速化用CacheServiceは6時間ごとに自動再生成。旧6時間セッションがまだ有効な端末は最初の照会時に継続ログインへ自動移行する。明示的ログアウトではサーバー側トークンと端末側情報を削除する。権限2・3・4の判定は講師マスタの最新状態で毎回確認し、権限を外した場合は利用不可。',
+      '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'パスワード・セッショントークンの実値は台帳やGitHubへ記録しない。端末紛失時は講師マスタの権限を外すことで次回照会から拒否できる。',
+      '確認済み事項':[...new Set([...confirmed,'明示的ログアウトまでログイン維持','パスワードは端末へ保存しない','ランダムトークンをサーバー側で失効可能に保持','旧6時間セッションを有効中なら自動移行','各照会で講師マスタの最新権限を確認','明示的ログアウトでサーバー・端末の認証を削除'])],
+      '確認状況':'ログアウトまでの継続ログイン仕様を認証正本へ反映'
+    });
+  }
+  return base;
+};
+</script>
+
 </body>
 </html>
