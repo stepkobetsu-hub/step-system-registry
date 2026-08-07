@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 61877)
+Total output lines: 1415
+
 <!doctype html>
 <html lang="ja">
 <head>
@@ -301,332 +304,7 @@ applyAssetInfo=function(item){
     '被参照システム':'スタッフ用アプリ（https://stepkobetsu-hub.github.io/seiseki-kanri/）',
     '連携メモ':['講師ポータルからスタッフ用アプリへ移動できる','スタッフ用アプリ上部から講師ポータルへ戻る導線がある'],
     '確認日':'2026年7月28日',
-    '確認根拠':'STEPシステム資産管理台帳の講師ポータルカードと、seiseki-kanri/index.html のスタッフ用アプリ画面を確認。',
-    '確認済み事項':['講師ポータル本体の既存リンク','スタッフ用アプリ：https://stepkobetsu-hub.github.io/seiseki-kanri/','講師ポータルとスタッフ用アプリの相互導線'],
-    '確認状況':'講師ポータル本体・スタッフ用アプリ・相互導線を確認済み'
-  });
-};
-const applyQrDeliveryCorrectionsBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyQrDeliveryCorrectionsBase(item);
-  const name=String(base['システム名']||'');
-  if(name.includes('出退くん')){
-    return Object.assign({},base,{
-      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html',
-      '読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
-      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
-      '正本ファイル':'student_qr_register.html（QR登録・管理）／tablet_checkin.html（入退室読み取り）',
-      '最新版の場所':'stepkobetsu-hub/student-QR（main）',
-      '確認日':'2026年7月28日',
-      '確認根拠':'本番HTML、manifest.json、manifest-qr.json、およびスタッフ用アプリ index.html をGitHub上で再取得して確認。',
-      '作業メモ':'2026年7月27日〜28日：スタッフ用アプリの「管理者QR登録」を student_qr_register.html へ修正。Androidで不達メール管理を開く際に「入退室」起動画面が一瞬表示される事象を解消するため、manifest.json の scope を tablet_checkin.html のみに、manifest-qr.json の scope を student_qr_register.html のみに限定。不達メール管理はQRアプリの対象外とした。',
-      '仕様メモ':'QR登録・管理と入退室読み取りは同じGitHubリポジトリ内の別画面。PWA設定も各画面だけを対象とし、/student-QR/ 配下全体を対象にしない。',
-      '確認済み事項':['QR登録の正しいURL：student_qr_register.html','読み取り画面：tablet_checkin.html','スタッフ用アプリ「管理者QR登録」のリンク修正','manifest.json scope：tablet_checkin.html のみ','manifest-qr.json scope：student_qr_register.html のみ','不達メール管理をQRアプリの対象外へ分離','GitHub：stepkobetsu-hub/student-QR'],
-      '確認状況':'正しいURL・スタッフ用入口・Android PWA範囲を確認済み'
-    });
-  }
-  if(name.includes('不達メール')){
-    return Object.assign({},base,{
-      '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/delivery_failures.html',
-      '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/archive_delivery_failures.html',
-      'GitHub URL':'https://github.com/stepkobetsu-hub/seiseki-kanri',
-      '正本ファイル':'delivery_failures.html／archive_delivery_failures.html／icons/delivery-failure-icon.svg',
-      '最新版の場所':'stepkobetsu-hub/seiseki-kanri（main）',
-      '確認日':'2026年7月28日',
-      '確認根拠':'本番HTML、専用SVGアイコン、スタッフ用アプリ index.html、およびQR用manifestのscopeをGitHub上で再取得して確認。',
-      '作業メモ':'2026年7月27日〜28日：不達メール専用アイコンを作成し、カードと両管理画面のfaviconへ設定。manifest scope訂正後も既存Android端末でQR起動画面が残ることを確認したため、現行版を seiseki-kanri へ移設。スタッフ用アプリと資産台帳のリンクも新URLへ変更した。旧 student-QR 配下は正本ではない。',
-      '仕様メモ':'不達メール管理はQR読み取りアプリではない。Androidに残る旧QRアプリ範囲の影響を確実に避けるため、2026年7月28日に本番画面・非表示データ管理・専用アイコンを /student-QR/ から /seiseki-kanri/ へ移設した。',
-      '関連カード':['STEPメッセージ','出退くんQR作成・読取'],
-      '確認済み事項':['本番画面：delivery_failures.html','非表示データ管理：archive_delivery_failures.html','専用アイコン：icons/delivery-failure-icon.svg','スタッフ用アプリのカードへ専用アイコン設定','両管理画面のfaviconへ専用アイコン設定','QRの「入退室」起動画面が表示されないようPWA範囲から分離','保存先：入退室ログ２／不達メール管理'],
-      '確認状況':'seiseki-kanriへの移設・新本番URL・専用アイコン・スタッフ用入口・Android起動画面対策を確認済み'
-    });
-  }
-  return base;
-};
-const linkLabelQrDeliveryBase=linkLabel;
-linkLabel=function(item,field,fallback){
-  const name=String(item['システム名']||'');
-  if(name.includes('出退くん')){
-    if(field==='利用者向けURL')return '管理者QR登録を開く';
-    if(field==='読み取りURL')return '入退室QR読み取りを開く';
-  }
-  if(name.includes('不達メール')){
-    if(field==='利用者向けURL')return '不達メール管理を開く';
-    if(field==='管理者向けURL')return '非表示データの管理を開く';
-  }
-  return linkLabelQrDeliveryBase(item,field,fallback);
-};
-const linkLabelBase=linkLabel;
-linkLabel=function(item,field,fallback){const name=String(item['システム名']||'');if(name.includes('生徒マスタ')){if(field==='Apps Script編集URL')return 'Apps Script（生徒名簿）を開く';if(field==='Apps Script WebアプリURL')return 'Apps Script Webアプリ v15（有効デプロイ）';if(field.startsWith('WebアプリURL '))return `Apps Script Webアプリ ${field.replace('WebアプリURL ','')}`}if(name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')){const timetable=TEACHER_TIMETABLE_LINKS.find(link=>link.field===field);if(timetable)return timetable.label;if(field==='Google Sheet URL 3')return 'Google Sheet（旧GAS版：講師出勤可否データ）を開く';if(field==='旧Apps Script編集URL')return 'Apps Script（旧GAS：スタンドアロン版）を開く';if(field==='旧Apps Script編集URL 2')return 'Apps Script（旧GAS：バインド型候補）を開く';if(field==='旧Apps Script編集URL 3')return 'Apps Script（旧GAS：先生出勤登録アプリ2）を開く';if(field==='旧WebアプリURL')return '旧Webアプリ（スタンドアロン版）を開く';if(field==='旧WebアプリURL 2')return '旧Webアプリ（バインド型候補）を開く'}return linkLabelBase(item,field,fallback)};
-</script>
-
-<script>
-const applyLearningProgressV36Base=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgressV36Base(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    '利用者向けURL':'https://stepkobetsu-hub.github.io/foresta-step-progress/',
-    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/foresta-step-progress/',
-    'GitHub URL':'https://github.com/stepkobetsu-hub/foresta-step-progress',
-    'Apps Script編集URL':'https://script.google.com/home/projects/1xu7BtCOMrB9bzWMcB_c0gcj-Df0Ql93yZp4CyPIgjWcf6EqMDSyRETIB/edit',
-    'Apps Scriptプロジェクト名':'フォレスタステップ進捗管理【開発】',
-    'Apps Script種別':'スタンドアロンWebアプリ',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。v39で大手町校限定の必修テキスト309単元（理科・地理・歴史・中3社会）を追加し、生徒別行取得、セッション短期キャッシュ、単元マスタ分割キャッシュの高速化を維持。',
-    'GASファイル一覧':['コード.gs','Index.html','DevelopmentRepair.gs','appsscript.json（GitHub正本では apps-script/required-textbook.gs を分離保管）'],
-    '主要関数':['routePublicApi_','listHomework_','getStudentDashboard_','studentLogin','authenticateStudent_','getStudentAuthRecord_','verifySession_','getRowsByFieldValue_','cacheGetLargeJson_'],
-    'Webアプリ設定':'実行ユーザー：デプロイ実行者／アクセス権：全員（匿名ユーザーを含む）／アプリ独自認証と本人照合あり',
-    'Webアプリ一覧':['v39（2026/07/29） 大手町校限定・必修テキスト309単元、単一宿題「赤×なおしとその単元の残り」／v36高速化を維持／既存デプロイID維持'],
-    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg/exec',
-    '保存基盤':'Google Sheet',
-    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI/edit',
-    'Google Sheet名':'フォレスタステップ進捗管理DB【開発】',
-    '正式Spreadsheet名':'フォレスタステップ進捗管理DB【開発】',
-    '保存先Spreadsheet ID':'1axZz8nGy15srgo2DVladaY_KQ3XXVbNrOrk3zL1GqaI',
-    '使用シート名':'設定／単元マスタ／生徒プロフィール／標準範囲／生徒別目標／学習進捗／宿題／セッション／操作履歴／学年要確認／エラーログ／達成節目',
-    '正本ファイル':'index.html／apps-script/code.gs／apps-script/required-textbook.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json／apps-script/README.md',
-    '最新版の場所':'stepkobetsu-hub/foresta-step-progress（main）',
-    'バックアップ場所':'https://github.com/stepkobetsu-hub/foresta-step-progress/tree/main/apps-script',
-    'GitHubドキュメント':'https://github.com/stepkobetsu-hub/foresta-step-progress/blob/main/apps-script/README.md',
-    '確認日':'2026年7月29日',
-    '確認根拠':'GitHub main、Apps Script Head、本番v38相当を比較してHeadを正本と確定。Apps Script v39、既存デプロイID、公開アプリ、進捗管理DB、GitHub正本、setupDatabase完了ログを確認。',
-    '作業メモ':'更新時はGitHub正本とApps Script Headを同期し、開発用テスト生徒で認証・宿題・ダッシュボード・権限制御を確認後、既存デプロイIDを新バージョンへ更新する。Script Propertiesの値や個人情報はGitHubへ保存しない。',
-    '確認済み事項':['Apps Scriptプロジェクト名・ID・編集URL','本番v39・既存デプロイID・WebアプリURL','実行ユーザー・アクセス設定','進捗管理DB名・ID・URL','使用シート一覧と役割','GitHub正本・バックアップ・更新方法','本人studentId照合・他生徒拒否','宿題先行表示3〜5秒台','大手町校限定の必修テキスト309単元','理科の中1・中2・中3分離','社会の学年別構成','宿題1項目・件数連動','既存教材への非干渉'],
-    '未確認項目':[],
-    '確認状況':'Apps Script v39・Spreadsheet・既存デプロイ・GitHub正本・必修テキスト運用を確認済み'
-  });
-};
-</script>
-
-<script>
-const applyStepMessageAbsenceUxBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyStepMessageAbsenceUxBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!(name.includes('STEPメッセージ')||name.includes('STEP配信')))return base;
-  return Object.assign({},base,{
-    '利用者向けURL':'https://stepkobetsu-hub.github.io/step-message-center/',
-    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/step-message-center/',
-    'GitHub URL':'https://github.com/stepkobetsu-hub/step-message-center',
-    '正本ファイル':'index.html／style.css／app.js／api.js',
-    '最新版の場所':'stepkobetsu-hub/step-message-center（main）',
-    '確認日':'2026年7月29日',
-    '確認根拠':'GitHub mainの index.html・style.css・app.js と公開画面を確認。注意書きの計算済みスタイル（赤・13px）も公開画面で確認。',
-    '作業メモ':'2026年7月29日：欠席連絡の手動更新ボタンを目立つ緑色へ変更。「※送信前に必ず更新」を最終確認時刻の右横へ配置し、自動更新表示と同じ13pxの赤字に調整。欠席連絡は更新後、新しい連絡が上に表示される新着順へ変更。CSSの改行記述不備を修正し、公開画面で反映を再確認。',
-    '仕様メモ':'送信前に「欠席連絡を手動更新」を実行する運用。欠席連絡一覧は新しい連絡を上、古い連絡を下に表示する。',
-    '確認済み事項':['公開画面：index.html','通信処理：api.js','Apps Script Webアプリ接続','欠席連絡の手動更新ボタン：緑色で強調','送信前の更新注意書き：最終確認時刻の右横・赤字13px','欠席連絡一覧：新着順（新しい連絡が上）','公開画面で注意書きの色・文字サイズを確認'],
-    '未確認項目':['Spreadsheet ID','Apps Scriptバインド先'],
-    '確認状況':'公開画面・通信処理・欠席連絡の手動更新導線・新着順表示を確認済み / 保存先は継続調査'
-  });
-};
-</script>
-
-<script>
-const applyLearningProgress20260729LatestBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260729LatestBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。Apps Script v40で必修テキスト309単元（理科・地理・歴史・中3社会）を全校舎で利用可能。画面側は保存中の中央表示、保存中の画面移動抑止、宿題再取得、スマホ向け宿題カード圧縮、宿題アーカイブ表示、教材別LCT除外を実装。',
-    'Webアプリ一覧':['v40（2026/07/29） 必修テキストを全校舎で利用可能／v39の309単元・単一宿題・高速化を維持／既存デプロイID維持'],
-    '確認日':'2026年7月29日',
-    '確認根拠':'Apps Script v40と既存デプロイID、GitHub mainの公開画面 index.html、および公開コミット 4b1bd0c610b71215a64b86a7bf04b12394c8ac78 までを確認。',
-    '作業メモ':'2026年7月29日追加更新：必修テキストの校舎制限を解除。進捗・目標範囲の保存中は画面中央に「保存中です。そのままお待ちください。」を大きく表示し、完了までページ・科目・教材切替とログアウトを抑止。保存開始待ちを500msから120msへ短縮。進捗保存後は宿題キャッシュを破棄して即時再取得。宿題カードをスマホで低くし、必修テキスト宿題名とボタンを1行化。完了カードは×でアーカイブ、アーカイブ画面では「復活」。アーカイブ状態だけは同一端末・同一ブラウザのlocalStorage保存で、宿題完了日などの本体データは従来どおりGoogle Sheet保存。',
-    '仕様メモ':'必修テキストは全校舎で表示。理科は学年別。社会は中1・中2が地理＋歴史、中3が地理＋歴史＋中3社会。必修テキストの宿題は「赤×なおしとその単元の残り」1項目。LCT非搭載のため進捗画面からLCT欄を完全に除外する組合せ：フォレスタステップ国語、フォレスタゴール英語、フォレスタゴール国語。宿題アーカイブ状態はブラウザ単位で、別端末へは同期しない。',
-    '確認済み事項':['Apps Scriptプロジェクト名・ID・編集URL','本番v40・既存デプロイID・WebアプリURL','進捗管理DB名・ID・URL','GitHub正本・バックアップ・更新方法','本人studentId照合・他生徒拒否','必修テキスト309単元を全校舎で表示','理科の中1・中2・中3分離','社会の学年別構成','必修テキスト宿題「赤×なおしとその単元の残り」1項目','保存中の中央大型表示と画面移動抑止','保存開始待ち120ms','進捗保存後の宿題再取得','スマホ向け宿題カード圧縮','宿題アーカイブ・復活（ブラウザ単位）','LCT除外：ステップ国語・ゴール英語・ゴール国語','既存教材への非干渉'],
-    '未確認項目':[],
-    '確認状況':'Apps Script v40・Spreadsheet・既存デプロイ・GitHub main・必修テキスト全校舎運用・最新画面仕様を確認済み'
-  });
-};
-</script>
-
-
-<script>
-const applyLearningProgress20260730SaveUxBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260730SaveUxBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。Apps Script v42で進捗チェックと目標範囲を差分一括保存へ変更し、対象生徒・教材・周回・単元・項目に関係する行だけを更新。複数変更は1回のAPI呼び出しにまとめ、可能な範囲でsetValuesを集約する。',
-    'Webアプリ一覧':['v42（2026/07/30） 進捗・目標範囲の差分一括保存、楽観的更新、既存デプロイID維持／v40の必修テキスト309単元・全校舎運用を維持'],
-    '確認日':'2026年7月30日',
-    '確認根拠':'Apps Script v42・既存デプロイID、GitHub mainの公開画面 index.html、公開コミット cfa70e8a1ee9797cbc1a469eb201032af27b7658 までを確認。',
-    '作業メモ':'2026年7月30日：進捗チェックと目標範囲を画面へ即時反映する楽観的更新へ変更。連続操作は800msでデバウンスし、変更分を一括API送信。保存中も次の項目を操作可能。手動で即時一括保存できるフローティング「保存する」ボタンを追加し、スマートフォンでは右上・横幅最大320pxで表示。保存中は「保存中…しばらくお待ちください」と砂時計回転・軽い点滅を表示する。押し忘れ対策として800ms後の自動一括保存も維持。保存失敗時は対象項目のみ元へ戻し再試行を表示。ブラウザ離脱警告は削除。ID・パスワードを記憶した端末ではセッションを先に復元し、再読み込み時の自動再ログインを行う。「保存したログイン情報を消す」は下線付きテキスト表示（13px）。',
-    '仕様メモ':'進捗・目標範囲は楽観的更新＋800msデバウンス＋差分一括保存。フローティング保存ボタンは手動の即時保存手段であり、自動一括保存も安全網として併用する。保存中に画面全体を操作不能にしない。ブラウザ離脱確認は表示しない。保存失敗時だけ該当項目をロールバックする。既存の宿題判定・達成率・周回・目標範囲の意味と保存内容は変更しない。',
-    '確認済み事項':['Apps Script v42・既存デプロイID・WebアプリURL','進捗チェックの楽観的更新','目標範囲の楽観的更新','800msデバウンスと差分一括API保存','3件連続操作を原則1回のAPIへ集約する設計','保存中も次の項目を操作可能','保存失敗時の対象項目ロールバックと再試行','右上フローティング保存ボタン・最大幅320px','保存中メッセージと砂時計アニメーション','800ms後の自動一括保存を安全網として維持','ブラウザ離脱警告を削除','保存済みログイン情報からのセッション復元・自動再ログイン','保存ログイン情報削除リンクの文字拡大','既存の宿題・達成率・周回・目標範囲への非干渉'],
-    '未確認項目':[],
-    '確認状況':'Apps Script v42・Spreadsheet・既存デプロイ・GitHub main・差分一括保存・最新保存UI・ログイン復元を確認済み'
-  });
-};
-
-const applyLearningProgress20260730RecoveryBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260730RecoveryBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。2026年7月30日の重大表示不具合を復旧し、Apps Script本番はv47。未設定の必修テキストおよびフォレスタステップ全5教科は目標範囲0件から開始し、既存の生徒別設定は保持する。生徒・管理者画面に進捗件数表示、管理者一覧に校舎選択・並び替え・個人画面を追加した。既存デプロイIDを維持している。',
-    'Webアプリ一覧':['v47（2026/07/30） 未設定の必修テキスト・フォレスタステップ全5教科を目標範囲0件で開始／既存設定を保持／進捗件数・管理一覧改善／既存デプロイID AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg を維持'],
-    '確認日':'2026年7月30日',
-    '確認根拠':'公開版で宿題、進捗入力、目標範囲、達成率・グラフ、再読み込み、ログアウトを実画面確認。GitHub Pages最終コミット 0671528365a2ff44dad4de6c6bbbf804eeb7fc45、Apps Script正本コミット 2d1394dcf39a57d4d208713e8ae359194edb7e00、GitHub Pagesコミット 8187915b44ffb57c4fdbc55111b4a609a11e2b71、Apps Script本番v47、既存デプロイID維持を確認。',
-    '作業メモ':'2026年7月30日：目標範囲の初期値を修正。必修テキストは未設定時に全チェックを外し、フォレスタステップ理科・社会も未設定者のみ全チェックを外す。生徒別目標に保存済み行がある教材・科目は既存設定をそのまま保持する。GitHub正本コミット 35b5a9d3da004a6c3cee6d2d457dfcbd5cb73899、Apps Script本番v46、既存デプロイIDを維持。\n\n2026年7月30日：ログイン後に進捗データの読み込みが終わらず、進捗入力・目標範囲・達成率グラフが表示されない重大障害を復旧。原因はApps Script本番コードから filterUnitsForProfile_ が欠落してダッシュボードAPIが失敗していたこと、背景取得成功後の再描画がなかったこと、およびブラウザー側15秒タイムアウトが正常な応答より先に切れていたこと。欠落関数を復元し、成功後の再描画、失敗・中断を含む読込み表示の確実な解除、明示的な再試行表示、旧形式・破損キャッシュの安全な破棄、ダッシュボード取得上限45秒を実装した。',
-    '仕様メモ':'目標範囲の初期値：必修テキストは全教科で未設定時0件。フォレスタステップは英語・数学・国語・理科・社会の全5教科で未設定時0件。生徒別目標に当該教材・科目の保存済み行が1件以上ある場合は設定済みと判定し、選択済み・未選択を含む既存設定を保持する。チェックが入った単元だけを達成率・目標範囲の分母へ含める。\n\nダッシュボード背景取得は成功時に必ず通常画面を再描画する。失敗またはタイムアウト時も進捗入力・目標範囲タブ自体は隠さず、永続的な読込み表示を残さず「読み込みに失敗しました。再試行」を表示する。旧形式または破損した生徒別キャッシュは生徒ID単位で安全に破棄して再取得する。ログアウト用の世代管理・中断処理は通常ログイン時の初期取得と分離する。\n\n本番反映前確認項目：①参照関数が本番ソースに欠落していないこと、②背景取得成功後に再描画されること、③タイムアウト・失敗・中断時に読込み表示が解除され失敗表示と再試行が出ること、④旧形式・破損キャッシュが安全に破棄されること、⑤公開実画面で進捗入力タブ・目標範囲タブ・達成率グラフをそれぞれ確認すること。',
-    '本番反映前確認項目':['参照される関数がApps Script本番ソースに欠落していないこと','背景取得成功後に再描画関数が実行されること','タイムアウト・失敗・中断のすべてで読込み表示が解除され、失敗表示と再試行が出ること','旧形式または破損キャッシュが安全に破棄されること','公開実画面で進捗入力タブを開きデータ表示を確認すること','公開実画面で目標範囲タブを開きデータ表示を確認すること','公開実画面で達成率・グラフ表示を確認すること'],
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script v47・既存デプロイID維持','GitHub Pagesコミット 0671528365a2ff44dad4de6c6bbbf804eeb7fc45','Apps Script正本コミット 2d1394dcf39a57d4d208713e8ae359194edb7e00','GitHub Pagesコミット 8187915b44ffb57c4fdbc55111b4a609a11e2b71','宿題・進捗入力・目標範囲・達成率グラフの公開実画面表示','永続的な読込み表示の解消','再読み込み後の正常表示','ログアウト約0.41秒・古い画面へ戻らないこと'],
-    '未確認項目':[],
-    '確認状況':'目標範囲初期値と進捗表示・管理一覧改善をApps Script本番v47へ反映。必修テキストと未設定者のフォレスタステップ全5教科は0件開始、設定済み生徒は既存設定保持。既存デプロイID維持を確認済み'
-  });
-};
-</script>
-
-
-<script>
-const applyLearningProgress20260731AdminUxBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260731AdminUxBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。Apps Script本番v47と既存デプロイIDを維持。2026年7月31日はGitHub Pages側の管理画面・表示・キャッシュ処理のみ更新。',
-    'Webアプリ一覧':['v47（Apps Script本番・既存デプロイID維持）／GitHub Pages 2026/07/31 管理画面改善・表示高速化'],
-    '確認日':'2026年7月31日',
-    '確認根拠':'GitHub Pages公開画面と stepkobetsu-hub/foresta-step-progress main を照合。最新コミット 1e55b1f3193910d6df24b91613e62605fe669109。Apps Scriptコード・本番バージョン・既存デプロイIDは変更なし。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年7月31日：生徒画面の教材タグへ目標範囲の単元数を表示。管理者の生徒個人画面は初期状態を閲覧専用とし、教科行右端の「管理者編集」で編集を有効化。全体進捗へ戻るボタンを設定付近へ移動して強調。生徒別目標を「生徒検索」へ改称し、検索入力時は結果一覧だけを更新して1文字で入力が止まる不具合を修正。検索結果を氏名・ID・学年・校舎・個人画面ボタンの横1行に圧縮。全体進捗と生徒検索からの個人画面は事前読込と共通キャッシュで高速化。宿題チェックは5分キャッシュと事前読込を追加し、確認変更時はキャッシュを破棄。学年要確認は通常メニューから設定内へ移動。管理者編集の注意書きは赤字1行「閲覧専用です。変更する場合は、右の「管理者編集」を押してください。」とした。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'管理者の生徒個人画面は誤操作防止のため閲覧専用で開始し、「管理者編集」を押した場合のみ次回の宿題・進捗入力・目標範囲を変更できる。学年要確認は生徒マスタのJ列・K列の学年不一致を開いた時点で照合表示する診断機能で、設定内に配置する。修正は生徒マスタ側で人が行う。',
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'教材タグの目標単元数表示','管理者編集ロックと教科行右端の編集ボタン','全体進捗へ戻るボタンの強調配置','生徒検索の連続文字入力','生徒検索結果の横1行表示','全体進捗・生徒検索から個人画面への事前読込とキャッシュ','宿題チェックの5分キャッシュ・事前読込・更新時破棄','学年要確認を設定内へ移動','GitHub Pages最新コミット 1e55b1f3193910d6df24b91613e62605fe669109'],
-    '未確認項目':[],
-    '確認状況':'Apps Script本番v47・既存デプロイIDを維持。GitHub Pagesの管理者編集、安全ロック、生徒検索、個人画面・宿題チェック高速化、学年要確認の設定内移動を確認済み'
-  });
-};
-</script>
-<script>
-const applyLearningProgress20260731SupabaseBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260731SupabaseBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。2026年7月31日に学習進捗と生徒別目標の本番保存先をSupabaseへ切り替えた。その他のデータと復旧用原本はGoogle Sheetに維持。',
-    'GASファイル一覧':['コード.gs','Index.html','DevelopmentRepair.gs','SupabaseStorage.gs','appsscript.json（GitHub正本では apps-script/required-textbook.gs を分離保管）'],
-    'Webアプリ一覧':['v53（2026/07/31） Supabase保存先切替／既存デプロイID AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg を維持'],
-    '保存基盤':'Supabase（学習進捗・生徒別目標）／Google Sheet（その他データ・復旧用）',
-    'データベース名':'Supabase learning-progress（Northeast Asia / Tokyo）',
-    'Supabase URL':'https://wisedgcgwaebtkprdhth.supabase.co',
-    '使用シート名':'Google Sheet：設定／単元マスタ／生徒プロフィール／標準範囲／宿題／セッション／操作履歴／学年要確認／エラーログ／達成節目。Supabase：learning_progress／student_targets。Google Sheetの生徒別目標・学習進捗も復旧用に保持。',
-    '正本ファイル':'index.html／apps-script/code.gs／apps-script/SupabaseStorage.gs／apps-script/required-textbook.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json／apps-script/README.md',
-    '最新版の場所':'stepkobetsu-hub/foresta-step-progress（main） commit d508bdb7547ebe9bb22f9f0c4cdeea2bd61cc622',
-    '確認日':'2026年7月31日',
-    '確認根拠':'Supabase移行実行ログで学習進捗429件・生徒別目標3,761件が一致。SUPABASE_ENABLED=trueで検証関数を実行し、既存デプロイIDを新バージョンへ更新。公開画面で管理者ログイン、テスト生徒表示、進捗保存、再読込後の保持を確認。GitHub PR #2をmainへsquash merge。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年7月31日：Supabaseプロジェクト learning-progress を東京リージョンで作成。public.learning_progress と public.student_targets を作成し、RLS有効・anon/authenticated権限なし・service_roleのみApps Scriptから利用。接続情報はScript Properties（SUPABASE_URL／SUPABASE_SERVICE_ROLE_KEY／SUPABASE_ENABLED）で管理し、秘密鍵をGitHubへ保存しない。SUPABASE_ENABLED=falseでGoogle Sheetへ即時復旧可能。移行件数は429件／3,761件。未使用の重複デプロイ AKfycbx-J_MyY-vOHNhRldgOE85sHN_K7wuIeOcWkZcmehL7juficJqtyRHN5S1XKKWmO_W6Ew が作成されたが、公開画面は従来デプロイIDを継続使用。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'学習進捗と生徒別目標の読込・保存はSUPABASE_ENABLED=trueの場合にSupabase RESTを使用する。生徒別目標は1,000件単位でページ分割取得し、全件取得漏れを防ぐ。進捗は student_id＋unit_id＋school_year＋round_number、生徒別目標は student_id＋unit_id を一意キーとしてupsertする。Google Sheetは削除せず復旧経路として保持する。',
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Supabase learning-progress 東京リージョン','learning_progress 429件の移行・件数一致','student_targets 3,761件の移行・件数一致','SUPABASE_ENABLED=trueで読込成功','テスト生徒の進捗保存・再読込保持','Google Sheetへの復旧フラグを維持','既存公開デプロイID維持','GitHub main commit d508bdb7547ebe9bb22f9f0c4cdeea2bd61cc622'],
-    '未確認項目':['管理者一覧・宿題チェックなどGoogle Sheet継続部分の追加高速化'],
-    '確認状況':'Supabaseへの学習進捗・生徒別目標移行と本番切替を完了。公開画面で読込・保存・再読込保持を確認。Google Sheet復旧経路を維持。'
-  });
-};
-</script>
-
-
-<script>
-const applyLearningProgress20260731FinalOptimizationBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260731FinalOptimizationBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒・講師・管理者認証、期限付きセッション、本人studentId照合、単元・進捗・宿題・目標範囲・達成率集計。Google Sheetを復旧用原本として維持しながら、Supabaseを進捗・目標範囲・宿題・ログイン関連データの本番保存先として段階導入。生徒単位の絞り込み取得、差分一括保存、読込の並列化、短時間キャッシュを実装。',
-    '保存基盤':'Supabase（学習進捗・生徒別目標・宿題・生徒プロフィール・生徒認証）／Google Sheet（単元等のマスタ・監査・復旧用原本）',
-    'データベース名':'Supabase learning-progress（Northeast Asia / Tokyo）',
-    'Supabase URL':'https://wisedgcgwaebtkprdhth.supabase.co',
-    '使用シート名':'Supabase：learning_progress／student_targets／homework／student_profiles／student_auth。Google Sheet：単元・標準範囲等のマスタ、操作履歴、エラーログ、達成節目および復旧用データ。Supabase切替フラグをfalseに戻すことでGoogle Sheet経路へ復旧可能。',
-    '正本ファイル':'stepkobetsu-hub/foresta-step-progress：index.html／apps-script/code.gs／apps-script/SupabaseStorage.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json',
-    '最新版の場所':'stepkobetsu-hub/foresta-step-progress。高速化の最終Apps Script候補はブランチ agent/supabase-login-homework、code.gs commit e35f46c0c2f1432c2e295f9d33f5f1e541bc3db7。PR #3は未統合のため、mainとの差異を解消してから正本確定する。',
-    '確認日':'2026年7月31日',
-    '確認根拠':'Supabase移行・件数照合、差分書込み試験、既存デプロイ更新後の公開画面保存、再読込後の保持を確認。最終実画面計測は進捗入力 通信約5.0秒・処理約2.8秒（最長homework約1.2秒）、目標範囲 通信約4.3秒・処理約2.1秒。トップ宿題ページと達成率グラフはキャッシュ小型化後に正常速度へ復旧。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年7月31日：Supabase移行後の保存失敗と速度問題を段階修正。student_id等の一意キーでupsertし、同一リクエスト内の重複行を排除。生徒別に対象行だけ取得・更新し、Supabase利用時はGoogle Sheet用の全体ロックを回避。進捗・目標範囲は連続変更を差分一括送信する。ダッシュボードでは進捗・目標・宿題を並列取得し、同一APIの重複読込を抑止。目標IDと選択可能単元を10分キャッシュし、保存後の目標範囲全体再計算を廃止。保存用単元キャッシュをunitId・subject・series・hasLctだけに小型化し、既存キャッシュがある場合は再作成しないことでトップ画面のグラフ表示遅延を解消。保存結果には通信時間・サーバー処理時間・最長処理区間を表示する。移行関数はSUPABASE_ENABLED=trueでは再実行を拒否し、誤った再移行を防止。Google Sheetの復旧用データは削除していない。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'現在の保存経路は GitHub Pages → Apps Script → Supabase。サービスロールキーはApps ScriptのScript Propertiesだけで管理し、GitHub・台帳・画面へ保存しない。SupabaseはRLSを有効化し、anon/authenticatedの直接アクセスを許可しない。進捗保存では宿題の自動生成と監査記録を同期して行う。目標範囲の複数選択は800msの待機後、変更行を1回のAPIでまとめて保存する。現構成ではApps Script経由の通信固定費があるため、通常保存4～5秒程度を実用上の到達点とする。1～2秒台を目指す場合はSupabase Auth・RLS・RPCを含む直接保存方式の別設計が必要。',
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Supabaseへの進捗・目標範囲・宿題・生徒プロフィール・生徒認証の段階移行','生徒単位の絞り込み読込と差分一括保存','ダッシュボードの並列取得と重複API抑止','進捗・目標範囲の保存時間表示','進捗入力 通信約5.0秒・処理約2.8秒','目標範囲 通信約4.3秒・処理約2.1秒','トップ宿題ページ・グラフ表示の速度復旧','Google Sheet復旧経路の維持','移行関数の本番再実行防止','秘密鍵をScript Propertiesだけで管理'],
-    '未確認項目':['PR #3をmainへ統合し、Apps Script本番コードとGitHub正本を完全一致させる作業'],
-    '確認状況':'Supabase移行と保存高速化を本番で確認。トップ画面は正常、進捗・目標範囲は約4～5秒。復旧経路とセキュリティを維持。GitHub PR #3のmain統合のみ正本整理として残る。'
-  });
-};
-</script>
-
-
-<script>
-const applyLearningProgress20260801StudentAuthRecoveryBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260801StudentAuthRecoveryBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  return Object.assign({},base,{
-    '状態':'本番',
-    'Apps Script概要':'生徒認証はGoogle Sheetの生徒マスタ正本を使用。講師・管理者認証は従来どおり。進捗・目標範囲・宿題はApps Script経由でSupabaseへ保存する。期限付きセッション、本人studentId照合、差分一括保存、読込の並列化、短時間キャッシュを維持。',
-    '保存基盤':'認証：Google Sheet（生徒マスタ）／Supabase：学習進捗・生徒別目標・宿題・生徒プロフィール／Google Sheet：単元等のマスタ・監査・復旧用原本',
-    '使用シート名':'Supabase：learning_progress／student_targets／homework／student_profiles。student_authテーブルは削除せず保持するが、本番の生徒ログインには使用しない。Google Sheet：生徒マスタ認証、単元・標準範囲等のマスタ、操作履歴、エラーログ、達成節目および復旧用データ。',
-    '確認日':'2026年8月1日',
-    '確認根拠':'Supabase生徒認証経路で複数生徒が正しいID・パスワードでもINTERNAL_ERRORとなる障害を確認。SupabaseStorage.gsを修正し、生徒認証をGoogle Sheet正本へ戻した既存デプロイを更新。更新後、生徒IDでログイン成功を実画面確認。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月1日：講師・管理者はログイン可能だが、生徒のみ複数IDで「処理に失敗しました」となる障害が発生。Supabaseのstudent_auth認証経路を本番既定から外し、生徒ログインをGoogle Sheetの生徒マスタ正本へ復旧した。進捗・目標範囲・宿題のSupabase保存は継続し、速度改善・保存データには影響なし。SupabaseStorage.gs修正コミット 9530bda4b9655e226e78a1fc98026856f3d4322c。student_authテーブルは将来調査用に保持し、削除・再移行は行わない。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'本番ではSUPABASE_AUTH_ENABLEDを設定しない。未設定のまま生徒認証はGoogle Sheetを使用する。SUPABASE_ENABLED=trueは維持し、進捗・目標範囲・宿題のSupabase運用を継続する。SUPABASE_URLとSUPABASE_SERVICE_ROLE_KEYも変更しない。student_authテーブルを本番認証へ戻す場合は、別途原因調査と複数生徒での事前検証が完了するまでSUPABASE_AUTH_ENABLED=trueにしない。',
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'生徒認証をGoogle Sheet正本へ復旧','更新後の生徒IDログイン成功','講師・管理者ログイン経路は変更なし','進捗・目標範囲・宿題のSupabase保存を維持','SUPABASE_ENABLED=trueを維持','SUPABASE_AUTH_ENABLEDは未設定','student_authテーブルは保持・本番未使用','SupabaseStorage.gs commit 9530bda4b9655e226e78a1fc98026856f3d4322c'],
-    '未確認項目':['Supabase student_auth経路の障害原因調査（本番運用には使用せず保留）','PR #3をmainへ統合し、Apps Script本番コードとGitHub正本を完全一致させる作業'],
-    '確認状況':'生徒ログイン障害を復旧済み。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabaseの構成で本番動作を確認。Supabase認証は停止したまま保留。'
-  });
-};
-</script>
-
-
-<script>
-const applyLearningProgress20260801CanonicalMainBase=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyLearningProgress20260801CanonicalMainBase(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(!name.includes('学習進捗管理'))return base;
-  const unresolved=(Array.isArray(base['未確認項目'])?base['未確認項目']:[]).filter(value=>
-    !String(value).includes('PR #3') && !String(value).includes('GitHub正本を完全一致')
-  );
-  return Object.assign({},base,{
-    '状態':'本番',
-    '最新版の場所':'stepkobetsu-hub/foresta-step-progress main commit af603f5f3c449d39a0b0f36a89ea06aba383bade。PR #4で本番相当コードとmain後発変更を統合済み。',
-    '確認日':'2026年8月1日',
-    '確認根拠':'main最新版 af603f5f3c449d39a0b0f36a89ea06aba383bade を再取得し、apps-script/code.gsとapps-script/SupabaseStorage.gsのJavaScript構文確認、保存アクション名、Google Sheet生徒認証既定、秘密情報非混入を確認。PR #4をsquash mergeし、競合した旧PR #3は参照用として閉鎖。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月1日：GitHub mainの後発8コミットと旧PR #3の21コミットを新しい統合ブランチで競合なく統合。現行のsaveStudentProgressBatch、setOwnTargetChanges、saveVocabularyProgress、saveVocabularyTargets、confirmHomework、confirmHomeworkGroup、setStudentTargetをSAVE_ACTIONS_へ追加し、ログアウト時に保存通信を読取通信として中断する事故を防止。PR #4をsquash mergeし、main commit af603f5f3c449d39a0b0f36a89ea06aba383bade を正本化。旧PR #3はPR #4へ移行した旨を記録して閉鎖。Apps Script本番デプロイとSupabaseデータには今回変更なし。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'GitHub正本はmainを使用する。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabase。保存中断防止のSAVE_ACTIONS_には現行の書込API名を必ず含める。今後の修正はmain commit af603f5f3c449d39a0b0f36a89ea06aba383bade 以降を基準とし、閉鎖済みPR #3を直接基準にしない。',
-    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'本番相当コードとGitHub mainの正本化','PR #4 squash merge','main commit af603f5f3c449d39a0b0f36a89ea06aba383bade','現行保存アクションのログアウト中断防止','main上のApps Script 2ファイル構文確認','旧PR #3の閉鎖'],
-    '未確認項目':unresolved,
-    '確認状況':'GitHub mainを本番相当コードの正本として確定。生徒認証はGoogle Sheet、進捗・目標範囲・宿題はSupabase。保存中断防止を統合済み。Apps Script本番・Supabaseデータは変更なし。'
-  });
-};
-</script>
-
-<script>
-const organizePointManager20260801Base=organizeEntryImport;
-organizeEntryImport=function(items){
-  const out=organizePointManager20260801Base(items);
-  if(!out.some(x=>String(x['システム名']||'').includes('ポイント管理'))){
-    out.push({
-      'システム名':'STEP ポイント管理',
-      '正式名称':'STEP管理者用 ポイント管理',
-      '分類':'管理',
-      '状態':'本番',
-      '概要':'生徒番号別の残高確認、特別ポイント付与、ポイント使用、履歴訂正、入退室ポイント基本設定を行うスタッフ用画面。',
-      'GitHub正本':'stepkobetsu-hub/student-QR（main）',
-      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
-      '主要ファイル':'points_manager.html / gas/PointManager.js / gas/コード.js',
-      'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
-      'Apps Script編集URL':'https://script.google.com/home/projects/1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22/edit',
-      'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
-      '公開URL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+    '確認根拠':'…11877 tokens truncated…   '公開URL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
       '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
       '正本スプレッドシート':'入退室ログ２（1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A）',
       '旧ファイル':'入退室ログ（1zNK...）。今後使用しない旧ファイル。削除せず保管。',
@@ -1386,6 +1064,28 @@ applyAssetInfo=function(item){
     '確認済み事項':[...new Set([...confirmed,'管理者用・生徒用に端末選択2択を追加','端末未選択の大きな注意を選択ボタン直下へ表示','自分・家族の端末でID・パスワードを保存','自分・家族の端末で明示的ログアウトまでログイン維持','塾のタブレットでは認証情報を永続保存しない','塾のタブレットは30分無操作で自動ログアウト','明示的ログアウトで保存済み認証情報を削除','成績データ・GAS・Supabaseスキーマ変更なし','管理者用3件・生徒用4件・既存3件の試験合格','管理者用・生徒用のGitHub Pages公開確認'])],
     '確認状況':'管理者・生徒の端末選択、個人端末の自動ログイン、塾端末の30分無操作ログアウトを本番反映済み'
   });
+};
+</script>
+
+<script id="auth-resume-screen-status-20260807">
+const applyAuthResumeScreenStatus20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyAuthResumeScreenStatus20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  if(name.includes('成績管理')&&!name.includes('塾生アプリ'))return Object.assign({},base,{
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 自動ログイン画面：個人端末の有効なセッションまたは保存済み認証情報を確認している間はログイン画面を描画せず、成功時は生徒画面へ直接移動する。認証できない場合だけログイン画面を表示する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'本番コミット ce7143a012776ad2e76a5720a64cc713211ffdd7。端末別試験を含む11件とJavaScript構文検査合格。データ・GAS・スキーマ変更なし。',
+    '確認済み事項':[...new Set([...confirmed,'個人端末の自動認証中はログイン画面を非表示','認証失敗時だけログイン画面を表示','成績管理11件の試験合格'])],
+    '確認状況':'個人端末の自動ログイン画面ちらつき防止を本番反映済み'
+  });
+  if(base['ID']==='learning-progress'||name.includes('学習進捗管理'))return Object.assign({},base,{
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 自動ログイン画面：保存済みセッションの認証確認中はログイン画面を描画せず、成功時は進捗画面へ直接移動する。認証できない場合だけログイン画面を表示する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'ソースコミット 7c17acc7053b6b802d89ed3dfe656960b178b20d。Cloudflare側試験6件、TypeScript検査、JavaScript構文検査、dry-run合格。Cloudflare管理画面の人間確認によりWorkerアップロード待ち。既存本番Version 72c8dafa-53e9-46c4-9048-77e8fa1b8645は未変更。',
+    '確認済み事項':[...new Set([...confirmed,'自動認証中のログイン画面非表示をソースへ反映','認証失敗時だけログイン画面を表示','Cloudflare側試験6件合格','TypeScript検査合格'])],
+    '確認状況':'自動ログイン画面ちらつき防止はソース反映済み／Cloudflare Worker公開待ち'
+  });
+  return base;
 };
 </script>
 

@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-06
+最終更新: 2026-08-07
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -248,6 +248,15 @@
 - 塾のタブレット: 管理者・生徒のIDとパスワードを永続保存しない。操作のたびに無操作時間を更新し、30分間操作がない場合は自動ログアウトする。ページ再読込後も同一タブ内では直前の操作時刻から30分を判定する。
 - データ影響: ログイン画面とブラウザー側の状態管理だけを変更。成績データ、Google Sheet、GAS、Supabaseスキーマの変更なし。
 - 検証: 管理者用端末別試験3件、生徒用端末別試験4件、既存共通ログイン試験3件、JavaScript構文検査、`git diff --check` が合格。管理者用・生徒用のGitHub Pages公開HTMLで新処理を確認。
+
+### 2026-08-07 自動ログイン中のログイン画面ちらつき防止
+
+- 成績管理: 個人端末に有効なセッションまたは保存済み認証情報がある場合、ページの初回描画前からログイン画面を隠し、認証成功後に生徒画面を直接表示する。認証できなかった場合だけログイン画面を表示する。
+- 成績管理の本番コミット: `ce7143a012776ad2e76a5720a64cc713211ffdd7`。生徒用URLは https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html 。端末別試験を含む11件とJavaScript構文検査が合格。
+- 学習進捗管理: 有効な共通セッション、保存済みセッション、または保存済みスタッフログインがある場合、認証確認中はログイン画面を隠す。認証失敗または期限切れ時だけログイン画面へ戻す。
+- 学習進捗管理のソースコミット: `7c17acc7053b6b802d89ed3dfe656960b178b20d`（正本ブランチ `agent/cloudflare-progress-migration`）。Cloudflare側試験6件、TypeScript検査、JavaScript構文検査、dry-runが合格。
+- 公開状況: 成績管理はGitHub Pagesへ反映済み。学習進捗管理はCloudflare Workerへのアップロード待ち。既存本番Version `72c8dafa-53e9-46c4-9048-77e8fa1b8645` は変更していない。
+- データ影響: 成績データ、D1データ、Google Sheet、GAS、Supabaseスキーマ、Cloudflare環境変数を変更していない。
 
 ## 資産管理ポータル自体の更新
 
