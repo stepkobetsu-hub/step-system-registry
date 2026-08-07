@@ -657,5 +657,25 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="student-home-navigation-labels-20260807">
+const applyStudentHomeNavigationLabels20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentHomeNavigationLabels20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-student-app'||name.includes('STEP塾生アプリ（step-hub）')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '正本ファイル':['step-hub/index.html','step-hub/sw.js','step-hub/tests/common-login.test.mjs','student-QR/my_qr.html','student-QR/my_qr_sw.js','student-QR/tests/my-qr-cache-behavior.test.mjs','student-QR/tests/my-qr-security.test.mjs','student-QR/gas/MyQrApi.js'],
+    '最新版の場所':'塾生ホーム：stepkobetsu-hub/step-hub（main）／公開URL：https://stepkobetsu-hub.github.io/step-hub/／本人QR：stepkobetsu-hub/student-QR（main）',
+    '確認根拠':'step-hubのGitHub mainにあるindex.html・sw.jsと、GitHub Pages公開構成を照合。画面変更の最終コミットはindex.html 537218c84dc6dda948b31588ac54547a2767ffa6、sw.js 9acb468bb5b42ac1d2051437968d3d0000a6d46d。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 ホーム画面整理：愛知県入試制度・愛知全県模試は上段の正方形ショートカットだけを削除し、下段の展開式詳細パネルは維持する。残る正方形ショートカットは「愛知県公立高校 入試問題 過去問」「年間予定」の2件。お知らせ・今日の宿題・次回の授業には「工事中」ラベルを表示し、文字・余白・背景色・影を大きく目立つ仕様にした。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：ホーム画面の工事中表示】step-hub/index.html の resource-grid、notice construction-label、今日の宿題と次回の授業の section-title badge を確認する。愛知県入試制度と愛知全県模試は下段の examPanel・admissionPanel を削除しない。PWA更新は index.html の sw.js?v=23 と、sw.js の step-student-v23-large-construction-labels を対で確認する。変更履歴：重複ボタン削除・お知らせ工事中 fe20cc17c2e1ed81ed39d1ad2e883ebf1225d913、宿題・次回授業工事中 53b68deccdbc2efae605444c331837572412bdb5、ラベル拡大 537218c84dc6dda948b31588ac54547a2767ffa6、キャッシュ最終 9acb468bb5b42ac1d2051437968d3d0000a6d46d。',
+    '確認済み事項':[...new Set([...confirmed,'愛知県入試制度の上段正方形ボタンを削除','愛知全県模試の上段正方形ボタンを削除','愛知県入試制度の下段詳細パネルを維持','愛知全県模試の下段詳細パネルを維持','お知らせに大きな工事中ラベルを表示','今日の宿題に大きな工事中ラベルを表示','次回の授業に大きな工事中ラベルを表示','残る正方形リンクを2列表示','step-hub Service Worker v23へ更新'])],
+    '確認状況':'ホーム画面の重複リンク整理・3か所の工事中強調表示・PWAキャッシュv23を本番反映済み'
+  });
+};
+</script>
+
 </body>
 </html>
