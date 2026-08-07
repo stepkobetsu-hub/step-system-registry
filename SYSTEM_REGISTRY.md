@@ -52,7 +52,7 @@
 ## 登録詳細：STEP塾生アプリ（step-hub）開発記録
 
 - ID: `step-student-app`
-- 更新日・仕様基準日: 2026年8月6日
+- 更新日・仕様基準日: 2026年8月7日
 - 状態: 本番使用中
 - 目的: 既存の塾生向けシステムを一つにまとめ、スマートフォンのホーム画面から利用できる塾生専用PWAとして運用する。ホームページのリンク集ではなく、塾生専用アプリを正本とする。
 - 利用者向けURL: https://stepkobetsu-hub.github.io/step-hub/
@@ -132,6 +132,18 @@
 - GitHub反映: `step-hub` は `index.html` commit `85ae15d6eac639ce7902bac42dc0004726a8d74c`、`sw.js` commit `3831019de288af67e8f35af5949fb17b8453378d`、試験 commit `8c103c89e2badfb629593c735f8e022c4cffbe02`。`foresta-step-progress` は `apps-script/code.gs` commit `01286ac689ac5e9a3f03f5cdf01073bf6f4ea4ed`、`index.html` commit `22cef7ecdd8be3638a09cb13cadd23054bcedd56`、試験 commit `383f0dd201ec64ecaa0f15ecab7461ecc34fd093`。
 - 検証: `step-hub` の共通ログイン試験9件合格。認証API側の継続ログイン・旧セッション移行・無効生徒拒否・明示的ログアウトの対象試験合格。
 - 【次回ここから確認】再ログインが出る場合は、① `stepCommonStudentSessionToken` が端末にあるか、② `getCommonStudentSession` の応答コード、③生徒マスタの在籍状態、④ `step-hub/index.html` のService Worker読込版 `sw.js?v=21`、⑤Apps Scriptがバージョン84か、の順で確認する。パスワード保存を回避策にしない。
+
+### 2026年8月7日：自分のQRを端末へ保存して即時表示
+
+- 原因: `student-QR/my_qr.html` のQR表示キャッシュが15分で失効し、保存済みでも毎回バックグラウンドで本人セッションとQRをサーバーへ確認していたため、Apps Scriptの応答待ちが発生していた。
+- 採用仕様: 初回に本人確認して取得した表示用QRを、同一端末・同一ブラウザーの `localStorage`（`stepMyQrDisplayCacheV5`）へ保存する。2回目以降は、保存済みQRをサーバー通信より先に描画し、その時点で処理を終了するため、本人確認API・QR取得APIへアクセスしない。
+- 保存範囲: 生徒ID、表示氏名、校舎名、QR登録有無、QRデータだけ。パスワードおよびセッショントークンはQR表示キャッシュへ保存しない。
+- 有効期間: 15分制限を廃止し、本人が明示的にログアウトするまで保存する。旧V4キャッシュが残っている端末はV5へ自動移行する。
+- 取り違え防止: STEP塾生アプリの明示的ログアウト時にV5・V4・旧セッションキャッシュを削除する。別の生徒IDでログインした場合は、保存済み生徒IDとの不一致を検出して旧QRを削除し、新しい本人QRへ入れ替える。
+- PWA更新: `student-QR/my_qr_sw.js` を `step-my-qr-v9-persistent-local-qr`、登録URLを `my_qr_sw.js?v=9` に変更し、旧キャッシュを自動削除する。
+- GitHub反映: `student-QR` は `my_qr.html` commit `42b1c18634026ddfd2e9f43604580283a1bc189f`、`my_qr_sw.js` commit `19812fc59ef3790d9d4d65f9d7fff9132e051b93`、対象試験最終 commit `d20dafdded54368d65f6f579605e0a72812defd4`。`step-hub` は `index.html` commit `b5bb43ffa6286c22fc4585f8ac259fc9eb4fa3b9`、対象試験 commit `c0399462d17eae4540ba018e67cab03c5d44f398`。
+- 検証: `student-QR` の自分のQR対象試験15件、`step-hub` の共通ログイン試験9件が全件合格。GitHub Pages公開版でV5保存キー、通信確認なし表示、Service Worker v9、ログアウト・生徒変更時の削除処理を確認。
+- 【次回ここから確認】QR表示が遅い場合は、①初回表示が一度完了しているか、② `stepMyQrDisplayCacheV5` があるか、③ `student-QR/my_qr.html` が保存済み時に `return` しているか、④Service Workerが `my_qr_sw.js?v=9` か、の順で確認する。保存済みがある限り、本人確認APIやQR取得APIの速度調査は不要。
 
 ## 登録詳細：出退くんQR作成・読取
 
