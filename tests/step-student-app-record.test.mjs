@@ -76,3 +76,24 @@ test('the persistent student login implementation is recorded for the next inves
     '次回ここから確認'
   ]) assert.match(registry, new RegExp(text));
 });
+
+test('the persistent local QR cache and its invalidation rules are recorded', () => {
+  for (const text of [
+    'student-persistent-qr-cache-20260807',
+    'stepMyQrDisplayCacheV5',
+    '2回目以降は保存済みQRを最初に描画して処理を終了',
+    '明示的にログアウトするまで保存',
+    '別生徒でログインした場合',
+    'my_qr_sw.js?v=9',
+    '自分のQR対象試験15件'
+  ]) assert.match(page, new RegExp(text.replace(/[?]/g, '\\?')));
+
+  for (const text of [
+    '2026年8月7日：自分のQRを端末へ保存して即時表示',
+    '15分制限を廃止',
+    '本人確認API・QR取得APIへアクセスしない',
+    'stepMyQrDisplayCacheV5',
+    '別の生徒IDでログインした場合',
+    'my_qr_sw.js?v=9'
+  ]) assert.match(registry, new RegExp(text.replace(/[?]/g, '\\?')));
+});
