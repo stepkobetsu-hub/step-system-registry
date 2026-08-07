@@ -11,12 +11,16 @@ test('成績管理の端末別ログイン仕様が公開台帳に記録され�
     '自分・家族の端末',
     '塾のタブレット',
     '30分間操作がない場合に自動ログアウト',
-    '7f53ce97f5a2363ccee808ff3e19481554c8ab4b'
+    '7f53ce97f5a2363ccee808ff3e19481554c8ab4b',
+    '4f24aa86622bad821234c80650af9c0d033b4de7',
+    'juku_app.html',
+    '生徒用4件'
   ]) assert.ok(page.includes(text), `公開台帳に ${text} が必要`);
 
   for (const text of [
-    '2026-08-07 成績管理の端末別ログイン',
-    '講師コードとパスワードを同一端末・同一ブラウザーへ保存',
+    '2026-08-07 成績管理の管理者・生徒別端末ログイン',
+    '生徒用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html',
+    '生徒IDと、それぞれのパスワードを同一端末・同一ブラウザーへ保存',
     '30分間操作がない場合は自動ログアウト',
     '成績データ、Google Sheet、GAS、Supabaseスキーマの変更なし'
   ]) assert.ok(registry.includes(text), `台帳文書に ${text} が必要`);
