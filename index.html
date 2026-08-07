@@ -1368,5 +1368,26 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="grade-management-device-login-20260807">
+const applyGradeManagementDeviceLogin20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyGradeManagementDeviceLogin20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('成績管理')&&!name.includes('塾生アプリ')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
+    '最新版の場所':'stepkobetsu-hub/seiseki-kanri（main）／admin.html',
+    '正本ファイル':['admin.html','admin-device-session.test.mjs','gas_code.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 端末別ログイン：管理入口のログイン欄直前で「自分・家族の端末」「塾のタブレット」を選択する。未選択時は2択直下に赤枠・淡い赤背景・太字の大きな注意を表示する。自分・家族の端末は講師コードとパスワードを同一ブラウザーへ保存し、次回は自動ログインして、明示的ログアウトまでログイン状態を維持する。塾のタブレットは認証情報を永続保存せず、30分間操作がない場合に自動ログアウトする。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：成績管理の端末別ログイン】stepkobetsu-hub/seiseki-kanri の admin.html にある ADMIN_DEVICE_KEY、selectAdminDevice、doAdminLogin、scheduleAdminIdleLogout、recordAdminActivity、logout を確認する。本番コミットは7f53ce97f5a2363ccee808ff3e19481554c8ab4b。成績データ・GAS・Supabaseスキーマは変更していない。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'自分・家族の端末を共有端末で選ばない。塾のタブレットでは講師コード・パスワードを永続保存しない。明示的ログアウトでは保存済み認証情報を削除する。',
+    '確認済み事項':[...new Set([...confirmed,'管理入口に端末選択2択を追加','端末未選択の大きな注意を選択ボタン直下へ表示','自分・家族の端末でID・パスワードを保存','自分・家族の端末で明示的ログアウトまでログイン維持','塾のタブレットでは認証情報を永続保存しない','塾のタブレットは30分無操作で自動ログアウト','明示的ログアウトで保存済み認証情報を削除','成績データ・GAS・Supabaseスキーマ変更なし','端末別ログイン試験3件・既存試験3件合格'])],
+    '確認状況':'端末選択・個人端末の自動ログイン・塾端末の30分無操作ログアウトを本番反映済み'
+  });
+};
+</script>
+
 </body>
 </html>

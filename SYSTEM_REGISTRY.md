@@ -14,7 +14,7 @@
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
 | 学習進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタの講師向け管理は別システム |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html`を現行入口とする |
-| 成績管理 | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`admin.html`、`gas_code.js` | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-07-22 | 一般入口 `index.html`、管理入口 `admin.html` |
+| 成績管理 | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`admin.html`、`gas_code.js`、`admin-device-session.test.mjs` | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-07 | 一般入口 `index.html`、管理入口 `admin.html`。管理入口は自分・家族の端末／塾のタブレットを選択 |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-07-20 | `entry_import.html`を現行版とする |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
@@ -236,6 +236,17 @@
 - 検証: Cloudflare側テスト18件、TypeScript検査、`git diff --check` が合格。Versionプレビューと本番URLの両方で、未選択時の大きい注意書きが端末選択ボタン直下へ表示されることを実画面確認。本番 `/health` はHTTP 200、`ok=true`。
 - 復旧: 問題がある場合は直前Version `f3ac9e47-496c-4350-b3e8-1a3276e5ae05` を100%へ再指定する。D1データの変更やマイグレーションは今回実施していない。
 - 完全履歴bundle: `foresta-device-warning-position.bundle`、SHA-256 `064efcc4c58a17d958ab3fc4aeb338f73c5e91e6d742388c3b266f4397b10810`。
+
+### 2026-08-07 成績管理の端末別ログイン
+
+- 本番URL: https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html
+- 正本: `stepkobetsu-hub/seiseki-kanri` の `main`。変更ファイルは `admin.html`、`admin-device-session.test.mjs`。
+- 変更コミット: `7f53ce97f5a2363ccee808ff3e19481554c8ab4b`（`Add device-aware grade management login`）。
+- 端末選択: ログイン欄の直前に「自分・家族の端末」「塾のタブレット」の大きな2択を表示。未選択でログインした場合は、2択の直下へ赤枠・淡い赤背景・太字の大きな注意書きを表示する。
+- 自分・家族の端末: 講師コードとパスワードを同一端末・同一ブラウザーへ保存し、次回は自動ログインする。本人がログアウトするまでログイン状態を維持し、明示的ログアウト時は端末区分・ログイン状態・保存した講師コード・パスワードを削除する。
+- 塾のタブレット: 講師コードとパスワードを永続保存しない。操作のたびに無操作時間を更新し、30分間操作がない場合は自動ログアウトする。ページ再読込後も同一タブ内では直前の操作時刻から30分を判定する。
+- データ影響: ログイン画面とブラウザー側の状態管理だけを変更。成績データ、Google Sheet、GAS、Supabaseスキーマの変更なし。
+- 検証: 成績管理の端末別ログイン試験3件と既存共通ログイン試験3件、JavaScript構文検査、`git diff --check` が合格。
 
 ## 資産管理ポータル自体の更新
 
