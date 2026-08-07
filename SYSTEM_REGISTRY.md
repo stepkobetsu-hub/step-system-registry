@@ -221,6 +221,22 @@
 - GitHub Pages最新コミット: `1e55b1f3193910d6df24b91613e62605fe669109`
 - Apps Script本番: v47、既存デプロイID維持。今回Apps Scriptコードの変更なし。
 
+### 2026-08-07 Cloudflare本番ログイン画面の端末選択注意表示
+
+- Cloudflare本番URL: https://step-progress-api.stepkobetsu.workers.dev/
+- Worker名: `step-progress-api`
+- D1: `step-progress-db`（binding `DB`）
+- 正本ブランチ: `agent/cloudflare-progress-migration`
+- 変更コミット: `07fd87d39e6330027ad47e97b00efea4e8593156`（`Move device selection warning beside choices`）
+- 変更ファイル: `cloudflare/public/index.html`、`cloudflare/tests/save-status.test.mjs`
+- 変更内容: 生徒ログインで端末を選ばずにログインした場合の注意書きを、画面最下部の小さい表示から「自分・家族の端末」「塾のタブレット」の選択ボタン直下へ移動。警告アイコン、赤枠、淡い赤背景、太字17pxの大きい注意表示とし、端末を選択した時点で自動的に消す。生徒／講師・管理者の切替時にも残さない。
+- 本番Worker Version: `72c8dafa-53e9-46c4-9048-77e8fa1b8645`（traffic 100%）
+- 直前Version: `f3ac9e47-496c-4350-b3e8-1a3276e5ae05`
+- 本番設定維持: `PRODUCTION_WRITE_APPROVED=true`、`BROWSER_D1_WRITE_ENABLED=true`、`TEST_WRITE_APPROVED=false`、`TEST_STUDENT_ID=1320` を変更せず維持。
+- 検証: Cloudflare側テスト18件、TypeScript検査、`git diff --check` が合格。Versionプレビューと本番URLの両方で、未選択時の大きい注意書きが端末選択ボタン直下へ表示されることを実画面確認。本番 `/health` はHTTP 200、`ok=true`。
+- 復旧: 問題がある場合は直前Version `f3ac9e47-496c-4350-b3e8-1a3276e5ae05` を100%へ再指定する。D1データの変更やマイグレーションは今回実施していない。
+- 完全履歴bundle: `foresta-device-warning-position.bundle`、SHA-256 `064efcc4c58a17d958ab3fc4aeb338f73c5e91e6d742388c3b266f4397b10810`。
+
 ## 資産管理ポータル自体の更新
 
 - 画面: `index.html`
