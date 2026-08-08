@@ -1174,5 +1174,48 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const organizeTimetableMasterInput20260809Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeTimetableMasterInput20260809Base(items);
+  if(!out.some(x=>String(x['システム名']||'').includes('時間割マスタ入力'))){
+    out.push({
+      'システム名':'時間割マスタ入力',
+      '正式名称':'時間割マスタ入力',
+      '分類':'生徒管理・時間割',
+      '状態':'本番',
+      '概要':'生徒マスタの「時間割マスタ」シートを、スタッフが専用画面から編集するWebアプリ。生徒番号・氏名・学年・教室を表示し、時間割、兄弟コード、標準コース、標準オプションを選択式で入力・保存する。',
+      '公開URL':'https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec',
+      '利用者向けURL':'https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec',
+      'Apps Scriptプロジェクト名':'生徒名簿',
+      'Apps ScriptプロジェクトID':'16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45',
+      'Apps Script編集URL':'https://script.google.com/u/0/home/projects/16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45/edit',
+      'デプロイID':'AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA',
+      '本番バージョン':'v42（2026年8月9日）',
+      '正本スプレッドシート':'★生徒マスタ202606-（1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk）',
+      'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit?gid=829117795#gid=829117795',
+      '使用シート名':'時間割マスタ',
+      'GASファイル一覧':['時間割入力.gs','時間割一覧表示.gs','時間割Web.gs','時間割入力Web4.html'],
+      '現在の入口':'時間割Web.gs の doGet → 時間割入力Web4.html',
+      'スタッフ用アプリ':'https://stepkobetsu-hub.github.io/seiseki-kanri/ の「時間割マスタ入力」カード。AK=2・3・4のみ表示。',
+      'スタッフ用アプリ正本':'stepkobetsu-hub/seiseki-kanri（main）／index.html commit f8da684185fc2be7dc79bc5165e29e8ffb4e61ee',
+      '認証・権限':'Webアプリはアクセス中のGoogleユーザーとして実行し、Googleアカウントを持つユーザーが入口へアクセスできる。実データはスプレッドシートの共有権限で制御。スタッフ用アプリ側ではAK=2以上（2・3・4）だけカードを表示し、追加のID・パスワード確認は行わない。',
+      '一覧表示仕様':'左側の生徒一覧は従来順の逆順で、新しく追加された生徒を上に表示する。I～X列がすべて空欄なら小さな赤字「未設定」、AI列の標準コースが空欄なら小さな赤字「コース未設定」を氏名付近に表示し、両方なら2つを並べる。',
+      '入力仕様':'時間割、AH列の兄弟コード、AI列の標準コース、AJ列の標準オプションを選択式で保存する。シート側のプルダウンは「（空欄に戻す）」を選ぶと実際の空欄へ戻す。',
+      '画面仕様':'上部に「時間割マスタを開く」ボタンと「更新」ボタンを配置。シートボタンはデスクトップで右半分の別ウィンドウ、狭い画面では新しいタブを開く。更新ボタンはページ全体を再読込せず、生徒一覧・未設定判定・コース設定をスプレッドシートから再取得する。',
+      '注意表示':'コース設定の横に「※コース設定をしないと学費請求がされません。正確に設定してください。」を大きな赤字・太字・赤枠で表示する。',
+      '名前カード関連':'「④名前カード」ではコード番号に連動してコード・氏名・QRをB4付近から表示する仕組みを追加。学年色の適用範囲・色を付けない範囲・罫線削除を調整した。',
+      '要再確認':'「④名前カード」のB16付近（氏名を囲む罫線）が残るとの報告あり。次回、条件付き書式・結合セル・画像／描画・通常罫線のどれが表示元かを実画面で再確認する。',
+      '変更履歴':'v37を正常版の基準として復旧。v39で上部のシート表示ボタンとコース設定の重要注意文を追加。v40で生徒一覧を新しい順へ変更し、未設定・コース未設定マークを追加。v41の単純なページ再読込方式はGoogle Apps Script内で画面が空になるため廃止。v42で更新ボタンを安全なデータ再取得方式へ修正。',
+      '作業メモ':'本番デプロイIDは変更せず、既存デプロイを新バージョンへ更新する。現在の正本はv42／時間割入力Web4.html。v41のlocation.reload方式へ戻さない。更新時は上部ボタン、生徒一覧96件の再取得、未設定表示、コース警告、エラーなしを実画面確認する。',
+      '確認日':'2026年8月9日',
+      '確認状況':'本番v42、上部更新ボタンの再取得完了、生徒一覧表示、未設定・コース未設定表示、スタッフ用アプリの「時間割マスタ入力」表記を公開画面で確認済み',
+      '関連カード':['生徒マスタ','スタッフ用アプリ','講師ポータル']
+    });
+  }
+  return out;
+};
+</script>
 </body>
 </html>
