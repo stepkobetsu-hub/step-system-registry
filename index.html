@@ -1217,101 +1217,28 @@ organizeEntryImport=function(items){
   return out;
 };
 </script>
-
-<script id="learning-progress-cloudflare-production-20260809">
-const applyLearningProgressCloudflareProduction20260809Base=applyAssetInfo;
+<script id="learning-progress-display-release-20260809">
+const applyLearningProgressDisplayRelease20260809Base=applyAssetInfo;
 applyAssetInfo=function(item){
-  const base=applyLearningProgressCloudflareProduction20260809Base(item);
+  const base=applyLearningProgressDisplayRelease20260809Base(item);
   const name=String(base['システム名']||base['正式名称']||'');
-  if(base['ID']!=='learning-progress'&&!name.includes('学習進捗管理'))return base;
+  if(!(base['ID']==='learning-progress'||name.includes('学習進捗管理')))return base;
   const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
   return Object.assign({},base,{
     '確認日':'2026年8月9日',
-    '状態':'Cloudflare D1本番運用（宿題保存・再読込・配置修復済み）',
-    '本番URL':'https://step-progress-api.stepkobetsu.workers.dev',
+    '状態':'Cloudflare Worker本番使用中',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
     'Cloudflare Worker':'step-progress-api',
-    'Cloudflare D1':'step-progress-db',
-    '本番Version ID':'eb7d6bae-efec-4deb-88aa-33544494049c',
-    '本番Traffic':'100%',
-    'ロールバックVersion ID':'72c8dafa-53e9-46c4-9048-77e8fa1b8645',
-    '実装コミット':'207ae60 Pin homework positions with CSS grid areas',
-    'データ移行・保全':'Supabaseを読取元として全生徒の主要データをD1へ移行・監査。D1の完全論理バックアップを作成してSQLite復元・integrity_check・foreign_key_checkを確認。homework_recordsへ不足13列を追加し、Supabaseの現行homeworkを正本として既存2,241行をbackfill。既存17列、全テーブル件数、重複、参照孤児の差分0を確認。',
-    '宿題保存仕様':'declareHomework／confirmHomework／confirmHomeworkGroupはD1へ保存する。宿題一覧listHomeworkもD1から読み、student_statusを生徒状態の正本、teacher_statusを講師確認状態として分離する。保存後は対象行をD1から再読込し、ページ更新・保存済みセッション再開時もlocalStorageの古い宿題キャッシュを確定値にせずD1で更新する。mutation revisionが一致しない古い応答は破棄する。',
-    '宿題画面仕様':'PCでは左に「TRY赤×直し」、右に「Exercise」。スマホでは上にTRY赤×直し、下にExercise。片方だけでも位置を固定する。配置変更はCSS Grid Areasだけで行い、data-home／data-status／data-home-type、クリックイベント、declareHomework、listHomework、キャッシュ処理、D1処理を変更しない。保存中・保存成功・保存失敗の表示は画面上部中央の大きな表示を維持する。',
-    'ログイン仕様':'ログイン画面で「自分・家族の端末」と「塾のタブレット」を選択する。個人端末は明示的ログアウトまでセッションを維持し、塾端末は認証情報を永続保存せず30分無操作で自動ログアウトする。保存済みセッションの確認中はログイン画面を一瞬表示しない。',
-    '本番設定注意':'Preview VersionはPRODUCTION_WRITE_APPROVED=false、TEST_WRITE_APPROVED=true等のテスト用設定を持つため、そのまま本番trafficへ昇格しない。本番用Versionを新規作成し、正常な本番VersionのGOOGLE_API_URL、GOOGLE_DUAL_WRITE_URL、DB、ADMIN_API_ENABLED、EMERGENCY_STOP、MIRROR_READ_ENABLED、SYNC_BATCH_SIZE、assets、compatibility設定を値を出力せず完全継承する。本番はPRODUCTION_WRITE_APPROVED=true、BROWSER_D1_WRITE_ENABLED=true、TEST_WRITE_APPROVED=false、DUAL_WRITE_ENABLED=true。',
-    '再発防止':'配信HTMLへ「Warning: truncated output」「tokens truncated」「original token count」「Total output lines」などのツール出力を混入させない。全インラインJavaScriptの構文検査、ルートHTMLのdoctype・ログイン文言検査、事故文字列検査を本番反映前に行う。workers.devへのcurlがCONNECT 403でも既知の実行環境プロキシ制限であり、それだけを理由にロールバックしない。',
-    '既知の残課題':'Googleバックアップ側のsync_queueにDO_POST_ERRORが残る場合がある。D1保存成功とGoogleバックアップエラーを混同しない。同期失敗行を根拠にD1の新しい値を古い値へ戻さない。Cloudflare本番とGitHub mainのソース差を次回作業開始時に必ず確認する。',
-    '正本・復旧方針':'現在の実運用正本はCloudflare Worker Version eb7d6bae-efec-4deb-88aa-33544494049c。異常時はVersion 72c8dafa-53e9-46c4-9048-77e8fa1b8645を100%へ再昇格できるよう削除しない。Versionや一時cloneが消失しても誤ったHEADで作業せず、Cloudflare Versions APIまたは検証済みbundleから完全なmodules・assets・bindingsを復元する。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月9日：全生徒D1移行後、宿題保存SQLとD1スキーマの不一致を修復。保存後にGoogle由来の古いlistHomeworkやlocalStorageキャッシュで表示が戻る問題を、D1読込・キャッシュ鮮度管理・古いresponse排除で修正。連続保存と完全再読込を確認。最後に保存処理を変更せずCSS Grid AreasだけでTRY／Exercise位置を固定し、本番Version eb7d6bae-efec-4deb-88aa-33544494049cをtraffic 100%へ反映。旧正常Version 72c8dafa-53e9-46c4-9048-77e8fa1b8645はロールバック用に維持。',
-    '確認済み事項':[...new Set([...confirmed,
-      'Cloudflare Worker step-progress-apiを本番運用',
-      'D1 step-progress-dbへ全生徒主要データを移行・監査',
-      'D1完全論理バックアップとSQLite復元検証',
-      'homework_records不足13列追加・2,241行backfill',
-      '宿題保存をD1へ統一',
-      'listHomeworkをD1読込へ変更',
-      'student_statusとteacher_statusを分離',
-      'localStorage古い宿題キャッシュをD1で必ず更新',
-      '古い非同期responseをmutation revisionで破棄',
-      '連続保存・ページ更新後の保存維持を確認',
-      'PC左TRY／右Exercise',
-      'スマホ上TRY／下Exercise',
-      '保存ステータスを大きく表示',
-      '個人端末と塾端末のログイン方式を分離',
-      '本番Version eb7d6bae-efec-4deb-88aa-33544494049c・traffic 100%',
-      'ロールバックVersion 72c8dafa-53e9-46c4-9048-77e8fa1b8645を維持',
-      'HTML事故文字列とJavaScript構文の回帰検査'
-    ])],
-    '確認状況':'Cloudflare D1本番運用。宿題保存・再読込・連続保存、端末別ログイン、TRY／Exercise固定配置を本番確認済み'
+    'D1':'step-progress-db（binding DB）',
+    '本番Version':'bf08686b-79d0-4187-9139-458e73c0d3d3（traffic 100%）',
+    '復旧Version':'eb7d6bae-efec-4deb-88aa-33544494049c',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月9日 学習進捗グラフ表示：教科ごとの1本のバーで、1周目100%を全体の70%、2周目を15%、3周目を15%として表示する。70%位置には破線と「1周目ゴール」を表示する。2周目・3周目の宿題は「TRYの赤×なおし」「エクササイズの赤×なおし」と表示する。1周目と教材固有の宿題生成規則は維持する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月9日 Cloudflare本番反映：Version bf08686b-79d0-4187-9139-458e73c0d3d3をtraffic 100%で公開。変更前の安定Version eb7d6bae-efec-4deb-88aa-33544494049cは復旧用に維持。変更はStatic Assetのcloudflare/public/index.htmlだけで、Worker保存API・D1・認証・同期処理・Cron・環境変数を変更していない。プレビューと本番配信HTMLで70%線・3文言・70/15/15加重計算を確認。本番/healthはHTTP 200、ok=true、productionWriteApproved=true、browserD1WriteEnabled=true、dualWriteEnabled=true。反映用package SHA-256は109454faa1c0ce091740faa27488955e8f1427dcc4798bbc95355a852a188d34。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'Cloudflare接続の標準手順：Node.js未導入時はwingetでOpenJS.NodeJS.LTSを導入し、wrangler@4.120.0 loginでブラウザー認証する。通常ブラウザーでCloudflareへログインしただけではWrangler認証にならない。whoamiで接続先を確認後、versions upload --no-bundle --strict --keep-varsでプレビューを作り、表示とhealthを確認してからversions deploy <Version ID>@100%で本番化する。Cloudflareのクイック編集ではStatic Assetsを確認できない。今回のWindows環境ではwrangler init --from-dashを使わない。OAuthコードやAPIトークンをチャット・GitHub・台帳へ記録しない。問題時はeb7d6bae-efec-4deb-88aa-33544494049cを100%へ戻し、D1データは操作しない。Windows PowerShell 5.1向けスクリプトはASCIIのみで作成する。',
+    '確認済み事項':[...new Set([...confirmed,'1周目100%をバーの70%位置として表示','70%位置に破線と1周目ゴールを表示','2周目を15%・3周目を15%として表示','2周目・3周目のTRYをTRYの赤×なおしと表示','2周目・3周目のExerciseをエクササイズの赤×なおしと表示','Cloudflare Worker Version bf08686bを100%公開','本番health HTTP 200・ok=true','productionWriteApproved=trueを維持','browserD1WriteEnabled=trueを維持','dualWriteEnabled=trueを維持','保存API・D1・認証・同期処理・Cron変更なし','復旧用Version eb7d6baeを維持','Node.js導入からWrangler OAuth認証までを記録','Versions upload・preview・deploy・rollbackの標準手順を記録','Static Assetsはクイック編集で探さない','OAuthコード・APIトークンを台帳へ記録しない'])],
+    '確認状況':'70%基準グラフと2・3周目の宿題文言をCloudflare本番へ反映し、表示・health・保存許可設定を確認済み'
   });
 };
 </script>
-
-
-<script id="billing-v31-production-20260809">
-const applyBillingV31Production20260809Base=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyBillingV31Production20260809Base(item);
-  const name=String(base['システム名']||base['正式名称']||'');
-  if(base['ID']!=='billing'&&!name.includes('請求管理')&&!name.includes('請求システム'))return base;
-  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
-  return Object.assign({},base,{
-    '確認日':'2026年8月9日',
-    '状態':'本番（v39）',
-    'Apps Scriptプロジェクト名':'請求システム2026NEW',
-    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
-    'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
-    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
-    'デプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
-    '本番バージョン':'v39（2026年8月9日 03:43 JST）',
-    '最新版の場所':'Apps Script「請求システム2026NEW」／本番デプロイ v39',
-    'Apps Script概要':'通常授業料・諸経費等の月次請求、料金設定、コースマスタ、割引・教材・模試・請求確認を管理する請求V3.1。',
-    '主要関数':['getCourseMasterAdminData','applyCourseValidationFromAdmin','deleteOrDisableCourseForAdmin','saveCourseMasterRowForAdmin','setBillingTargetMonth','getRateUsageRowsForAdmin_'],
-    'Webアプリ一覧':['本番 v39／デプロイID AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb'],
-    '確認根拠':'Apps Script本番デプロイ、実行ログ、管理画面の請求対象月・料金設定・コースマスタを照合。2026/09の項目名が「9月分授業料」「9月分諸経費」になることを実行ログで確認。',
-    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月9日確定仕様：請求対象月と項目名の月は同じにする。9月分請求は「9月分授業料」「9月分諸経費」、10月分請求は「10月分授業料」「10月分諸経費」。画面上部の月選択も請求対象月をそのまま表示する。振替日は請求対象月の前月を基準に算出し、2026年9月分は「2026年9月分（8/27振替）」と表示する。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月9日：請求V3.1をv34～v39で修正。v34でコースマスタ読取経路、v35で権限2の管理操作、v36で料金設定の初期化と文字化け表示、v37で料金設定のSpreadsheet／Sheet取り違え、v38で月選択表示、v39で請求項目名を請求対象月と同月へ統一。最終正本はv39。デプロイIDは変更していない。',
-    '注意事項':(base['注意事項']?base['注意事項']+' ':'')+'最終仕様は「9月分＝9月分授業料・9月分諸経費」。前月名（8月分授業料・8月分諸経費）へ戻さない。振替日だけ前月基準。コースマスタと請求対象月の管理権限は2以上。料金設定ではSpreadsheetオブジェクトをSheetとしてgetRangeへ渡さない。作業用の一時実行関数は本番コードから削除済み。',
-    '確認済み事項':[...new Set([...confirmed,
-      '本番デプロイをv39へ更新',
-      '本番デプロイIDは変更なし',
-      '請求対象月2026/09を設定',
-      '9月分の項目名は9月分授業料',
-      '9月分の項目名は9月分諸経費',
-      '月選択は2026年9月分（8/27振替）',
-      '振替日は請求対象月の前月基準',
-      'コースマスタの読取・編集・料金設定・無効化／削除を権限2へ対応',
-      'コースマスタの編集・料金設定・無効化／削除・無効の表示文字を修復',
-      '料金設定のrateUsageData未宣言を修正',
-      '料金設定のSpreadsheet／Sheet取り違えを修正',
-      '料金設定13表と利用状況23キーの読込を確認',
-      '作業用の一時実行関数を削除'
-    ])],
-    '確認状況':'本番v39。9月分授業料・9月分諸経費、料金設定読込、コースマスタ権限2と表示修復を確認済み'
-  });
-};
-</script>
-
 </body>
 </html>
