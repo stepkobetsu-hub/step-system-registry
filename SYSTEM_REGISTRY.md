@@ -297,6 +297,28 @@
 - 公開状況: 成績管理はGitHub Pagesへ反映済み。学習進捗管理はCloudflare Workerへのアップロード待ち。既存本番Version `72c8dafa-53e9-46c4-9048-77e8fa1b8645` は変更していない。
 - データ影響: 成績データ、D1データ、Google Sheet、GAS、Supabaseスキーマ、Cloudflare環境変数を変更していない。
 
+### 2026-08-09 学習進捗グラフ70%基準・2周目以降の宿題文言
+
+- 本番URL: https://step-progress-api.stepkobetsu.workers.dev/
+- Worker名: `step-progress-api`
+- D1: `step-progress-db`（binding `DB`）
+- 新本番Version: `bf08686b-79d0-4187-9139-458e73c0d3d3`（traffic 100%）
+- 変更前の安定Version／復旧先: `eb7d6bae-efec-4deb-88aa-33544494049c`（削除せず維持）
+- グラフ仕様: 教科ごとの1本の進捗バーで、1周目100%をバー全体の70%位置、2周目を次の15%、3周目を最後の15%として表示する。70%位置には破線と「1周目ゴール」を表示する。生徒が1周目100%を現実的な到達目標として認識でき、従来の300%満点表示による心理的負担を減らす目的。
+- 宿題文言: 2周目・3周目は `TRY_REDO` を「TRYの赤×なおし」、`EXERCISE_REDO`（互換上の `EXERCISE` を含む）を「エクササイズの赤×なおし」と表示する。1周目と教材固有の宿題生成規則は変更しない。
+- 変更範囲: `cloudflare/public/index.html` のグラフ表示と宿題表示文言のみ。Workerの保存API、D1クエリ、宿題生成処理、認証、同期処理、Cron、D1スキーマ、D1データは変更していない。
+- 本番設定維持: `/health` で `ok=true`、`productionWriteApproved=true`、`browserD1WriteEnabled=true`、`dualWriteEnabled=true` を確認。`TEST_WRITE_APPROVED=false`、`TEST_STUDENT_ID=1320` も維持。
+- 検証: Versionプレビュー `bf08686b-step-progress-api.stepkobetsu.workers.dev` と本番URLでHTTP 200を確認。配信HTMLに `left:70%`、「1周目ゴール」「TRYの赤×なおし」「エクササイズの赤×なおし」および1周目70%・2周目15%・3周目15%の加重計算が含まれることを確認。本番 `/health` もHTTP 200。
+- 反映手順上の注意: Cloudflare Static AssetsはWorkerのクイック編集画面に表示されないため、`wrangler versions upload` でプレビューVersionを作成し、表示・health確認後に `wrangler versions deploy <version>@100%` で本番化する。既存環境変数は `--keep-vars`、リモート差分保護は `--strict` を使用する。Windows PowerShell 5.1用スクリプトは文字化けを避けるためASCIIのみで作成する。
+- 反映障害の記録: `wrangler init --from-dash` はWindows上のcreate-cloudflare処理で異常終了したため使用しない。現行Worker本体、D1 binding、assets、Cron、互換日を明示した設定でVersion uploadを行う。プレビューのPowerShell文字判定が誤停止した場合は、配信HTMLと `/health` を直接確認してから昇格する。
+- Cloudflare接続の標準手順: Windows端末にNode.jsがない場合は、PowerShellで `winget install --id OpenJS.NodeJS.LTS -e --accept-package-agreements --accept-source-agreements` を実行する。同じPowerShell内で直ちに続行する場合は `$env:Path += ";C:\Program Files\nodejs"` を追加する。認証は `npx --yes wrangler@4.120.0 login` を実行し、ブラウザーの「Authorization granted to Wrangler」を確認する。認証確認は `npx --yes wrangler@4.120.0 whoami`。通常ブラウザーでCloudflareへログインしただけではWrangler認証にならない。
+- 認証時の判断: `Wrangler is missing some expected OAuth scopes` の警告に `websearch.run`、`agent-memory:write`、`challenge-widgets.write` だけが表示される場合、今回のWorkers Version upload/deployには不要。`Would you like Wrangler to automatically install Cloudflare skills? (Y/n)` は `n` を選ぶ。Workers Scripts、Workers Tail、D1等の必要権限が不足して実処理が403になる場合だけ `wrangler login` を再実行する。
+- 次回の最短経路: 正本一式と `wrangler.jsonc` が揃った作業フォルダーで、`npx --yes wrangler@4.120.0 versions upload --no-bundle --strict --keep-vars --message "<変更内容>"` を実行する。出力されたVersion Preview URLで表示と `/health` を確認し、合格後に `npx --yes wrangler@4.120.0 versions deploy "<Version ID>@100%" --yes --config .\wrangler.jsonc --message "<反映内容>"` を実行する。問題時は同じdeployコマンドで `eb7d6bae-efec-4deb-88aa-33544494049c@100%` を指定する。
+- 接続作業で避けること: OAuthコードやAPIトークンをチャット、GitHub、台帳へ貼らない。認証済みローカル端末のWrangler設定を利用する。Static Assets変更でCloudflareクイック編集画面を探し続けない。`wrangler init --from-dash` を今回のWindows環境で再試行しない。検査に失敗したVersionを確認なしで100%へ昇格しない。
+- 復旧: 表示または保存に問題がある場合は、Version `eb7d6bae-efec-4deb-88aa-33544494049c` をtraffic 100%へ戻す。D1のロールバックやデータ削除は行わない。
+- 反映用パッケージ: `step-progress-final-deploy.zip`、SHA-256 `109454faa1c0ce091740faa27488955e8f1427dcc4798bbc95355a852a188d34`。資格情報・OAuthトークン・個人情報は含めない。
+- 確認日: 2026-08-09
+
 ## 資産管理ポータル自体の更新
 
 - 画面: `index.html`
