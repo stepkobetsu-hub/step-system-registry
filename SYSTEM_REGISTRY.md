@@ -193,6 +193,14 @@
 - 検証: Worker試験33件、TypeScript／Wrangler型検査、古いAndroid互換試験4件に合格。本番HTML・マニフェスト・Cookie発行、保存トークンなし・古い校舎値でAPI認証通過、`/health` のHTTP 200・`ok=true`・`production-interim` を確認
 - 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値の実値はGitHub・台帳へ記録しない。校舎別設定QRは過去方式で、現在のWorker配信軽量画面では使用しない
 
+### 2026年8月8日：退室時のレア人物写真を復活
+
+- 対象: 生徒の通常退室時だけ、約20%の確率で `assets/checkin/goodbye-director-night-fast.webp` を表示。入室、60秒以内の重複受付、講師の出勤・退勤は従来の画像を維持
+- 速度対策: 1254px PNGではなく640px・18,338 bytesのWebPを起動時に先読み。古いタブレットで画像を読み込めない場合は通常の退室イラストへ自動復帰
+- 反映: student-QR PR #29をsquash merge。main `d5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e`
+- 検証: Worker試験33件、退室写真試験2件、TypeScript／Wrangler型検査に合格。本番 `/legacy-tablet` で20%設定と軽量画像参照を確認し、`/health` はHTTP 200・`ok=true`・`production-interim`
+- 復旧: 変更前の正常版 `8db0ce9aab24333cfa43083bb085fdf4c3817c96` をGitHubブランチ `checkpoint/checkin-stable-20260808-before-rare-exit` に固定。問題時はこのブランチを基準に戻す
+
 ## 登録詳細：学習進捗管理
 
 - ID: `learning-progress`
