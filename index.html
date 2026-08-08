@@ -1089,5 +1089,31 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="checkin-edge-interim-production-20260808">
+const applyCheckinEdgeInterimProduction20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyCheckinEdgeInterimProduction20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('出退くん'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '状態':'Cloudflare暫定本番（実記録・メール送信有効）',
+    '読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    'Cloudflare Worker':'step-checkin-edge-staging（production-interimとして暫定本番運用）',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev',
+    'Cloudflare health':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/health',
+    '現在のApps Script版':'バージョン78（既存デプロイID維持）',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main）／tablet_checkin.html／cloudflare/checkin-edge',
+    '正本ファイル':['tablet_checkin.html','cloudflare/checkin-edge/src/index.ts','cloudflare/checkin-edge/wrangler.jsonc','gas/EdgeRosterSync.gs','gas/コード.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月8日 Cloudflare高速受付を暫定本番化。タブレットはCloudflare Workerへ先に受付し、校舎単位のDurable Objectで入退室状態を共有する。神領・大手町のどちらのタブレットで読んでも同じ状態を参照する。60秒以内の同一QRは重複として追加記録・追加メールを行わない。次回の有効読取で入室／退室を切り替える。受付後はApps ScriptのcheckInへ書き戻し、既存の入退室ログ・通知メール・ポイント処理を継続する。同期名簿は神領92名・大手町66名、重複0件を確認し、毎朝7時（UTC 0 22 * * *）に更新する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日：実機2台で高速読取、校舎認証、60秒重複抑止、次回退室、2台間状態共有を確認。試験ページ tablet_checkin_edge_pilot.html は停止表示へ変更。PR #17をsquash merge（a72c58df53f90c4712226889e24e82bd94ef376d）し、CHECKIN_WRITE_ACTION=checkInを有効化。PR #18をsquash merge（2e7b20a326c50423172c99f563f289c605cf5dac）し、healthの環境表示をproduction-interimへ変更。/healthはHTTP 200・ok=true・production-interim。大手町・神領のreceipt-status認証とDurable Object接続を、存在しない受付IDの照会で確認（記録・メール0件）。専用step-checkin-edge-production Workerは未作成で、現在は検証済みstaging Workerを暫定本番利用している。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'端末トークン、同期トークン、名簿取得トークンの実値はGitHub・台帳へ記録しない。校舎別タブレット設定QRは非公開Libraryで管理する。従来のApps Script直接受付はフォールバックとして削除しない。正式production Workerへ移行する際はSecretsを再設定し、端末トークンをローテーションして設定QRを作り直す。',
+    '確認済み事項':[...new Set([...confirmed,'Cloudflare Worker暫定本番化','実記録・通知メールへのcheckIn書戻し有効','神領92名・大手町66名・重複0件','毎朝7時の名簿同期','Durable Objectによる校舎単位の状態共有','60秒以内の重複読取を追加記録・追加メールなしで抑止','異なる2台間で入退室状態を共有','試験ページを停止','既存Apps Script直接受付フォールバックを維持','Apps Scriptバージョン78・既存デプロイID維持','PR #17・#18をsquash merge','health HTTP 200・production-interim','神領・大手町の認証とDurable Object接続確認','設定用QRを非公開Libraryへ保存'])],
+    '確認状況':'Cloudflare高速受付を暫定本番反映し、2校舎の認証・状態共有・healthを確認済み'
+  });
+};
+</script>
+
 </body>
 </html>
