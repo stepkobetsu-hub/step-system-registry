@@ -1268,5 +1268,50 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script id="billing-v31-production-20260809">
+const applyBillingV31Production20260809Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31Production20260809Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(base['ID']!=='billing'&&!name.includes('請求管理')&&!name.includes('請求システム'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月9日',
+    '状態':'本番（v39）',
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
+    'デプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
+    '本番バージョン':'v39（2026年8月9日 03:43 JST）',
+    '最新版の場所':'Apps Script「請求システム2026NEW」／本番デプロイ v39',
+    'Apps Script概要':'通常授業料・諸経費等の月次請求、料金設定、コースマスタ、割引・教材・模試・請求確認を管理する請求V3.1。',
+    '主要関数':['getCourseMasterAdminData','applyCourseValidationFromAdmin','deleteOrDisableCourseForAdmin','saveCourseMasterRowForAdmin','setBillingTargetMonth','getRateUsageRowsForAdmin_'],
+    'Webアプリ一覧':['本番 v39／デプロイID AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb'],
+    '確認根拠':'Apps Script本番デプロイ、実行ログ、管理画面の請求対象月・料金設定・コースマスタを照合。2026/09の項目名が「9月分授業料」「9月分諸経費」になることを実行ログで確認。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月9日確定仕様：請求対象月と項目名の月は同じにする。9月分請求は「9月分授業料」「9月分諸経費」、10月分請求は「10月分授業料」「10月分諸経費」。画面上部の月選択も請求対象月をそのまま表示する。振替日は請求対象月の前月を基準に算出し、2026年9月分は「2026年9月分（8/27振替）」と表示する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月9日：請求V3.1をv34～v39で修正。v34でコースマスタ読取経路、v35で権限2の管理操作、v36で料金設定の初期化と文字化け表示、v37で料金設定のSpreadsheet／Sheet取り違え、v38で月選択表示、v39で請求項目名を請求対象月と同月へ統一。最終正本はv39。デプロイIDは変更していない。',
+    '注意事項':(base['注意事項']?base['注意事項']+' ':'')+'最終仕様は「9月分＝9月分授業料・9月分諸経費」。前月名（8月分授業料・8月分諸経費）へ戻さない。振替日だけ前月基準。コースマスタと請求対象月の管理権限は2以上。料金設定ではSpreadsheetオブジェクトをSheetとしてgetRangeへ渡さない。作業用の一時実行関数は本番コードから削除済み。',
+    '確認済み事項':[...new Set([...confirmed,
+      '本番デプロイをv39へ更新',
+      '本番デプロイIDは変更なし',
+      '請求対象月2026/09を設定',
+      '9月分の項目名は9月分授業料',
+      '9月分の項目名は9月分諸経費',
+      '月選択は2026年9月分（8/27振替）',
+      '振替日は請求対象月の前月基準',
+      'コースマスタの読取・編集・料金設定・無効化／削除を権限2へ対応',
+      'コースマスタの編集・料金設定・無効化／削除・無効の表示文字を修復',
+      '料金設定のrateUsageData未宣言を修正',
+      '料金設定のSpreadsheet／Sheet取り違えを修正',
+      '料金設定13表と利用状況23キーの読込を確認',
+      '作業用の一時実行関数を削除'
+    ])],
+    '確認状況':'本番v39。9月分授業料・9月分諸経費、料金設定読込、コースマスタ権限2と表示修復を確認済み'
+  });
+};
+</script>
+
 </body>
 </html>
