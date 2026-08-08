@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-07
+最終更新: 2026-08-09
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -23,7 +23,7 @@
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`tablet_checkin.html`、`gas/MyQrApi.js`、入退室ログ2 | GitHub＋Apps Script＋Google Sheet | Pagesと既存Apps Scriptデプロイを更新し、塾生本人QR・スタッフ登録・タブレット読取を確認 | 2026-08-01 | 塾生用 `my_qr.html` とスタッフ用 `student_qr_register.html` を分離。塾生は期限付きセッションのみ端末保存 |
+| 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1 | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Spreadsheet `請求書202608_請求 NEW`、Apps Script project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | Sheetの「拡張機能→Apps Script」で編集し、新バージョンを作成して既存デプロイIDを更新 | 2026-07-22 | 上記プロジェクトと本番デプロイIDを現行正本とし、旧版・試作を変更しない |
 | STEP請求書PDF作成・配信システム | テスト運用 | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main` | `index.html`、`assets/`、`apps-script/`、Apps Script v6 | GitHub Pages＋Apps Script＋Google Sheet＋非公開Google Drive | GitHub mainとPagesを確認し、Apps Scriptは既存デプロイIDを新バージョンへ更新。本番メール送信は別途承認まで無効 | 2026-08-02 | 10円単位四捨五入、期限付きトークン、再送時旧URL無効化。非公開資産の識別子、個人情報、CSV、PDFはGitHubへ保存しない |
@@ -200,6 +200,19 @@
 - 反映: student-QR PR #29をsquash merge。main `d5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e`
 - 検証: Worker試験33件、退室写真試験2件、TypeScript／Wrangler型検査に合格。本番 `/legacy-tablet` で20%設定と軽量画像参照を確認し、`/health` はHTTP 200・`ok=true`・`production-interim`
 - 復旧: 変更前の正常版 `8db0ce9aab24333cfa43083bb085fdf4c3817c96` をGitHubブランチ `checkpoint/checkin-stable-20260808-before-rare-exit` に固定。問題時はこのブランチを基準に戻す
+
+
+### 2026年8月9日：入退室メール書き戻しの受付ID不一致を修正
+
+- 障害: WorkerでQR受付と入室・退室判定は成功する一方、既存Apps Scriptへの書き戻しが停止し、入退室ログと通知メールが2026年8月8日20:12以降進まない状態を確認
+- 原因: 古いタブレット画面が発行する `legacy-...` 形式の受付IDを、Apps Script側の検証が不正な形式として拒否。Durable Objectの先頭受付が再試行を続け、同じ処理単位の後続受付も滞留
+- 修正: Apps Scriptへ送信する直前だけ、非対応の受付IDをSHA-256由来の決定的な `qr-edge-...` 形式へ変換。既存のUUIDと `qr-...` は変更せず、同じ受付は再試行でも同じIDになるため二重登録を防止。名簿同期処理は対象外
+- 反映: student-QR PR #30をsquash merge。main `3d8d93f1ad93371e23f539ee922fc62a00fdfa57`
+- 自動試験: Worker 35件すべて合格、TypeScript／Wrangler型検査、差分検査に合格。実際に失敗した形式を回帰試験へ追加
+- 復旧確認: 2026年8月9日1:33 JSTに講師分、1:43 JSTに生徒分の滞留受付が自動再処理され、メール送信キュー `SENT`、入退室ログ「送信完了」・配信状態「配信完了」を確認
+- 運用影響: 8月8日の受付は試験データ。復旧検証に使用し、削除は実施していない。以後の新規受付も同じ変換規則を使用
+- 復旧点: GitHubブランチ `checkpoint/checkin-stable-20260809-email-fixed` を上記mainコミットへ固定。メール送信まで確認済みの基準点として使用
+- 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値、メールアドレスの実値は記録しない
 
 ## 登録詳細：学習進捗管理
 
