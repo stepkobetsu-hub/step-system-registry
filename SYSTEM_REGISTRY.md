@@ -175,6 +175,24 @@
 - GitHub: メール状態確認の非ブロッキング化PR #11、mainマージSHA `7966769c52a1e7a14d01cb756067d5ddd0768cc0`
 - 確認日: 2026-08-04
 
+### 2026年8月8日：Cloudflare高速受付の校舎共通化・古いタブレット対応
+
+- 現在の運用読取URL: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
+- 従来のGitHub Pages読取URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+- Worker: `step-checkin-edge-staging`。専用production Workerはまだ作成せず、検証済みWorkerを `production-interim` として暫定本番利用
+- 正本: https://github.com/stepkobetsu-hub/student-QR の `main`。最終確認コミット `8db0ce9`。主な正本は `cloudflare/checkin-edge/src/index.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/wrangler.jsonc`、`cloudflare/checkin-edge/tests/`、`gas/EdgeRosterSync.gs`、`gas/コード.js`
+- 状態共有: Durable Object `CAMPUS_CHECKIN` を使用。神領・大手町で別URL・別アプリにせず、どちらのタブレットで読んでも同じ入退室状態を参照
+- 校舎判定: 通常受付では端末保存の神領／大手町値を判定に使わない。古い値・空欄・大手町を含めて共通受付へ正規化し、神領名簿を主、大手町名簿を代替として同一処理で照合。`integration-test` だけは別名前空間・別認証を維持
+- 重複処理: 60秒以内の同一QRは追加記録・追加メールを行わず同じ受付として返す。その後の有効な読取で入室／退室を切り替える。異なる2台間でも状態を共有
+- 名簿同期: Apps Script `EdgeRosterSync.gs` から神領・大手町名簿を取得。神領92名・大手町66名・重複0件を確認。毎朝7時（Cron `0 22 * * *`）に更新し、未登録QR読取時も同期を試みる
+- 古いタブレット: 古いAndroid用のES5軽量画面とQR解析ライブラリをWorkerから直接配信。外部PWA・外部CDNを経由せず、カメラ読取、入室・退室・重複表示を継続
+- 認証: Worker配信軽量画面は保存済み校舎・端末トークンを要求せず、Workerが発行する署名済み `HttpOnly`・`Secure`・`SameSite=Strict` Cookieを使用。通常のGitHub Pages画面のBearer認証と管理API認証は維持
+- 画面: 読取直後の不要な「受付中」全画面表示を廃止。入室・退室・重複は従来の色・キャラクターを使った表示へ改善。ホーム画面アイコンは以前の緑色カメラ `icon-192.png`／`icon-512.png` を復元
+- Apps Script連携: 受付後は既存Apps Scriptの `checkIn` へ書き戻し、入退室ログ、通知メール、ポイント処理を継続。Apps Scriptはバージョン78、既存デプロイIDを維持。従来のApps Script直接受付はフォールバックとして削除しない
+- 反映履歴: PR #19（未登録QR時の名簿自動更新）、#20（初回同期待機）、#21（古いAndroid軽量画面）、#22（Worker直結入口）、#23（受付表示改善）、#24〜#26（校舎設定・校舎別端末認証依存の撤廃）、#27（署名済みCookie認証）、#28（緑色カメラアイコン）をsquash merge
+- 検証: Worker試験33件、TypeScript／Wrangler型検査、古いAndroid互換試験4件に合格。本番HTML・マニフェスト・Cookie発行、保存トークンなし・古い校舎値でAPI認証通過、`/health` のHTTP 200・`ok=true`・`production-interim` を確認
+- 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値の実値はGitHub・台帳へ記録しない。校舎別設定QRは過去方式で、現在のWorker配信軽量画面では使用しない
+
 ## 登録詳細：学習進捗管理
 
 - ID: `learning-progress`
