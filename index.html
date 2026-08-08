@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 61877)
-Total output lines: 1415
-
 <!doctype html>
 <html lang="ja">
 <head>
@@ -1155,6 +1152,24 @@ applyAssetInfo=function(item){
     '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日：PR #29をsquash merge（d5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e）。Worker試験33件、退室写真試験2件、TypeScript／Wrangler型検査に合格。本番/legacy-tabletで20%設定と軽量画像参照、/healthのHTTP 200・ok=true・production-interimを確認。変更前の正常版8db0ce9aab24333cfa43083bb085fdf4c3817c96はcheckpoint/checkin-stable-20260808-before-rare-exitへ固定した。',
     '注意事項':(base['注意事項']?base['注意事項']+' ':'')+'退室レア写真の変更で問題が出た場合はcheckpoint/checkin-stable-20260808-before-rare-exitを基準に復旧する。',
     '確認済み事項':[...new Set([...confirmed,'生徒の通常退室時だけ約20%で人物写真を表示','入室・重複受付・講師表示は従来どおり','18KB軽量WebPを起動時に先読み','画像失敗時は通常退室イラストへ復帰','PR #29をmainへ反映','最終main d5a64ca','変更前チェックポイント8db0ce9を固定','退室写真試験2件合格','Worker試験33件合格','本番/legacy-tablet反映確認','health HTTP 200・production-interim'])]
+  });
+};
+</script>
+
+<script id="teacher-portal-timetable-input-20260808">
+const applyTeacherPortalTimetableInput20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyTeacherPortalTimetableInput20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('講師ポータル'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '最新版の場所':'stepkobetsu-hub/teacher-portal（main）／index.html commit 2c1f7f862d117beba21eb96d161471b2e01d6e10',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月8日：講師ポータルのホーム画面へ「時間割入力」カードを追加。カードから生徒マスタの「時間割マスタ」シートを開き、上部の「🗓️ 時間割入力」メニューから専用入力画面を利用する。シート上の E～AB、AH～AJ のプルダウンには「（空欄に戻す）」を追加し、選択すると編集時トリガー clearTimetableBlankChoice がセル内容を実際の空欄へ戻す。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'Apps Script project 16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45 に clearTimetableBlankChoice を追加し、スプレッドシート編集時トリガーを作成。講師ポータル公開コミット 2c1f7f862d117beba21eb96d161471b2e01d6e10。',
+    '確認済み事項':[...new Set([...confirmed,'講師ポータルに時間割入力カードを追加','時間割マスタへのリンクを公開確認','シートの時間割・兄弟コード・標準コース・標準オプションで空欄へ戻せる','空欄選択時に文字を残さずセルをクリア','編集時トリガー clearTimetableBlankChoice を設定','teacher-portal commit 2c1f7f862d117beba21eb96d161471b2e01d6e10'])],
+    '確認状況':'講師ポータルの時間割入力カードと、シート上の空欄復帰機能を本番反映済み'
   });
 };
 </script>
