@@ -1141,5 +1141,23 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="checkin-edge-rare-exit-photo-20260808">
+const applyCheckinEdgeRareExitPhoto20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyCheckinEdgeRareExitPhoto20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('出退くん'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main、d5a64ca）／cloudflare/checkin-edge',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'生徒の通常退室時だけ約20%で人物写真を表示する。入室、60秒以内の重複受付、講師の出勤・退勤は従来画像を維持する。人物写真は640px・18,338 bytesの軽量WebPを起動時に先読みし、古いタブレットで読み込めない場合は通常の退室イラストへ戻す。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日：PR #29をsquash merge（d5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e）。Worker試験33件、退室写真試験2件、TypeScript／Wrangler型検査に合格。本番/legacy-tabletで20%設定と軽量画像参照、/healthのHTTP 200・ok=true・production-interimを確認。変更前の正常版8db0ce9aab24333cfa43083bb085fdf4c3817c96はcheckpoint/checkin-stable-20260808-before-rare-exitへ固定した。',
+    '注意事項':(base['注意事項']?base['注意事項']+' ':'')+'退室レア写真の変更で問題が出た場合はcheckpoint/checkin-stable-20260808-before-rare-exitを基準に復旧する。',
+    '確認済み事項':[...new Set([...confirmed,'生徒の通常退室時だけ約20%で人物写真を表示','入室・重複受付・講師表示は従来どおり','18KB軽量WebPを起動時に先読み','画像失敗時は通常退室イラストへ復帰','PR #29をmainへ反映','最終main d5a64ca','変更前チェックポイント8db0ce9を固定','退室写真試験2件合格','Worker試験33件合格','本番/legacy-tablet反映確認','health HTTP 200・production-interim'])]
+  });
+};
+</script>
+
 </body>
 </html>
