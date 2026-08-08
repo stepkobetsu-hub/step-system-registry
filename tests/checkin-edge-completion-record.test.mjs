@@ -34,3 +34,19 @@ test('日常利用のQR読み取りリンクは登録済みの運用URLを使う
   assert.ok(page.includes("const qrReaderUrl=String(item['読み取りURL']"));
   assert.ok(page.includes("'読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet'"));
 });
+
+test('退室時のレア人物写真と復旧地点が記録されている', () => {
+  for (const text of [
+    'checkin-edge-rare-exit-photo-20260808',
+    '生徒の通常退室時だけ約20%で人物写真を表示',
+    '最終main d5a64ca',
+    'checkpoint/checkin-stable-20260808-before-rare-exit',
+    '退室写真試験2件合格',
+  ]) assert.ok(page.includes(text), text);
+  for (const text of [
+    '2026年8月8日：退室時のレア人物写真を復活',
+    'goodbye-director-night-fast.webp',
+    'd5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e',
+    'checkpoint/checkin-stable-20260808-before-rare-exit',
+  ]) assert.ok(registry.includes(text), text);
+});
