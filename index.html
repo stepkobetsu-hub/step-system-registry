@@ -43,7 +43,9 @@
       <form id="loginForm">
         <label for="loginCode">講師番号</label><input id="loginCode" name="code" type="text" autocomplete="username" required>
         <label for="loginPassword">パスワード</label><input id="loginPassword" name="password" type="password" autocomplete="current-password">
-        <button class="open" id="loginBtn" type="submit">ログイン</button><p id="loginError" class="login-error hidden" role="alert"></p>
+        <button class="open" id="loginBtn" type="submit">ログイン</button>
+        <p>この端末にID・パスワードを記憶し、次回から自動ログインします。ログアウトすると保存情報を削除します。</p>
+        <p id="loginError" class="login-error hidden" role="alert"></p>
       </form>
     </section>
     <section id="portal" class="hidden">
@@ -72,6 +74,8 @@
 <script>
 const GAS='https://script.google.com/macros/s/AKfycbypkUc0MqZ07E7pZRglNPeRM56WbCcuWaLpRzi9bVFcPklHDxaaLC7GfzG6ozTGCbEX/exec';
 const AUTH_KEY='stepStaffAppAuth';
+const STAFF_CODE_KEY='stepStaffAppCode';
+const STAFF_PASSWORD_KEY='stepStaffAppPassword';
 const INVESTIGATION_MEMO_KEY='stepSystemPortalInvestigationMemosV1';
 const INVESTIGATION_STATUSES=['未着手','調査中','ChatGPTへ確認予定','Codexへ確認予定','回答待ち','確認済み','保留'];
 const INVESTIGATION_DEFINITIONS=[
@@ -106,6 +110,9 @@ const ASSET_SECTIONS=[
   {title:'確認済み',fields:[['確認済み事項','確認済み']]}
 ];
 let systems=[];
+let loginInProgress=false;
+let autoLoginTimer=null;
+let autoLoginAttemptedSignature='';
 document.addEventListener('DOMContentLoaded',init);
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('category').addEventListener('change',render);
@@ -120,15 +127,74 @@ document.getElementById('memoCardFilter').addEventListener('change',renderInvest
 document.getElementById('clearAllMemos').addEventListener('click',clearAllInvestigationMemos);
 document.getElementById('logoutBtn').addEventListener('click',logout);
 document.getElementById('loginForm').addEventListener('submit',login);
+['loginCode','loginPassword'].forEach(id=>{
+  const input=document.getElementById(id);
+  input.addEventListener('input',scheduleAutoLogin);
+  input.addEventListener('change',scheduleAutoLogin);
+});
 
 function auth(){try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')}catch(e){return null}}
 async function api(action,extra){const a=auth();const res=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,systemPortalSessionToken:a?.systemPortalSessionToken||''},extra||{})),redirect:'follow'});return res.json()}
-async function init(){const a=auth();if(!a||!['2','3','4'].includes(String(a.permissionLevel))||!a.systemPortalSessionToken)return showLogin();try{await loadPortal()}catch(e){localStorage.removeItem(AUTH_KEY);showLogin(e.message||'セッションが切れました。再ログインしてください。')}}
+async function init(){
+  const a=auth();
+  if(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken){
+    try{await loadPortal();return}catch(e){localStorage.removeItem(AUTH_KEY)}
+  }
+  showLogin();
+  scheduleAutoLogin();
+}
 async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');systems=organizeEntryImport(Array.isArray(out.systems)?out.systems:[]);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');render()}
-function showLogin(message){document.getElementById('portal').classList.add('hidden');document.getElementById('loginPanel').classList.remove('hidden');const error=document.getElementById('loginError');error.textContent=message||'';error.classList.toggle('hidden',!message);document.getElementById('loginCode').value=auth()?.code||localStorage.getItem('stepStaffAppCode')||'';document.getElementById('loginCode').focus()}
-async function login(event){event.preventDefault();const code=document.getElementById('loginCode').value.trim();const password=document.getElementById('loginPassword').value;const button=document.getElementById('loginBtn');button.disabled=true;try{const out=await api('staffLogin',{code,password});if(!out.success)throw new Error(out.error||'ログインできませんでした。');if(!['2','3','4'].includes(String(out.permissionLevel))||!out.systemPortalSessionToken)throw new Error('STEP総合管理ポータルを利用する権限がありません。');localStorage.setItem('stepStaffAppCode',code);localStorage.setItem(AUTH_KEY,JSON.stringify({code,name:out.name||'',permissionLevel:out.permissionLevel,systemPortalSessionToken:out.systemPortalSessionToken,systemPortalExpiresAt:out.systemPortalExpiresAt||'',savedAt:new Date().toISOString()}));document.getElementById('loginPassword').value='';await loadPortal()}catch(e){localStorage.removeItem(AUTH_KEY);showLogin(e.message||'ログインできませんでした。')}finally{button.disabled=false}}
+function showLogin(message){
+  document.getElementById('portal').classList.add('hidden');
+  document.getElementById('loginPanel').classList.remove('hidden');
+  const error=document.getElementById('loginError');
+  error.textContent=message||'';
+  error.classList.toggle('hidden',!message);
+  const code=document.getElementById('loginCode');
+  const password=document.getElementById('loginPassword');
+  code.value=auth()?.code||localStorage.getItem(STAFF_CODE_KEY)||'';
+  password.value=localStorage.getItem(STAFF_PASSWORD_KEY)||'';
+  (code.value?(password.value?code:password):code).focus();
+}
+function scheduleAutoLogin(){
+  const code=document.getElementById('loginCode').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!code||!password||loginInProgress)return;
+  const signature=code+'\u0000'+password;
+  if(signature===autoLoginAttemptedSignature)return;
+  clearTimeout(autoLoginTimer);
+  autoLoginTimer=setTimeout(()=>{
+    autoLoginAttemptedSignature=signature;
+    performLogin(true);
+  },450);
+}
+async function login(event){event.preventDefault();await performLogin(false)}
+async function performLogin(isAuto){
+  if(loginInProgress)return;
+  const code=document.getElementById('loginCode').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!code){if(!isAuto)showLogin('講師番号を入力してください。');return}
+  const button=document.getElementById('loginBtn');
+  loginInProgress=true;
+  button.disabled=true;
+  try{
+    const out=await api('staffLogin',{code,password});
+    if(!out.success)throw new Error(out.error||'ログインできませんでした。');
+    if(!['2','3','4'].includes(String(out.permissionLevel))||!out.systemPortalSessionToken)throw new Error('STEP総合管理ポータルを利用する権限がありません。');
+    localStorage.setItem(STAFF_CODE_KEY,code);
+    localStorage.setItem(STAFF_PASSWORD_KEY,password);
+    localStorage.setItem(AUTH_KEY,JSON.stringify({code,name:out.name||'',permissionLevel:out.permissionLevel,systemPortalSessionToken:out.systemPortalSessionToken,systemPortalExpiresAt:out.systemPortalExpiresAt||'',savedAt:new Date().toISOString()}));
+    await loadPortal();
+  }catch(e){
+    localStorage.removeItem(AUTH_KEY);
+    showLogin(e.message||'ログインできませんでした。');
+  }finally{
+    loginInProgress=false;
+    button.disabled=false;
+  }
+}
 function deny(message){document.getElementById('portal').classList.add('hidden');const el=document.getElementById('denied');el.textContent=message;el.classList.remove('hidden')}
-async function logout(){try{await api('logoutSystemPortal')}catch(e){}localStorage.removeItem(AUTH_KEY);document.getElementById('loginPassword').value='';showLogin('ログアウトしました。')}
+async function logout(){try{await api('logoutSystemPortal')}catch(e){}localStorage.removeItem(AUTH_KEY);localStorage.removeItem(STAFF_CODE_KEY);localStorage.removeItem(STAFF_PASSWORD_KEY);autoLoginAttemptedSignature='';document.getElementById('loginCode').value='';document.getElementById('loginPassword').value='';showLogin('ログアウトしました。')}
 function fillFilters(){fill('category',unique(systems.map(x=>x['分類'])));fill('status',unique(systems.map(effectiveStatus)))}
 function fill(id,values){const s=document.getElementById(id);values.forEach(v=>{if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)})}
 function unique(a){return [...new Set(a.filter(Boolean))].sort((x,y)=>x.localeCompare(y,'ja'))}
