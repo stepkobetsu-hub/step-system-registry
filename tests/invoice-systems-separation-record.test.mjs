@@ -34,3 +34,18 @@ test('the invoice delivery Cloudflare production connection is recorded without 
   assert.doesNotMatch(page, /CLOUDFLARE_ADMIN_API_KEY=[0-9a-f]{32,}/i);
   assert.doesNotMatch(registry, /CLOUDFLARE_ADMIN_API_KEY=[0-9a-f]{32,}/i);
 });
+
+test('the invoice delivery Apps Script source is directly identifiable', () => {
+  for (const text of [
+    '1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
+    'AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw',
+    '1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y',
+    'コード_v022.gs',
+    'Download.html',
+    'バージョン27'
+  ]) {
+    assert.match(page, new RegExp(text));
+    assert.match(registry, new RegExp(text));
+  }
+  assert.doesNotMatch(registry, /専用プロジェクトは引き続き正本照合中/);
+});

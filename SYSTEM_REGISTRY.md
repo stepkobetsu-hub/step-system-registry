@@ -26,7 +26,7 @@
 | 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF/edit)から既存デプロイを新バージョンへ更新 | 2026-08-10 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
-| STEP請求書PDF作成・配信システム | Cloudflare接続済み・Apps Script切替待ち | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `agent/cloudflare-production-switch`（PR #12） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | Cloudflare接続確認後、**このシステム専用Apps Script**の既存デプロイだけを更新。本番メール送信は別途承認まで無効 | 2026-08-10 | Worker `step-invoice-api`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
+| STEP請求書PDF作成・配信システム | Apps Script正本確認済み・Cloudflare切替待ち | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `agent/cloudflare-production-switch`（PR #12） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v022.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを更新。本番メール送信は別途承認まで無効 | 2026-08-10 | Worker `step-invoice-api`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
@@ -45,6 +45,14 @@
 
 - 利用者向け画面: https://stepkobetsu-hub.github.io/invoice-pdf/
 - GitHub正本: https://github.com/stepkobetsu-hub/invoice-pdf
+- Apps Scriptプロジェクト名: `STEP請求書PDF作成・配信システム`
+- Apps Script編集URL: https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit
+- Apps ScriptプロジェクトID: `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1`
+- 現行デプロイ: バージョン27（2026-08-09 18:06）、説明 `v0.1.22 送信待ちキュー自動復旧・DL状態表示修正（本番メール送信無効）`
+- デプロイID: `AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw`
+- WebアプリURL: https://script.google.com/macros/s/AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw/exec
+- 接続Spreadsheet: `STEP請求書PDF作成・配信システム`（ID `1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y`）
+- Apps Scriptファイル: `コード_v022.gs`、`Download.html`、`appsscript.json`
 - Cloudflare切替ブランチ: `agent/cloudflare-production-switch`、PR #12、接続設定コミット `deb5e57`
 - Cloudflare Worker: `step-invoice-api`
 - Worker URL: https://step-invoice-api.stepkobetsu.workers.dev
@@ -52,7 +60,7 @@
 - D1: `step-invoice-db`（binding `DB`）
 - 非公開R2: `step-invoice-pdfs`（binding `PDFS`）
 - 2026-08-10確認: D1マイグレーション3件適用済み、R2接続済み、Worker `/health` は `ok=true`・`storage=cloudflare-r2`、管理API認証は `ok=true`。
-- Apps Script: 専用プロジェクトは引き続き正本照合中。`請求システム2026NEW` は明確に対象外とする。正本確定までは他のApps Scriptを変更しない。
+- Apps Script: 上記プロジェクトを専用正本として確認済み。`請求システム2026NEW` は明確に対象外とする。
 - 安全設定: `PRODUCTION_SEND_APPROVED=false`、`TEST_SEND_APPROVED=false`を維持。Cloudflare URLでPDF保存・表示・テストメールを確認するまで本番メールを有効化しない。
 - 秘密情報: `ADMIN_API_KEY`、`TOKEN_PEPPER`、Apps ScriptのScript Properties実値は台帳・GitHubへ記録しない。
 

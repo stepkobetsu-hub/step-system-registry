@@ -569,7 +569,7 @@ organizeEntryImport=function(items){
     '確認日':'2026年8月10日',
     '確認状況':'Cloudflare Worker・D1・非公開R2・管理API接続を確認済み。専用Apps Script正本の照合と本番切替は未完了。本番メール送信は未承認。',
     '確認済み事項':['GitHub Pages公開','Apps Script v6・既存デプロイID維持','Google Sheet 10シート','請求書CSV 2件読込','取引先CSV 3件読込','202608001：28,550円','202608002：小計25,045円・消費税2,505円・合計27,550円','高解像度PNGロゴ','新ロゴ入りPDF 2件を非公開保存','API応答の一時値検証','無効トークン案内画面','本番メール送信無効'],
-    '未確認項目':['専用Apps Scriptプロジェクトの正本確認','Cloudflare URLによる実PDFダウンロード','テスト宛先へのメール送信','本番メール送信承認']
+    '未確認項目':['Cloudflare URLによる実PDFダウンロード','テスト宛先へのメール送信','本番メール送信承認']
   });
   return out;
 };
@@ -1325,7 +1325,15 @@ applyAssetInfo=function(item){
     '確認状況':'Apps Script編集画面でプロジェクト名とコードファイル3件を確認済み'
   });
   if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム'))return Object.assign({},base,{
-    '状態':'Cloudflare接続済み・Apps Script切替待ち',
+    '状態':'Apps Script正本確認済み・Cloudflare切替待ち',
+    'Apps Scriptプロジェクト名':'STEP請求書PDF作成・配信システム',
+    'Apps ScriptプロジェクトID':'1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit',
+    'Apps Scriptファイル':'コード_v022.gs / Download.html / appsscript.json',
+    'Apps Script現行デプロイ':'バージョン27（2026/08/09 18:06）・v0.1.22 送信待ちキュー自動復旧・DL状態表示修正（本番メール送信無効）',
+    'Apps ScriptデプロイID':'AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw/exec',
+    '接続Spreadsheet':'STEP請求書PDF作成・配信システム（1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y）',
     'Cloudflare Worker':'step-invoice-api',
     'Cloudflare Worker URL':'https://step-invoice-api.stepkobetsu.workers.dev',
     'Cloudflare health':'https://step-invoice-api.stepkobetsu.workers.dev/health',
@@ -1333,11 +1341,11 @@ applyAssetInfo=function(item){
     'D1':'step-invoice-db（binding DB）',
     '非公開R2':'step-invoice-pdfs（binding PDFS）',
     '最新版の場所':'stepkobetsu-hub/invoice-pdf branch agent/cloudflare-production-switch、PR #12、commit deb5e57',
-    'Apps Script正本':'専用プロジェクトを照合中。請求システム2026NEWは対象外。正本確定まで他プロジェクトを変更しない。',
+    'Apps Script正本':'専用プロジェクトを確認済み。請求システム2026NEWは対象外。',
     '安全設定':'PRODUCTION_SEND_APPROVED=false、TEST_SEND_APPROVED=false。Cloudflare URLの実PDF・テストメール確認まで本番送信を有効にしない。',
     '確認日':'2026年8月10日',
-    '確認状況':'D1マイグレーション3件、R2、Worker health、管理API認証を確認済み。Apps Script本番切替待ち。',
-    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','管理API認証 ok=true','請求システム2026NEWを対象外として識別'])]
+    '確認状況':'専用Apps Script正本、バージョン27の現行デプロイ、D1マイグレーション3件、R2、Worker health、管理API認証を確認済み。Cloudflare本番切替待ち。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script専用正本・プロジェクトID確認','Apps ScriptデプロイIDとWebアプリURLのコード一致','Spreadsheet ID確認','Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','管理API認証 ok=true','請求システム2026NEWを対象外として識別'])]
   });
   return base;
 };
