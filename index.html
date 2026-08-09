@@ -355,7 +355,10 @@ applyAssetInfo=function(item){
     '旧GAS版Apps Script':['スタンドアロン：夏期講習_先生出勤管理／コード.gs／doGet・doPost・handleSaveAvailability・reflectToTimetable／有効Webアプリ1件（v3・2026/06/26）／最近の実行なし','バインド型候補：先生出勤登録アプリ／プロジェクト1l9s…／公開URLは有効だが編集権限上、プロジェクト名・バインド先・デプロイ日時・実行履歴は未確認','候補2バインド型：先生出勤登録アプリ2／コード.gs／候補2の旧名「出勤可否」を参照／有効デプロイ4件（最新確認v52・2026/06/28）／最近の実行なし'],'連携メモ':['現行：講師入力 → Supabase availability → 管理画面の転記ボタン → 校舎別Apps Script一括転記API → 全体時間割','スタンドアロン旧GAS：講師入力 → doPost → 出勤可否_神領／出勤可否_大手町 → reflectToTimetable → 全体時間割 → メール通知','バインド旧GAS：getActiveSpreadsheet()の出勤可否／出勤可否_大手町へ保存。bulkWriteは神領Sheet固定の不具合候補あり','現行GitHub Pagesは旧GAS入力Webアプリを呼び出さず、講師保存時のメール送信も実装していない','講師マスターIDの実値は生徒マスタIDと異なり、コードコメントと不一致'],'確認根拠':'本番GitHub PagesはSupabaseを直接参照。旧GAS各URLはGitHub内に参照がなく、確認可能な2プロジェクトの最近の実行履歴もない。候補2には複数世代の旧GAS用シートが残る。',
     '確認済み事項':['現行の講師入力・授業枠設定の正本：Supabase','神領校・大手町校のGoogle Sheetは夏期講習時間割の出力先','旧GAS版の保存先：候補2（夏期講習_出勤可否データ）','スタンドアロン旧GAS：夏期講習_先生出勤管理／有効Webアプリ1件','候補2バインド型：先生出勤登録アプリ2／別プロジェクト','現行Pagesから旧GAS入力Webアプリの呼び出しなし','追加指定の旧WebアプリURLは現在も有効'],'未確認項目':['プロジェクト1l9s…のバインド先・デプロイ一覧・実行履歴（編集権限上確認不可）','候補1がプロジェクト1l9s…のバインド先かどうか','旧HTML・個人ブックマークから旧Webアプリを開いている利用者の有無'],'確認状況':'現行Supabase経路を使用／旧GAS入力経路の現行利用は確認できず'
   });
-  if(name.includes('請求管理'))Object.assign(patch,{'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit'});
+  if(name.includes('請求管理'))Object.assign(patch,{
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF/edit'
+  });
   return Object.assign({},base,patch);
 };
 const applyTeacherPortalLinkBase=applyAssetInfo;
@@ -546,27 +549,27 @@ organizeEntryImport=function(items){
     '状態':'テスト運用',
     '利用者':'STEPスタッフ',
     '運用担当':'管理者',
-    '概要':'請求書CSVと取引先CSVを読み込み、10円単位の四捨五入、PDF作成、非公開Drive保存、期限付きトークン配信、送信・取得状態管理を行う。',
+    '概要':'請求書CSVと取引先CSVを読み込み、10円単位の四捨五入、PDF作成、非公開Cloudflare R2保存、期限付きトークン配信、送信・取得状態管理を行う。',
     '利用者向けURL':'https://stepkobetsu-hub.github.io/invoice-pdf/',
     'GitHub Pages URL':'https://stepkobetsu-hub.github.io/invoice-pdf/',
     'GitHub URL':'https://github.com/stepkobetsu-hub/invoice-pdf',
-    'GitHub正本':'stepkobetsu-hub/invoice-pdf（main）',
-    'ブランチ':'main',
-    'コミットSHA':'99dfdbf',
-    '主要ファイル':'index.html / assets/app.js / assets/core.js / assets/invoice-pdf.js / apps-script/Code.gs / apps-script/Download.html',
+    'GitHub正本':'stepkobetsu-hub/invoice-pdf（Cloudflare切替：agent/cloudflare-production-switch、PR #12）',
+    'ブランチ':'agent/cloudflare-production-switch',
+    'コミットSHA':'deb5e57',
+    '主要ファイル':'index.html / assets/app.js / assets/core.js / assets/invoice-pdf.js / apps-script/Code.gs / cloudflare/',
     'Apps Scriptバージョン':'6（v0.1.5、2026年8月2日）',
     'Google Sheet名':'STEP請求書PDF作成・配信システム',
     '使用シート名':'取引先マスタ／基本設定／メール定型文／請求書データ／請求書明細／請求書配信履歴／ダウンロード履歴／操作ログ／ユーザー権限／送信キュー',
-    '非公開資産':'Spreadsheet、PDF保存フォルダ、Apps Script編集・デプロイ識別子は公開台帳へ記載しない。管理者の非公開台帳で管理。',
+    '非公開資産':'Spreadsheet、管理APIキー、TOKEN_PEPPER、Script Properties実値、CSV、請求書PDFは公開台帳へ記載しない。PDFは非公開Cloudflare R2へ保存。',
     '認証':'管理APIキー＋Apps Script権限。API応答は要求ごとの暗号学的一時値で相互検証。',
-    '配信仕様':'推測困難なトークン、既定45日有効、手動無効化、再送時の旧URL無効化。PDFフォルダは非公開。',
+    '配信仕様':'推測困難なトークン、既定45日有効、手動無効化、再送時の旧URL無効化。PDFは非公開R2からWorker経由でのみ取得。Google Drive配信URLは使用しない。',
     '丸め仕様':'最終金額の1円の位を四捨五入して10円単位。小計・消費税・合計を一致させる。',
     'メール運用':'本番メール送信はPRODUCTION_SEND_APPROVED=falseで無効。別途承認まで有効化しない。',
     '更新方法':'GitHub mainを更新してPagesを確認後、Apps Scriptは同じデプロイIDの新バージョンへ更新する。個人情報・CSV・請求書PDFはGitHubへ保存しない。',
-    '確認日':'2026年8月2日',
-    '確認状況':'公開画面、CSV読込、金額、PNGロゴ、PDF作成・非公開保存、API接続、無効トークン案内画面を確認済み。本番メール送信は未承認のため未実施。',
+    '確認日':'2026年8月10日',
+    '確認状況':'Cloudflare Worker・D1・非公開R2・管理API接続を確認済み。専用Apps Script正本の照合と本番切替は未完了。本番メール送信は未承認。',
     '確認済み事項':['GitHub Pages公開','Apps Script v6・既存デプロイID維持','Google Sheet 10シート','請求書CSV 2件読込','取引先CSV 3件読込','202608001：28,550円','202608002：小計25,045円・消費税2,505円・合計27,550円','高解像度PNGロゴ','新ロゴ入りPDF 2件を非公開保存','API応答の一時値検証','無効トークン案内画面','本番メール送信無効'],
-    '未確認項目':['有効トークンによる実ダウンロード','テスト宛先へのメール送信','本番メール送信承認']
+    '未確認項目':['専用Apps Scriptプロジェクトの正本確認','Cloudflare URLによる実PDFダウンロード','テスト宛先へのメール送信','本番メール送信承認']
   });
   return out;
 };
@@ -1304,6 +1307,39 @@ applyAssetInfo=function(item){
     '確認済み事項':[...new Set([...confirmed,'1周目100%をバーの70%位置として表示','70%位置に破線と1周目ゴールを表示','2周目を15%・3周目を15%として表示','2周目・3周目のTRYをTRYの赤×なおしと表示','2周目・3周目のExerciseをエクササイズの赤×なおしと表示','Cloudflare Worker Version bf08686bを100%公開','本番health HTTP 200・ok=true','productionWriteApproved=trueを維持','browserD1WriteEnabled=trueを維持','dualWriteEnabled=trueを維持','保存API・D1・認証・同期処理・Cron変更なし','復旧用Version eb7d6baeを維持','Node.js導入からWrangler OAuth認証までを記録','Versions upload・preview・deploy・rollbackの標準手順を記録','Static Assetsはクイック編集で探さない','OAuthコード・APIトークンを台帳へ記録しない'])],
     '確認状況':'70%基準グラフと2・3周目の宿題文言をCloudflare本番へ反映し、表示・health・保存許可設定を確認済み'
   });
+};
+</script>
+<script id="invoice-systems-separation-20260810">
+const applyInvoiceSystemsSeparation20260810Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyInvoiceSystemsSeparation20260810Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(name.includes('請求管理システムV3.1'))return Object.assign({},base,{
+    '正式名称':'請求管理システムV3.1（学費計算・請求データ作成）',
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF/edit',
+    '用途':'生徒マスタ・時間割マスタ・料金表を参照する学費計算と請求データ作成。PDF配信基盤ではない。',
+    '識別注意':'STEP請求書PDF作成・配信システムとは別物。Cloudflare版コードやPDF配信用Script Propertiesを設定しない。',
+    '確認日':'2026年8月10日',
+    '確認状況':'Apps Script編集画面でプロジェクト名とコードファイル3件を確認済み'
+  });
+  if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム'))return Object.assign({},base,{
+    '状態':'Cloudflare接続済み・Apps Script切替待ち',
+    'Cloudflare Worker':'step-invoice-api',
+    'Cloudflare Worker URL':'https://step-invoice-api.stepkobetsu.workers.dev',
+    'Cloudflare health':'https://step-invoice-api.stepkobetsu.workers.dev/health',
+    'Worker Version':'2cbfc116-20cb-4f76-9283-0528b0df37eb',
+    'D1':'step-invoice-db（binding DB）',
+    '非公開R2':'step-invoice-pdfs（binding PDFS）',
+    '最新版の場所':'stepkobetsu-hub/invoice-pdf branch agent/cloudflare-production-switch、PR #12、commit deb5e57',
+    'Apps Script正本':'専用プロジェクトを照合中。請求システム2026NEWは対象外。正本確定まで他プロジェクトを変更しない。',
+    '安全設定':'PRODUCTION_SEND_APPROVED=false、TEST_SEND_APPROVED=false。Cloudflare URLの実PDF・テストメール確認まで本番送信を有効にしない。',
+    '確認日':'2026年8月10日',
+    '確認状況':'D1マイグレーション3件、R2、Worker health、管理API認証を確認済み。Apps Script本番切替待ち。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','管理API認証 ok=true','請求システム2026NEWを対象外として識別'])]
+  });
+  return base;
 };
 </script>
 </body>
