@@ -48,6 +48,8 @@ test('the invoice delivery Apps Script source is directly identifiable', () => {
     assert.match(registry, new RegExp(text));
   }
   assert.doesNotMatch(registry, /専用プロジェクトは引き続き正本照合中/);
-  assert.match(page, /ADMIN_AUTH_REQUIRED/);
-  assert.match(registry, /ADMIN_AUTH_REQUIRED/);
+  assert.match(page, /testCloudflareIntegration実行完了/);
+  assert.match(registry, /testCloudflareIntegration` の実行完了/);
+  assert.doesNotMatch(page, /ADMIN_AUTH_REQUIRED/);
+  assert.doesNotMatch(registry, /ADMIN_AUTH_REQUIRED/);
 });
