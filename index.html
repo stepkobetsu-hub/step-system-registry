@@ -1325,7 +1325,7 @@ applyAssetInfo=function(item){
     '確認状況':'Apps Script編集画面でプロジェクト名とコードファイル3件を確認済み'
   });
   if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム'))return Object.assign({},base,{
-    '状態':'Cloudflare本番コード反映済み・共有キー同期待ち',
+    '状態':'Cloudflare本番接続完了（本番メール送信無効）',
     'Apps Scriptプロジェクト名':'STEP請求書PDF作成・配信システム',
     'Apps ScriptプロジェクトID':'1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
     'Apps Script編集URL':'https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit',
@@ -1344,9 +1344,9 @@ applyAssetInfo=function(item){
     'Apps Script正本':'専用プロジェクトを確認済み。請求システム2026NEWは対象外。',
     '安全設定':'PRODUCTION_SEND_APPROVED=false、TEST_SEND_APPROVED=false。Cloudflare URLの実PDF・テストメール確認まで本番送信を有効にしない。',
     '確認日':'2026年8月10日',
-    '接続試験':'testCloudflareIntegrationはADMIN_AUTH_REQUIRED。Apps ScriptのCLOUDFLARE_ADMIN_API_KEYとWorkerのADMIN_API_KEYを同期後に再試験する。秘密値は台帳へ記録しない。',
-    '確認状況':'専用Apps Script正本へv0.1.23を既存デプロイIDのまま反映済み。D1マイグレーション3件、R2、Worker healthは確認済み。共有キー同期と結合再試験待ち。',
-    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script専用正本・プロジェクトID確認','Apps Script v0.1.23を既存デプロイIDへ反映','Apps ScriptデプロイIDとWebアプリURLのコード一致','Spreadsheet ID確認','Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','Worker管理APIを認証済みローカル環境から確認','請求システム2026NEWを対象外として識別'])]
+    '接続試験':'Apps ScriptのCLOUDFLARE_ADMIN_API_KEYとWorkerのADMIN_API_KEYを同期し、testCloudflareIntegrationの実行完了を2026年8月10日に確認。秘密値は台帳へ記録しない。',
+    '確認状況':'専用Apps Script正本へv0.1.23を既存デプロイIDのまま反映済み。D1マイグレーション3件、R2、Worker health、Apps ScriptからWorkerへの認証接続を確認済み。本番メール送信は無効を維持。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script専用正本・プロジェクトID確認','Apps Script v0.1.23を既存デプロイIDへ反映','Apps ScriptデプロイIDとWebアプリURLのコード一致','Spreadsheet ID確認','Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','Worker管理APIを認証済みローカル環境から確認','Apps Script testCloudflareIntegration実行完了','請求システム2026NEWを対象外として識別'])]
   });
   return base;
 };
