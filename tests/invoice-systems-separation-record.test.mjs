@@ -42,10 +42,12 @@ test('the invoice delivery Apps Script source is directly identifiable', () => {
     '1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y',
     'コード_v022.gs',
     'Download.html',
-    'バージョン27'
+    'v0.1.23'
   ]) {
     assert.match(page, new RegExp(text));
     assert.match(registry, new RegExp(text));
   }
   assert.doesNotMatch(registry, /専用プロジェクトは引き続き正本照合中/);
+  assert.match(page, /ADMIN_AUTH_REQUIRED/);
+  assert.match(registry, /ADMIN_AUTH_REQUIRED/);
 });
