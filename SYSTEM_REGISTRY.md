@@ -38,8 +38,11 @@
 - Apps Scriptプロジェクト名: `請求システム2026NEW`
 - Apps Script編集URL: https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit
 - 画面で確認するファイル: `コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs`
-- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-11にバージョン40へ更新）
-- 確定権限仕様: 模試マスタと模試申込は、AK権限2以上（2・3・4）で追加・編集・削除・一括登録が可能。権限1以下は拒否する。
+- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-11にバージョン43へ更新）
+- 確定権限仕様: 模試マスタと模試申込は、AK権限2以上（2・3・4）で追加・編集・削除・一括登録・請求対象ON/OFF・全員チェック・全解除・チェック済み申込の一括削除が可能。権限1以下は拒否する。
+- 模試仕様: 対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。チェック済み申込データの一括削除は管理操作として用意し、削除後も生徒は一覧に残って請求対象OFFとなる。
+- 模試データ保存: `模試申込` の6列目を `請求対象` Boolean（TRUE/FALSE）として明示保存する。旧行は従来の請求状態をONとして安全移行し、今後は行の存在ではなくBoolean TRUEだけを請求計算・請求確認・MF等の元データへ含める。
+- 模試実装・検証: `コード.gs` の `ensureMockBillingSchema_`、`billingImpl_getMockBillingRoster_`、`saveMockBillingTargets_`、`billingImpl_deleteCheckedMockBillingTargets_`、`readMockTestEntries_`、`BillingV31_Index.html` の模試一覧UI、`BillingV31_Auth.gs` のAK>=2ルーティングを更新。2026/09「第３回愛知全県模試」対象62名で全解除、全選択、個別OFF、再読込保持、OFFの請求抽出除外、別月・別模試非干渉、権限設定、状態復元を確認。
 - 用途: 生徒マスタ・時間割マスタ・料金表を参照して、学費計算と請求データを作成する。
 - 注意: このプロジェクトはSTEP請求書PDF作成・配信システムではない。Cloudflare版コードやPDF配信用Script Propertiesを設定しない。
 
