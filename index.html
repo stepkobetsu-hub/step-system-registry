@@ -1389,5 +1389,64 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="billing-v31-complete-release-history-20260811">
+const applyBillingV31CompleteReleaseHistory20260811Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31CompleteReleaseHistory20260811Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('請求管理システムV3.1'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '正式名称':'請求管理システムV3.1（請求システム2026NEW）',
+    '状態':'本番稼働中',
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    'Apps ScriptデプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン54（2026年8月11日）',
+    '現行バージョン':'v54',
+    '変更ファイル':'コード.gs（ローカル正本名 Code.gs）／BillingV31_Index.html／BillingV31_Auth.gs。請求書メール処理 BillingV31_InvoiceMail.gs は既存保護。',
+    '主要変更関数':'doGet、BILLING_FUNCTION_PERMISSIONS_、billingApplyPermissionUi、billingStartApp、setupNav、showPage、模試マスタ・申込一覧取得／請求対象個別保存／一括保存／チェック済み申込一括削除、模試料金読込・請求生成、特別調整一覧取得／単月保存／継続保存／アーカイブ／復元。',
+    '権限仕様':'請求V3.1の全操作はAK権限2・3・4が可能。AK権限1以下は変更不可。認証・セッション方式は維持。模試、特別調整、料金設定、請求生成、請求確認、CSV、PDF・メール送信を含む。',
+    '模試運用手順':'最初に模試マスタで模試名・対象区分／対象学年・実施回・金額・有効状態を設定する。模試申込では同じ模試・請求月を選び、対象学年の在籍生徒全員を一覧表示して、請求対象チェックで受験／非受験を決める。',
+    '模試仕様':'対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整・一括保存・チェック済み申込の一括削除に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。保存後は模試単位の1行表示へ折りたたみ、クリックで生徒一覧を再表示する。1行表示には対象請求月（例：2026年9月分（8/27振替））も表示する。',
+    '模試データ保存':'模試申込の請求対象列へBoolean TRUE/FALSEを明示保存する。既存申込は安全にONとして引き継ぐ。行の存在では判定せず、TRUEの生徒だけを模試料金集計・請求生成・請求確認・MF等の請求元データへ含める。月・模試をキーに分離し、別月／別模試の状態を変更しない。',
+    '模試一括処理':'全員チェック・全解除は1人ずつ通信せず、一括更新サーバー関数を1回呼ぶ。個人変更は1名単位で保存可能。保存中／保存完了を表示する。同じ模試・同じ請求月の重複レコード大量作成を防ぐ。',
+    '模試削除仕様':'通常の受験者選択は削除ではなく請求対象OFFを使う。チェック済み申込の一括削除は誤登録レコードの管理操作として提供する。削除後も対象学年の在籍生徒一覧は残り、請求対象OFFとして表示する。模試マスタは申込生徒の削除とは別管理で、名称変更・無効化・削除操作を区別する。',
+    '特別調整仕様':'今月だけの調整、継続調整、旧データ確認、アーカイブ／復元を管理する。生徒は最新の在籍生徒から選択する。加算・減額、税抜金額、対象請求月を明示し、請求計算へ反映する。',
+    '料金特別調整専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html',
+    '料金特別調整直接URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
+    '専用画面仕様':'請求システムと同じデータ・認証・権限を使う特別調整専用入口。他機能の左ナビを非表示にし、スマホでは料金特別調整だけを全画面表示する。青い上部バー右端に小型ログアウトボタンを配置し、画面内の大きなログアウト欄は専用画面のみ非表示。',
+    'スタッフ用アプリ連携':'stepkobetsu-hub/seiseki-kanri のスタッフ用アプリに「料金特別調整／イレギュラーな割引・加算を、気づいた時点で入力」カードを追加。AK=2・3・4だけ表示し、スマホ用入口を開く。',
+    'スマホホーム画面':'専用の金色¥アイコンを180px・512pxで配置。iPhone Safari／Android Chromeのホーム画面追加に対応。ホーム画面名は「料金特別調整」。入口ページがApps Script専用画面を全画面表示する。',
+    'スタッフ用アプリ正本':'GitHub stepkobetsu-hub/seiseki-kanri（main）。関連コミット：dd7d309（カード追加）、44ef497（アイコン画像追加）、1a85f8f（カードへアイコン設定）、4974d72（スマホ用入口追加）、aa90df4（カードを専用入口へ接続）、b7d7dd6（右上小型ログアウト）。',
+    '本番更新履歴':'v40 模試権限をAK2以上へ統一。v43 対象学年の在籍生徒全員表示・請求対象Boolean方式・一括操作・請求除外を本番化。その後、模試設定変更／削除、一覧復旧、1行折りたたみ、請求月表示を追加。v51 請求V3.1全操作をAK2以上へ統一。v52 料金特別調整の専用画面とスタッフ用入口。v53 スマホホーム画面用アイコン。v54 右上小型ログアウトへ整理。すべて既存デプロイIDを維持。',
+    '請求計算への反映':'模試申込の請求対象BooleanがTRUEの行だけを readMockTestEntries_ 相当の読込対象とし、請求作成・今月の請求・請求確認・MF等の出力元へ加算する。FALSEは模試代を一切加算しない。特別調整は単月／継続の有効データだけを請求明細へ反映し、アーカイブ中は適用しない。',
+    '既存機能保護':'料金設定、コースマスタ、割引設定、兄弟割引、教材、請求確認、請求生成、認証、セッション、月切替、既存デプロイIDを維持。STEP請求書PDF作成・配信システムは別システムとして変更対象外。',
+    'テスト結果':'対象学年の在籍生徒全員表示、全員チェック、全解除、個別ON/OFF、再読込保持、ONのみ模試代請求、OFFの請求確認／請求抽出除外、別月・別模試非干渉、権限2操作可、権限1変更不可を確認。特別調整は権限2で一覧・追加・編集・アーカイブ操作が有効。専用URL表示、スタッフ用カード、180/512pxアイコン、スマホ入口、右上ログアウト表示を本番確認。',
+    '確認日':'2026年8月11日',
+    '確認状況':'請求システム2026NEW v54を既存デプロイIDのまま本番反映済み。模試の請求対象方式、全操作AK2以上、料金特別調整専用画面、スタッフ用アプリカード、スマホホーム画面アイコン、右上ログアウトまで確認済み。',
+    '確認済み事項':[...new Set([...confirmed,
+      '対象学年の在籍生徒を全員表示',
+      '請求対象Boolean TRUE/FALSE保存',
+      '全員チェック・全解除・個別調整・一括保存',
+      'チェック済み申込の一括削除',
+      '請求対象ONだけ模試代請求',
+      '請求対象OFFは請求確認・請求抽出から除外',
+      '別月・別模試の状態を維持',
+      '模試単位の保存して1行折りたたみ表示',
+      '模試1行表示に請求月・振替日',
+      '請求V3.1の全操作はAK2・3・4',
+      '料金特別調整専用画面',
+      'スタッフ用アプリに料金特別調整カード',
+      'スマホホーム画面用180px・512pxアイコン',
+      '右上小型ログアウト',
+      '既存デプロイID維持・バージョン54',
+      'STEP請求書PDF作成・配信システムは変更対象外'
+    ])]
+  });
+};
+</script>
 </body>
 </html>
