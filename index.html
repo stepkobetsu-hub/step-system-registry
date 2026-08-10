@@ -357,7 +357,7 @@ applyAssetInfo=function(item){
   });
   if(name.includes('請求管理'))Object.assign(patch,{
     'Apps Scriptプロジェクト名':'請求システム2026NEW',
-    'Apps Script編集URL':'https://script.google.com/home/projects/1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF/edit'
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit'
   });
   return Object.assign({},base,patch);
 };
@@ -1317,8 +1317,8 @@ applyAssetInfo=function(item){
   if(name.includes('請求管理システムV3.1'))return Object.assign({},base,{
     '正式名称':'請求管理システムV3.1（学費計算・請求データ作成）',
     'Apps Scriptプロジェクト名':'請求システム2026NEW',
-    'Apps ScriptプロジェクトID':'1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF',
-    'Apps Script編集URL':'https://script.google.com/home/projects/1aeBIJZEvMuh7fvJNj64hvK-Udq764L0GUO6rlMNP8vZPYukegnA8ItVF/edit',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
     '用途':'生徒マスタ・時間割マスタ・料金表を参照する学費計算と請求データ作成。PDF配信基盤ではない。',
     '識別注意':'STEP請求書PDF作成・配信システムとは別物。Cloudflare版コードやPDF配信用Script Propertiesを設定しない。',
     '確認日':'2026年8月10日',
@@ -1349,6 +1349,26 @@ applyAssetInfo=function(item){
     '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script専用正本・プロジェクトID確認','Apps Script v0.1.23を既存デプロイIDへ反映','Apps ScriptデプロイIDとWebアプリURLのコード一致','Spreadsheet ID確認','Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','Worker管理APIを認証済みローカル環境から確認','Apps Script testCloudflareIntegration実行完了','請求システム2026NEWを対象外として識別'])]
   });
   return base;
+};
+</script>
+
+<script id="billing-v31-canonical-permissions-20260811">
+const applyBillingV31CanonicalPermissions20260811Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31CanonicalPermissions20260811Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('請求管理システムV3.1'))return base;
+  return Object.assign({},base,{
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    'Apps ScriptデプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン40（2026年8月11日）',
+    '模試権限仕様':'模試マスタ・模試申込の追加、編集、削除、一括登録はAK権限2以上（2・3・4）が可能。権限1以下は拒否。',
+    '確認日':'2026年8月11日',
+    '確認状況':'正本プロジェクト、主要3ファイル、現行WebアプリURL、請求V3.1画面構成を確認。模試権限をAK 2以上へ統一し、既存デプロイIDのままバージョン40へ更新済み。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'正本Project ID訂正','主要3ファイル確認','本番デプロイID一致','請求V3.1画面構成一致','模試関連の追加・編集・削除・一括登録はAK 2以上','既存デプロイID維持・バージョン40'])]
+  });
 };
 </script>
 </body>
