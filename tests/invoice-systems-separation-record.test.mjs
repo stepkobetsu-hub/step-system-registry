@@ -49,6 +49,7 @@ test('the August 12 invoice delivery release and load test are accumulated', () 
     assert.match(page, new RegExp(text));
     assert.match(registry, new RegExp(text));
   }
+  assert.match(page, /filter\(entry=>entry!=='本番メール送信無効'\)/);
 });
 
 test('the invoice delivery Apps Script source is directly identifiable', () => {
