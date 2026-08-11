@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-11
+最終更新: 2026-08-12
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -26,7 +26,7 @@
 | 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-10 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
-| STEP請求書PDF作成・配信システム | Cloudflare本番接続完了（本番メール送信無効） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `agent/cloudflare-production-switch`（PR #12） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v022.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイへ `v0.1.23` を反映済み。Apps ScriptとWorkerの管理APIキーを同期し、結合試験完了。本番メール送信は別途承認まで無効 | 2026-08-10 | Worker `step-invoice-api`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。Worker health正常。Apps Scriptの `testCloudflareIntegration` は実行完了。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
+| STEP請求書PDF作成・配信システム | 本番稼働中（CSV一括作成・バックグラウンド送信確認済み） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `f31216d`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v022.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。メール送信は受付後にバックグラウンド処理し、指定テスト用3宛先へ33件ずつ、合計99件がアプリ上で送信済みとなることを確認 | 2026-08-12 | Worker `step-invoice-api`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。CSVの日付正規化・同一CSV再取込・直接メール列・最大100件の一括送信を確認。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
@@ -67,8 +67,23 @@
 - 2026-08-10確認: D1マイグレーション3件適用済み、R2接続済み、Worker `/health` は `ok=true`・`storage=cloudflare-r2`。Worker管理API自体は認証済みローカル環境から `ok=true` を確認済み。
 - Apps Script結合試験: `CLOUDFLARE_ADMIN_API_KEY` とWorkerの `ADMIN_API_KEY` を同期し、`testCloudflareIntegration` の実行完了を2026-08-10に確認。秘密値は台帳へ記録しない。
 - Apps Script: 上記プロジェクトを専用正本として確認済み。`請求システム2026NEW` は明確に対象外とする。
-- 安全設定: `PRODUCTION_SEND_APPROVED=false`、`TEST_SEND_APPROVED=false`を維持。Cloudflare URLでPDF保存・表示・テストメールを確認するまで本番メールを有効化しない。
+- 安全設定: メール送信は宛先・件数を確認してキューへ登録し、バックグラウンドで処理する。送信許可フラグやAPIキーなどの秘密値は台帳へ記録しない。
 - 秘密情報: `ADMIN_API_KEY`、`TOKEN_PEPPER`、Apps ScriptのScript Properties実値は台帳・GitHubへ記録しない。
+
+#### 2026年8月12日 更新・検証履歴
+
+- GitHub正本: `stepkobetsu-hub/invoice-pdf` の `main`。確認時の最新コミットは `f31216d`。
+- CSV一括作成: 請求日の形式を保存前に正規化。同一CSVを再度取り込んだ場合も別請求書として作成する。CSV内の許可されたメールアドレス列を利用可能。
+- 一括送信: 画面は送信完了を待たず、最大100件をキューへ登録してバックグラウンド処理する。PDF生成・台帳書込みは競合防止のため順次処理する。
+- 送信負荷試験: 指定されたテスト用3宛先へ各33件、合計99件を送信。アプリ上で全99件が「送信済み」となることを確認。受信箱での到着確認とは区別する。
+- 請求書一覧: 100件ずつ表示し「さらに読み込む」で追加表示。全選択チェック、一括メール送信、一括削除、一括入金（日付指定）、選択解除を維持。「すべての検索結果を選択する」は使用しない。
+- 一覧表示: カードは約8件分の高さを上限とし、それ以降は一覧内スクロール。カード余白と送信状態表示を小型化し、「入金済」は11pxで表示。
+- 詳細表示: 取引先名・作成日・請求書番号・入金情報をコンパクトに整理。メモとタグは作成日側の次の行へ横並びで表示。操作ボタンは高さ38pxの1段表示。
+- 画面遷移: 通常起動時は請求書一覧。ブラウザ更新では現在ページを維持し、請求書一覧へ強制移動しない。STEPロゴは請求書一覧へ戻る。
+- 接続表示: 画面名は「請求書作成＆送信システム」。資産台帳上の正式名称は「STEP請求書PDF作成・配信システム」。
+- 検証: JavaScript構文検査、UI、請求書ワークスペース、領収書、デモ保存・バックグラウンド送信、Cloudflare基盤・セキュリティの自動テストを通過。
+- 主要コミット: `df612e9`（バックグラウンド送信）、`d6f40fe`（CSVメール列）、`8e2916c`（PDF台帳書込み直列化）、`3129fe7`（一覧約8件）、`48aabaf`（一覧カード小型化）、`d8f2cb0`（詳細上部圧縮）、`cadb5e0`（メモ・タグ配置）、`f31216d`（メモ・タグを次行へ）。
+- 確認済み事項: 同一CSV再取込でも別請求書を作成／最大100件のバックグラウンド送信／指定テスト用3宛先へ各33件・合計99件／一覧カード約8件／メモ・タグを作成日側の次行へ配置／請求管理システムV3.1と分離。
 
 ### 今後の請求関連調査ルール
 
