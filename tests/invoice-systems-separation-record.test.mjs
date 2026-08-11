@@ -23,10 +23,10 @@ test('the invoice delivery Cloudflare production connection is recorded without 
     'step-invoice-api',
     'step-invoice-db',
     'step-invoice-pdfs',
-    '2cbfc116-20cb-4f76-9283-0528b0df37eb',
+    '2507faba-4027-4937-96d0-0e44d449cac1',
     'agent/cloudflare-production-switch',
     'deb5e57',
-    'f31216d'
+    '534cbd0'
   ]) {
     assert.match(page, new RegExp(text));
     assert.match(registry, new RegExp(text));
@@ -37,11 +37,10 @@ test('the invoice delivery Cloudflare production connection is recorded without 
 
 test('the August 12 invoice delivery release and load test are accumulated', () => {
   for (const text of [
-    '本番稼働中（CSV一括作成・バックグラウンド送信確認済み）',
+    '本番稼働中（100件送信を約65秒で完了確認）',
     '同一CSV再取込でも別請求書を作成',
-    '最大100件のバックグラウンド送信',
-    '指定テスト用3宛先へ各33件',
-    '合計99件',
+    '100件実送信を約65秒で完了',
+    '配信履歴100件すべて',
     '一覧カード約8件',
     'メモ・タグを作成日側の次行へ配置',
     '請求管理システムV3.1と分離'
@@ -57,9 +56,9 @@ test('the invoice delivery Apps Script source is directly identifiable', () => {
     '1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
     'AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw',
     '1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y',
-    'コード_v022.gs',
+    'コード_v023.gs',
     'Download.html',
-    'v0.1.23'
+    'バージョン38'
   ]) {
     assert.match(page, new RegExp(text));
     assert.match(registry, new RegExp(text));

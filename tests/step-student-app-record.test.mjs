@@ -15,8 +15,8 @@ test('the student app development record is registered in the portal and ledger'
 test('the STEP invoice PDF system is registered with the current background sending record', () => {
   assert.match(page, /'ID':'step-invoice-pdf'/);
   assert.match(page, /step-invoice-pdf-release-20260812/);
-  assert.match(page, /最大100件のバックグラウンド送信/);
-  assert.match(registry, /本番稼働中（CSV一括作成・バックグラウンド送信確認済み）/);
+  assert.match(page, /100件実送信を約65秒で完了/);
+  assert.match(registry, /本番稼働中（100件送信を約65秒で完了確認）/);
 });
 
 test('the record preserves the confirmed pre-design functional scope', () => {
