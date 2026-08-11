@@ -23,7 +23,7 @@ test('the invoice delivery Cloudflare production connection is recorded without 
     'step-invoice-api',
     'step-invoice-db',
     'step-invoice-pdfs',
-    '2507faba-4027-4937-96d0-0e44d449cac1',
+    '7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2',
     'agent/cloudflare-production-switch',
     'deb5e57',
     '534cbd0'
@@ -58,7 +58,7 @@ test('the invoice delivery Apps Script source is directly identifiable', () => {
     '1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y',
     'コード_v023.gs',
     'Download.html',
-    'バージョン38'
+    'バージョン39'
   ]) {
     assert.match(page, new RegExp(text));
     assert.match(registry, new RegExp(text));
