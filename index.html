@@ -1488,29 +1488,20 @@ applyAssetInfo=function(item){
   return Object.assign({},base,{
     '正式名称':'STEP請求書PDF作成・配信システム',
     '状態':'本番稼働中（100件送信を約65秒で完了確認）',
-    '最新版の場所':'stepkobetsu-hub/invoice-pdf main、commit 534cbd0（2026年8月12日確認）',
-    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン38（2026年8月12日）',
+    '最新版の場所':'stepkobetsu-hub/invoice-pdf main、commit b6d1c50（2026年8月12日確認）',
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン39（2026年8月12日）',
     'Apps Scriptファイル':'コード_v023.gs / Download.html / appsscript.json',
-    'Cloudflare Worker Version':'2507faba-4027-4937-96d0-0e44d449cac1',
+    'Cloudflare Worker Version':'7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2',
+    '請求書番号仕様':'新規作成画面を開くたびに、既存請求書番号の最大値＋1を自動入力。番号欄は編集可能で、数字なら桁数を固定しない。同じ番号が既に存在する場合だけ新規保存を拒否する。',
+    'ログイン維持仕様':'スタッフ共通認証の永続セッションを使用。請求書アプリの通信エラーでは端末のログイン情報を削除せず、本人がスタッフ用アプリで明示的にログアウトするまで維持する。',
+    '今回の本番反映':'GitHub commits 571ce1f・b6d1c50、Apps Script バージョン39、Worker Version 7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2。公開画面で最大番号2026081000に対し2026081001の自動入力と編集可能状態を確認。',
     '一括送信':'再送時は保存済みPDFを再利用し、Cloudflareで最大100件の配信URLを一括発行してバックグラウンド送信する。',
     '送信負荷試験':'2026年8月12日、指定テスト用3宛先を使って100件を実送信。開始17:41:31.747、最終送信済み17:42:36.802、約65秒。配信履歴100件すべて「送信済み・未アクセス・正常」を確認。受信箱での到着確認とは区別する。',
     '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+'2026年8月12日：再送PDFの不要な再生成を停止。Cloudflareで100件の配信URLを一括発行し、D1上限内で旧URLを一括無効化。Apps Script v38、Worker Version 2507faba、GitHub commits 67b306a・534cbd0。100件実送信を約65秒で完了。',
     'テスト結果':'JavaScript構文、UI、請求書ワークスペース、領収書、デモ保存・バックグラウンド送信、Cloudflare基盤・セキュリティの自動テストを通過。100件実送信は全件「送信済み・正常」、最終完了まで約65秒。',
     '確認日':'2026年8月12日',
     '確認状況':'100件の送信受付、一括URL発行、旧URL無効化、バックグラウンド送信を本番で確認。開始から最終送信済みまで約65秒で、3分以内の目標を達成。',
-    '確認済み事項':[...new Set([...confirmed,'再送時は保存済みPDFを再利用','Cloudflareで100件の配信URLを一括発行','D1一括上限内で旧URLを無効化','100件実送信を約65秒で完了','配信履歴100件すべて送信済み・正常','Apps Scriptバージョン38','Worker Version 2507faba','GitHub commits 67b306a・534cbd0'])]
-  });
-};
-</script>
-<script id="step-invoice-number-release-20260812">
-const applyStepInvoiceNumberRelease20260812Base=applyAssetInfo;
-applyAssetInfo=function(item){
-  const base=applyStepInvoiceNumberRelease20260812Base(item);
-  if(base['ID']!=='step-invoice-pdf')return base;
-  return Object.assign({},base,{
-    '請求書番号仕様':'新規作成画面を開くたびに、既存請求書番号の最大値＋1を自動入力。番号欄は編集可能で、数字なら桁数を固定しない。同じ番号が既に存在する場合だけ新規保存を拒否する。',
-    'ログイン維持仕様':'スタッフ共通認証の永続セッションを使用。請求書アプリの通信エラーでは端末のログイン情報を削除せず、本人がスタッフ用アプリで明示的にログアウトするまで維持する。',
-    '今回の本番反映':'GitHub commits 571ce1f・b6d1c50、Apps Script バージョン39、Worker Version 7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2。公開画面で最大番号2026081000に対し2026081001の自動入力と編集可能状態を確認。'
+    '確認済み事項':[...new Set([...confirmed,'再送時は保存済みPDFを再利用','Cloudflareで100件の配信URLを一括発行','D1一括上限内で旧URLを無効化','100件実送信を約65秒で完了','配信履歴100件すべて送信済み・正常','新規請求書番号は既存最大値＋1','請求書番号は編集可能・数字の桁数制限なし','新規保存時は重複番号だけ拒否','明示的ログアウトまでログインを維持','Apps Scriptバージョン39','Worker Version 7b6dbbe4','GitHub commits 571ce1f・b6d1c50'])]
   });
 };
 </script>
