@@ -24,3 +24,24 @@ test('明示的ログアウトでセッション・ID・パスワードを削除
   assert.match(html, /localStorage\.removeItem\(STAFF_CODE_KEY\)/);
   assert.match(html, /localStorage\.removeItem\(STAFF_PASSWORD_KEY\)/);
 });
+
+test('一時的な通信・JSON応答エラーではログイン情報を削除しない', () => {
+  assert.equal((html.match(/localStorage\.removeItem\(AUTH_KEY\)/g) || []).length, 1);
+  assert.match(html, /const text=await res\.text\(\)/);
+  assert.match(html, /ログイン状態は保持しています/);
+  assert.match(html, /if\(await restoreStoredLogin\(\)\)return/);
+});
+
+test('通信できない場合は直近の台帳キャッシュを表示する', () => {
+  assert.match(html, /const SYSTEMS_CACHE_KEY='stepSystemRegistryCacheV1'/);
+  assert.match(html, /function loadPortalCache\(\)/);
+  assert.match(html, /if\(loadPortalCache\(\)\)return/);
+});
+
+test('すべてのインラインJavaScriptが構文エラーなく読み込める', () => {
+  const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)];
+  assert.ok(scripts.length > 0);
+  scripts.forEach((match, index) => {
+    assert.doesNotThrow(() => new Function(match[1]), `script ${index}`);
+  });
+});

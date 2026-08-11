@@ -76,6 +76,7 @@ const GAS='https://script.google.com/macros/s/AKfycbypkUc0MqZ07E7pZRglNPeRM56WbC
 const AUTH_KEY='stepStaffAppAuth';
 const STAFF_CODE_KEY='stepStaffAppCode';
 const STAFF_PASSWORD_KEY='stepStaffAppPassword';
+const SYSTEMS_CACHE_KEY='stepSystemRegistryCacheV1';
 const INVESTIGATION_MEMO_KEY='stepSystemPortalInvestigationMemosV1';
 const INVESTIGATION_STATUSES=['未着手','調査中','ChatGPTへ確認予定','Codexへ確認予定','回答待ち','確認済み','保留'];
 const INVESTIGATION_DEFINITIONS=[
@@ -134,16 +135,44 @@ document.getElementById('loginForm').addEventListener('submit',login);
 });
 
 function auth(){try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')}catch(e){return null}}
-async function api(action,extra){const a=auth();const res=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,systemPortalSessionToken:a?.systemPortalSessionToken||''},extra||{})),redirect:'follow'});return res.json()}
+async function api(action,extra){
+  const a=auth();
+  const res=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,systemPortalSessionToken:a?.systemPortalSessionToken||''},extra||{})),redirect:'follow'});
+  const text=await res.text();
+  if(!res.ok)throw new Error(`サーバーに接続できませんでした（${res.status}）。しばらくしてから再読み込みしてください。`);
+  try{return JSON.parse(text)}catch(e){
+    const isHtml=/^\s*</.test(text);
+    throw new Error(isHtml?'サーバーが一時的に応答できません。ログイン状態は保持しています。しばらくしてから再読み込みしてください。':'サーバーから正しい応答を受け取れませんでした。ログイン状態は保持しています。');
+  }
+}
 async function init(){
   const a=auth();
   if(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken){
-    try{await loadPortal();return}catch(e){localStorage.removeItem(AUTH_KEY)}
+    try{await loadPortal();return}catch(firstError){
+      try{if(await restoreStoredLogin())return}catch(e){}
+      if(loadPortalCache())return;
+      showLogin(firstError.message);
+      scheduleAutoLogin();
+      return;
+    }
   }
   showLogin();
   scheduleAutoLogin();
 }
-async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');systems=organizeEntryImport(Array.isArray(out.systems)?out.systems:[]);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');render()}
+function savePortalCache(items){try{localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date().toISOString()}))}catch(e){}}
+function showPortal(items){systems=organizeEntryImport(items);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');render()}
+function loadPortalCache(){try{const cached=JSON.parse(localStorage.getItem(SYSTEMS_CACHE_KEY)||'null');if(!cached||!Array.isArray(cached.items))return false;showPortal(cached.items);return true}catch(e){return false}}
+async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');const items=Array.isArray(out.systems)?out.systems:[];savePortalCache(items);showPortal(items)}
+async function restoreStoredLogin(){
+  const code=localStorage.getItem(STAFF_CODE_KEY)||'';
+  const password=localStorage.getItem(STAFF_PASSWORD_KEY)||'';
+  if(!code||!password)return false;
+  const out=await api('staffLogin',{code,password});
+  if(!out.success||!['2','3','4'].includes(String(out.permissionLevel))||!out.systemPortalSessionToken)return false;
+  localStorage.setItem(AUTH_KEY,JSON.stringify({code,name:out.name||'',permissionLevel:out.permissionLevel,systemPortalSessionToken:out.systemPortalSessionToken,systemPortalExpiresAt:out.systemPortalExpiresAt||'',savedAt:new Date().toISOString()}));
+  await loadPortal();
+  return true;
+}
 function showLogin(message){
   document.getElementById('portal').classList.add('hidden');
   document.getElementById('loginPanel').classList.remove('hidden');
@@ -186,7 +215,6 @@ async function performLogin(isAuto){
     localStorage.setItem(AUTH_KEY,JSON.stringify({code,name:out.name||'',permissionLevel:out.permissionLevel,systemPortalSessionToken:out.systemPortalSessionToken,systemPortalExpiresAt:out.systemPortalExpiresAt||'',savedAt:new Date().toISOString()}));
     await loadPortal();
   }catch(e){
-    localStorage.removeItem(AUTH_KEY);
     showLogin(e.message||'ログインできませんでした。');
   }finally{
     loginInProgress=false;
@@ -370,20 +398,10 @@ applyAssetInfo=function(item){
     '被参照システム':'スタッフ用アプリ（https://stepkobetsu-hub.github.io/seiseki-kanri/）',
     '連携メモ':['講師ポータルからスタッフ用アプリへ移動できる','スタッフ用アプリ上部から講師ポータルへ戻る導線がある'],
     '確認日':'2026年7月28日',
-    '確認根拠':'…11877 tokens truncated…   '公開URL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
-      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
-      '正本スプレッドシート':'入退室ログ２（1VyQ3O69PDArG2bJt_Qf347rlTwKfjqM6KPLDWqIPo6A）',
-      '旧ファイル':'入退室ログ（1zNK...）。今後使用しない旧ファイル。削除せず保管。',
-      '権限':'表示・履歴確認: スタッフ用アプリ利用者。付与・使用・編集: AK=2・3・4。基本設定変更: AK=4。API側でも検証。',
-      '接続関係':'QR入退室→入退室ログ２「ログ」、自動ポイント・特別ポイント・ポイント使用→同「ポイント履歴」、STEP塾生アプリ残高→ポイント履歴の生徒番号別合計。',
-      '更新方法':'GitHub mainを更新し、Apps Script既存デプロイを新バージョンへ更新。デプロイIDは維持する。',
-      '運用開始日':'2026年8月3日',
-      '作業メモ':'2026年8月1日、CHECKIN_LOG_SS_IDを入退室ログ２へ統一。ポイント履歴は本番開始前に見出し行を残して初期化。ログ・不達メール管理も構造を維持してテストデータ行のみ初期化。',
-      '確認済み事項':['既存Apps Script全コードのバックアップ','Script Propertiesのキー名と設定状況の記録（秘密値はGitHub非保存）','入退室ログ２と旧入退室ログのDriveバックアップ','既存デプロイID維持','スタッフ用アプリへポイント設定カード追加'],
-      '確認日':'2026年8月1日'
-    });
-  }
-  return out;
+    '確認根拠':'STEPシステム資産管理台帳の講師ポータルカードと、seiseki-kanri/index.html のスタッフ用アプリ画面を確認。',
+    '確認済み事項':['講師ポータル本体の既存リンク','スタッフ用アプリ：https://stepkobetsu-hub.github.io/seiseki-kanri/','講師ポータルとスタッフ用アプリの相互導線'],
+    '確認状況':'講師ポータル本体・スタッフ用アプリ・相互導線を確認済み'
+  });
 };
 </script>
 
@@ -853,7 +871,7 @@ applyAssetInfo=function(item){
     'Webアプリ一覧':[...deployments,'v56（2026/08/05 11:57） ポイント管理・不達管理復旧／API振り分け保護（既存デプロイIDを維持）'],
     '確認根拠':'本番Apps Script再読込、公開Webアプリへの匿名・非個人情報リクエスト、GitHub main commits b1f9e435f1cf1ada781cd0b0ffe2a077bd544bc6・000fd5b610eed6586e73b4a530f1d51b5f494931、対象テスト17件合格を照合。',
     '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月5日 障害復旧：Apps Script v54でPointManager.gsとDeliveryFailures.gsの正本コード全体が初期関数 myFunction の内側へ入った状態になり、外部からAPI振り分け関数を呼べなくなった。doPost先頭がPointManagerの振り分け関数を無条件に呼んでいたため、ポイント管理だけでなく同じWebアプリのPOST処理全体が「処理中にエラーが発生しました」で停止。PointManager.gs・DeliveryFailures.gsをGitHub正本から再作成し、コード.gsへ各追加モジュールの存在確認ガードを追加。1機能の読込異常で他のQR受付・受付状況・不達管理まで全停止しない構成へ変更。v55でポイント管理を復旧し、v56で不達管理も復旧。既存デプロイIDと公開URLは維持。',
-    '確認済み事項':[...new Set([...confirmed,'PointManager.gsの不要なmyFunction包み込みを除去','DeliveryFailures.gsの不要なmyFunction包み込みを除去','GitHub正本から両ファイルを全文復旧','doPostへ追加モジュール存在確認ガードを追加','ポイント管理APIがスタッフ認証処理まで到達','受付状況APIが固有のRECEIPT_NOT_FOUNDを返却','QR受付APIが固有のINVALID_RECEIPT_IDを返却','不達管理API振り分け関数を復旧','対象テスト17件合格','Apps Script v56・既存デプロイID維持']]),
+    '確認済み事項':[...new Set([...confirmed,'PointManager.gsの不要なmyFunction包み込みを除去','DeliveryFailures.gsの不要なmyFunction包み込みを除去','GitHub正本から両ファイルを全文復旧','doPostへ追加モジュール存在確認ガードを追加','ポイント管理APIがスタッフ認証処理まで到達','受付状況APIが固有のRECEIPT_NOT_FOUNDを返却','QR受付APIが固有のINVALID_RECEIPT_IDを返却','不達管理API振り分け関数を復旧','対象テスト17件合格','Apps Script v56・既存デプロイID維持'])],
     '確認状況':'本番v56への更新、公開API振り分け、ポイント管理復旧、QR受付系の独立動作を確認済み'
   };
   return Object.assign({},base,common);
