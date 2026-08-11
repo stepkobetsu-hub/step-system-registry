@@ -1505,5 +1505,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="step-invoice-pdf-open-levels-20260812">
+const applyStepInvoicePdfOpenLevels20260812Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepInvoicePdfOpenLevels20260812Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '正式名称':'STEP請求書PDF作成・配信システム',
+    '最新版の場所':'stepkobetsu-hub/invoice-pdf main、commit 1dec174（2026年8月12日確認）',
+    'Cloudflare Worker Version':'a62f70e6-d8d6-4261-b43d-8a3a41160324',
+    '開封表示仕様':'メール開封は「開封」、メール内URLを押した段階は「開封2」、PDFを表示した段階は「開封3」。複数を並べず、到達済みの最高段階1つだけを一覧カードへ表示する。',
+    'DL済仕様':'「DL済」はスタッフが請求書アプリ内のPDFダウンロード操作を行った場合だけ記録する。受信者側のURLアクセス・PDF表示とは分離し、一覧カードの件名右横へ9pxの小型表示とする。',
+    '開封記録基盤':'Brevoメール開封日時、Cloudflare配信URLアクセス日時、Cloudflare PDF表示日時、アプリ内PDFダウンロード日時を別々に保持。D1 migration 0007_invoice_open_levels.sqlで invoices.app_downloaded_at を追加。',
+    'PDF複数ページ仕様':'明細が多い請求書は全品目を複数ページへ分割。1ページ目には入るだけ明細を配置し、2ページ目以降は生徒名・住所を繰り返さず明細の続きから開始。税率別内訳・小計・合計、振込先、備考は各ブロックを分割せず、残り領域へ入るブロックだけ前ページに配置する。偶数行を薄色表示し、フッターは下端余白内へ配置する。',
+    '新規・デモ作成仕様':'通常の新規作成は取引先欄を空欄にし、請求書の複製時だけ元の取引先を引き継ぐ。デモ送信は取引先空欄、テスト100円、テスト割引-100円、請求0円のテンプレートを維持する。旧テスト送信モードは使用せず、デモ送信は維持する。',
+    '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+'2026年8月12日：再送リンク維持、新規・複製・デモ作成、月別請求書番号、メール開封追跡、長い明細の複数ページPDF、未入金表示、出力ブロックの空き領域配置を反映。続いて開封／開封2／開封3とアプリ内DL済を分離し、D1 migration 0007、Worker Version a62f70e6、GitHub commits fff7068・1dec174を本番反映。',
+    'テスト結果':'JavaScript構文、UI、請求書ワークスペース、PDF複数ページ、領収書、デモ保存・バックグラウンド送信、再送リンク保持、Cloudflare基盤・セキュリティの全自動テストを通過。GitHub Pagesの最新版ファイル、Worker health、D1 app_downloaded_at列を本番で確認。',
+    '確認日':'2026年8月12日',
+    '確認状況':'開封3段階とアプリ内DL済の分離、長い請求書PDFの複数ページ・ブロック配置、新規・複製・デモ作成の確定仕様を本番反映。GitHub Pages配信ファイル、Worker、D1を確認済み。',
+    '確認済み事項':[...new Set([...confirmed,'再送リンクを新しい送信まで維持','通常の新規作成は取引先空欄','複製時だけ取引先を引き継ぐ','0円デモ送信テンプレートを維持','旧テスト送信モードを削除・デモ送信を維持','長い請求書明細を複数ページ表示','2ページ目以降は明細の続きから表示','出力3ブロックを分割せず空き領域へ配置','偶数明細行を薄色表示','未入金は赤地に白文字','メール開封を開封・開封2・開封3で段階表示','最高の開封段階だけを表示','アプリ内PDFダウンロードだけDL済','DL済を件名右横へ小型表示','D1 migration 0007適用','Worker Version a62f70e6','GitHub commits fff7068・1dec174'])]
+  });
+};
+</script>
 </body>
 </html>

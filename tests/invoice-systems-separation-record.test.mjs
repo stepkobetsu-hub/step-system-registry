@@ -51,6 +51,25 @@ test('the August 12 invoice delivery release and load test are accumulated', () 
   assert.match(page, /filter\(entry=>entry!=='本番メール送信無効'\)/);
 });
 
+test('the invoice open levels, app download, and multipage release are accumulated', () => {
+  for (const text of [
+    '1dec174',
+    'a62f70e6-d8d6-4261-b43d-8a3a41160324',
+    '「開封」',
+    '「開封2」',
+    '「開封3」',
+    '最高段階1つだけ',
+    'アプリ内PDFダウンロード',
+    '0007_invoice_open_levels.sql',
+    'invoices.app_downloaded_at',
+    '複数ページ',
+    '税率別内訳'
+  ]) {
+    assert.match(page, new RegExp(text));
+    assert.match(registry, new RegExp(text));
+  }
+});
+
 test('the invoice delivery Apps Script source is directly identifiable', () => {
   for (const text of [
     '1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
