@@ -25,7 +25,7 @@
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
 | 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
-| 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v72） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
+| 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v73） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
@@ -37,8 +37,8 @@
 
 - Apps Scriptプロジェクト名: `請求システム2026NEW`
 - Apps Script編集URL: https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit
-- 画面で確認するファイル: `コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs`
-- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-12にバージョン72へ更新）
+- 画面で確認するファイル: `コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs`
+- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-12にバージョン73へ更新）
 - 確定権限仕様: 模試マスタと模試申込は、AK権限2以上（2・3・4）で追加・編集・削除・一括登録・請求対象ON/OFF・全員チェック・全解除・チェック済み申込の一括削除が可能。権限1以下は拒否する。
 - 模試仕様: 対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。チェック済み申込データの一括削除は管理操作として用意し、削除後も生徒は一覧に残って請求対象OFFとなる。
 - 模試データ保存: `模試申込` の6列目を `請求対象` Boolean（TRUE/FALSE）として明示保存する。旧行は従来の請求状態をONとして安全移行し、今後は行の存在ではなくBoolean TRUEだけを請求計算・請求確認・MF等の元データへ含める。
@@ -56,6 +56,18 @@
 - 工事中表示: ホームカードと左ナビの「PDF・メール送信」は「PDF・メール送信（工事中）」と表示する。
 - 本番更新履歴: v68 全請求明細CSV連携、v69 在籍更新・請求再作成時刻判定、v70 中央処理表示、v71 ①〜⑤・工事中表示・中央通知小型化、v72 エラーチェック後のエラー一覧自動表示。すべて既存デプロイIDを維持。
 - 変更ファイル: `コード.gs`、`BillingV31_Index.html`。`BillingV31_InvoiceMail.gs`、認証方式、既存デプロイIDは維持した。
+
+#### 2026年8月12日 CSV品名・備考・振込先設定（v73）
+
+- CSV品名簡略化: 明細名の先頭に付く「追加口座」「追加講座」「模試：」をCSV出力時に除去する。講座名・模試名本体と金額は維持する。
+- 備考W列: 全員共通の標準文言を `個別指導ステップ（運営：株式会社エデュクレスト）` とする。中3は次行へ `※中３は９月より直前講座が必修受講となります。` を追加する。
+- 振込先X列: 口座振替対象者の振替日を含む既存自動文言を維持する。設定による自動／追加／置換／空欄を選べるが、初期状態では従来の自動判定を変更しない。
+- 管理画面: 左ナビへ「備考・振込先設定」を追加。全員・学年・生徒別に、W列とX列の追加／置換／自動／空欄を設定できる。設定の一覧、編集、有効・無効、削除に対応する。
+- 設定保存: 専用シート `備考・振込先設定` を使用し、設定ID、対象種別、対象値、列、動作、文言、有効・無効、更新日時を保存する。適用優先順は全員→学年→生徒。全員標準備考と中3追加備考を初期登録済み。
+- 既存機能保護: 学費計算、対象生徒選択、口座振替可否、振替日の自動計算、料金、CSV列順・116列構成、認証、既存デプロイIDを維持。STEP請求書PDF作成・配信システム側は変更していない。
+- 検証: 中3の2行備考、中3以外の標準備考、振込先自動文言、CSV品名の接頭語除去、CSV 116列維持、設定シート初期化を確認。Apps Scriptの `testBillingTextSettingsLogic` と `testBillingTextSettingsInitialization` は実行完了。
+- 本番: `請求システム2026NEW` を既存デプロイIDのままバージョン73へ更新。説明は「備考・振込先設定・CSV品名簡略化 2026-08-12」。
+- 復旧: 問題時は既存デプロイをバージョン72へ戻す。2026-08-12 10:05時点の全ソースを復元用ZIPとしてローカル保管済み。個人情報・CSV実データ・秘密値は保存していない。
 
 ### B. STEP請求書PDF作成・配信システム
 
