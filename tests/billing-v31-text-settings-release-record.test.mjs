@@ -28,3 +28,21 @@ test('billing v73 record does not accumulate sensitive or personal data', () => 
     assert.doesNotMatch(target, /CLOUDFLARE_ADMIN_API_KEY\s*=\s*[0-9a-z_-]{16,}/i);
   }
 });
+
+test('billing v74 transfer automatic rule investigation is accumulated', () => {
+  for (const text of [
+    'バージョン74',
+    '生徒番号1300以下',
+    '1301以上',
+    '営業日補正なし',
+    '自動設定を使用【デフォルト】',
+    '在籍91名',
+    '口座有効80名',
+    'N列未設定11名',
+    '2026/08/27',
+    'バージョン73'
+  ]) {
+    assert.match(page, new RegExp(text));
+    assert.match(registry, new RegExp(text));
+  }
+});
