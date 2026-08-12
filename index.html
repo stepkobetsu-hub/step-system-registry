@@ -1529,5 +1529,43 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="invoice-details-order-workflow-release-20260812">
+const applyInvoiceDetailsOrderWorkflowRelease20260812Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyInvoiceDetailsOrderWorkflowRelease20260812Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  if(name.includes('請求管理システムV3.1')){
+    return Object.assign({},base,{
+      'Apps Script現行デプロイ':'既存デプロイID維持・バージョン72（2026年8月12日）',
+      '請求CSV明細連携':'件名と明細を分離し、授業料・諸経費・教材・模試・調整等の明細名と金額を最大8明細まで個別に連携。合計だけの1明細へ集約しない。',
+      '在籍更新後の再作成判定':'在籍更新時刻と請求再作成時刻を記録・比較し、再作成済みでも古いフラグだけが残る問題を解消。',
+      '月次操作手順':'①在籍生徒を今すぐ更新、②今月の請求設定、③請求作成、④エラーチェック、⑤請求確認。各カード右側へ番号を表示。',
+      'エラーチェック仕様':'④エラーチェックは請求再作成後にErrors画面へ移動し、最新のエラー一覧を自動表示する。',
+      '処理表示仕様':'作成中と完了を画面中央の小型パネルへ表示。完了は約3秒で自動的に消える。',
+      'PDF・メール送信表示':'PDF・メール送信（工事中）',
+      '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+'2026年8月12日：v68 全請求明細CSV連携、v69 在籍更新・請求再作成時刻判定、v70 中央処理表示、v71 ①〜⑤・工事中表示・中央通知小型化、v72 エラーチェック後のエラー一覧自動表示。既存デプロイIDを維持。',
+      '確認日':'2026年8月12日',
+      '確認状況':'請求システム2026NEW バージョン72を既存デプロイIDのまま本番反映済み。',
+      '確認済み事項':[...new Set([...confirmed,'最大8明細をCSV連携','在籍更新時刻と請求再作成時刻を比較','①在籍生徒を今すぐ更新','②今月の請求設定','③請求作成','④エラーチェック','⑤請求確認','エラー一覧を自動表示','PDF・メール送信（工事中）','バージョン72'])]
+    });
+  }
+  if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム')){
+    return Object.assign({},base,{
+      '最新版の場所':'stepkobetsu-hub/invoice-pdf main、commit c9f00a58（2026年8月12日確認）',
+      'Cloudflare Worker Version':'a15d34ed-fe4d-494d-a677-79be2ca7bbac',
+      '請求明細取込':'請求管理システムV3.1から受け取った全明細を個別に保持し、授業料・諸経費等をPDFへ別明細として表示する。',
+      '請求書一覧順':'新しいCSV取込グループを最上段へ表示。同じ取込グループ内は生徒番号の大きい順。',
+      'CSV再取込時刻':'同じ請求書番号の再取込時はD1 created_atを今回の取込時刻へ更新し、再取込グループ全体を一覧上部へ移動する。',
+      '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+'2026年8月12日：PR #24（94a5007）で全明細取込と一覧比較、PR #25（c9f00a58）でD1再取込時刻を更新。Worker Version a15d34edへ本番反映しhealth確認。',
+      'テスト結果':'一覧比較core test、Cloudflare invoice workspace test、主要JavaScript構文検査を通過。依存パッケージのネットワーク取得が必要な全テストは未実行として区別。',
+      '確認日':'2026年8月12日',
+      '確認状況':'請求明細の個別表示、新しいCSV取込グループ最優先、同一取込内の生徒番号降順を本番反映済み。',
+      '確認済み事項':[...new Set([...confirmed,'全請求明細を個別取込','新しいCSV取込グループを最上段','同一取込内は生徒番号の大きい順','D1 created_atを再取込時に更新','GitHub merge 94a5007・c9f00a58','Worker Version a15d34ed-fe4d-494d-a677-79be2ca7bbac'])]
+    });
+  }
+  return base;
+};
+</script>
 </body>
 </html>

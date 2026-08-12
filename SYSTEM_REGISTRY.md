@@ -25,8 +25,8 @@
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
 | 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
-| 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中 | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-10 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
-| STEP請求書PDF作成・配信システム | 本番稼働中（100件送信を約65秒で完了確認） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `1dec174`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。実送信試験100件は全件「送信済み・正常」、開始から最終完了まで約65秒。開封はメール／URL／PDFの3段階、DL済はアプリ内PDFダウンロードだけを記録。長い明細は複数ページ化。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
+| 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v72） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
+| STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
@@ -38,13 +38,24 @@
 - Apps Scriptプロジェクト名: `請求システム2026NEW`
 - Apps Script編集URL: https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit
 - 画面で確認するファイル: `コード.gs`、`BillingV31_Index.html`、`BillingV31_InvoiceMail.gs`
-- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-11にバージョン43へ更新）
+- 現行デプロイID: `AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb`（既存ID維持、2026-08-12にバージョン72へ更新）
 - 確定権限仕様: 模試マスタと模試申込は、AK権限2以上（2・3・4）で追加・編集・削除・一括登録・請求対象ON/OFF・全員チェック・全解除・チェック済み申込の一括削除が可能。権限1以下は拒否する。
 - 模試仕様: 対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。チェック済み申込データの一括削除は管理操作として用意し、削除後も生徒は一覧に残って請求対象OFFとなる。
 - 模試データ保存: `模試申込` の6列目を `請求対象` Boolean（TRUE/FALSE）として明示保存する。旧行は従来の請求状態をONとして安全移行し、今後は行の存在ではなくBoolean TRUEだけを請求計算・請求確認・MF等の元データへ含める。
 - 模試実装・検証: `コード.gs` の `ensureMockBillingSchema_`、`billingImpl_getMockBillingRoster_`、`saveMockBillingTargets_`、`billingImpl_deleteCheckedMockBillingTargets_`、`readMockTestEntries_`、`BillingV31_Index.html` の模試一覧UI、`BillingV31_Auth.gs` のAK>=2ルーティングを更新。2026/09「第３回愛知全県模試」対象62名で全解除、全選択、個別OFF、再読込保持、OFFの請求抽出除外、別月・別模試非干渉、権限設定、状態復元を確認。
 - 用途: 生徒マスタ・時間割マスタ・料金表を参照して、学費計算と請求データを作成する。
 - 注意: このプロジェクトはSTEP請求書PDF作成・配信システムではない。Cloudflare版コードやPDF配信用Script Propertiesを設定しない。
+
+#### 2026年8月12日 請求CSV連携・月次操作UI更新
+
+- 請求明細連携: 「請求書PDF作成・配信へ進む」で渡すCSVは、合計1項目への集約を廃止し、授業料・諸経費・教材・模試・調整等の明細名と金額を最大8明細まで個別に保持する。件名と明細を分離して保護者向け請求書へ渡す。
+- 在籍更新後の再作成判定: 在籍更新時刻と請求再作成時刻をDocument Propertiesへ記録して比較する。古い単一フラグだけが残り、再作成済みでもCSV出力を拒否する不具合を解消した。
+- 月次操作手順: ホームカード右側に、①在籍生徒を今すぐ更新、②今月の請求設定、③請求作成、④エラーチェック、⑤請求確認を表示する。
+- エラーチェック: ④は請求を再作成した後、`Errors` 画面へ自動移動し、`getErrorRowsForAdmin` で最新のエラー一覧を読み込む。③の請求作成だけを呼ぶ旧配線は廃止した。
+- 処理表示: 作成中・読込中などは画面中央の小型パネルで表示し、完了も中央へ約3秒表示して自動的に消す。
+- 工事中表示: ホームカードと左ナビの「PDF・メール送信」は「PDF・メール送信（工事中）」と表示する。
+- 本番更新履歴: v68 全請求明細CSV連携、v69 在籍更新・請求再作成時刻判定、v70 中央処理表示、v71 ①〜⑤・工事中表示・中央通知小型化、v72 エラーチェック後のエラー一覧自動表示。すべて既存デプロイIDを維持。
+- 変更ファイル: `コード.gs`、`BillingV31_Index.html`。`BillingV31_InvoiceMail.gs`、認証方式、既存デプロイIDは維持した。
 
 ### B. STEP請求書PDF作成・配信システム
 
@@ -61,7 +72,7 @@
 - Cloudflare切替ブランチ: `agent/cloudflare-production-switch`、PR #12、接続設定コミット `deb5e57`
 - Cloudflare Worker: `step-invoice-api`
 - Worker URL: https://step-invoice-api.stepkobetsu.workers.dev
-- Worker Version: `a62f70e6-d8d6-4261-b43d-8a3a41160324`
+- Worker Version: `a15d34ed-fe4d-494d-a677-79be2ca7bbac`
 - D1: `step-invoice-db`（binding `DB`）
 - 非公開R2: `step-invoice-pdfs`（binding `PDFS`）
 - 2026-08-10確認: D1マイグレーション3件適用済み、R2接続済み、Worker `/health` は `ok=true`・`storage=cloudflare-r2`。Worker管理API自体は認証済みローカル環境から `ok=true` を確認済み。
@@ -72,7 +83,9 @@
 
 #### 2026年8月12日 更新・検証履歴
 
-- GitHub正本: `stepkobetsu-hub/invoice-pdf` の `main`。確認時の最新コミットは `1dec174`。
+- 過去の確認状態: `本番稼働中（100件送信を約65秒で完了確認）`。この負荷試験結果は、後続の明細連携・取込順更新後も履歴として保持する。
+- Worker更新履歴: 100件送信確認時 `7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2`、開封段階・アプリ内DL分離時 `a62f70e6-d8d6-4261-b43d-8a3a41160324`、現行は後記 `a15d34ed-fe4d-494d-a677-79be2ca7bbac`。
+- GitHub正本: `stepkobetsu-hub/invoice-pdf` の `main`。確認時の最新コミットは `c9f00a58`。
 - 新規請求書番号: 新規作成画面を開くたびに既存請求書番号の最大値＋1を自動入力する。番号欄は編集可能で、数字なら桁数を固定しない。同じ番号が既に存在する場合だけ新規保存を拒否する。
 - ログイン: スタッフ共通認証の永続セッションを利用し、請求書アプリ側の通信エラーでは端末のログイン情報を削除しない。本人がスタッフ用アプリで明示的にログアウトするまで維持する。
 - CSV一括作成: 請求日の形式を保存前に正規化。同一CSVを再度取り込んだ場合も別請求書として作成する。CSV内の許可されたメールアドレス列を利用可能。
@@ -85,12 +98,22 @@
 - 接続表示: 画面名は「請求書作成＆送信システム」。資産台帳上の正式名称は「STEP請求書PDF作成・配信システム」。
 - 検証: JavaScript構文検査、UI、請求書ワークスペース、領収書、デモ保存・バックグラウンド送信、Cloudflare基盤・セキュリティの自動テストを通過。
 - 開封表示: メールを開いた段階は「開封」、メール内URLを押した段階は「開封2」、PDFを表示した段階は「開封3」。複数表示せず、到達済みの最高段階1つだけを表示する。
-- DL済: スタッフが請求書アプリ内でPDFをダウンロードした場合だけ記録し、受信者側のURLアクセス・PDF表示とは分離する。表示位置は一覧カードの件名右横、9pxの小型表示。D1 migration `0007_invoice_open_levels.sql` で `invoices.app_downloaded_at` を追加。
+- DL済: スタッフによるアプリ内PDFダウンロードだけを記録し、受信者側のURLアクセス・PDF表示とは分離する。表示位置は一覧カードの件名右横、9pxの小型表示。D1 migration `0007_invoice_open_levels.sql` で `invoices.app_downloaded_at` を追加。
 - PDF複数ページ: 明細が多い場合は全品目を複数ページへ出力。1ページ目には入るだけ明細を配置し、2ページ目以降は生徒名・住所を繰り返さず明細の続きから表示する。税率別内訳・小計・合計、振込先、備考はそれぞれ分割しないブロックとして、残り領域へ入るものだけ前ページへ配置する。偶数明細行は薄色、フッターは下端余白内に配置する。
 - 新規・複製・デモ: 通常の新規作成は取引先欄を空欄にし、複製時だけ元の取引先を引き継ぐ。デモ送信は取引先空欄、テスト100円、テスト割引-100円、請求0円のテンプレートを維持する。旧テスト送信モードは削除し、デモ送信は維持する。
 - 検証追加: PDF複数ページ、再送リンク保持を含む全自動テストを通過。GitHub Pagesの最新版ファイル、Worker `/health`、D1 `app_downloaded_at` 列を本番で確認。
-- 主要コミット: `df612e9`（バックグラウンド送信）、`f31216d`（一覧・詳細表示調整）、`67b306a`（100件配信URL一括発行・再送PDF再利用）、`534cbd0`（D1一括上限対応）、`571ce1f`（請求書番号・ログイン維持）、`b6d1c50`（公開キャッシュ更新）、`9ccd505`・`15ec788`・`c51518b`（PDF複数ページと出力ブロック配置）、`fff7068`・`1dec174`（開封段階・アプリ内DL分離と公開更新）。Apps Script v39。旧Worker Version `7b6dbbe4-1fea-4374-a5dd-9bb8d043d2a2` から現行 Worker Version `a62f70e6-d8d6-4261-b43d-8a3a41160324` へ更新。
+- 主要コミット: `df612e9`（バックグラウンド送信）、`f31216d`（一覧・詳細表示調整）、`67b306a`（100件配信URL一括発行・再送PDF再利用）、`534cbd0`（D1一括上限対応）、`571ce1f`（請求書番号・ログイン維持）、`b6d1c50`（公開キャッシュ更新）、`9ccd505`・`15ec788`・`c51518b`（PDF複数ページと出力ブロック配置）、`fff7068`・`1dec174`（開封段階・アプリ内DL分離と公開更新）、`94a5007`（全明細取込・一覧比較）、`c9f00a58`（CSV再取込時刻更新）。Apps Script v39。現行 Worker Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`。
 - 確認済み事項: 同一CSV再取込でも別請求書を作成／最大100件のバックグラウンド送信／100件実送信を約65秒で完了／配信履歴100件すべて正常／一覧カード約8件／メモ・タグを作成日側の次行へ配置／請求管理システムV3.1と分離。
+
+#### 2026年8月12日 請求明細・CSV取込順更新
+
+- 明細取込: 請求管理システムV3.1から受け取るCSVの明細をすべて解析し、授業料・諸経費等を別明細としてPDFへ表示する。合計だけの1明細へ戻さない。
+- 一覧の基本順: 新しいCSV取込グループを請求書一覧の最上段へ表示する。同じ取込グループ内は顧客コード（生徒番号）の大きい順とする。
+- 再取込時刻: 同じ請求書番号を再取込した場合、D1の `created_at` も今回の取込時刻へ更新する。初回取込時刻が残って過去のダミー・手入力請求書より下へ並ぶ不具合を解消した。
+- GitHub反映: PR #24（merge `94a5007`）で明細取込と一覧比較処理、PR #25（merge `c9f00a58`）でD1再取込時刻更新をmainへ反映した。
+- Cloudflare反映: Worker `step-invoice-api` をVersion `a15d34ed-fe4d-494d-a677-79be2ca7bbac`へ更新。`/health` の `ok=true`・`storage=cloudflare-r2`を確認した。
+- 検証: 一覧比較のcore test、Cloudflare invoice workspace test、`assets/core.js`・`assets/app.js`・`cloudflare/src/index.js`の構文検査を通過した。依存パッケージのネットワーク取得を要する全テストは未実行として区別する。
+- 保護事項: 個人名、実CSV、PDF、メールアドレス、APIキー、Script Properties実値は台帳へ保存しない。
 
 ### 今後の請求関連調査ルール
 
