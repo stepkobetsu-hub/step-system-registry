@@ -12,6 +12,11 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-step-progress/"
     },
     {
+      "正式名称": "定期テスト進捗管理",
+      "状態": "本番",
+      "利用者向けURL": "https://beautiful-blini-37eee7.netlify.app/"
+    },
+    {
       "正式名称": "スタッフ用アプリ",
       "状態": "本番使用中",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/"
