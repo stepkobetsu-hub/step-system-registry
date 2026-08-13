@@ -430,6 +430,7 @@ applyAssetInfo=function(item){
   const isPoint=name.includes('ポイント管理');
   return Object.assign({},base,{
     '状態':'本番',
+    '概要':'講師が校舎別の出勤可能時間を登録し、管理者が授業枠・提出状況・先生別一覧を管理して夏期講習時間割へ転記するシステム。講師番号＋誕生日4桁認証とSTEPスタッフ共通認証を使用する。',
     'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
     'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
     'GitHub正本':'stepkobetsu-hub/student-QR（main）',
@@ -1696,6 +1697,9 @@ applyAssetInfo=function(item){
     'STEP共通認証連携':'正本 stepkobetsu-hub/seiseki-kanri のstaffLogin／verifySystemPortalを再利用。ブラウザからSupabaseへ送るのはsystemPortalSessionTokenのみ。スタッフID・パスワード、Supabase service role key、秘密情報はGitHub Pagesへ配置しない。',
     '管理者画面':'管理者メール入力、ログインリンク送信、Magic Link待機画面を撤去。STEP資産管理でログイン済みならログイン画面を表示せず管理画面へ進む。共通セッションが無効・欠落・改変されている場合は「STEPスタッフログインが必要です。」とSTEP資産管理への戻りボタンを表示。',
     '講師画面':'講師番号＋誕生日4桁でログイン。講師本人の情報・availabilityだけを表示・保存し、○・△・空白、保存して送信、締切制御、校舎切替、印刷を維持。',
+    '連携メモ':[...(Array.isArray(base['連携メモ'])?base['連携メモ']:(base['連携メモ']?[String(base['連携メモ'])]:[])),'講師認証：teacher_app.html → teacher-login v4 → 正式講師マスター照合 → 講師本人用Supabase Authセッション → 本人限定RLS','管理者認証：admin.html → admin-login v3 → STEP正式verifySystemPortal → 権限2・3・4確認 → schedule_admin付きSupabase Authセッション → 管理者RLS','管理者画面から校舎別Apps Script一括転記APIを呼び、神領校・大手町校の全体時間割へ転記。'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'【2026年8月 認証仕様】講師・管理者ともSupabase Magic Linkメールを廃止。講師は講師番号＋誕生日4桁をサーバー側で正式講師マスターへ照会し、app_metadata.schedule_teacher_codeを持つ本人用セッションを発行する。管理者はlocalStorageの存在だけでは許可せず、systemPortalSessionTokenをadmin-loginから正式verifySystemPortalへ照会し、権限2・3・4だけにapp_metadata.schedule_admin=trueを設定する。teachers・availability等の既存RLSは維持し、講師は本人データだけ、管理者は管理者ポリシー経由で操作する。private.schedule_is_admin()は従来許可メールとschedule_adminの双方を認める。anon全開放、ブラウザへのservice role key配置、スタッフID・パスワードのSupabase送信は禁止。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月13日：メール429で講師・管理者がログインできない問題へ対応。講師はteacher-login v4、管理者はadmin-login v3へ移行。管理者の初回・5分間隔のSTEP正式検証、検証済みトークンSHA-256ハッシュ、Supabaseセッションによる更新・新規タブ復帰を実装。偽造トークン401、anon拒否、本人限定RLS、PC・スマホ、本番Pages、管理者主要画面、講師実ログインを確認。秘密情報とトークン実値は台帳へ記録しない。',
     '正本ファイル':['teacher_schedule/teacher_app.html','teacher_schedule/admin.html','teacher_schedule/supabase/functions/teacher-login/index.ts','teacher_schedule/supabase/functions/admin-login/index.ts','teacher_schedule/supabase/migrations/202608130002_admin_step_session_auth.sql'],
     '最新版の場所':'stepkobetsu-hub/teacher_schedule（main）／講師認証 commit b58ed3d0ed3c81955181af3fb00d9535e6b91ba6／管理者認証 commits 379044d・64f7fd24b3800aa06639e317c24a661cf8e29408',
     '関連コミット':'b58ed3d0（講師番号＋誕生日4桁認証）／379044d（管理者をSTEP共通認証へ移行）／64f7fd2（STEP管理者セッション自動復帰の安定化）',
