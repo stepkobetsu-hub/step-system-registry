@@ -40,3 +40,11 @@ test('送信結果の自動確認と重複送信防止を記録する', () => {
   assert.match(registry, /送信結果自動確認 `1608316`/);
   assert.match(registry, /受付済みなら送信完了と表示/);
 });
+
+test('送信後に再通信なしで全生徒表示へ戻す仕様を記録する', () => {
+  assert.match(page, /送信後全生徒表示 commit ca24e07/);
+  assert.match(page, /全校舎・全生徒・検索欄空・学年昇順へ戻す/);
+  assert.match(page, /送信後の生徒データ再取得なし/);
+  assert.match(registry, /送信後全生徒表示 `ca24e07`/);
+  assert.match(registry, /送信成功後は再通信せず/);
+});
