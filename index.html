@@ -1634,5 +1634,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="step-message-history-limit10-release-20260813">
+const applyStepMessageHistoryLimit10Release20260813Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageHistoryLimit10Release20260813Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEP配信')||name.includes('STEPメッセージ')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月13日',
+    '最新版の場所':'stepkobetsu-hub/step-message-center（main）／最新commit 2a9a183。バックエンド高速化はCode.gs commit 1b2a595。',
+    '送信履歴初期表示':'「送信履歴」を押した時点で日付・検索語・アーカイブ状態を解除し、通常履歴を新しい順に自動取得する。',
+    '送信履歴表示件数':'直近10件。フロント側でも最大10件に固定し、旧Apps Scriptが応答した場合も11件以上は表示しない。',
+    '送信履歴更新操作':'検索・クリアの隣に「更新」ボタンを配置。現在の検索条件を維持したまま再取得し、読み込み中・取得失敗も画面へ表示する。',
+    '送信履歴高速化':'Code.gsはlimit=10を受け取り、履歴シート全体ではなく末尾側の最大100行だけを読み、送信日時の新しい順で10件を返す。',
+    'Apps Script反映状況':'GitHubのCode.gsは更新済み。Google Apps Scriptの既存Webアプリデプロイを「新バージョン」へ更新する作業は利用者側で実施待ち。新しいデプロイは作らず既存URL・デプロイIDを維持する。',
+    '更新方法':'GitHub mainのCode.gs全体をApps Scriptプロジェクトの「コード.gs」へ貼り付けて保存し、デプロイ→デプロイを管理→既存Webアプリの編集→バージョン「新バージョン」→デプロイ。appsscript.json・StepMessageDeliveryTrack系・555.gsは変更しない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月13日：送信履歴タブを開いた時点で通常履歴を自動取得するようにし、検索・クリアの隣へ更新ボタンを追加。初期表示時は検索条件を解除する。履歴は直近10件に限定し、画面側の10件固定とCode.gsの末尾範囲読取・limit=10を併用。GitHub Pagesはcommit 2a9a183まで公開済み。Apps Script側の高速化は既存デプロイを新バージョンへ更新後に有効になる。',
+    '関連コミット':'c330388（自動取得・更新ボタン・読み込み表示）／1b2a595（Code.gs直近10件・範囲読取）／2a9a183（フロント表示を必ず10件に固定）',
+    '確認済み事項':[...new Set([...confirmed,'送信履歴タブ選択時の自動取得','検索条件を解除して通常履歴を表示','検索・クリア横の更新ボタン','読み込み中・取得失敗表示','直近10件表示','フロント側の最大10件固定','Code.gsのlimit=10','履歴シート末尾側だけを読む高速化コード','GitHub Pages commit 2a9a183公開','既存Apps ScriptデプロイIDを維持する更新手順'])],
+    '未確認項目':['Google Apps Script既存Webアプリの新バージョンへの更新完了','本番Apps Scriptでの直近10件応答速度'],
+    '確認状況':'GitHub Pagesの画面変更・直近10件表示は公開済み。Code.gsの高速化は既存Apps Scriptデプロイの新バージョン更新待ち。'
+  });
+};
+</script>
 </body>
 </html>
