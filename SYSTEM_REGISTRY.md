@@ -1,13 +1,13 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-12
+最終更新: 2026-08-13
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（19件）
+## 登録システム（20件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +28,7 @@
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
+| STEP業務ホーム | 本番 | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main` | `index.html`、`styles.css`、`core.js`、`app.js`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋システム台帳API | `main`へ反映してPages、認証、検索、お気に入り、最近使ったアプリ、全リンクを確認 | 2026-08-13 | 日常業務用ランチャー。資産調査・保守を行う本台帳とは役割を分離し、正式名称・本番URLは `getSystemRegistry` から取得 |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
 
