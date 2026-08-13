@@ -88,7 +88,7 @@
     },
     {
       "正式名称": "STEP業務ホーム",
-      "状態": "本番（全端末共有・再作成版）",
+      "状態": "本番（全端末共有・版競合防止）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-workspace/"
     },
     {

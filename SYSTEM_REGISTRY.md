@@ -28,7 +28,7 @@
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
-| STEP業務ホーム | 本番（全端末共有・再作成版） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（再作成 `031a986`） | `index.html`、`styles.css`、`core.js`、`app.v20260814-29.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、7項目・39カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-14 | 共有設定版5を現行正本とする。旧タブや古いブラウザから再保存すると上書きされ得るため、修正前に最新配置と共有版を確認する |
+| STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `217a3aa`） | `index.html`、`styles.css`、`core.js`、`app.v20260814-31.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・39カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-14 | 共有設定版5を現行正本とする。古い版・版番号なしの保存要求は拒否し、最新版を再読込する。カードIDが異なれば同じURLでも別カードとして全件表示する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
 
@@ -39,7 +39,7 @@
 - 本番URL: https://stepkobetsu-hub.github.io/step-workspace/
 - GitHub正本: https://github.com/stepkobetsu-hub/step-workspace
 - 公開ブランチ: `main`
-- 現行再作成コミット: `031a986`（2026-08-14）
+- 現行コミット: `217a3aa`（2026-08-14）。再作成の基点は `031a986`。
 - 共有設定: 版5。7項目・39カードを全パソコン向け設定として保存済み。
 - 再作成ページ: https://stepkobetsu-hub.github.io/step-workspace/rebuild-workspace.html
 - 復旧補助ページ: `recover-workspace.html`、`repair-workspace-v2.html`。通常運用では使用せず、障害調査時だけ内容を確認して使う。
@@ -72,7 +72,9 @@
 - 項目とカードはドラッグ＆ドロップで並べ替え・移動できる。左項目一覧へのカードドロップにも対応する。
 - カードはすべて別タブで開く。Google Sheetsマーク、PC／スマホ／両方、ハートのお気に入り、鉛筆編集、アーカイブ操作を保持する。
 - 共有設定は認証済みバックエンドの `getWorkspaceConfig`／`saveWorkspaceConfig` を使い、端末のlocalStorageは高速表示と一時キャッシュに使う。
+- 共有保存時は、読み込んだ共有版番号を `expectedVersion` として必ず送る。バックエンドはScriptLock内で現行版と照合し、古い版または版番号なしの保存を `WORKSPACE_VERSION_CONFLICT` として拒否する。競合時は現行共有設定を返し、画面側で最新版を再読込して変更のやり直しを案内する。
 - 現行の再作成設定は `replaceCatalog: true`。共有設定の39カードを優先し、台帳から取得した別カードが自動で混ざらないようにしている。
+- 共有設定内の追加カードはカードIDで識別する。同じURLや同じページ内のハッシュを使うカードでも、IDが異なれば重複排除せず表示する。これにより7項目・39カードを全件表示する。
 - ログイン画面は保存済みカタログを先に表示し、台帳・共有設定の通信は背景で行う。通信障害だけを理由に、表示可能な保存済みホームから直ちにログアウト画面へ戻さない。
 
 ### 2026-08-13〜14の障害と復旧履歴
@@ -82,20 +84,21 @@
 - 最新タブを識別するため「5555」カードを追加し、同一Chromeから復旧データを抽出。項目情報が欠けていたため、最終的に利用者が貼り付けた全画面一覧から7項目・39カードを再作成した。
 - 復旧用コミット: `9c4281d`（端末配置復旧ページ）、`69c4cf8`（7項目復旧補助）、`031a986`（39カード再作成と再作成一覧優先）。
 - 共有設定バックエンドのGitHub記録: `stepkobetsu-hub/seiseki-kanri` コミット `cc005ad`。Apps Script側は共有設定対応版を既存デプロイへ反映済み。秘密値・セッショントークンは本台帳へ記載しない。
+- 2026-08-14に版競合防止を追加。フロントエンド `1653eb7`、共有設定バックエンド `stepkobetsu-hub/seiseki-kanri` の `5303698`。Apps Scriptは既存デプロイを維持してバージョン67へ更新済み。古いタブ、古いブラウザ、旧フロントからの保存は最新版を上書きしない。
+- 同日、本番確認で共有設定39件のうち同じURLを持つ別カードが重複扱いされ、画面上では一部が欠ける問題を確認。`217a3aa` で追加カードの同一URLを許容し、カードIDが異なる39件をすべて表示するよう修正した。
 
 ### 次回変更時の必須手順
 
-1. 作業開始前に、古いSTEP業務ホーム、復旧ページ、再作成ページのタブをすべて閉じる。
+1. 作業開始前に、古いSTEP業務ホーム、復旧ページ、再作成ページのタブをすべて閉じる。閉じ忘れた旧タブから保存してもバックエンドが版競合として拒否するが、操作混乱を避けるため原則は閉じる。
 2. 新しいタブで本番を開き、7項目・39カードと最新の共有表示を確認する。
 3. `stepkobetsu-hub/step-workspace` の `main`、本台帳の本節、直近コミットを先に読む。
 4. 変更は新しい1つのタブだけで行い、保存完了後の共有版番号を記録する。
 5. 別ブラウザまたは別パソコンで再読込し、同じ項目・カード・順番・URLが表示されることを確認する。
-6. 古いページから「この配置を全端末へ反映」や編集操作を行わない。現行バックエンドは後から保存された内容を採用するため、古いタブの保存は配置を巻き戻す危険がある。
+6. 古いページから「この配置を全端末へ反映」や編集操作を行わない。現行バックエンドは古い版の保存を拒否して最新版を返すため配置は巻き戻らないが、競合メッセージ後は最新版で変更をやり直す。
 7. コード変更時は `npm test`、GitHub Pages、ログイン維持、検索、カード編集、ドラッグ＆ドロップ、共有同期、PC・スマホ幅を確認する。
 
 ### 今後の改善候補
 
-- 共有保存へ版番号の競合検出（楽観ロック）を追加し、古い版からの保存を拒否する。
 - 保存前の自動バックアップと、管理画面からの版履歴・復元を追加する。
 - URL要確認4カードの正式URLを台帳で確定し、「リンク切れ」を解消する。
 - 認証情報そのものをlocalStorageへ長期保存せず、安全なセッションだけでログイン維持する設計を継続確認する。
