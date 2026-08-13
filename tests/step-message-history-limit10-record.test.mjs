@@ -32,3 +32,11 @@ test('SYSTEM_REGISTRY一覧にも今回の正本と運用を蓄積する', () =>
   assert.match(registry, /履歴タブを開くと直近10件を新しい順に自動取得/);
   assert.match(registry, /Brevo Webhook・専用Script Properties・「開封キャッシュ」シートも削除済み/);
 });
+
+test('送信結果の自動確認と重複送信防止を記録する', () => {
+  assert.match(page, /送信結果自動確認 commit 1608316/);
+  assert.match(page, /同じ送信要求IDのログを最大4回自動確認/);
+  assert.match(page, /送信POST自体は再試行せず、重複送信を防止/);
+  assert.match(registry, /送信結果自動確認 `1608316`/);
+  assert.match(registry, /受付済みなら送信完了と表示/);
+});
