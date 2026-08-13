@@ -11,6 +11,7 @@
 ## 本番リンク
 
 - 本番アプリ（Netlify）: https://beautiful-blini-37eee7.netlify.app/
+- Apps Script編集画面: https://script.google.com/home/projects/1FRGidtWBgikGhdQlTI86wMBgOlnERYzCeGivKfSlWxlcAb2HZR7HTLRI/edit
 - 認証・保存Apps Script Webアプリ: https://script.google.com/macros/s/AKfycbzKzfGh2q7EO3Zeuuwn1lRLA8jefGgU4rff9kcXycTi0XZidW43B-BTskHBNUX1R46L/exec
 - 保存先Google Sheet: https://docs.google.com/spreadsheets/d/1djHVsUQ1vZpvmtPlzMf295U_RKfazk-tR5ysLBP_R9k/edit
 - 生徒マスタ: https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit?gid=674620482#gid=674620482
@@ -38,11 +39,12 @@
 ## Apps Script
 
 - プロジェクト名: **定期テスト進捗管理・認証API**
+- Project ID: `1FRGidtWBgikGhdQlTI86wMBgOlnERYzCeGivKfSlWxlcAb2HZR7HTLRI`
+- 編集URL: https://script.google.com/home/projects/1FRGidtWBgikGhdQlTI86wMBgOlnERYzCeGivKfSlWxlcAb2HZR7HTLRI/edit
 - WebアプリURL: https://script.google.com/macros/s/AKfycbzKzfGh2q7EO3Zeuuwn1lRLA8jefGgU4rff9kcXycTi0XZidW43B-BTskHBNUX1R46L/exec
 - 実行設定: 自分として実行
 - アクセス設定: 全員
 - 現行版では、認証だけでなくGoogle Sheetへの進捗保存・読込・先生一覧取得を担当する。
-- Apps Scriptの編集URL／Project IDは台帳上で未確定。確認できた時点で追記する。
 - TOKEN_SECRET等の秘密値は台帳・GitHubへ保存しない。
 
 ## 認証仕様
@@ -102,11 +104,12 @@ Netlifyサイト `beautiful-blini-37eee7` はGitHub連携ではなく **Netlify 
 - 生徒ID＋生徒マスタL列PASSでログイン成功。
 - 講師ID＋講師マスターL列生年月日（月日4桁）でログイン成功。
 - Google Sheet「定期テスト進捗管理DB_2026」への保存成功を実機確認。
+- Apps Script編集URL／Project IDを確認し、管理台帳へ追記済み。
 
 ## 次回作業開始点
 
 1. 本番URL `beautiful-blini-37eee7.netlify.app` を確認。
 2. 保存先は必ず `定期テスト進捗管理DB_2026` → `進捗データ` を確認。
-3. 認証・保存APIは上記Apps Script WebアプリURLを確認。
+3. 認証・保存APIはProject ID `1FRGidtWBgikGhdQlTI86wMBgOlnERYzCeGivKfSlWxlcAb2HZR7HTLRI` のApps Scriptを確認。
 4. Firebase `juku-teiki-progress` は旧構成であり、現行保存先として修正しない。
 5. Netlify更新はNetlify Drop方式であることを忘れない。
