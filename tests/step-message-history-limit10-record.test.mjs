@@ -18,17 +18,17 @@ test('STEP配信システムの直近10件履歴仕様を公開台帳へ記録�
   ]) assert.match(page, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('Apps Script v52と開封キャッシュの本番反映を記録する', () => {
-  assert.match(page, /既存Webアプリを新バージョン52へ更新済み/);
+test('Apps Script v53と開封確認撤去を記録する', () => {
+  assert.match(page, /既存Webアプリを新バージョン53へ更新済み/);
   assert.match(page, /URL・デプロイIDを維持/);
   assert.match(page, /appsscript\.json・StepMessageDeliveryTracking\.gs・555\.gsは変更していない/);
-  assert.match(page, /履歴表示時は外部共通ログを読まない/);
-  assert.match(registry, /Apps Script v52・既存データ同期済み/);
+  assert.match(page, /利用者判断により撤去済み/);
+  assert.match(registry, /Apps Script Webアプリ v53/);
 });
 
 test('SYSTEM_REGISTRY一覧にも今回の正本と運用を蓄積する', () => {
-  assert.match(registry, /STEP配信システム \| 本番使用中（直近10件・開封確認高速版）/);
-  assert.match(registry, /開封確認高速化 `860553d`/);
+  assert.match(registry, /STEP配信システム \| 本番使用中（履歴は直近10件版）/);
+  assert.match(registry, /開封確認撤去 `159cecd`/);
   assert.match(registry, /履歴タブを開くと直近10件を新しい順に自動取得/);
-  assert.match(registry, /開封確認あり／なし／データなし/);
+  assert.match(registry, /Brevo Webhook・専用Script Properties・「開封キャッシュ」シートも削除済み/);
 });
