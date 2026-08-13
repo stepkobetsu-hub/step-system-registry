@@ -1679,5 +1679,35 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="teacher-schedule-secure-auth-release-20260814">
+const applyTeacherScheduleSecureAuthRelease20260814Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyTeacherScheduleSecureAuthRelease20260814Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'本番',
+    '認証':'講師：講師番号＋誕生日4桁をteacher-login Edge Functionで正式講師マスターへ照会し、講師本人用Supabase Authセッションを発行。管理者：STEPスタッフ共通認証のstepStaffAppAuth.systemPortalSessionTokenをadmin-login Edge Functionから正式verifySystemPortalへサーバー間照会し、権限2・3・4だけに管理者用Supabase Authセッションを発行。Magic Linkメールは講師・管理者とも不使用。',
+    '認証セッション':'講師番号・誕生日、スタッフID・パスワードそのものは端末へ長期保存しない。管理者はSTEP共通トークンを初回および5分間隔で正式検証し、検証済みトークンのSHA-256ハッシュとSupabaseセッションを保持。再読み込み・タブ再オープン時は有効セッションから自動復帰し、ログアウト時は管理画面用Supabaseセッションを削除してSTEP資産管理へ戻る。',
+    'Supabaseプロジェクト':'teacher-schedule／Project ID jbiolkvegexkqjcwtyye',
+    'Supabase Edge Functions':['teacher-login v4：講師番号＋誕生日4桁を正式講師マスターで照合し、本人用Authセッションを発行','admin-login v3：systemPortalSessionTokenをSTEP正式verifySystemPortalで検証し、権限2・3・4へschedule_admin付きAuthセッションを発行'],
+    'RLS・権限':'teachers・availability等の既存RLSを維持。講師は改変不能なapp_metadata.schedule_teacher_codeに一致する本人データだけを操作可能。管理者判定private.schedule_is_admin()は従来の許可メールを残し、app_metadata.schedule_admin=trueも許可。public・anonへの関数権限は付与せず、anonからteachers・availability一覧を直接取得できない。',
+    'STEP共通認証連携':'正本 stepkobetsu-hub/seiseki-kanri のstaffLogin／verifySystemPortalを再利用。ブラウザからSupabaseへ送るのはsystemPortalSessionTokenのみ。スタッフID・パスワード、Supabase service role key、秘密情報はGitHub Pagesへ配置しない。',
+    '管理者画面':'管理者メール入力、ログインリンク送信、Magic Link待機画面を撤去。STEP資産管理でログイン済みならログイン画面を表示せず管理画面へ進む。共通セッションが無効・欠落・改変されている場合は「STEPスタッフログインが必要です。」とSTEP資産管理への戻りボタンを表示。',
+    '講師画面':'講師番号＋誕生日4桁でログイン。講師本人の情報・availabilityだけを表示・保存し、○・△・空白、保存して送信、締切制御、校舎切替、印刷を維持。',
+    '正本ファイル':['teacher_schedule/teacher_app.html','teacher_schedule/admin.html','teacher_schedule/supabase/functions/teacher-login/index.ts','teacher_schedule/supabase/functions/admin-login/index.ts','teacher_schedule/supabase/migrations/202608130002_admin_step_session_auth.sql'],
+    '最新版の場所':'stepkobetsu-hub/teacher_schedule（main）／講師認証 commit b58ed3d0ed3c81955181af3fb00d9535e6b91ba6／管理者認証 commits 379044d・64f7fd24b3800aa06639e317c24a661cf8e29408',
+    '関連コミット':'b58ed3d0（講師番号＋誕生日4桁認証）／379044d（管理者をSTEP共通認証へ移行）／64f7fd2（STEP管理者セッション自動復帰の安定化）',
+    'テスト結果':'講師の正しい認証・誤誕生日・存在しない番号・無効講師、神領／大手町の本人データ限定、再読み込み・再オープン・ログアウト、他講師データ拒否を確認。管理者はSTEP共通セッション自動ログイン、更新・新規タブ復帰、偽造トークンHTTP 401、anonのteachers取得拒否、PC・スマホ相当幅、授業枠・先生別一覧・提出状況・講師登録・バックアップ・印刷・時間割転記入口を確認。自動試験11件合格。',
+    '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+'2026年8月13日：講師Magic Linkを講師番号＋誕生日4桁認証へ移行し、teacher-login v4と本人限定RLSで本番化。管理者Magic Linkを廃止し、STEPスタッフ共通systemPortalSessionTokenを正式verifySystemPortalで検証するadmin-login v3へ移行。GitHub Pages、PC・スマホ相当幅、RLS、不正トークン、講師回帰を確認。',
+    '確認日':'2026年8月14日',
+    '確認根拠':'teacher_schedule mainのb58ed3d0・379044d・64f7fd2、Supabase本番Edge Function teacher-login v4・admin-login v3、private.schedule_is_admin()、GitHub Pages本番画面、Node自動試験11件、実ブラウザの管理者自動復帰・講師本人予定表示を照合。',
+    '確認済み事項':[...new Set([...confirmed,'講師Magic Link廃止','講師番号＋誕生日4桁認証','正式講師マスターを再利用','teacher-login v4','講師本人限定RLS','管理者Magic Link廃止','STEPスタッフ共通systemPortalSessionTokenを再利用','verifySystemPortalによるサーバー側検証','権限2・3・4だけを管理者として許可','admin-login v3','app_metadata.schedule_admin','従来管理者メール判定を維持','anonからteachers・availability一覧を取得不可','偽造STEPトークンHTTP 401','管理者の再読み込み・新規タブ自動復帰','管理者主要機能の表示・RLS権限確認','講師側の実ログイン・本人予定表示','PC・スマホ相当幅のGitHub Pages確認','自動試験11件合格','GitHub main 64f7fd24b3800aa06639e317c24a661cf8e29408'])],
+    '未確認項目':Array.isArray(base['未確認項目'])?base['未確認項目']:[],
+    '確認状況':'講師・管理者のMagic Linkを廃止し、安全なSupabase Authセッションと既存RLSを維持した構成を本番反映・確認済み。'
+  });
+};
+</script>
 </body>
 </html>
