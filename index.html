@@ -611,20 +611,20 @@ applyAssetInfo=function(item){
     'Apps ScriptプロジェクトID':'1nrEhPSvPj9qyyF6buHjut_aGOEMiHmnKZ0N53rFaBNPdkaA3sBpBgek4',
     'Apps Script編集URL':'https://script.google.com/home/projects/1nrEhPSvPj9qyyF6buHjut_aGOEMiHmnKZ0N53rFaBNPdkaA3sBpBgek4/edit',
     'デプロイID':'AKfycbxIH2VtgwRi50xduXgrkYrjD0yrzNfQ5vCWt1XgOzil6LZSgXNj6MJo9jPYvOkjNHdu',
-    'Apps Scriptバージョン':'47（2026年8月3日）',
-    '最新版の場所':'GitHub mainとApps Script本番v47を同期。Code.gs commit 5718bc7a42e4dde3e28c4e33e0689f878d42ec4f。',
+    'Apps Scriptバージョン':'51（2026年8月13日）',
+    '最新版の場所':'GitHub main（開封確認 d41988b／Webhook補正 89061a1）とApps Script本番v51。既存デプロイIDを維持。',
     '検索仕様':'生徒コード（☆マスタA列）、氏名（E列）、フリガナ（F列）を検索。氏名の半角／全角スペースを無視し、ひらがな／カタカナを同一視。F列フリガナによるローマ字検索に対応し、長音、促音「っ」、拗音「ゃゅょ」、撥音「ん」を処理する。',
     '生徒キャッシュ仕様':'生徒キャッシュへ生徒番号・氏名・フリガナ・校舎・学年・メールを保存。対象生徒はメール未登録でも一覧へ含める。ブラウザキャッシュは step_students_v314_roman。',
-    '配信基盤':'MAILAPP／BREVO切替対応。BREVO送信、メッセージID、照合ID、配信状態、共通ログ・配信追跡を本番Code.gsに保持。',
-    '更新方法':'Apps Scriptは本番v47を正本として検索部分のみ差分反映し、既存デプロイIDを維持。変更後に生徒キャッシュを更新する。GitHubのCode.gsは本番固有BREVO機能を含む本番正本と同期する。',
-    '確認日':'2026年8月3日',
-    '確認根拠':'本番API getStudentsでID 1320が氏名「加瀬智子」、kana「カセトモコ」を返すことを確認。かな・カタカナ・ローマ字検索で加瀬智子1名になること、本番v47 Code.gsとGitHub Code.gsの一致、BREVO機能の保持を確認。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月3日：生徒コード・氏名・フリガナ検索を本番反映。ひらがな／カタカナ同一視、氏名空白無視、メール未登録対象の一覧化、ローマ字検索（長音・促音・拗音・撥音）を追加。生徒キャッシュを更新し、既存デプロイIDのままApps Script v47へ更新。ブラウザキャッシュキーとapp.js/api.jsのキャッシュバスターを更新し、JSONP待機を45秒へ延長。本番v47のCode.gsをBREVO機能込みでGitHubへ同期。',
+    '配信基盤':'MAILAPP／BREVO切替対応。BREVO送信、メッセージID、照合ID、配信状態、共通ログ・配信追跡に加え、opened Webhookによる宛先単位の開封確認を保持。',
+    '更新方法':'GitHub mainを更新し、Apps Scriptは既存デプロイIDを維持して新バージョンへ更新する。開封Webhookの初回設定・URL変更時は setupStepBrevoOpenWebhook を実行する。秘密トークンはScript Propertiesだけに保存する。',
+    '確認日':'2026年8月13日',
+    '確認根拠':'Apps Script v51への更新と既存デプロイID維持を確認。setupStepBrevoOpenWebhookの実行完了を確認。GitHub側の構文確認・開封追跡テスト4件合格。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月3日：生徒コード・氏名・フリガナ検索を本番反映。ひらがな／カタカナ同一視、氏名空白無視、メール未登録対象の一覧化、ローマ字検索（長音・促音・拗音・撥音）を追加。生徒キャッシュを更新し、既存デプロイIDのままApps Script v47へ更新。ブラウザキャッシュキーとapp.js/api.jsのキャッシュバスターを更新し、JSONP待機を45秒へ延長。本番v47のCode.gsをBREVO機能込みでGitHubへ同期。\n\n2026年8月13日：送信履歴タブを開いた時点で条件を解除して直近10件を新しい順に自動取得。検索・クリア横に更新ボタンを追加。Brevo opened Webhookを追加し、送信要求IDと宛先で共通ログへ初回・最終開封日時と回数を記録。履歴には「開封確認あり／なし／データなし」を表示し、画像遮断等を考慮して未開封とは断定しない。Apps Script v51へ更新しWebhook登録を完了。',
     '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'検索対象：☆マスタA列の生徒コード、E列の氏名、F列のフリガナ。入力は正規化・小文字化・空白除去・カタカナ→ひらがな変換を行い、ローマ字変換は長音・促音・拗音・撥音に対応。',
-    'コミットSHA':'5718bc7a42e4dde3e28c4e33e0689f878d42ec4f',
-    '関連コミット':'dde065b（ローマ字検索）／f316e38（案内・app.jsキャッシュ）／4da3834（APIタイムアウト45秒）／4c2bcbe（api.jsキャッシュ）／5718bc7（本番v47 Code.gs同期）',
-    '確認済み事項':[...new Set([...confirmed,'本番API ID 1320：加瀬智子・kana カセトモコ','生徒コード・漢字氏名・ひらがな・カタカナ検索','ローマ字検索：kase／KASE／kase tomoko／kasetomoko','氏名の半角・全角スペース無視','長音・促音・拗音・撥音のローマ字変換','メール未登録対象を検索一覧へ表示','生徒キャッシュ更新','Apps Script v47・既存デプロイID維持','本番v47 Code.gsとGitHub mainを同期','BREVO送信・配信追跡・共通ログ機能を保持','app.js/api.jsキャッシュバスター更新','JSONP待機45秒'])],
-    '確認状況':'本番v47・GitHub同期・生徒キャッシュ・かな／ローマ字検索・BREVO機能保持を確認済み / Spreadsheet ID・Apps Scriptバインド先は継続調査'
+    'コミットSHA':'89061a1',
+    '関連コミット':'d41988b（直近10件・更新ボタン・開封確認）／89061a1（Webhook本番URL補正）',
+    '確認済み事項':[...new Set([...confirmed,'送信履歴を開くと直近10件を新しい順に自動取得','検索・クリア横の更新ボタン','送信要求IDと宛先単位のBrevo opened記録','履歴の開封確認あり／なし／データなし表示','過去履歴を推測で開封扱いにしない','Apps Script v51・既存デプロイID維持','setupStepBrevoOpenWebhook実行完了','Webhook秘密トークンはScript Propertiesのみ','開封追跡テスト4件合格'])],
+    '確認状況':'本番v51・GitHub main・直近10件履歴・手動更新・Brevo開封Webhookを確認済み / 開封確認はメール画像の読込状況に依存'
   });
 };
 </script>
@@ -1643,18 +1643,19 @@ applyAssetInfo=function(item){
   const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
   return Object.assign({},base,{
     '確認日':'2026年8月13日',
-    '最新版の場所':'stepkobetsu-hub/step-message-center（main）／最新commit 2a9a183。バックエンド高速化はCode.gs commit 1b2a595。',
+    '最新版の場所':'stepkobetsu-hub/step-message-center（main）／開封確認 commit d41988b、Webhook本番URL補正 commit 89061a1。Apps Script本番v51。',
     '送信履歴初期表示':'「送信履歴」を押した時点で日付・検索語・アーカイブ状態を解除し、通常履歴を新しい順に自動取得する。',
     '送信履歴表示件数':'直近10件。フロント側でも最大10件に固定し、旧Apps Scriptが応答した場合も11件以上は表示しない。',
     '送信履歴更新操作':'検索・クリアの隣に「更新」ボタンを配置。現在の検索条件を維持したまま再取得し、読み込み中・取得失敗も画面へ表示する。',
     '送信履歴高速化':'Code.gsはlimit=10を受け取り、履歴シート全体ではなく末尾側の最大100行だけを読み、送信日時の新しい順で10件を返す。',
-    'Apps Script反映状況':'GitHubのCode.gsは更新済み。Google Apps Scriptの既存Webアプリデプロイを「新バージョン」へ更新する作業は利用者側で実施待ち。新しいデプロイは作らず既存URL・デプロイIDを維持する。',
-    '更新方法':'GitHub mainのCode.gs全体をApps Scriptプロジェクトの「コード.gs」へ貼り付けて保存し、デプロイ→デプロイを管理→既存Webアプリの編集→バージョン「新バージョン」→デプロイ。appsscript.json・StepMessageDeliveryTrack系・555.gsは変更しない。',
-    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月13日：送信履歴タブを開いた時点で通常履歴を自動取得するようにし、検索・クリアの隣へ更新ボタンを追加。初期表示時は検索条件を解除する。履歴は直近10件に限定し、画面側の10件固定とCode.gsの末尾範囲読取・limit=10を併用。GitHub Pagesはcommit 2a9a183まで公開済み。Apps Script側の高速化は既存デプロイを新バージョンへ更新後に有効になる。',
-    '関連コミット':'c330388（自動取得・更新ボタン・読み込み表示）／1b2a595（Code.gs直近10件・範囲読取）／2a9a183（フロント表示を必ず10件に固定）',
-    '確認済み事項':[...new Set([...confirmed,'送信履歴タブ選択時の自動取得','検索条件を解除して通常履歴を表示','検索・クリア横の更新ボタン','読み込み中・取得失敗表示','直近10件表示','フロント側の最大10件固定','Code.gsのlimit=10','履歴シート末尾側だけを読む高速化コード','GitHub Pages commit 2a9a183公開','既存Apps ScriptデプロイIDを維持する更新手順'])],
-    '未確認項目':['Google Apps Script既存Webアプリの新バージョンへの更新完了','本番Apps Scriptでの直近10件応答速度'],
-    '確認状況':'GitHub Pagesの画面変更・直近10件表示は公開済み。Code.gsの高速化は既存Apps Scriptデプロイの新バージョン更新待ち。'
+    'Apps Script反映状況':'既存Webアプリを新バージョン51へ更新済み。URL・デプロイIDを維持し、appsscript.json・StepMessageDeliveryTracking.gs・555.gsは変更していない。',
+    '開封確認仕様':'Brevoのopened Webhookを送信要求ID・宛先単位で共通ログへ記録し、履歴へ開封確認あり／なし／データなしを表示する。メール画像が読み込まれない場合があるため「未開封」とは断定しない。',
+    '更新方法':'GitHub mainのCode.gs全体をApps Scriptプロジェクトの「コード.gs」へ反映し、既存Webアプリを新バージョンへ更新する。開封Webhookの初回設定・URL変更時は setupStepBrevoOpenWebhook を実行する。appsscript.json・StepMessageDeliveryTracking.gs・555.gsは変更しない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月13日：送信履歴タブを開いた時点で通常履歴を自動取得するようにし、検索・クリアの隣へ更新ボタンを追加。初期表示時は検索条件を解除する。履歴は直近10件に限定し、画面側の10件固定とCode.gsの末尾範囲読取・limit=10を併用。Brevo opened Webhookと開封表示を追加し、既存デプロイIDのままApps Script v51へ更新。setupStepBrevoOpenWebhookの実行完了を確認。',
+    '関連コミット':'c330388（自動取得・更新ボタン）／1b2a595（直近10件・範囲読取）／2a9a183（画面10件固定）／d41988b（開封確認）／89061a1（Webhook本番URL補正）',
+    '確認済み事項':[...new Set([...confirmed,'送信履歴タブ選択時の自動取得','検索条件を解除して通常履歴を表示','検索・クリア横の更新ボタン','読み込み中・取得失敗表示','直近10件表示','フロント側の最大10件固定','Code.gsのlimit=10','履歴シート末尾側だけを読む高速化コード','Apps Script v51・既存デプロイID維持','Brevo opened Webhook登録完了','開封確認あり／なし／データなし表示','appsscript.json・StepMessageDeliveryTracking.gs・555.gsは変更なし'])],
+    '未確認項目':['実メール開封後の本番履歴表示（次回送信から確認可能）'],
+    '確認状況':'GitHub main、直近10件表示、Apps Script v51、Brevo開封Webhookを本番反映済み。実メールの開封表示は次回送信から確認可能。'
   });
 };
 </script>

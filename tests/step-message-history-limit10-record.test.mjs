@@ -18,15 +18,16 @@ test('STEP配信システムの直近10件履歴仕様を公開台帳へ記録�
   ]) assert.match(page, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('Apps Script再デプロイ待ちを完了済みと誤記しない', () => {
-  assert.match(page, /既存Apps Scriptデプロイの新バージョン更新待ち/);
-  assert.match(page, /新しいデプロイは作らず既存URL・デプロイIDを維持/);
-  assert.match(page, /appsscript\.json・StepMessageDeliveryTrack系・555\.gsは変更しない/);
-  assert.match(registry, /GAS高速化の本番反映は既存デプロイ更新待ち/);
+test('Apps Script v51と開封Webhookの本番反映を記録する', () => {
+  assert.match(page, /既存Webアプリを新バージョン51へ更新済み/);
+  assert.match(page, /URL・デプロイIDを維持/);
+  assert.match(page, /appsscript\.json・StepMessageDeliveryTracking\.gs・555\.gsは変更していない/);
+  assert.match(registry, /Apps Script v51・Webhook登録済み/);
 });
 
 test('SYSTEM_REGISTRY一覧にも今回の正本と運用を蓄積する', () => {
-  assert.match(registry, /STEP配信システム \| 本番使用中（履歴画面は直近10件版）/);
-  assert.match(registry, /画面 `2a9a183`／GAS高速化 `1b2a595`/);
-  assert.match(registry, /送信履歴タブで条件解除・自動取得/);
+  assert.match(registry, /STEP配信システム \| 本番使用中（直近10件・開封確認版）/);
+  assert.match(registry, /開封確認 `d41988b`／Webhook補正 `89061a1`/);
+  assert.match(registry, /履歴タブを開くと直近10件を新しい順に自動取得/);
+  assert.match(registry, /開封確認あり／なし／データなし/);
 });
