@@ -15,8 +15,8 @@
 | ステップ＆ゴール進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧表示名：学習進捗管理。旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタとは別システム |
 | フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`config.js`、`manifest.webmanifest`、公開用GASテンプレート、契約試験 | GitHub Pages＋Apps Script＋新規専用Google Sheet | PagesとAPIを更新し、health・生徒／講師／管理者入口・正式単元件数を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先 |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
-| スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html`を現行入口とする |
-| 成績管理 | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`admin.html`、`juku_app.html`、`gas_code.js`、端末別ログイン試験 | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-13 | 業務ホームの管理者入口は `admin.html`、生徒入口は `juku_app.html`。管理者・生徒とも端末区分を選択 |
+| スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
+| 成績管理 | 本番使用中 | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `admin.html`、`juku_app.html`、`gas_code.js`、端末別ログイン試験（`index.html` はスタッフ用ポータル） | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-15 | **成績管理の直接入口は2つ。講師・管理者は `admin.html`、生徒は `juku_app.html`。`/seiseki-kanri/`（`index.html`）はスタッフ用ポータルで、成績管理の直接入口とは区別する** |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-07-20 | `entry_import.html`を現行版とする |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
@@ -484,11 +484,11 @@
 - 復旧: 問題がある場合は直前Version `f3ac9e47-496c-4350-b3e8-1a3276e5ae05` を100%へ再指定する。D1データの変更やマイグレーションは今回実施していない。
 - 完全履歴bundle: `foresta-device-warning-position.bundle`、SHA-256 `064efcc4c58a17d958ab3fc4aeb338f73c5e91e6d742388c3b266f4397b10810`。
 
-### 2026-08-07 成績管理の管理者・生徒別端末ログイン
+### 2026-08-07 成績管理の講師・管理者・生徒別端末ログイン
 
-- 管理者用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html
+- 講師・管理者用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html
 - 生徒用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html
-- 正本: `stepkobetsu-hub/seiseki-kanri` の `main`。管理者用は `admin.html`、生徒用は `juku_app.html`。試験は `admin-device-session.test.mjs`、`student-device-session.test.mjs`。
+- 正本: `stepkobetsu-hub/seiseki-kanri` の `main`。講師・管理者用は `admin.html`、生徒用は `juku_app.html`。`index.html` はスタッフ用ポータルで、成績管理の直接入口ではない。試験は `admin-device-session.test.mjs`、`student-device-session.test.mjs`。
 - 変更コミット: 管理者用 `7f53ce97f5a2363ccee808ff3e19481554c8ab4b`、生徒用 `4f24aa86622bad821234c80650af9c0d033b4de7`。
 - 端末選択: 管理者用・生徒用とも、ログイン欄の直前に「自分・家族の端末」「塾のタブレット」の大きな2択を表示。未選択でログインした場合は、2択の直下へ赤枠・淡い赤背景・太字の大きな注意書きを表示する。
 - 自分・家族の端末: 管理者用は講師コード、生徒用は生徒IDと、それぞれのパスワードを同一端末・同一ブラウザーへ保存する。次回は自動ログインし、本人がログアウトするまでログイン状態を維持する。明示的ログアウト時は端末区分・ログイン状態・保存したID・パスワードを削除する。
