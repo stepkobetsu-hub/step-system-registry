@@ -95,7 +95,7 @@ const INVESTIGATION_DEFINITIONS=[
   {id:'contact-management-apps-script-url',cardAnchor:'contact-management',cardName:'お問い合わせ管理',text:'Apps Script編集URL',legacyIds:['investigation-contact-management-1-e0fno3']}
 ];
 const GROUPS=[
-  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く']]},
+  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く'],['時間割マスタ入力URL','時間割マスタ入力を開く']]},
   {title:'管理する',fields:[['管理者向けURL','管理者向けアプリを開く'],['Google Sheet URL','Google Sheetを開く'],['Google Sheet URL 2','Google Sheetを開く'],['Google Sheet URL 3','Google Sheetを開く'],['Supabase URL','Supabase管理画面を開く'],['入力フォームURL','登録画面を開く']]},
   {title:'修正する',fields:[['GitHub URL','GitHubを開く'],['Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL 2','Apps Scriptを編集'],['旧Apps Script編集URL 3','Apps Scriptを編集']]},
   {title:'メモ・保管場所',fields:[['DriveファイルURL','Driveファイルを開く'],['DriveフォルダURL','Driveフォルダを開く'],['仕様書URL','仕様書を開く'],['バックアップURL','バックアップを開く'],['GitHubドキュメントURL','GitHubドキュメントを開く'],['その他保管場所URL','その他の保管場所を開く']]},
@@ -103,7 +103,7 @@ const GROUPS=[
 ];
 const ASSET_SECTIONS=[
   {title:'保存先',fields:[['保存基盤','保存基盤'],['保存先Spreadsheet ID','Spreadsheet ID'],['正式Spreadsheet名','正式Spreadsheet名'],['Google Sheet名','Google Sheet名'],['Google Sheet 2','追加Google Sheet'],['旧GAS版データSheet','旧GAS版データSheet'],['管理対象','管理対象'],['使用シート名','使用シート'],['用途','用途'],['電話番号列','電話番号列'],['電話番号形式','電話番号形式'],['データベース名','データベース名']]},
-  {title:'Apps Script',fields:[['Apps Scriptプロジェクト名','プロジェクト名'],['Apps Script種別','Apps Script種別'],['Apps Script概要','主な処理'],['GASファイル一覧','ファイル'],['高度なGoogleサービス','高度なGoogleサービス'],['主要関数','主要関数'],['Webアプリ設定','Webアプリ設定'],['Webアプリ一覧','有効なデプロイ'],['トリガー','トリガー'],['Apps Script確認','編集URLの登録状況'],['旧GAS版Apps Script','旧GAS版Apps Script']]},
+  {title:'Apps Script',fields:[['Apps Scriptプロジェクト名','プロジェクト名'],['Apps Script種別','Apps Script種別'],['Apps Script概要','主な処理'],['GASファイル一覧','ファイル'],['高度なGoogleサービス','高度なGoogleサービス'],['主要関数','主要関数'],['Webアプリ設定','Webアプリ設定'],['Webアプリ一覧','有効なデプロイ'],['時間割マスタ入力デプロイ','時間割マスタ入力デプロイ'],['時間割マスタ入力対象ファイル','時間割マスタ入力の対象ファイル'],['時間割マスタ入力データ列','時間割マスタ入力のデータ列'],['トリガー','トリガー'],['Apps Script確認','編集URLの登録状況'],['旧GAS版Apps Script','旧GAS版Apps Script']]},
   {title:'関連システム',fields:[['参照システム','参照しているシステム'],['被参照システム','参照されているシステム'],['共有マスタ','共有マスタ'],['影響先','変更時の影響先']]},
   {title:'連携メモ',fields:[['連携メモ','連携メモ'],['連絡先運用','連絡先運用']]},
   {title:'正本・最新版',fields:[['正本ファイル','正本ファイル'],['API処理ファイル','API処理ファイル'],['最新版の場所','最新版の場所'],['確認日','確認日'],['確認根拠','確認根拠']]},
@@ -1710,6 +1710,31 @@ applyAssetInfo=function(item){
     '確認済み事項':[...new Set([...confirmed,'講師Magic Link廃止','講師番号＋誕生日4桁認証','正式講師マスターを再利用','teacher-login v4','講師本人限定RLS','管理者Magic Link廃止','STEPスタッフ共通systemPortalSessionTokenを再利用','verifySystemPortalによるサーバー側検証','権限2・3・4だけを管理者として許可','admin-login v3','app_metadata.schedule_admin','従来管理者メール判定を維持','anonからteachers・availability一覧を取得不可','偽造STEPトークンHTTP 401','管理者の再読み込み・新規タブ自動復帰','管理者主要機能の表示・RLS権限確認','講師側の実ログイン・本人予定表示','PC・スマホ相当幅のGitHub Pages確認','自動試験11件合格','GitHub main 64f7fd24b3800aa06639e317c24a661cf8e29408'])],
     '未確認項目':Array.isArray(base['未確認項目'])?base['未確認項目']:[],
     '確認状況':'講師・管理者のMagic Linkを廃止し、安全なSupabase Authセッションと既存RLSを維持した構成を本番反映・確認済み。'
+  });
+};
+</script>
+
+<script id="student-master-timetable-levels-release-20260814">
+const applyStudentMasterTimetableLevelsRelease20260814Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentMasterTimetableLevelsRelease20260814Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('生徒マスタ'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  const notes=Array.isArray(base['連携メモ'])?base['連携メモ']:(base['連携メモ']?[String(base['連携メモ'])]:[]);
+  return Object.assign({},base,{
+    '時間割マスタ入力URL':'https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec',
+    '時間割マスタ入力デプロイ':'現行デプロイID AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA／Apps Script バージョン43（2026年8月14日）／既存URLを維持して更新',
+    '時間割マスタ入力対象ファイル':['時間割入力.gs：時間割・コース・AO/APの読込、検証、保存、履歴','時間割入力Web4.html：現行入力画面、左の生徒一覧、英語・数学レベル入力','時間割一覧表示.gs：時間割・コース・中学生AO/APの未入力判定','時間割Web.gs：Webアプリ入口。時間割入力Web4.htmlを表示'],
+    '時間割マスタ入力データ列':'時間割 E～AB列／兄弟コード AH列／標準コース AI列／標準オプション AJ列／英語レベル AO列（41列目）／数学レベル AP列（42列目）',
+    '連携メモ':[...notes,'スタッフ用アプリ（seiseki-kanri/index.html）の「時間割マスタ入力」カードは現行デプロイID AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA を開く。修正時はこの既存デプロイを新バージョンへ更新し、URLを変更しない。'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'【時間割マスタ入力・英数レベル仕様】中学生は英語AO列・数学AP列へ1～3を必須入力する。画面最下部に2つの選択欄を表示し、AO/APのどちらかが空欄なら左の生徒一覧を赤字で「英数未設定」と表示する。小学生・高校生は入力欄を非表示とし、AO/APに既存値があってもこの画面では読み替え・上書き・消去をしない。保存時も中学生だけAO/APを書き込む。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月14日：時間割マスタ入力の対象を生徒マスタのバインドApps Scriptと確定。現行URL、デプロイID、対象4ファイル、AO/AP列番号、中学生必須・小学生等は無視する仕様を台帳へ明記。Apps Script v43へ本番反映し、中学生の入力欄表示、小学生の非表示、既存URL維持を確認。',
+    '最新版の場所':'Google Apps Script「生徒名簿」プロジェクト／時間割入力.gs・時間割入力Web4.html・時間割一覧表示.gs・時間割Web.gs／現行Webアプリ v43',
+    '確認日':'2026年8月14日',
+    '確認根拠':'生徒名簿Apps Script編集画面、スタッフ用アプリの時間割マスタ入力リンク、現行デプロイID、バージョン43の本番画面を照合。',
+    '確認済み事項':[...new Set([...confirmed,'時間割マスタ入力の現行WebアプリURL','現行デプロイIDとApps Script v43','対象ファイル4件','AO列＝英語レベル・AP列＝数学レベル','中学生は英語・数学とも1～3必須','AO/AP未入力の中学生を左一覧で赤字表示','小学生・高校生のAO/APは画面から変更しない','スタッフ用アプリからの現行リンク一致'])],
+    '確認状況':'生徒マスタ本体に加え、時間割マスタ入力の現行URL・デプロイ・対象ファイル・AO/AP仕様を確認済み。'
   });
 };
 </script>
