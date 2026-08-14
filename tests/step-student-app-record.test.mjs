@@ -9,7 +9,7 @@ test('the student app development record is registered in the portal and ledger'
   assert.match(page, /'ID':'step-student-app'/);
   assert.match(page, /STEP塾生アプリ（step-hub）開発記録/);
   assert.match(registry, /## 登録詳細：STEP塾生アプリ（step-hub）開発記録/);
-  assert.match(registry, /登録システム（20件）/);
+  assert.match(registry, /登録システム（22件）/);
 });
 
 test('the STEP invoice PDF system is registered with the current background sending record', () => {

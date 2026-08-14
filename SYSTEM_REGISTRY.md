@@ -1,18 +1,20 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-14
+最終更新: 2026-08-15
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（20件）
+## 登録システム（22件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| 学習進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタの講師向け管理は別システム |
+| ステップ＆ゴール進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧表示名：学習進捗管理。旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタとは別システム |
+| フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`config.js`、`manifest.webmanifest`、公開用GASテンプレート、契約試験 | GitHub Pages＋Apps Script＋新規専用Google Sheet | PagesとAPIを更新し、health・生徒／講師／管理者入口・正式単元件数を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先 |
+| 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html`を現行入口とする |
 | 成績管理 | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`admin.html`、`juku_app.html`、`gas_code.js`、端末別ログイン試験 | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-13 | 業務ホームの管理者入口は `admin.html`、生徒入口は `juku_app.html`。管理者・生徒とも端末区分を選択 |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
@@ -400,10 +402,10 @@
 - 復旧点: GitHubブランチ `checkpoint/checkin-stable-20260809-email-fixed` を上記mainコミットへ固定。メール送信まで確認済みの基準点として使用
 - 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値、メールアドレスの実値は記録しない
 
-## 登録詳細：学習進捗管理
+## 登録詳細：ステップ＆ゴール進捗管理
 
 - ID: `learning-progress`
-- 正式名称: 学習進捗管理
+- 正式名称: ステップ＆ゴール進捗管理
 - 旧称・参考名: フォレスタステップ進捗管理／夏休み進捗管理
 - 分類: 生徒・指導管理
 - 状態: 本番（正本で使用中の正式値。GitHub Pages公開画面とApps Script API接続を確認）
@@ -431,6 +433,26 @@
 - 台帳正本への反映: 2026-07-31更新済み。公開カードの正本はGoogle Sheet「システム台帳」であり、本Markdownは構成確認・保守用の台帳文書。`getSystemRegistry` は正本Sheetを読み込む。登録前14件、登録後15件、ID `learning-progress` の重複なしを確認。
 - 調査根拠: Issue #1、対象GitHub `main`、GitHub Pages公開画面、公開コード。
 - 確認日: 2026-07-31
+
+## 登録詳細：フォレスタ進捗管理
+
+- ID: `foresta-progress-v2`
+- 正式名称: フォレスタ進捗管理
+- 分類: 学習・授業管理
+- 状態: 本番
+- 利用者: 生徒、講師、管理者（講師権限1以上）
+- 運用担当: 管理者
+- 概要: 学校授業を先取りする9月以降の通常授業用フォレスタ進捗管理。自主学習・講習用のステップ＆ゴール進捗管理とは別システム。
+- GitHub Pages URL: https://stepkobetsu-hub.github.io/foresta-progress-v2/
+- GitHub URL: https://github.com/stepkobetsu-hub/foresta-progress-v2
+- 本番ブランチ: `main`
+- Apps Script Web API: 公開Webアプリを使用。デプロイ編集情報と非公開IDは運用アカウント側で管理する。
+- 保存先: 新規専用Googleスプレッドシート。保存先ID、生徒・講師・成績マスタID、正式単元表IDは公開台帳へ記録しない。
+- 単元マスタ: 正式26F進行表から中1～中3の数学・英語6教科書を取り込み、1,621件を登録。
+- 正本ファイル: `index.html`、`styles.css`、`app.js`、`config.js`、`manifest.webmanifest`、`gas/Code.gs`、`gas/appsscript.json`、`tests/app-contract.test.mjs`
+- セキュリティ: 実在パスワード、セッショントークン、非公開Spreadsheet IDをGitHubへ保存しない。公開用GASコードはScript Properties参照とする。
+- 確認: 公開API GET 200、health 200、正式単元1,621件、生徒329名、授業予定97件、有効講師32名、学校6校、成績181件を読み取り確認。確認時は実メール送信と実進捗書き込みを抑止。
+- 確認日: 2026-08-15
 
 ### 2026-07-31 管理画面・表示高速化
 

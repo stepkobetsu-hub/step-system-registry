@@ -1738,5 +1738,40 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="foresta-progress-v2-registration-20260815">
+const organizeForestaProgressV220260815Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const list=organizeForestaProgressV220260815Base(items);
+  const legacy=list.find(item=>item['ID']==='learning-progress'||String(item['システム名']||item['正式名称']||'')==='学習進捗管理');
+  if(legacy){
+    legacy['システム名']='ステップ＆ゴール進捗管理';
+    legacy['正式名称']='ステップ＆ゴール進捗管理';
+  }
+  const record={
+    'ID':'foresta-progress-v2',
+    'システム名':'フォレスタ進捗管理',
+    '正式名称':'フォレスタ進捗管理',
+    '分類':'学習・授業管理',
+    '状態':'本番',
+    '利用者':'生徒・講師・管理者（講師権限1以上）',
+    '運用担当':'管理者',
+    '概要':'学校授業の先取りを目的とした、9月以降の通常授業用フォレスタ進捗管理。ステップ＆ゴール進捗管理とは別システム。',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/foresta-progress-v2/',
+    'GitHub Pages URL':'https://stepkobetsu-hub.github.io/foresta-progress-v2/',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/foresta-progress-v2',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbx-KkkOPgOTgauFIcT9JFbuz1zgULkZRNx25PwbTWQabw2jUKdZr9ia2kkJljScEBSXVg/exec',
+    '本番ブランチ':'main',
+    '正本ファイル':['index.html','styles.css','app.js','config.js','manifest.webmanifest','gas/Code.gs','gas/appsscript.json','tests/app-contract.test.mjs'],
+    '最新版の場所':'stepkobetsu-hub/foresta-progress-v2（main）',
+    '認証':'生徒番号＋生徒パスワード、または在籍中・権限1以上の講師ID＋講師パスワード。サーバー側で権限を再確認。',
+    '保存先':'新規専用Googleスプレッドシート。ID・各マスタID・認証情報は非公開で管理。',
+    '確認日':'2026年8月15日',
+    '確認済み事項':['新規GitHub Pages','新規Apps Script Web API','新規専用保存シート','正式単元1,621件','API health HTTP 200','既存ステップ＆ゴール進捗管理とは別ID・別URL・別保存先','公開GitHubにパスワード・非公開Spreadsheet IDなし']
+  };
+  const index=list.findIndex(item=>item['ID']===record['ID']);
+  if(index>=0)list[index]=Object.assign({},list[index],record);else list.push(record);
+  return list;
+};
+</script>
 </body>
 </html>
