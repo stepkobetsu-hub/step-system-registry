@@ -13,7 +13,7 @@
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
 | ステップ＆ゴール進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧表示名：学習進捗管理。旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタとは別システム |
-| フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`config.js`、`manifest.webmanifest`、公開用GASテンプレート、契約試験 | GitHub Pages＋Apps Script＋新規専用Google Sheet | PagesとAPIを更新し、health・生徒／講師／管理者入口・正式単元件数を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先 |
+| フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/`、`data/japanese-units.json`、`tests/` | GitHub Pages＋Apps Script＋専用Google Sheet | Pagesと既存APIデプロイを更新し、health・3入口・国英数進行表・単元1,853件を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先。詳細は `docs/foresta-progress-v2-20260815.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
 | 成績管理 | 本番使用中 | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `admin.html`、`juku_app.html`、`gas_code.js`、端末別ログイン試験（`index.html` はスタッフ用ポータル） | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-15 | **成績管理の直接入口は2つ。講師・管理者は `admin.html`、生徒は `juku_app.html`。`/seiseki-kanri/`（`index.html`）はスタッフ用ポータルで、成績管理の直接入口とは区別する。エントリーシート（デジタル版）は成績管理カードではなく「受付カード・エントリーシート読み取り」カードに表示する** |
@@ -446,12 +446,23 @@
 - GitHub Pages URL: https://stepkobetsu-hub.github.io/foresta-progress-v2/
 - GitHub URL: https://github.com/stepkobetsu-hub/foresta-progress-v2
 - 本番ブランチ: `main`
-- Apps Script Web API: 公開Webアプリを使用。デプロイ編集情報と非公開IDは運用アカウント側で管理する。
-- 保存先: 新規専用Googleスプレッドシート。保存先ID、生徒・講師・成績マスタID、正式単元表IDは公開台帳へ記録しない。
-- 単元マスタ: 正式26F進行表から中1～中3の数学・英語6教科書を取り込み、1,621件を登録。
-- 正本ファイル: `index.html`、`styles.css`、`app.js`、`config.js`、`manifest.webmanifest`、`gas/Code.gs`、`gas/appsscript.json`、`tests/app-contract.test.mjs`
-- セキュリティ: 実在パスワード、セッショントークン、非公開Spreadsheet IDをGitHubへ保存しない。公開用GASコードはScript Properties参照とする。
-- 確認: 公開API GET 200、health 200、正式単元1,621件、生徒329名、授業予定97件、有効講師32名、学校6校、成績181件を読み取り確認。確認時は実メール送信と実進捗書き込みを抑止。
+- Apps Script編集URL: https://script.google.com/home/projects/1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M/edit
+- Apps ScriptプロジェクトID: `1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M`
+- Apps Script Web API: https://script.google.com/macros/s/AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ/exec
+- デプロイID: `AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ`
+- Apps Script現行版: v7「国語ワーク進行表・国語専用宿題ルール」
+- 専用保存先: [フォレスタ進捗管理 v2 保存データ（新規構築 2026-08-15）](https://docs.google.com/spreadsheets/d/11qBwaLVgZV2bD6bb4HY7-osvs58dBEZVaZo4UYNK7ec/edit)（21シート）
+- 生徒・時間割マスタ: [★生徒マスタ202606-](https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit)（`☆マスタ`、`時間割マスタ`）
+- 講師マスタ: [給与明細2026-6-](https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit)（`講師マスター`）
+- 成績・学校日程参照API: https://script.google.com/macros/s/AKfycbypkUc0MqZ07E7pZRglNPeRM56WbCcuWaLpRzi9bVFcPklHDxaaLC7GfzG6ozTGCbEX/exec
+- 学校・テスト日程登録: https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html#schools
+- 単元マスタ: 合計1,853件。国語232件（中1=78、中2=77、中3=77）、数学315件、英語1,306件（6教科書×3学年）。
+- 進行表対象: 国語、英語、数学。定期テスト履歴・目標点は国語、数学、英語、理科、社会の5科目。
+- 正本ファイル: `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/Code.gs`、`apps-script/appsscript.json`、`data/japanese-units.json`、`tests/`
+- 確認済みコミット: `631e264fb3496855559522f0c53f409127249824`
+- セキュリティ: 実在ID・パスワード・セッショントークン・通知先メール・個人情報を公開台帳へ記録しない。個人端末30日、共用端末8時間、管理者は明示ログアウトまで保持。
+- 確認: 公開API GETとhealth、GitHub Pages、生徒／講師／管理者入口、国語・英語・数学進行表、国語のCT非表示と専用宿題ルールを確認。ローカル自動テスト149件成功。確認時は実メール送信と実進捗書き込みを抑止。
+- 引継ぎ資料: [docs/foresta-progress-v2-20260815.md](https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v2-20260815.md)
 - 確認日: 2026-08-15
 
 ### 2026-07-31 管理画面・表示高速化
@@ -484,7 +495,7 @@
 - 復旧: 問題がある場合は直前Version `f3ac9e47-496c-4350-b3e8-1a3276e5ae05` を100%へ再指定する。D1データの変更やマイグレーションは今回実施していない。
 - 完全履歴bundle: `foresta-device-warning-position.bundle`、SHA-256 `064efcc4c58a17d958ab3fc4aeb338f73c5e91e6d742388c3b266f4397b10810`。
 
-### 2026-08-07 成績管理の講師・管理者・生徒別端末ログイン
+### 2026-08-07 成績管理の管理者・生徒別端末ログイン
 
 - 講師・管理者用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html
 - 生徒用URL: https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html

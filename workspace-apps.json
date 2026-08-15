@@ -29,7 +29,7 @@
     {
       "正式名称": "成績管理",
       "状態": "本番使用中",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html"
+      "利用者向けURL": "**講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html"
     },
     {
       "正式名称": "面談メモ",
