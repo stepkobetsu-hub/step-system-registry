@@ -17,12 +17,12 @@
 | 利用者向け本番URL | https://stepkobetsu-hub.github.io/foresta-progress-v2/ |
 | GitHub正本 | https://github.com/stepkobetsu-hub/foresta-progress-v2 |
 | 本番ブランチ | `main` |
-| 確認済みコミット | `a64ef7963482ebb55beedfb1ceeabcf36953525a` |
+| 確認済みコミット | `4c3318f058d51994658b5e0a2ed26f19ead37125` |
 | Apps Script編集 | https://script.google.com/home/projects/1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M/edit |
 | Apps ScriptプロジェクトID | `1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M` |
 | WebアプリAPI | https://script.google.com/macros/s/AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ/exec |
 | デプロイID | `AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ` |
-| Apps Script現行版 | バージョン8「ローマ字検索・管理者生徒検索・速報絞り込み選択肢」 |
+| Apps Script現行版 | バージョン9「管理者詳細の進行表閲覧権限を修正」 |
 | 専用保存シート | https://docs.google.com/spreadsheets/d/11qBwaLVgZV2bD6bb4HY7-osvs58dBEZVaZo4UYNK7ec/edit |
 | 生徒・時間割マスタ | https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit |
 | 講師マスタ | https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit |
@@ -252,6 +252,7 @@ GETでWebアプリURLを開くと、`ok: true`、アプリ名、`version: 2.0.0`
 - 生徒、講師、管理者の3入口が利用できる。
 - 講師画面で、氏名・ひらがな・カタカナ・ローマ字の入力時自動検索ができる。
 - 管理者画面で全在籍生徒を検索し、生徒詳細を直接開ける。
+- 管理者詳細の国語・英語・数学ボタンから、権限エラーなく生徒の進行表を開ける。
 - 本日の速報で神領・大手町、中1・中2・中3、登録済み全学校を選べる。
 - 生徒切替が軽く、×で外すと確認が出る。
 - 国語・英語・数学の進行表が開く。
@@ -262,7 +263,7 @@ GETでWebアプリURLを開くと、`ok: true`、アプリ名、`version: 2.0.0`
 - 専用保存シートの既存データを壊していない。
 - 実運用確認では、意図しない授業・宿題・CT・メールを保存しない。
 
-2026-08-15時点では、ローカル自動テスト（ドメイン34件、GAS純粋関数27件、管理者入口11件、管理者範囲18件、講師画面76件、国語14件、合計180件）がすべて成功しています。公開APIのGET／health、GitHub Pagesの最新ファイル、国語進行表と国語専用宿題ルールを確認済みです。
+2026-08-15時点では、ローカル自動テスト（ドメイン34件、GAS純粋関数30件、管理者入口11件、管理者範囲18件、講師画面76件、国語14件、合計183件）がすべて成功しています。公開APIのGET／health、GitHub Pagesの最新ファイル、管理者詳細からの進行表表示、国語進行表と国語専用宿題ルールを確認済みです。
 
 ## 15. 障害時の切り分け
 

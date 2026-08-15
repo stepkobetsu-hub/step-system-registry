@@ -450,7 +450,7 @@
 - Apps ScriptプロジェクトID: `1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M`
 - Apps Script Web API: https://script.google.com/macros/s/AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ/exec
 - デプロイID: `AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ`
-- Apps Script現行版: v8「ローマ字検索・管理者生徒検索・速報絞り込み選択肢」
+- Apps Script現行版: v9「管理者詳細の進行表閲覧権限を修正」
 - 専用保存先: [フォレスタ進捗管理 v2 保存データ（新規構築 2026-08-15）](https://docs.google.com/spreadsheets/d/11qBwaLVgZV2bD6bb4HY7-osvs58dBEZVaZo4UYNK7ec/edit)（21シート）
 - 生徒・時間割マスタ: [★生徒マスタ202606-](https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit)（`☆マスタ`、`時間割マスタ`）
 - 講師マスタ: [給与明細2026-6-](https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit)（`講師マスター`）
@@ -459,10 +459,10 @@
 - 単元マスタ: 合計1,853件。国語232件（中1=78、中2=77、中3=77）、数学315件、英語1,306件（6教科書×3学年）。
 - 進行表対象: 国語、英語、数学。定期テスト履歴・目標点は国語、数学、英語、理科、社会の5科目。
 - 正本ファイル: `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/Code.gs`、`apps-script/appsscript.json`、`data/japanese-units.json`、`tests/`
-- 確認済みコミット: `a64ef7963482ebb55beedfb1ceeabcf36953525a`
+- 確認済みコミット: `4c3318f058d51994658b5e0a2ed26f19ead37125`
 - セキュリティ: 実在ID・パスワード・セッショントークン・通知先メール・個人情報を公開台帳へ記録しない。個人端末30日、共用端末8時間、管理者は明示ログアウトまで保持。
 - 検索・速報: 講師検索はひらがな・カタカナ・ローマ字に対応し、入力・教室・学年変更で自動検索。管理者画面は全在籍生徒検索から詳細を直接開く。本日の速報の選択肢は全在籍生徒を基準に、神領・大手町、中1・中2・中3、登録済み全学校を表示。
-- 確認: 公開API GETとhealth、GitHub Pages、生徒／講師／管理者入口、国語・英語・数学進行表、国語のCT非表示と専用宿題ルールを確認。ローカル自動テスト180件成功。確認時は実メール送信と実進捗書き込みを抑止。
+- 確認: 公開API GETとhealth、GitHub Pages、生徒／講師／管理者入口、管理者詳細から英語進行表が権限エラーなく開くこと、国語・英語・数学進行表、国語のCT非表示と専用宿題ルールを確認。ローカル自動テスト183件成功。確認時は実メール送信と実進捗書き込みを抑止。
 - 引継ぎ資料: [docs/foresta-progress-v2-20260815.md](https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v2-20260815.md)
 - 確認日: 2026-08-15
 
