@@ -1766,13 +1766,13 @@ organizeEntryImport=function(items){
     'Apps ScriptプロジェクトID':'1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M',
     'Apps Script種別':'スタンドアロンWebアプリ',
     'デプロイID':'AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ',
-    'Apps Scriptバージョン':'v7（国語ワーク進行表・国語専用宿題ルール／2026年8月15日）',
+    'Apps Scriptバージョン':'v8（ローマ字検索・管理者生徒検索・速報絞り込み選択肢／2026年8月15日）',
     'Webアプリ設定':'実行ユーザー：デプロイ者／アクセス：全員／V8／Asia/Tokyo',
     'Apps Script概要':'生徒・講師・管理者認証、進行表、テスト範囲、学校進度、授業、CT、宿題、目標点、コメント、注意事項、特訓部屋、監査履歴の読込・保存。',
     'APIアクション':['health','studentLogin / staffLogin / resumeSession / logout','adminReauth / resumeAdminSession','searchStudents / getStudentDashboard / getProgression / getTeacherToday','getAdminDashboard / getAdminStudents / getAdminStudentDetail','getRangeSetup / getRangeOptions / getRangeEditor / saveRange / saveSchoolTextbook','saveSchoolPosition / saveLesson / getLessonCorrections / updateLessonCorrection','saveCt / studentCheckHomework / teacherCheckHomework','saveTargets / saveComment / saveNote / markCommentRead','getTrainingRoom / updateTrainingRoom / refreshSubjectCache'],
     '本番ブランチ':'main',
     '正本ファイル':['index.html','styles.css','app.js','domain.js','config.js','manifest.webmanifest','apps-script/Code.gs','apps-script/appsscript.json','data/japanese-units.json','tests/'],
-    '最新版の場所':'stepkobetsu-hub/foresta-progress-v2（main）／確認済みコミット 631e264fb3496855559522f0c53f409127249824',
+    '最新版の場所':'stepkobetsu-hub/foresta-progress-v2（main）／確認済みコミット a64ef7963482ebb55beedfb1ceeabcf36953525a',
     'GitHubドキュメントURL':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v2-20260815.md',
     '保存基盤':'Google Sheet',
     'Google Sheet URL':'https://docs.google.com/spreadsheets/d/11qBwaLVgZV2bD6bb4HY7-osvs58dBEZVaZo4UYNK7ec/edit',
@@ -1789,7 +1789,7 @@ organizeEntryImport=function(items){
     '参照元データ':['生徒：☆マスタ（A/B/E/F/H/K/L/P列）','時間割：時間割マスタ（A、E～AB、AO、AP列）','講師：講師マスター（A/B/D/R/AJ/AK列）','成績・学校日程：成績管理API','国語単元：光村・中1～中3の中学ワーク学習チェックシートC/D列'],
     '認証':'生徒ID＋生徒パスワード、または有効な講師ID＋講師パスワード。管理者は権限1以上の同じ講師が別ポップアップで再認証。',
     '認証・セッション':['生徒／講師：IDとパスワードをサーバー側で照合','個人端末30日／共用端末8時間','管理者は自分でログアウトするまで保持','ブラウザーにパスワードは保存せず、セッショントークンだけを保持'],
-    '主要機能':['生徒：国語・英語・数学進行表、学校進度、必要ペース、宿題、目標、5科履歴','講師：かな検索、複数生徒切替、日付付き授業単元、学校現在地、宿題、訂正','管理者：最上部の進行表・テスト範囲設定、速報、全生徒、特訓部屋、生徒詳細','学校→学年→国英数→次回テスト→予想／決定→単元複数選択→保存','学校・テスト日程登録への直リンク／通常非表示の英語教科書例外設定'],
+    '主要機能':['生徒：国語・英語・数学進行表、学校進度、必要ペース、宿題、目標、5科履歴','講師：ひらがな・カタカナ・ローマ字の入力時自動検索、複数生徒切替、日付付き授業単元、学校現在地、宿題、訂正','管理者：全在籍生徒検索、最上部の進行表・テスト範囲設定、速報、全生徒、特訓部屋、生徒詳細','本日の速報：神領・大手町、中1・中2・中3、登録済み全学校を全在籍生徒から選択肢化','学校→学年→国英数→次回テスト→予想／決定→単元複数選択→保存','学校・テスト日程登録への直リンク／通常非表示の英語教科書例外設定'],
     '科目別ルール':['英語：2-Part1形式、プレステップを一まとまり、KEY WORDS TESTは巻末暗記だけ','数学：TRY赤×直し・exercise・宿題赤×直しを単元別に選択','国語：中1～中3、CTなし、定型宿題なし、各単元の「その他」入力だけ'],
     '参照システム':['成績管理（学校・テスト日程、5科目成績）','STEPメッセージセンター'],
     '影響先':['フォレスタ進捗管理の生徒・講師・管理者画面','専用保存シート21枚'],
@@ -1799,8 +1799,8 @@ organizeEntryImport=function(items){
     '障害時の確認':['全画面Failed to fetch：API URL・デプロイ権限・config.js','画面が古い：Pages公開結果・キャッシュ','生徒検索：☆マスタB/F/H/K/P列','受講科目：時間割E～AB／AO／AP列とキャッシュ','管理者認証：講師マスターD/AJ/AK列','保存失敗：セッション・対象シート名／見出し・Apps Script実行履歴'],
     '変更時の注意':['シート名・見出し・単元IDを不用意に変えない','ステップ＆ゴール進捗管理と混同しない','実在ID・パスワード・トークン・個人情報・通知先メールを台帳へ載せない','メール通知は初期値SUPPRESS。実送信前に通知先と重複防止を確認'],
     '確認日':'2026年8月15日',
-    '確認根拠':'公開Pages、公開API GET／health、GitHub main 631e264、Apps Script v7、専用保存シート21枚、国語進行表と国語専用宿題の画面確認。',
-    '確認済み事項':['GitHub Pages本番','Apps Script Web API v7','専用保存シート21枚','単元1,853件','API GET／health成功','生徒／講師／管理者入口','国語・英語・数学進行表','国語CT非表示・国語その他宿題・KEY WORDS TEST専用宿題','自動テスト149件成功','ステップ＆ゴール進捗管理とは別ID・別URL・別保存先','公開台帳にパスワード・セッショントークン・個人情報なし']
+    '確認根拠':'公開Pages、公開API GET／health、GitHub main a64ef79、Apps Script v8、専用保存シート21枚、国語進行表、検索・速報選択肢の公開コードを確認。',
+    '確認済み事項':['GitHub Pages本番','Apps Script Web API v8','専用保存シート21枚','単元1,853件','API GET／health成功','生徒／講師／管理者入口','講師ローマ字・入力時自動検索','管理者の全在籍生徒検索','速報の神領・大手町／中1～中3／登録済み全学校選択肢','国語・英語・数学進行表','国語CT非表示・国語その他宿題・KEY WORDS TEST専用宿題','自動テスト180件成功','ステップ＆ゴール進捗管理とは別ID・別URL・別保存先','公開台帳にパスワード・セッショントークン・個人情報なし']
   };
   const index=list.findIndex(item=>item['ID']===record['ID']);
   if(index>=0)list[index]=Object.assign({},list[index],record);else list.push(record);
