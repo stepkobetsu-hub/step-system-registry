@@ -12,7 +12,7 @@
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| ステップ＆ゴール進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-step-progress/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `main` | `index.html`、`README.md`、`package.json`、`tests/`、Apps Script Webアプリ（詳細要確認） | GitHub＋Apps Script＋Google Sheet（正本：Google Sheet「システム台帳」） | Pages更新。API変更時は既存GASデプロイを更新し、本人限定・権限テストを確認 | 2026-07-31 | 旧表示名：学習進捗管理。旧称：フォレスタステップ進捗管理／夏休み進捗管理。通常授業用フォレスタとは別システム |
+| ステップ＆ゴール進捗管理 | Cloudflare Worker本番復旧済み | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `agent/cloudflare-progress-migration`（Worker正本）／`main`（公開ワークフロー） | `cloudflare/src/index.ts`、`cloudflare/public/index.html`、`cloudflare/tests/`、`cloudflare/wrangler.jsonc`、`.github/workflows/deploy-step-progress.yml` | GitHub＋Cloudflare Worker＋D1 `step-progress-db`＋既存Google API | 共通学年回帰試験・型検査・本番HTMLハッシュ検査後、GitHub ActionsからWorkerを公開 | 2026-08-17 | 理科・国語・社会は `中1～中3共通`。現行Version `bbefb81b-9d7e-4b90-9480-b245a751cd6c`。旧表示名：学習進捗管理。通常授業用フォレスタとは別システム。詳細は `docs/learning-progress-common-grade-hotfix-20260817.md` |
 | フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/`、`data/japanese-units.json`、`tests/` | GitHub Pages＋Apps Script＋専用Google Sheet | Pagesと既存APIデプロイを更新し、health・3入口・国英数進行表・単元1,853件を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先。詳細は `docs/foresta-progress-v2-20260815.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
@@ -420,13 +420,22 @@
 - 正式名称: ステップ＆ゴール進捗管理
 - 旧称・参考名: フォレスタステップ進捗管理／夏休み進捗管理
 - 分類: 生徒・指導管理
-- 状態: 本番（正本で使用中の正式値。GitHub Pages公開画面とApps Script API接続を確認）
+- 状態: Cloudflare Worker本番復旧済み（2026-08-17、共通学年の目標範囲対応）
 - 利用者: 生徒、講師、管理者
 - 運用担当: 管理者
 - 概要: 生徒がフォレスタステップとフォレスタゴールの学習進捗、宿題、目標範囲、LCT等を入力・確認する、自主学習・講習・受験勉強用の進捗管理アプリ。通常授業用フォレスタの講師向け進捗管理は対象外。
 - GitHub Pages URL: https://stepkobetsu-hub.github.io/foresta-step-progress/
 - GitHub URL: https://github.com/stepkobetsu-hub/foresta-step-progress
-- 本番ブランチ: `main`
+- 現行利用者向け本番URL: https://step-progress-api.stepkobetsu.workers.dev/
+- Cloudflare Worker: `step-progress-api`
+- D1: `step-progress-db`（binding `DB`、database ID `028f097c-2609-4bf7-9e9b-39b565606941`）
+- Worker正本ブランチ: `agent/cloudflare-progress-migration`
+- Worker現行Version: `bbefb81b-9d7e-4b90-9480-b245a751cd6c`
+- 同修正の直前Version: `b4eff6ac-62b8-4db7-8f74-845896a29639`
+- Worker修正コミット: `a3b7ce268ff3ec81b5f75db4c8a2d63762894184`
+- Cloudflare公開ワークフロー: `.github/workflows/deploy-step-progress.yml`（`main`）
+- 詳細復旧記録: `docs/learning-progress-common-grade-hotfix-20260817.md`
+- 本番ブランチ: `main`（従来GitHub Pages）／`agent/cloudflare-progress-migration`（現行Worker正本）
 - 調査時main: `1e55b1f3193910d6df24b91613e62605fe669109`
 - 正本ファイル: `index.html`、`README.md`、`package.json`、`tests/`、`apps-script/code.gs`、`apps-script/appsscript.json`、`apps-script/README.md`
 - 最新版の場所: `stepkobetsu-hub/foresta-step-progress` の `main` 直下
@@ -551,6 +560,22 @@
 - 反映用パッケージ: `step-progress-final-deploy.zip`、SHA-256 `109454faa1c0ce091740faa27488955e8f1427dcc4798bbc95355a852a188d34`。資格情報・OAuthトークン・個人情報は含めない。
 - 確認日: 2026-08-09
 
+### 2026-08-17 理科・国語・社会の目標範囲を復旧
+
+- 対象: ステップ＆ゴール進捗管理（ID `learning-progress`）、Cloudflare Worker `step-progress-api`。
+- 障害: フォレスタステップの理科・国語・社会で、目標範囲の選択肢が表示されず設定できない。英語・数学は表示される。以前設定した目標件数や進捗は残っていた。
+- 原因: 理科・国語・社会の単元は学年 `中1～中3共通` だが、Workerの `readDashboard` SQLが空欄と本人学年だけを許可し、共通学年を除外していた。D1の目標・進捗データは消失していない。
+- 修正: `u.grade` と `m.grade` の双方へ `中1～中3共通` 条件を追加。Worker修正コミット `a3b7ce268ff3ec81b5f75db4c8a2d63762894184`、正本ブランチ `agent/cloudflare-progress-migration`。
+- キャッシュ: 障害中の空一覧が端末へ最大24時間残らないよう、管理者キャッシュを `fsAdminDashboard:commonGradeFix20260817:`、生徒キャッシュを `forestaProgress.viewCache:commonGradeFix20260817:` へ更新。画面デザインと保存処理は変更していない。
+- 本番: 現行Version `bbefb81b-9d7e-4b90-9480-b245a751cd6c`。直前の同修正版 `b4eff6ac-62b8-4db7-8f74-845896a29639`、最初の共通単元修正版 `f7f7f491-5a6e-478e-b2b6-c011e58ba5ac`。
+- 本番確認: https://step-progress-api.stepkobetsu.workers.dev/ と `/health`。`ok=true`、`productionWriteApproved=false`、`testWriteApproved=true`、`dualWriteEnabled=true` を確認。本番HTML SHA-256は `9d67371dbe8b4e155e85952cdbf626d00ba38aa2f6cc63a636ab5d6fe14a5866`。
+- 検証: 共通学年の単元側・教材側条件、ダッシュボード変換、進捗集計、目標0件、保存禁止対象、TypeScript、本番Assets、healthを検査。最終Actionsで対象試験5件と全公開工程が成功。
+- Cloudflare公開経路: `foresta-step-progress/.github/workflows/deploy-step-progress.yml`。GitHub Actions成功実行 https://github.com/stepkobetsu-hub/foresta-step-progress/actions/runs/32006933794 、整備コミット `9333bf31c439b1465b1c2feed6fcda827986c1f7`。
+- 認証情報: GitHub Repository secret名は `CLOUDFLARE_API_TOKEN`。秘密値はGitHubファイル、台帳、チャットへ記録しない。再発行時は同名Secretの値だけを更新する。
+- 復旧: 現行Versionに問題がある場合は同じ修正を含む `b4eff6ac-62b8-4db7-8f74-845896a29639` を候補にする。D1の削除・初期化・ロールバックは行わない。
+- 詳細引継ぎ: `docs/learning-progress-common-grade-hotfix-20260817.md`。
+- 確認日: 2026-08-17
+
 ### 2026-08-09 資産管理ポータルの継続ログイン
 
 - 対象URL: https://stepkobetsu-hub.github.io/step-system-registry/
@@ -569,4 +594,3 @@
 - 台帳文書: `SYSTEM_REGISTRY.md`
 - 認証API: `seiseki-kanri` のApps Script。権限2・3・4、API呼び出しごとのセッショントークン再確認を維持する。
 - 更新方法: このリポジトリの `main` に反映し、GitHub Pagesの公開結果をPC／スマートフォン幅で確認する。
-

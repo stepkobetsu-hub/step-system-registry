@@ -8,8 +8,8 @@
     },
     {
       "正式名称": "ステップ＆ゴール進捗管理",
-      "状態": "本番",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-step-progress/"
+      "状態": "Cloudflare Worker本番復旧済み",
+      "利用者向けURL": "https://step-progress-api.stepkobetsu.workers.dev/"
     },
     {
       "正式名称": "フォレスタ進捗管理",

@@ -1867,5 +1867,35 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="learning-progress-common-grade-hotfix-20260817">
+const applyLearningProgressCommonGradeHotfix20260817Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressCommonGradeHotfix20260817Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='learning-progress'||name.includes('ステップ＆ゴール進捗管理')||name.includes('学習進捗管理')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const confirmed=toArray(base['確認済み事項']);
+  return Object.assign({},base,{
+    '状態':'Cloudflare Worker本番復旧済み（共通学年の目標範囲対応）',
+    '確認日':'2026年8月17日',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
+    'Cloudflare Worker':'step-progress-api',
+    'D1':'step-progress-db（binding DB／database ID 028f097c-2609-4bf7-9e9b-39b565606941）',
+    '本番Version':'bbefb81b-9d7e-4b90-9480-b245a751cd6c',
+    '復旧Version':'b4eff6ac-62b8-4db7-8f74-845896a29639（同じ共通学年修正を含む直前Version）',
+    '最新版の場所':'stepkobetsu-hub/foresta-step-progress の agent/cloudflare-progress-migration／Worker修正 a3b7ce268ff3ec81b5f75db4c8a2d63762894184',
+    'GitHubドキュメントURL':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/learning-progress-common-grade-hotfix-20260817.md',
+    'GitHubドキュメント':'docs/learning-progress-common-grade-hotfix-20260817.md',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月17日 共通学年単元：理科・国語・社会のフォレスタステップ単元は「中1～中3共通」。目標範囲の選択肢を作るWorker SQLは、単元側u.gradeと教材側m.gradeの双方で空欄・本人学年・中1～中3共通を許可する。既存の目標・進捗データは削除しない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月17日：理科・国語・社会の目標範囲が設定できない障害を復旧。原因はreadDashboard SQLが「中1～中3共通」を除外していたこと。Worker修正a3b7ce2をGitHub Actionsから本番公開し、現行Version bbefb81b-9d7e-4b90-9480-b245a751cd6c、health ok=trueを確認。障害中の空一覧を最大24時間保持しないよう管理者・生徒のキャッシュキーを更新。本番HTML SHA-256は9d67371dbe8b4e155e85952cdbf626d00ba38aa2f6cc63a636ab5d6fe14a5866。D1データ・スキーマ・マイグレーション変更なし。',
+    'Cloudflare公開方法':'GitHub Actions .github/workflows/deploy-step-progress.yml。Repository secret CLOUDFLARE_API_TOKENを使用し、秘密値は記録しない。成功run 32006933794、ワークフロー整備コミット 9333bf31c439b1465b1c2feed6fcda827986c1f7。',
+    '障害時の確認':[...new Set([...toArray(base['障害時の確認']),'理科・国語・社会だけ目標単元がない：readDashboard SQLのu.grade／m.gradeに中1～中3共通があるか確認','Worker修正後も端末だけ古い：commonGradeFix20260817のキャッシュキーと本番HTMLハッシュを確認','データ件数が残っているのに選択肢だけない：D1削除をせずselectableUnitsの読込条件を確認'])],
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'Cloudflare Dashboardの人間確認で止まる場合は、GitHub Actionsの専用ワークフローを使用する。CLOUDFLARE_API_TOKENの値をGitHubファイル・台帳・チャットへ書かない。ワークフローは既知の本番HTMLハッシュ以外では公開前停止するため、正式なUI変更時は許可ハッシュと検証も更新する。問題時もD1データを削除・初期化しない。',
+    '確認済み事項':[...new Set([...confirmed,'理科・国語・社会の中1～中3共通単元を目標範囲へ復旧','u.gradeの中1～中3共通条件','m.gradeの中1～中3共通条件','既存の目標・進捗データ消失なし','D1スキーマ・マイグレーション変更なし','管理者キャッシュ commonGradeFix20260817','生徒キャッシュ commonGradeFix20260817','Cloudflare Worker Version bbefb81bを本番公開','直前の同修正版Version b4eff6acを維持','GitHub Actions公開経路を整備','対象試験5件合格','TypeScript検査合格','本番health HTTP 200・ok=true','productionWriteApproved=false','testWriteApproved=true','dualWriteEnabled=true','本番HTML SHA-256一致','APIトークン本文を台帳へ記録しない'])],
+    '未確認項目':[],
+    '確認状況':'理科・国語・社会の共通学年目標範囲、古い端末キャッシュの無効化、GitHub Actions公開、本番health・HTMLを確認済み。'
+  });
+};
+</script>
 </body>
 </html>
