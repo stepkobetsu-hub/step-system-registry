@@ -86,8 +86,8 @@ const INVESTIGATION_DEFINITIONS=[
   {id:'student-master-archived-deployments',cardAnchor:'student-master',cardName:'生徒マスタ',text:'アーカイブ済み11デプロイの詳細',legacyIds:['investigation-student-master-4-p5c6bf']},
   {id:'grade-management-save-sheet',cardAnchor:'grade-management',cardName:'成績管理',text:'保存先Google Sheet',defaultStatus:'確認済み',legacyIds:['investigation-grade-management-1-695x20']},
   {id:'grade-management-gas-save',cardAnchor:'grade-management',cardName:'成績管理',text:'GAS側の保存処理',legacyIds:['investigation-grade-management-2-qu8az5','investigation-grade-management-1-qu8az5']},
-  {id:'step-message-spreadsheet-id',cardAnchor:'step-message',cardName:'STEP配信システム',text:'Spreadsheet ID',legacyIds:['investigation-step-message-1-uc5afq']},
-  {id:'step-message-apps-script-binding',cardAnchor:'step-message',cardName:'STEP配信システム',text:'Apps Scriptバインド先',legacyIds:['investigation-step-message-2-qgn6b0']},
+  {id:'step-message-spreadsheet-id',cardAnchor:'step-message',cardName:'STEP配信システム',text:'Spreadsheet ID',defaultStatus:'確認済み',legacyIds:['investigation-step-message-1-uc5afq']},
+  {id:'step-message-apps-script-binding',cardAnchor:'step-message',cardName:'STEP配信システム',text:'Apps Scriptバインド先',defaultStatus:'確認済み',legacyIds:['investigation-step-message-2-qgn6b0']},
   {id:'teacher-schedule-legacy-project',cardAnchor:'teacher-schedule',cardName:'講師予定・夏休み出勤登録',text:'プロジェクト1l9s…のバインド先・デプロイ一覧・実行履歴（編集権限上確認不可）',legacyIds:['investigation-teacher-schedule-1-1wq9lh1']},
   {id:'teacher-schedule-candidate-binding',cardAnchor:'teacher-schedule',cardName:'講師予定・夏休み出勤登録',text:'候補1がプロジェクト1l9s…のバインド先かどうか',legacyIds:['investigation-teacher-schedule-2-t17rpl']},
   {id:'teacher-schedule-legacy-users',cardAnchor:'teacher-schedule',cardName:'講師予定・夏休み出勤登録',text:'旧HTML・個人ブックマークから旧Webアプリを開いている利用者の有無',legacyIds:['investigation-teacher-schedule-3-12lzx0e']},
@@ -1805,6 +1805,34 @@ organizeEntryImport=function(items){
   const index=list.findIndex(item=>item['ID']===record['ID']);
   if(index>=0)list[index]=Object.assign({},list[index],record);else list.push(record);
   return list;
+};
+</script>
+<script id="step-message-absence-source-registration-20260817">
+const applyStepMessageAbsenceSourceRegistration20260817Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageAbsenceSourceRegistration20260817Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEP配信')||name.includes('STEPメッセージ')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  const notes=Array.isArray(base['連携メモ'])?base['連携メモ']:(base['連携メモ']?[String(base['連携メモ'])]:[]);
+  return Object.assign({},base,{
+    '保存基盤':'STEP配信システムのバインドGoogle Sheet＋遅刻・欠席・早退回答Google Sheet',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit',
+    'Google Sheet名':'遅刻・欠席・早退連絡（回答）',
+    '正式Spreadsheet名':'遅刻・欠席・早退連絡（回答）',
+    '保存先Spreadsheet ID':'1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ',
+    '使用シート名':['回答正本：★欠席遅刻','STEP配信システム側キャッシュ：欠席キャッシュ'],
+    '入力フォームURL':'https://x.gd/WfTJM',
+    '参照元データ':['遅刻・欠席・早退連絡（回答）の「★欠席遅刻」'],
+    '連携メモ':[...notes,'遅刻・欠席・早退連絡（回答）→ ★欠席遅刻 → Code.gs refreshAbsenceCache() → STEP配信システム側「欠席キャッシュ」→ app.jsの欠席一覧表示。','回答先変更時はDEFAULT_ABSENCE_ID、ABSENCE_SHEET_NAME、フォーム送信トリガー、手動更新、60秒自動更新を一体で確認する。'],
+    '更新方法':'GitHub mainを更新し、Apps Scriptは既存デプロイIDを維持して新バージョンへ更新する。欠席連携を変更する場合は、回答Google Sheet、Code.gsのSpreadsheet ID・シート名、トリガー、キャッシュ、画面表示を同時に確認する。',
+    '確認日':'2026年8月17日',
+    '確認根拠':'Google Sheet正本「遅刻・欠席・早退連絡（回答）」のSpreadsheet ID・★欠席遅刻見出しと、step-message-center Code.gsのDEFAULT_ABSENCE_ID／ABSENCE_SHEET_NAME／refreshAbsenceCache()、app.jsの欠席一覧表示処理が一致。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月17日：台帳で欠落していた「遅刻・欠席・早退連絡（回答）」の正本URL、Spreadsheet ID、使用シート、STEP配信システムとの読取・キャッシュ・画面表示経路、保護者向けフォーム入口を追記。説明だけでなく実体URL・ID・コード上の接続を確認済み情報として登録。',
+    '確認済み事項':[...new Set([...confirmed,'遅刻・欠席・早退連絡（回答）の正本URL','回答Spreadsheet ID 1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ','回答正本シート ★欠席遅刻','Code.gsのDEFAULT_ABSENCE_ID一致','Code.gsのABSENCE_SHEET_NAME一致','refreshAbsenceCache()による欠席キャッシュ取込','app.jsの欠席一覧表示','案内テンプレートの連絡フォーム入口 https://x.gd/WfTJM'])],
+    '未確認項目':[],
+    '確認状況':'回答Google Sheetの正本URL・Spreadsheet ID・使用シートと、STEP配信システムの読取・キャッシュ・表示経路を確認済み。'
+  });
 };
 </script>
 </body>
