@@ -1897,5 +1897,20 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="billing-adjustment-ledger-link-fix-20260817">
+const applyBillingAdjustmentLedgerLinkFix20260817Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingAdjustmentLedgerLinkFix20260817Base(item);
+  const id=String(base['ID']||'');
+  const name=String(base['システム名']||'');
+  const formalName=String(base['正式名称']||'');
+  const isBillingManagement=(id==='billing'||name.includes('請求管理')||formalName.includes('請求管理'))
+    && !name.includes('PDF')&&!formalName.includes('PDF');
+  if(!isBillingManagement)return base;
+  return Object.assign({},base,{
+    '料金特別調整専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html'
+  });
+};
+</script>
 </body>
 </html>
