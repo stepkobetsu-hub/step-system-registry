@@ -4,7 +4,7 @@
 
 - 公開URL: https://stepkobetsu-hub.github.io/step-message-center/
 - GitHub正本: https://github.com/stepkobetsu-hub/step-message-center
-- 現行main: `74c4943d0bfef42854bc413b48b0aab3a7780e04`
+- 現行main: `13b7b4a597322894dc58998dc11b77326b2a554f`
 - Apps Script Webアプリ: v53（今回変更なし）
 - 回答正本Google Sheet: https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit
 - Spreadsheet ID: `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`
@@ -29,7 +29,7 @@
 | 新規フォーム送信 | 既存の `onAbsenceFormSubmit` → `refreshAbsenceCache()` 経路を維持 |
 | 手動操作 | 「欠席連絡を手動更新」を予備として維持 |
 | 通信失敗 | 「自動更新に失敗しました」と表示 |
-| 正常時 | 「元データ更新：MM/DD HH:MM」と実更新時刻を表示 |
+| 正常時 | 「データ更新：MM/DD HH:MM」と実更新時刻を表示 |
 
 頻繁な元Sheet読取は行わない。通常はページ起動時と10分ごとだけ元データを読み、5分確認は軽いキャッシュ取得とする。
 
@@ -45,11 +45,11 @@
 
 ## 元データへの導線
 
-「元データ更新：日時」の右横に、小型の「元データへ」ボタンを設置した。
+更新情報は `データ更新：MM/DD HH:MM　[元データへ]　※送信前に必ず更新！` の1行にまとめた。日時の右横に小型の「元データへ」ボタンを設置している。
 
 - リンク先: 上記の回答正本Google Sheet
 - 別タブで開く
-- 赤色の「送信前に必ず更新してくださいね！」は右側に維持
+- 赤色の注意文は `※送信前に必ず更新！`
 
 ## 変更履歴
 
@@ -59,6 +59,7 @@
 | 未デプロイのCode.gs変更を戻し、Apps Script v53との整合を維持 | [#2](https://github.com/stepkobetsu-hub/step-message-center/pull/2) | `e121cc1d7e9fbed841cee2b8ac576c20939459dd` |
 | 当日分を最上部に変更 | [#3](https://github.com/stepkobetsu-hub/step-message-center/pull/3) | `b02dafeda8ca476574ecd6f6269373b664bb4fac` |
 | 「元データへ」ボタン追加 | [#4](https://github.com/stepkobetsu-hub/step-message-center/pull/4) | `74c4943d0bfef42854bc413b48b0aab3a7780e04` |
+| 更新日時・元データボタン・注意文を短い1行に整理 | [#5](https://github.com/stepkobetsu-hub/step-message-center/pull/5) | `13b7b4a597322894dc58998dc11b77326b2a554f` |
 
 変更前のmainは `e1ba6b9c3a3a9e6270804864f04a2cf71364563d`。
 
@@ -82,12 +83,13 @@
 - 既存Apps Script v53への互換フォールバック
 - 当日優先表示
 - 正本Google Sheetへの別タブリンク
+- `データ更新：日時　元データへ　※送信前に必ず更新！` の1行固定
 - JavaScript／CSSキャッシュ更新番号
 - 各mainコミットのGitHub Pages公開成功
 
 ## 障害時の確認順
 
-1. 画面の「元データ更新」時刻を確認する。
+1. 画面の「データ更新」時刻を確認する。
 2. 「元データへ」で `★欠席遅刻` の実データを確認する。
 3. 画面に「自動更新に失敗しました」が出ていないか確認する。
 4. 緑色の「欠席連絡を手動更新」を1回押す。
