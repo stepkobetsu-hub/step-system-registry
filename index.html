@@ -1835,5 +1835,37 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="step-message-absence-refresh-registration-20260817">
+const applyStepMessageAbsenceRefreshRegistration20260817Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageAbsenceRefreshRegistration20260817Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEP配信')||name.includes('STEPメッセージ')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const notes=toArray(base['連携メモ']).filter(note=>!String(note).includes('60秒自動更新'));
+  const confirmed=toArray(base['確認済み事項']);
+  const work='2026年8月17日：欠席一覧が1分ごとに古いキャッシュを再取得していた原因を修正。ページ起動時に元データを更新、5分ごとにキャッシュ確認、10分ごとに元データを予備更新する低負荷構成へ変更。当日分を最上部にし、「元データ更新」横へ正本Google Sheetを開く「元データへ」ボタンを追加。Apps Script v53と送信機能は変更していない。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（欠席一覧の低負荷自動更新・当日優先表示）',
+    'Apps Scriptバージョン':'v53（今回変更なし）',
+    '正本ファイル':'index.html / app.js / api.js / style.css / Code.gs',
+    '最新版の場所':'step-message-center main 74c4943',
+    'GitHubドキュメントURL':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/step-message-center-absence-refresh-20260817.md',
+    'GitHubドキュメント':'docs/step-message-center-absence-refresh-20260817.md',
+    '主要機能':[...new Set([...toArray(base['主要機能']),'欠席一覧：ページ起動時に元データ更新','欠席一覧：5分ごとにキャッシュ確認','欠席一覧：10分ごとに元データを予備更新','当日→近い未来順の表示','実更新時刻・自動更新失敗表示','元データGoogle Sheetへの直接リンク'])],
+    '連携メモ':[...notes,'欠席一覧はページ起動時に元データを1回更新、5分ごとにキャッシュ確認、10分ごとに元データを予備更新する。','フォーム送信トリガーと手動更新を維持。Apps Script v53は今回変更していない。','遅刻・欠席・早退連絡（回答）→ ★欠席遅刻 → refreshAbsenceCache() → 欠席キャッシュ → app.js欠席一覧。'],
+    '更新方法':'画面変更はstep-message-centerのGitHub mainへ反映してPages成功を確認する。API／Code.gs変更時だけ、Apps Scriptの既存デプロイIDを維持して新版へ更新する。',
+    '確認手順':['ページを開いて元データ更新時刻を確認','5分キャッシュ確認・10分元データ更新の設定をapp.jsで確認','当日分が最上部であることを確認','「元データへ」が正本Google Sheetを別タブで開くことを確認','GitHub Pagesの公開コミットを確認'],
+    '障害時の確認':['元データ更新時刻が古い：緑の手動更新を1回実行','「自動更新に失敗しました」：api.jsのAPI URLとApps Script v53を確認','Sheetにはあるが画面にない：★欠席遅刻→refreshAbsenceCache()→欠席キャッシュを確認','表示順が逆：app.jsにnormalized.items.reverse()が復活していないか確認','画面が旧版：Pages公開コミットとindex.htmlのJS／CSS更新番号を確認'],
+    '変更時の注意':['5分確認はキャッシュ取得、10分更新は元Sheet読取','回答先変更時はSpreadsheet ID・★欠席遅刻・トリガー・手動更新・画面リンクを一体確認','送信機能と欠席表示の変更範囲を分離','Code.gs変更時だけApps Script v53の既存デプロイを新版へ更新'],
+    '確認日':'2026年8月17日',
+    '確認根拠':'step-message-center main 74c4943。低負荷自動更新 0688178、Apps Script v53整合 e121cc1、当日優先 b02dafe、元データリンク 74c4943。各GitHub Pages公開成功。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+work,
+    '確認済み事項':[...new Set([...confirmed,'欠席一覧の故障原因：1分ごとに古いキャッシュを再取得','ページ起動時の元データ更新','5分ごとのキャッシュ確認','10分ごとの元データ予備更新','当日分最上部','実更新時刻表示','自動更新失敗表示','正本Google Sheetへの「元データへ」ボタン','Apps Script v53変更なし','送信機能変更なし','本番main 74c4943'])],
+    '未確認項目':[],
+    '確認状況':'欠席一覧の更新経路、低負荷更新間隔、当日優先表示、元データリンク、本番コミット、Apps Script v53非変更を確認済み。'
+  });
+};
+</script>
 </body>
 </html>
