@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-15
+最終更新: 2026-08-17
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -21,7 +21,7 @@
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
-| STEP配信システム | 本番使用中（履歴は直近10件版） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（送信後全生徒表示 `ca24e07`／送信結果自動確認 `1608316`／開封確認撤去 `159cecd`） | `index.html`、`app.js`、`api.js`、`Code.gs`、Apps Script Webアプリ v53 | GitHub＋Apps Script＋Brevo | Pagesを更新し、`Code.gs`変更時は既存デプロイIDを維持して新バージョンへ更新 | 2026-08-13 | 送信成功後は再通信せず、全校舎・全生徒・検索欄空・学年昇順へ即時復帰。送信応答に失敗しても同じ送信要求IDのログを自動確認し、受付済みなら送信完了と表示。送信POSTは再試行せず重複送信を防止。履歴タブを開くと直近10件を新しい順に自動取得し、検索／クリア横に更新ボタン。開封確認機能は利用者判断で撤去し、Brevo Webhook・専用Script Properties・「開封キャッシュ」シートも削除済み |
+| STEP配信システム | 本番使用中（履歴は直近10件版） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（送信後全生徒表示 `ca24e07`／送信結果自動確認 `1608316`／開封確認撤去 `159cecd`） | `index.html`、`app.js`、`api.js`、`Code.gs`、Apps Script Webアプリ v53。欠席・遅刻・早退の回答正本：[遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、Spreadsheet ID `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`、参照シート `★欠席遅刻` | GitHub＋Apps Script＋Brevo＋Google Sheet | Pagesを更新し、`Code.gs`変更時は既存デプロイIDを維持して新バージョンへ更新。欠席連携変更時は `DEFAULT_ABSENCE_ID`、`ABSENCE_SHEET_NAME`、`refreshAbsenceCache()`、フォーム送信トリガー、画面の欠席一覧を一体で確認 | 2026-08-17 | 回答Google Sheet `★欠席遅刻` → `Code.gs` が読取 → STEP配信システム側 `欠席キャッシュ` → `app.js` の欠席一覧表示。案内テンプレート内の連絡フォーム入口は https://x.gd/WfTJM。送信履歴は直近10件。開封確認は撤去済み |
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
@@ -33,6 +33,18 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `217a3aa`） | `index.html`、`styles.css`、`core.js`、`app.v20260814-31.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・39カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-14 | 共有設定版5を現行正本とする。古い版・版番号なしの保存要求は拒否し、最新版を再読込する。カードIDが異なれば同じURLでも別カードとして全件表示する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## STEP配信システム：遅刻・欠席・早退回答連携
+
+- 回答データ正本: [遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)
+- Spreadsheet ID: `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`
+- STEP配信システムが読むシート: `★欠席遅刻`
+- 回答項目: タイムスタンプ、生徒名、校舎名、対象日、理由、欠席・遅刻・早退の内容など
+- 保護者向け連絡フォーム入口（STEP配信システムの案内テンプレートに記載）: https://x.gd/WfTJM
+- 実装上の接続: `stepkobetsu-hub/step-message-center` の `Code.gs` に `DEFAULT_ABSENCE_ID` と `ABSENCE_SHEET_NAME` を定義
+- データの流れ: 回答Google Sheet `★欠席遅刻` → `refreshAbsenceCache()` → STEP配信システム側 `欠席キャッシュ` → Web画面の欠席・遅刻連絡一覧
+- 更新方法: 回答先を変更する場合は、Google Formの回答先だけでなく、`Code.gs` のSpreadsheet ID、対象シート名、フォーム送信トリガー、手動更新、60秒自動更新をすべて照合する
+- 確認根拠（2026-08-17）: Google Sheet正本のタイトル・Spreadsheet ID・`★欠席遅刻`見出しと、GitHub正本 `Code.gs` の `DEFAULT_ABSENCE_ID`／`ABSENCE_SHEET_NAME`、`app.js` の欠席一覧表示処理が一致
 
 ## STEP業務ホーム（次回はここから着手）
 
