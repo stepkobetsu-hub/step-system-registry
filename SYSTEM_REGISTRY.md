@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-18
+最終更新: 2026-08-19
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -622,21 +622,29 @@
 - 本番URL: https://stepkobetsu-hub.github.io/step-message-center/exam_ticket.html
 - GitHub: https://github.com/stepkobetsu-hub/step-message-center
 - 本番ブランチ: `main`
-- 正本ファイル: `exam_ticket.html`、`exam_ticket.css`、`exam_ticket.js`、`ExamTicket.gs`
+- 正本ファイル: `exam_ticket.html`、`exam_ticket.css`、`exam_ticket.js`、`Code.gs`、`ExamTicket.gs`
+- Apps Scriptプロジェクト名: `STEP配信システム`
+- Apps ScriptプロジェクトID: `1nrEhPSvPj9qyyF6buHjut_aGOEMiHmnKZ0N53rFaBNPdkaA3sBpBgek4`
+- Apps Script編集URL: https://script.google.com/home/projects/1nrEhPSvPj9qyyF6buHjut_aGOEMiHmnKZ0N53rFaBNPdkaA3sBpBgek4/edit
 - Apps Script Web API: https://script.google.com/macros/s/AKfycbxIH2VtgwRi50xduXgrkYrjD0yrzNfQ5vCWt1XgOzil6LZSgXNj6MJo9jPYvOkjNHdu/exec
+- 現行デプロイ: 既存デプロイIDを維持し、2026-08-19にApps Scriptバージョン55「全県模試受験票・Sheet訂正自動反映」へ更新。
+- API入口: `Code.gs` の `doGet` で `action=getExamTicketStudents` を `getExamTicketStudents_(year)` へルーティングし、`ExamTicket.gs` がGoogle Sheetの読込・年度別固定番号・新規割当を処理する。
 - 生徒マスタ: [★生徒マスタ202606-](https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit)
 - 使用シート: `☆マスタ`、`全県模試受験番号`
 - 在籍判定: `☆マスタ` B列が1の生徒。小4・小5・小6・中1・中2・中3を対象とする。
 - 参照項目: 生徒コード、氏名、フリガナ、学年、H列の校舎。校舎は受験票右下へ「個別指導ステップ 神領校／大手町校」と表示する。
 - 受験番号: 中1=1001、中2=2001、中3=3001、小4=4001、小5=5001、小6=6001から開始。年度・学年別にGoogle Sheetへ固定保存する。新規生は同学年の既存最大番号より後ろで、重複しない番号を割り当てる。既存番号を詰め直さない。
-- 訂正反映: `全県模試受験番号`を直接訂正した場合、「生徒情報を更新」で再取得する。新入塾や学年訂正も同じ更新操作で取り込む。更新ボタンは生徒選択見出し付近と一覧下部の2か所。
+- 訂正反映: `全県模試受験番号`を直接訂正した場合、「生徒情報を更新」で本番APIから再取得する。新入塾や学年訂正も同じ更新操作で取り込む。更新ボタンは生徒選択見出し付近と一覧下部の2か所。
+- 自動反映方式: バージョン55以降は更新操作のたびにApps ScriptがGoogle Sheetを直接読み込むため、Sheet内の氏名・学年・校舎・受験番号の訂正だけではApps Scriptの再デプロイは不要。Apps Scriptコード自体を変更した場合のみ、同じデプロイIDの新バージョンへ更新する。
+- 重複防止: Sheet上の年度・学年別最大番号を確認してから新規番号を割り当て、既存番号を優先する。ブラウザーに残る旧一時番号がSheetの確定番号と衝突した場合は、確定番号を予約したうえで新規生を最大番号より後ろへ再割当する。
 - 年度: 学年切替は4月1日。翌年度は当年3月1日から選択でき、3月中は進級後の学年として翌年度番号を新規割当する。4月以降も同じ年度番号を継続する。
 - 検索: 生徒コード・氏名・フリガナに加え、ローマ字検索へ対応。ひらがな・カタカナを同一視し、全角英字も正規化する。例：`tanaka`→たなか、`shiori`→しおり、`kanna`→かんな、`shinryou`→しんりょう。
 - 印刷内容: 第1回～第6回のタイトル、塾名、塾コード4258、受験番号、氏名、学区「尾張」、年度、校舎名、学年別時間割、イラスト。選択した全生徒を1人1枚のA4で一括印刷する。
 - 時間割区分: 小学生、中1・中2、中3の3区分。生徒の学年に応じて受験票下部へ自動表示する。
 - 訂正導線: 画面右上の「受験番号を訂正する」から `全県模試受験番号` シートを開く。
 - 関連入口: 成績管理・スタッフ用アプリ、およびSTEP業務ホームの「管理・運営」に「全県模試受験票作成」カードを設置。
-- 注意: 秘密値、パスワード、セッショントークン、生徒個人情報の実データは台帳へ記録しない。
+- 本番確認: 2026年度APIで在籍生90名を取得し、Sheet訂正後の番号が反映され、API警告0件・受験番号重複0件であることを2026-08-19に確認。フロントエンドは `exam_ticket.js?v=20260819-8`。
+- 注意: 秘密値、パスワード、セッショントークン、生徒個人情報の実データは台帳へ記録しない。Apps Scriptバージョン54はAPI入口の反映前に作成された中間版のため、本番復旧先として使用しない。
 - 確認日: 2026-08-19
 
 ## 資産管理ポータル自体の更新
