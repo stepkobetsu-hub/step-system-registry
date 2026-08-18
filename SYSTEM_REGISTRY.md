@@ -1,13 +1,13 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-17
+最終更新: 2026-08-18
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（22件）
+## 登録システム（23件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -19,6 +19,7 @@
 | 成績管理 | 本番使用中 | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `admin.html`、`juku_app.html`、`gas_code.js`、端末別ログイン試験（`index.html` はスタッフ用ポータル） | GitHub＋Apps Script | Pagesと既存GASデプロイを同時に整合させる | 2026-08-15 | **成績管理の直接入口は2つ。講師・管理者は `admin.html`、生徒は `juku_app.html`。`/seiseki-kanri/`（`index.html`）はスタッフ用ポータルで、成績管理の直接入口とは区別する。エントリーシート（デジタル版）は成績管理カードではなく「受付カード・エントリーシート読み取り」カードに表示する** |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
+| お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
 | STEP配信システム | 本番使用中（欠席一覧の低負荷自動更新・当日優先表示） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（現行 `13b7b4a`／低負荷自動更新 `0688178`／当日優先 `b02dafe`／元データリンク `74c4943`／1行表示 `13b7b4a`。変更前 `e1ba6b9`） | `index.html`、`app.js`、`api.js`、`style.css`、`Code.gs`、Apps Script Webアプリ v53（今回変更なし）。欠席・遅刻・早退の回答正本：[遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、Spreadsheet ID `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`、参照シート `★欠席遅刻` | GitHub Pages＋既存Apps Script v53＋Brevo＋Google Sheet | 欠席一覧はページ起動時に元データを1回更新、表示中は5分ごとにキャッシュ確認、10分ごとに元データを予備更新。フォーム送信トリガーと手動更新を維持。API変更時だけApps Script既存デプロイIDを維持して新版へ更新 | 2026-08-17 | 旧「1分ごと」は古い欠席キャッシュの再取得だけで、何日も古い表示が残る設計だった。現在は当日→近い未来順、実更新時刻／失敗表示、「元データへ」ボタンを実装。表示は「データ更新：日時　元データへ　※送信前に必ず更新！」の1行。送信機能は未変更。詳細は `docs/step-message-center-absence-refresh-20260817.md` |
@@ -33,6 +34,28 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `217a3aa`） | `index.html`、`styles.css`、`core.js`、`app.v20260814-31.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・39カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-14 | 共有設定版5を現行正本とする。古い版・版番号なしの保存要求は拒否し、最新版を再読込する。カードIDが異なれば同じURLでも別カードとして全件表示する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## お友達紹介カード読み取り：本番仕様
+
+- 本番URL: https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html
+- GitHub正本: `stepkobetsu-hub/seiseki-kanri` の `main / referral_card_import.html`
+- 利用入口: スマートフォンで撮影または画像選択。新しいログインや利用者によるAPIキー入力は不要
+- AI読取項目:
+  - 紹介された方：学年、氏名、TEL
+  - 紹介した方：学年、氏名、TEL
+  - 紹介した方の図書カード1,000円
+  - 紹介された方の図書カード1,000円
+  - 紹介された方の初回学費2,000円割引
+- 「済」判定: 「済」「済み」「すみ」「完」「配布済」など、同じ意味またはよく似た崩し字を処理済み候補とする。ただし、大きな丸・長い線・隣欄から通過した囲みだけでは処理済みにしない。図書カード2欄が済でも、初回学費欄に個別の済印がなければ学費割引は未処理
+- 保存内容: 原本画像URL、画像取込日時、両者の学年・氏名・TEL、3特典の状態、AIメモ
+- 保存経路: 原本画像は成績管理共通GASの `uploadEntryImage` でGoogle Driveへ保存。管理レコードは `REFERRAL_CARD_V1` を付け、`saveWish`／`getAllWishes` の互換経路で保存・取得
+- 一覧機能: 氏名・TEL検索、すべて／未完了／完了の絞り込み、3特典の個別更新、原本画像リンク
+- 運用注意: OCR結果は保存前に人が確認する。個人情報画像・原本URLをGitHubや公開台帳へ保存しない
+- 確認日: 2026-08-18。公開URL HTTP 200、空欄カードで既存AIサーバーの画像認識接続を確認
+- 関連入口:
+  - スタッフ用アプリ: https://stepkobetsu-hub.github.io/seiseki-kanri/
+  - STEP業務ホーム: https://stepkobetsu-hub.github.io/step-workspace/
+  - STEPシステム資産管理台帳: https://stepkobetsu-hub.github.io/step-system-registry/
 
 ## STEP配信システム：遅刻・欠席・早退回答連携
 
