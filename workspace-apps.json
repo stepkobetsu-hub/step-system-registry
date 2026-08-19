@@ -47,6 +47,11 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html"
     },
     {
+      "正式名称": "V-code ID＆Pass 印刷",
+      "状態": "本番使用中",
+      "利用者向けURL": "https://vcode-poster-maker.mintcocoajasmine.chatgpt.site"
+    },
+    {
       "正式名称": "受付カード読み取り",
       "状態": "本番使用中",
       "利用者向けURL": "https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit"
