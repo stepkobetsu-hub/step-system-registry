@@ -7,7 +7,7 @@
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（23件）
+## 登録システム（24件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -20,6 +20,7 @@
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
 | お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
+| V-code ID＆Pass 印刷 | 本番使用中 | https://vcode-poster-maker.mintcocoajasmine.chatgpt.site | GitHub正本なし（ChatGPT Sites管理） | 該当なし | ChatGPT Sites管理ソース、固定ログインQR、月別V-code案内 | ChatGPT Sites（所有者限定公開）＋Gmail確認 | 新しい月の案内到着後、月別データを追加し、年月・ID・PW・QR・A4/PDF印刷を確認 | 2026-08-19 | 所有者限定公開。ID・PWの実値を台帳やGitHubへ記載しない |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
 | STEP配信システム | 本番使用中（欠席一覧の低負荷自動更新・当日優先表示） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（現行 `13b7b4a`／低負荷自動更新 `0688178`／当日優先 `b02dafe`／元データリンク `74c4943`／1行表示 `13b7b4a`。変更前 `e1ba6b9`） | `index.html`、`app.js`、`api.js`、`style.css`、`Code.gs`、Apps Script Webアプリ v53（今回変更なし）。欠席・遅刻・早退の回答正本：[遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、Spreadsheet ID `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`、参照シート `★欠席遅刻` | GitHub Pages＋既存Apps Script v53＋Brevo＋Google Sheet | 欠席一覧はページ起動時に元データを1回更新、表示中は5分ごとにキャッシュ確認、10分ごとに元データを予備更新。フォーム送信トリガーと手動更新を維持。API変更時だけApps Script既存デプロイIDを維持して新版へ更新 | 2026-08-17 | 旧「1分ごと」は古い欠席キャッシュの再取得だけで、何日も古い表示が残る設計だった。現在は当日→近い未来順、実更新時刻／失敗表示、「元データへ」ボタンを実装。表示は「データ更新：日時　元データへ　※送信前に必ず更新！」の1行。送信機能は未変更。詳細は `docs/step-message-center-absence-refresh-20260817.md` |
@@ -31,9 +32,26 @@
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
 | お問い合わせ管理 | 本番使用中 | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main` | `contact_form.html`、`問い合わせ.gs` | GitHub＋Google SheetバインドApps Script | Pagesと既存GASデプロイを整合させる | 2026-07-20 | 生徒管理側の連絡先を優先する現行設計 |
-| STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・40カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-18 | 共有設定版5を基礎に、お友達紹介カード読み取りを管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
+| STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・42カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-19 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## V-code ID＆Pass 印刷：本番仕様
+
+- 本番URL: https://vcode-poster-maker.mintcocoajasmine.chatgpt.site
+- 公開範囲: ChatGPTの所有者アカウントだけが利用できる非公開アプリ。外部訪問者は許可しない
+- 用途: 対象年月を選び、V-code電子テキストの月別ID・パスワード、固定ログインQR、年月を配置したA4縦1ページの掲示物を作成する
+- 月別案内の確認元: `mintcocoajasmine@gmail.com` のGmailで、送信元 `support@e-sia.jp`、件名「【V-code】電子テキスト ログインID・PW変更のお知らせ」を確認
+- 登録済み範囲: 2026年1月～8月。対象月を選択すると該当月の登録済み内容を取得する
+- 表示・印刷: 「V-code」「YYYY年」「M月」「固定ログインQR」「ID」「PW」を大きく表示。A4プレビューからブラウザの印刷画面を開き、PDF保存または印刷する
+- PDFファイル名: `V-code YYYY年M月.pdf`
+- 毎月の更新: 新しい月の案内メール到着後、対象月データを追加し、年月・ID・PW・QR・A4/PDF印刷を確認して公開する
+- データ保護: ID・パスワードの実値は本台帳、GitHub、公開ページの説明へ記載しない。アプリ本体は所有者限定公開を維持する
+- 確認日: 2026-08-19。7月分の取得、年月表示、A4印刷画面を確認
+- 関連入口:
+  - スタッフ用アプリ: https://stepkobetsu-hub.github.io/seiseki-kanri/
+  - STEP業務ホーム: https://stepkobetsu-hub.github.io/step-workspace/
+  - STEPシステム資産管理台帳: https://stepkobetsu-hub.github.io/step-system-registry/
 
 ## お友達紹介カード読み取り：本番仕様
 
@@ -77,7 +95,7 @@
 - GitHub正本: https://github.com/stepkobetsu-hub/step-workspace
 - 公開ブランチ: `main`
 - 現行コミット: `217a3aa`（2026-08-14）。再作成の基点は `031a986`。
-- 共有設定: 版5を基礎に、必須カード「お友達紹介カード読み取り」を追加した7項目・40カードを全パソコンで表示。
+- 共有設定: 版5を基礎に、必須カード「お友達紹介カード読み取り」「全県模試受験票作成」「V-code ID＆Pass 印刷」を追加した7項目・42カードを全パソコンで表示。
 - 再作成ページ: https://stepkobetsu-hub.github.io/step-workspace/rebuild-workspace.html
 - 復旧補助ページ: `recover-workspace.html`、`repair-workspace-v2.html`。通常運用では使用せず、障害調査時だけ内容を確認して使う。
 
@@ -86,12 +104,12 @@
 1. 生徒・授業（7件）
 2. 時間割（4件）
 3. 連絡・受付（8件）
-4. 管理・運営（5件）
+4. 管理・運営（7件）
 5. 請求・会計（4件）
 6. 講師・給与（7件）
 7. ポータル・ホーム（5件）
 
-合計40カード。利用者が貼り付けた2026-08-14時点の39カードを再作成基礎とし、2026-08-18に「お友達紹介カード読み取り」を管理・運営へ必須追加した。既存35件と新規1件、合計36件のURLを、端末に残る同名カードまたは本台帳の正式URLから引き継いだ。URLを確定できなかった4件は、誤ったリンクを開かないようカード名の先頭へ「リンク切れ」を付け、鉛筆ボタンから後で正しいURLへ修正できるようにした。
+合計42カード。利用者が貼り付けた2026-08-14時点の39カードを再作成基礎とし、「お友達紹介カード読み取り」「全県模試受験票作成」「V-code ID＆Pass 印刷」の3件を管理・運営へ必須追加した。既存35件と新規3件、合計38件のURLを、端末に残る同名カードまたは本台帳の正式URLから引き継いだ。URLを確定できなかった4件は、誤ったリンクを開かないようカード名の先頭へ「リンク切れ」を付け、鉛筆ボタンから後で正しいURLへ修正できるようにした。
 
 ### URL要確認の4カード
 
@@ -110,8 +128,8 @@
 - カードはすべて別タブで開く。Google Sheetsマーク、PC／スマホ／両方、ハートのお気に入り、鉛筆編集、アーカイブ操作を保持する。
 - 共有設定は認証済みバックエンドの `getWorkspaceConfig`／`saveWorkspaceConfig` を使い、端末のlocalStorageは高速表示と一時キャッシュに使う。
 - 共有保存時は、読み込んだ共有版番号を `expectedVersion` として必ず送る。バックエンドはScriptLock内で現行版と照合し、古い版または版番号なしの保存を `WORKSPACE_VERSION_CONFLICT` として拒否する。競合時は現行共有設定を返し、画面側で最新版を再読込して変更のやり直しを案内する。
-- 現行の再作成設定は `replaceCatalog: true`。共有設定版5の39カードを基礎に、必須カード「お友達紹介カード読み取り」だけを追加して40カードを表示し、それ以外の別カードは自動で混ぜない。
-- 共有設定内の追加カードはカードIDで識別する。同じURLや同じページ内のハッシュを使うカードでも、IDが異なれば重複排除せず表示する。これにより7項目・40カードを全件表示する。
+- 現行の再作成設定は `replaceCatalog: true`。共有設定版5の39カードを基礎に、必須カード「お友達紹介カード読み取り」「全県模試受験票作成」「V-code ID＆Pass 印刷」を追加して42カードを表示し、それ以外の別カードは自動で混ぜない。
+- 共有設定内の追加カードはカードIDで識別する。同じURLや同じページ内のハッシュを使うカードでも、IDが異なれば重複排除せず表示する。これにより7項目・42カードを全件表示する。
 - ログイン画面は保存済みカタログを先に表示し、台帳・共有設定の通信は背景で行う。通信障害だけを理由に、表示可能な保存済みホームから直ちにログアウト画面へ戻さない。
 
 ### 2026-08-13〜14の障害と復旧履歴
@@ -127,7 +145,7 @@
 ### 次回変更時の必須手順
 
 1. 作業開始前に、古いSTEP業務ホーム、復旧ページ、再作成ページのタブをすべて閉じる。閉じ忘れた旧タブから保存してもバックエンドが版競合として拒否するが、操作混乱を避けるため原則は閉じる。
-2. 新しいタブで本番を開き、7項目・40カードと「管理・運営」のお友達紹介カード読み取り、最新の共有表示を確認する。
+2. 新しいタブで本番を開き、7項目・42カードと「管理・運営」のお友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、最新の共有表示を確認する。
 3. `stepkobetsu-hub/step-workspace` の `main`、本台帳の本節、直近コミットを先に読む。
 4. 変更は新しい1つのタブだけで行い、保存完了後の共有版番号を記録する。
 5. 別ブラウザまたは別パソコンで再読込し、同じ項目・カード・順番・URLが表示されることを確認する。
