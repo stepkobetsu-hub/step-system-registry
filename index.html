@@ -2023,5 +2023,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="step-message-absence-timestamp-order-registration-20260820">
+const applyStepMessageAbsenceTimestampOrder20260820Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageAbsenceTimestampOrder20260820Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEP配信')||name.includes('STEPメッセージ')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const work='2026年8月20日：右側の欠席連絡一覧について、当日分を回答正本Google SheetのA列タイムスタンプ降順（新着順）へ変更。元データの並び順・未来日の表示順・Apps Script v53・メール送信機能は変更していない。公開画面で18:46→18:24→17:25→16:46→16:33の順を確認。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（欠席一覧の低負荷自動更新・当日分はA列タイムスタンプ新着順）',
+    '最新版の場所':'step-message-center main 39882d1（当日新着順 81905b5）',
+    '主要機能':[...new Set([...toArray(base['主要機能']),'当日分はA列タイムスタンプの新しい順に表示'])],
+    '確認手順':[...new Set([...toArray(base['確認手順']),'当日分の受付時刻が新しい順に並ぶことを確認','公開ページがapp.js?v=20260820-absence-timestamp-desc-v1を読み込むことを確認'])],
+    '障害時の確認':[...new Set([...toArray(base['障害時の確認']),'当日分が新着順でない：app.jsのsortAbsencesForDisplay_、receivedLabel、JS読込番号、ブラウザキャッシュを確認'])],
+    '変更時の注意':[...new Set([...toArray(base['変更時の注意']),'当日内の並び順は元データA列タイムスタンプ降順。元Google Sheet自体の並びは変更しない'])],
+    '確認日':'2026年8月20日',
+    '確認根拠':'step-message-center main 39882d1。当日新着順 81905b5、JavaScriptキャッシュ更新 39882d1。公開画面で18:46→18:24→17:25→16:46→16:33を確認。Apps Script v53は変更なし。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+work,
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'当日分はA列タイムスタンプ降順（新着順）','同時刻は元行番号の新しい順','未来日の既存順序を維持','元Google Sheet変更なし','Apps Script v53変更なし','本番main 81905b5','キャッシュ更新main 39882d1'])],
+    '確認状況':'欠席一覧の低負荷更新、当日優先、当日内のA列タイムスタンプ新着順、元データリンク、本番公開を確認済み。'
+  });
+};
+</script>
 </body>
 </html>
