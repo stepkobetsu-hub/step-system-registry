@@ -2096,5 +2096,51 @@ organizeEntryImport=function(items){
 };
 </script>
 
+
+<script id="teacher-name-badge-registration-20260820">
+const organizeTeacherNameBadge20260820Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const list=organizeTeacherNameBadge20260820Base(items);
+  const existingIndex=list.findIndex(item=>String(item['ID']||'')==='teacher-name-badge-print'||String(item['システム名']||item['正式名称']||'')==='講師名札印刷');
+  if(existingIndex>=0)list.splice(existingIndex,1);
+  const record={
+    'ID':'teacher-name-badge-print',
+    'システム名':'講師名札印刷',
+    '正式名称':'講師名札印刷',
+    '分類':'講師マスター／給与明細',
+    '状態':'本番使用中',
+    '利用者':'管理者・給与処理担当者',
+    '運用担当':'管理者',
+    '概要':'講師マスターの在籍講師を、漢字・ひらがな・カタカナ・ローマ字・講師コードで検索し、個別指導STEPのロゴ、講師コード、入退室用QR、よみがな、苗字、フルネームを配置した二つ折り名札を作成・印刷する。',
+    '利用者向けURL':'https://step-name-badge.mintcocoajasmine.chatgpt.site',
+    '本番URL':'https://step-name-badge.mintcocoajasmine.chatgpt.site',
+    'GitHub URL':'なし（ChatGPT Sites管理）',
+    '保存基盤':'ChatGPT Sites（所有者限定公開）',
+    '正本ファイル':['ChatGPT Sites管理ソース'],
+    '最新版の場所':'ChatGPT Sites「名札出力アプリ」',
+    '元データ':'Google Sheet「給与明細2026-6-」の講師マスター',
+    '使用項目':['A列 講師コード','B列 氏名','C列 よみ','D列 在籍','Q列 QR識別値'],
+    '対象者仕様':'講師マスターで在籍＝1の講師だけを登録。2026年8月20日時点で32名。',
+    '検索仕様':['漢字','ひらがな','カタカナ','ローマ字','講師コード'],
+    '印刷仕様':'A4縦1ページ、展開時約200.2mm×68.2mm、中央で二つ折り後は約100.1mm×68.2mm。左右に同じ名札を配置し、印刷時は操作画面を非表示にする。',
+    '表示仕様':'上部は薄紫色の帯と個別指導STEPロゴ。QRは約36.3mm角。よみがなと苗字はゴシック極太で、苗字は文字数に応じて大きさを自動調整。下部にフルネームを表示する。',
+    'QR仕様':'講師マスターQ列にQR識別値がある場合はその値をQR化する。Q列が空欄の講師コード7064・7066は暫定的に講師コード自体をQR化しているため、実機読取確認またはQ列登録が必要。',
+    '個人情報保護':'アプリには名札作成に必要な講師コード・氏名・よみ・QR識別値・校舎だけを使用し、給与、住所、口座、メール、生年月日、マイナンバー等は持ち込まない。',
+    '認証仕様':'ChatGPT Sitesの所有者限定公開。外部訪問者は許可しない。',
+    '導線':['生徒・講師QR／入退室管理の「新規QR発行・名札印刷」画面に「名札発行」ボタン','スタッフ用アプリ（成績管理）カード','STEP業務ホーム「講師・給与」カード'],
+    '更新方法':'講師の追加・退職・氏名・よみ・QR変更時は講師マスターを正本として、在籍者だけを名札アプリへ反映する。反映後は検索、QR、左右同一表示、A4一枚印刷を確認する。',
+    '変更時の注意':['QR識別値を公開台帳へ記載しない','給与・住所・口座等の不要な個人情報をアプリへ追加しない','印刷幅200.2mmのためA4印刷余白4mmを維持する','QRを変更した場合は入退室端末で実機読取を確認する'],
+    '関連カード':['講師給与計算・出力アプリ','生徒・講師QR／入退室管理','スタッフ用アプリ','STEP業務ホーム'],
+    '確認日':'2026年8月20日',
+    '確認済み事項':['所有者限定公開','在籍講師32名','5方式検索','左右同一名札','A4縦1ページ','二つ折り寸法','QR拡大','よみがな・苗字のゴシック極太','上部カラーバー拡張','フルネーム表示','操作部分の印刷除外'],
+    '未確認項目':['講師コード7064・7066のQ列QR識別値'],
+    '確認状況':'2026年8月20日、名札作成・検索・QR生成・A4一枚印刷レイアウト・所有者限定公開を確認済み。'
+  };
+  const payrollIndex=list.findIndex(item=>String(item['ID']||'')==='teacher-payroll-processing');
+  list.splice(payrollIndex>=0?payrollIndex+1:0,0,record);
+  return list;
+};
+</script>
+
 </body>
 </html>
