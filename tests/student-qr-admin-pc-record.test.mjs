@@ -13,7 +13,8 @@ test('出退くんQR管理者アプリの2026-08-20改善記録を保持する',
     'A4縦3×3',
     '月単位へ戻すリセット',
     '開始日・終了日の日本語曜日表示',
-    '8d3894ec160096d435294dda3ba25c7ccbd548ac'
+    '89b251c9c6888135db906df328530fc014b94d8f',
+    'batchPrintHost'
   ].forEach(marker => assert.ok(html.includes(marker), marker));
   [
     '管理者QR登録',
@@ -27,6 +28,7 @@ test('出退くんQR管理者アプリの2026-08-20改善記録を保持する',
     '1ページ最大9枚',
     '「新規QR発行」',
     '検索語が空の間は候補ボックスを表示しない',
-    'PR #38'
+    'PR #41',
+    '1枚印刷の白紙ページ修正'
   ].forEach(marker => assert.ok(detail.includes(marker), marker));
 });
