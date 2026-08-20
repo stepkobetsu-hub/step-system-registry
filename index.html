@@ -2047,5 +2047,54 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="teacher-payroll-app-registration-20260820">
+const organizeTeacherPayrollApp20260820Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const list=organizeTeacherPayrollApp20260820Base(items);
+  const matchIndex=list.findIndex(item=>{
+    const id=String(item['ID']||'');
+    const name=String(item['システム名']||item['正式名称']||'');
+    return id==='teacher-payroll-processing'||(name.includes('講師マスター')&&name.includes('給与明細'))||name==='講師給与処理';
+  });
+  const previous=matchIndex>=0?list.splice(matchIndex,1)[0]:{};
+  const record=Object.assign({},previous,{
+    'ID':'teacher-payroll-processing',
+    'システム名':'講師給与計算・出力アプリ',
+    '正式名称':'講師給与計算・出力アプリ',
+    '分類':'講師マスター／給与明細',
+    '状態':'本番使用中',
+    '利用者':'管理者・給与処理担当者',
+    '運用担当':'管理者',
+    '概要':'年・月を選ぶだけで、出退くんの勤怠取込から完成版、授業コマ数、月別給与データ、給与明細確認、ゆうちょBIZ振込CSV出力までを順番に処理できる講師給与業務アプリ。通常はアプリ内で完結し、訂正が必要な場合だけGoogle Sheetを直接開く。',
+    '利用者向けURL':'https://script.google.com/macros/s/AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9/exec?app=payroll',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9/exec?app=payroll',
+    'Apps Script編集URL':'https://script.google.com/u/0/home/projects/1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn/edit',
+    'Apps ScriptプロジェクトID':'1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn',
+    'デプロイID':'AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9',
+    'Apps Scriptバージョン':'v53（2026年8月20日）',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit',
+    'Google Sheet名':'給与明細2026-6-',
+    '正式Spreadsheet名':'給与明細2026-6-',
+    '保存先Spreadsheet ID':'1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E',
+    '使用シート名':['入退くんCSV','完成版','日々コマ数','月別データ','講師マスター'],
+    '処理手順':['1. 年・月を選択','2. 出退くん勤怠を直接取り込む','3. 完成版を作成','4. コマ数データを作成','5. 月別給与データへ追加','6. 給与明細を確認','7. ゆうちょBIZ振込CSVを出力'],
+    '主要機能':['選択月の初日から末日までを自動指定','出退くん勤怠データの直接取込','勤怠と授業データを講師コード＋日付で照合','打刻も授業もない不要行を完成版から除外','勤怠だけ、授業だけの行も必要に応じて保持','完成版・日々コマ数・月別給与データ作成','給与明細Webアプリ確認','ゆうちょBIZ振込CSV出力','新規講師の従業員マスタ登録','Google Sheetを開いて直接確認・訂正'],
+    '日付照合仕様':'勤怠側と授業側は講師コードと同一日付で結合する。月単位は毎月1日から月末日までとし、8月は8月1日～8月31日。',
+    '不要行の扱い':'勤怠側の入室・退室打刻が両方なく、同じ講師・同じ日付の授業データもない行は完成版へ出力しない。',
+    '更新内容':'2026年8月20日、完成版で日付が1日ずれて右側データと対応しない問題を修正。伊東里紗さん（7028）の8/4・8/5・8/19が同一日付で正しく対応し、不要な8/3・8/18行が除外されることを確認。',
+    '更新方法':'Apps Script編集プロジェクトで変更し、完成版の実データ確認後、既存デプロイIDを維持して新しいバージョンへ更新する。',
+    '確認手順':['対象年月を選んで勤怠取込','完成版でC列の日付とU列の出勤日が一致することを確認','打刻も授業もない行が出力されないことを確認','コマ数・月別データ・給与明細を確認','必要な場合だけGoogle Sheetで訂正'],
+    '変更時の注意':['日付をApps ScriptとGoogle Sheetのタイムゾーン間で不用意に再変換しない','勤怠と授業の照合キーは講師コード＋日付を維持','打刻のある勤怠単独行と授業単独行は削除しない','既存デプロイIDを維持して更新する','給与・口座・個人情報の実値を公開台帳へ記載しない'],
+    '確認日':'2026年8月20日',
+    '確認根拠':'完成版シートの7028・7040・7042を実データで確認。7028は8/4・8/5・8/19のC列とU列が一致し、不要な8/3・8/18は除外。7042の授業のみ8/20も同一日付で出力。Apps Script v53を既存デプロイへ反映し、本番アプリの表示を確認。',
+    '確認済み事項':['年・月選択','月初から月末までの範囲','出退くん直接取込','完成版作成','講師コード＋日付照合','空打刻・授業なし行の除外','7028の8/4・8/5・8/19一致','7028の不要な8/3・8/18除外','7042の授業のみ8/20一致','コマ数データ作成','月別給与データ追加','給与明細確認','ゆうちょBIZ振込CSV','Google Sheet直接確認・訂正','Apps Script v53本番反映'],
+    '未確認項目':[],
+    '確認状況':'2026年8月20日、完成版の日付照合修正、不要行除外、Apps Script v53本番公開を確認済み。'
+  });
+  return [record,...list.filter(item=>String(item['ID']||'')!==record['ID'])];
+};
+</script>
+
 </body>
 </html>
