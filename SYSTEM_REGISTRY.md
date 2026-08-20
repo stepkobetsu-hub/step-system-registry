@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-19
+最終更新: 2026-08-20
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -27,7 +27,7 @@
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `my_qr.html`、`student_qr_register.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | `main`へ反映してWorkerを自動デプロイ。Apps Script変更時は既存デプロイIDを更新し、QR受付・60秒重複・入退室状態共有・メール送信を確認 | 2026-08-09 | 端末読取の現行入口はWorker `/legacy-tablet`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
+| 出退くんQR作成・読取 | 本番使用中（管理者アプリPC最適化・QR検索／カード印刷対応） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（管理者アプリ最新 `8d3894e`） | `student_qr_register.html`、`my_qr.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | 管理者画面はGitHub Pages `main`へ反映。QR受付基盤変更時はWorkerを自動デプロイし、Apps Script変更時は既存デプロイIDを更新する。管理者アプリはPC表示、検索、カード実寸印刷、現行／新規QR、通知先メール、勤怠CSVを回帰確認 | 2026-08-20 | 端末読取の現行入口はWorker `/legacy-tablet`。管理者QR登録は `student_qr_register.html`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持。今回の詳細は `docs/student-qr-admin-pc-20260820.md` |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
@@ -668,6 +668,52 @@
 - 本番確認: 2026年度APIで在籍生90名・中学生65名を取得し、登録済み学校コードを既存中学生64名へ反映、未登録校1校を登録画面に表示、API警告0件・受験番号重複0件であることを2026-08-19に確認。フロントエンドは `exam_ticket.js?v=20260819-11`／`exam_ticket.css?v=20260819-8`。塾名・塾コード・生徒コード・中学校コードの4行を同じ高さ・同じ文字サイズに統一し、中学校コード見出しの1行固定、氏名欄の大型化・学年併記を確認。Apps Scriptはv58。生徒90名の即時表示用名簿と、QRの年度・回・学年表記も公開確認済み。
 - 注意: 秘密値、パスワード、セッショントークン、生徒個人情報の実データは台帳へ記録しない。Apps Scriptバージョン54はAPI入口の反映前に作成された中間版のため、本番復旧先として使用しない。
 - 確認日: 2026-08-19
+
+## 出退くんQR作成・読取：管理者アプリPC最適化（2026-08-20）
+
+- 対象画面: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html
+- 正本: `stepkobetsu-hub/student-QR` の `main / student_qr_register.html`
+- 利用前提: 管理者本人が主にPCで使用する。画面は最大幅1,280px、左側220pxの固定ナビゲーション、右側の作業パネルを基本とし、900px未満では縦並びへ戻す。
+- ログイン保持: 同じ端末・同じブラウザーでは、自主的にログアウトするまでログインを保持する。保存した講師番号・パスワードは端末内で暗号化し、保存済みセッションを優先、必要時は保存情報から自動ログインする。明示的ログアウト時だけ保存情報を削除する。共有端末では必ずログアウトする。
+- QR確認・対象検索:
+  - 生徒コード、氏名、フリガナで検索できる。
+  - ひらがな・カタカナを同一視し、ローマ字は一部入力でも検索できる。
+  - 校舎、学年の複数選択、学年昇順／降順、全選択・全解除・反転に対応する。
+  - 選択中の生徒を一覧で確認し、複数生徒のQRをまとめて印刷できる。
+- QRカード印刷:
+  - 1枚の実寸は54mm×74mm、QRは42mm。以前のカードサイズを維持する。
+  - A4縦へ3列×3行、1ページ最大9枚を配置する。
+  - 10枚目以降は自動的に次ページへ送る。
+  - 印刷設定は倍率100%／実際のサイズを推奨し、ブラウザーの拡大縮小によるカード寸法の変化を避ける。
+- 現行QRと新規発行:
+  - 登録済みの場合は「現行QRが登録されています」を大きく表示し、登録済み連絡先も表示する。連絡先がなければ現行QRなしとして扱う。
+  - 生徒を開いた時点で現行QRを表示し、カードへ「現行QR（現在有効）」と明記する。
+  - 「現行QRの確認」から再確認でき、「現行QRを印刷する」からカード印刷できる。
+  - 発行操作は「新規QR発行」と表記する。既存QRがある場合は、旧QRが使えなくなる旨と本当に変更してよいかを確認してから発行する。
+  - 発行直後は「新規発行したQR（現在有効）」と表示する。
+- 通知先メール:
+  - 生徒コード、氏名、ひらがな、カタカナ、ローマ字の一部で検索できる。
+  - QR確認とは異なり対象は1名だけを選択する。
+  - 候補にはコード、氏名、フリガナ、学年、校舎を表示する。生徒コードの直接入力も残す。
+  - 未入力時は「検索語を入力すると候補が表示されます」の候補ボックス自体を非表示にし、検索入力後だけ候補欄を表示する。
+- 勤怠CSV:
+  - 通常利用は月単位。年・月を選ぶと、その月の初日と末日を開始日・終了日へ自動入力する。
+  - 開始日または終了日を個別変更すると「日付を個別指定中」と表示し、年・月欄を灰色・操作不可にする。
+  - 「月単位に戻す（年・月を選び直す）」で個別日付をリセットし、年・月を再選択できる。
+  - 開始日・終了日の下へ曜日を確実に表示する。例: 2026年8月1日（土）、2026年8月31日（月）。月単位・個別指定の双方で即時更新する。
+  - 終了日が開始日より前にならないよう検証する。
+- 確認結果: 管理者画面の回帰試験9件、JavaScript構文検査、差分確認を実施。公開変更はstudent-QR PR #31～#38で段階的に反映し、最新マージは `8d3894ec160096d435294dda3ba25c7ccbd548ac`。
+- 変更履歴:
+  - PR #31 `02109adf`: 継続ログイン、検索、複数QR
+  - PR #32 `154e9e72`: PC中心レイアウト
+  - PR #33 `ac041f9d`: QR検索UI、カード実寸・A4複数ページ印刷
+  - PR #34 `daabcc65`: 現行QRと新規発行の明確化
+  - PR #35 `fe04f9e8`: 現行QR自動表示・印刷、通知先メール検索
+  - PR #36 `2ffc408d`: 通知先候補の未入力時非表示、月単位勤怠CSV
+  - PR #37 `2ff2e8fb`: 月単位へ戻すリセット
+  - PR #38 `8d3894ec`: 開始日・終了日の曜日表示
+- データ保護: 講師番号、パスワード、セッショントークン、通知先メール、生徒個人情報の実値は台帳・GitHub・公開説明へ記録しない。
+- 詳細引継ぎ: `docs/student-qr-admin-pc-20260820.md`
 
 ## 資産管理ポータル自体の更新
 
