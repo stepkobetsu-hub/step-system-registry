@@ -88,6 +88,8 @@ GitHub正本: https://github.com/stepkobetsu-hub/student-QR
 | #37 | `2ff2e8fb` | 月単位へ戻すリセット |
 | #38 | `8d3894ec` | 開始日・終了日の曜日表示 |
 
+student-QR PR #31～#38 を段階的に本番反映した。
+
 最新マージコミット: `8d3894ec160096d435294dda3ba25c7ccbd548ac`
 
 ## 10. 確認項目
