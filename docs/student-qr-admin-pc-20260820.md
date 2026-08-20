@@ -90,7 +90,7 @@ GitHub正本: https://github.com/stepkobetsu-hub/student-QR
 
 student-QR PR #31～#38 を段階的に本番反映した。
 
-最新マージコミット: `8d3894ec160096d435294dda3ba25c7ccbd548ac`
+PR #38 最新マージコミット: `8d3894ec160096d435294dda3ba25c7ccbd548ac`
 
 ## 10. 確認項目
 
