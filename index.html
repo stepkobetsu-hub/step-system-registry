@@ -2,9 +2,6 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>STEPシステム資産管理台帳</title>
   <link rel="icon" type="image/png" sizes="32x32" href="https://stepkobetsu-hub.github.io/seiseki-kanri/images/system-portal/favicon.png?v=20260722-fix">
@@ -84,6 +81,7 @@ const AUTH_KEY='stepStaffAppAuth';
 const STAFF_CODE_KEY='stepStaffAppCode';
 const STAFF_PASSWORD_KEY='stepStaffAppPassword';
 const SYSTEMS_CACHE_KEY='stepSystemRegistryCacheV1';
+const SYSTEMS_CACHE_REFRESH_MS=5*60*1000;
 const INVESTIGATION_MEMO_KEY='stepSystemPortalInvestigationMemosV1';
 const CARD_CUSTOMIZATION_KEY='stepSystemRegistryCardCustomizationV1';
 const INVESTIGATION_STATUSES=['未着手','調査中','ChatGPTへ確認予定','Codexへ確認予定','回答待ち','確認済み','保留'];
@@ -123,6 +121,7 @@ let systems=[];
 let baseSystems=[];
 let cardCustomization=loadCardCustomization();
 let cardSettingsDraft=[];
+let portalCacheSavedAt=0;
 let loginInProgress=false;
 let autoLoginTimer=null;
 let autoLoginAttemptedSignature='';
@@ -165,9 +164,12 @@ async function api(action,extra){
 async function init(){
   const a=auth();
   if(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken){
+    if(loadPortalCache()){
+      if(Date.now()-portalCacheSavedAt>=SYSTEMS_CACHE_REFRESH_MS)refreshPortalInBackground();
+      return;
+    }
     try{await loadPortal();return}catch(firstError){
       try{if(await restoreStoredLogin())return}catch(e){}
-      if(loadPortalCache())return;
       showLogin(firstError.message);
       scheduleAutoLogin();
       return;
@@ -176,10 +178,11 @@ async function init(){
   showLogin();
   scheduleAutoLogin();
 }
-function savePortalCache(items){try{localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date().toISOString()}))}catch(e){}}
+function savePortalCache(items){try{portalCacheSavedAt=Date.now();localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date(portalCacheSavedAt).toISOString()}))}catch(e){}}
 function showPortal(items){baseSystems=organizeEntryImport(items).map((item,index)=>Object.assign({},item,{__cardKey:cardCustomizationKey(item,index),__sourceIndex:index}));systems=sortCustomizedCards(baseSystems);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');document.getElementById('openCardSettings').classList.toggle('hidden',String(auth()?.permissionLevel)!=='4');render()}
-function loadPortalCache(){try{const cached=JSON.parse(localStorage.getItem(SYSTEMS_CACHE_KEY)||'null');if(!cached||!Array.isArray(cached.items))return false;showPortal(cached.items);return true}catch(e){return false}}
+function loadPortalCache(){try{const cached=JSON.parse(localStorage.getItem(SYSTEMS_CACHE_KEY)||'null');if(!cached||!Array.isArray(cached.items))return false;portalCacheSavedAt=Date.parse(cached.savedAt||'')||0;showPortal(cached.items);return true}catch(e){return false}}
 async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');const items=Array.isArray(out.systems)?out.systems:[];savePortalCache(items);showPortal(items)}
+async function refreshPortalInBackground(){try{await loadPortal()}catch(firstError){try{await restoreStoredLogin()}catch(e){console.warn('台帳のバックグラウンド更新を次回へ延期しました。')}}}
 async function restoreStoredLogin(){
   const code=localStorage.getItem(STAFF_CODE_KEY)||'';
   const password=localStorage.getItem(STAFF_PASSWORD_KEY)||'';
@@ -242,7 +245,7 @@ async function performLogin(isAuto){
 function deny(message){document.getElementById('portal').classList.add('hidden');const el=document.getElementById('denied');el.textContent=message;el.classList.remove('hidden')}
 async function logout(){try{await api('logoutSystemPortal')}catch(e){}localStorage.removeItem(AUTH_KEY);localStorage.removeItem(STAFF_CODE_KEY);localStorage.removeItem(STAFF_PASSWORD_KEY);autoLoginAttemptedSignature='';document.getElementById('loginCode').value='';document.getElementById('loginPassword').value='';showLogin('ログアウトしました。')}
 function fillFilters(){fill('category',unique(systems.map(x=>x['分類'])));fill('status',unique(systems.map(effectiveStatus)))}
-function fill(id,values){const s=document.getElementById(id);values.forEach(v=>{if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)})}
+function fill(id,values){const s=document.getElementById(id),selected=s.value;s.replaceChildren(s.options[0]);values.forEach(v=>{if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});s.value=[...s.options].some(option=>option.value===selected)?selected:''}
 function unique(a){return [...new Set(a.filter(Boolean))].sort((x,y)=>x.localeCompare(y,'ja'))}
 function loadCardCustomization(){try{const value=JSON.parse(localStorage.getItem(CARD_CUSTOMIZATION_KEY)||'null');return value&&typeof value==='object'&&Array.isArray(value.order)&&value.cards&&typeof value.cards==='object'?value:{order:[],cards:{}}}catch(e){return {order:[],cards:{}}}}
 function cardCustomizationKey(item,index){const id=String(item?.['ID']||'').trim();if(id)return `id:${id}`;const name=String(item?.['システム名']||item?.['正式名称']||'').trim();const category=String(item?.['分類']||'').trim();return name?`name:${name}|${category}`:`index:${index}`}
