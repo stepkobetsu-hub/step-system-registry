@@ -41,7 +41,7 @@
         <label for="loginCode">講師番号</label><input id="loginCode" name="code" type="text" autocomplete="username" required>
         <label for="loginPassword">パスワード</label><input id="loginPassword" name="password" type="password" autocomplete="current-password">
         <button class="open" id="loginBtn" type="submit">ログイン</button>
-        <p>この端末にID・パスワードを記憶し、次回から自動ログインします。ログアウトすると保存情報を削除します。</p>
+        <p>この端末にID・パスワードを記憶し、次回から自動ログインします。明示的にログアウトするまで台帳画面を維持します。</p>
         <p id="loginError" class="login-error hidden" role="alert"></p>
       </form>
     </section>
@@ -163,31 +163,34 @@ async function api(action,extra){
 }
 async function init(){
   const a=auth();
-  if(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken){
-    if(loadPortalCache()){
-      if(Date.now()-portalCacheSavedAt>=SYSTEMS_CACHE_REFRESH_MS)refreshPortalInBackground();
-      return;
-    }
+  const hasSession=!!(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken);
+  const hasStoredLogin=hasStoredCredentials();
+  if((hasSession||hasStoredLogin)&&loadPortalCache()){
+    if(!hasSession||Date.now()-portalCacheSavedAt>=SYSTEMS_CACHE_REFRESH_MS)refreshPortalInBackground();
+    return;
+  }
+  if(hasSession){
     try{await loadPortal();return}catch(firstError){
       try{if(await restoreStoredLogin())return}catch(e){}
-      showLogin(firstError.message);
-      scheduleAutoLogin();
+      showLogin();
+      if(hasStoredLogin)await performLogin(true);else scheduleAutoLogin();
       return;
     }
   }
   showLogin();
-  scheduleAutoLogin();
+  if(hasStoredLogin)await performLogin(true);else scheduleAutoLogin();
 }
+function hasStoredCredentials(){return !!((localStorage.getItem(STAFF_CODE_KEY)||'').trim()&&localStorage.getItem(STAFF_PASSWORD_KEY))}
 function savePortalCache(items){try{portalCacheSavedAt=Date.now();localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date(portalCacheSavedAt).toISOString()}))}catch(e){}}
 function showPortal(items){baseSystems=organizeEntryImport(items).map((item,index)=>Object.assign({},item,{__cardKey:cardCustomizationKey(item,index),__sourceIndex:index}));systems=sortCustomizedCards(baseSystems);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');document.getElementById('openCardSettings').classList.toggle('hidden',!canCustomizeCards());render()}
 function loadPortalCache(){try{const cached=JSON.parse(localStorage.getItem(SYSTEMS_CACHE_KEY)||'null');if(!cached||!Array.isArray(cached.items))return false;portalCacheSavedAt=Date.parse(cached.savedAt||'')||0;showPortal(cached.items);return true}catch(e){return false}}
 async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');const items=Array.isArray(out.systems)?out.systems:[];savePortalCache(items);showPortal(items)}
-async function refreshPortalInBackground(){try{await loadPortal()}catch(firstError){try{await restoreStoredLogin()}catch(e){console.warn('台帳のバックグラウンド更新を次回へ延期しました。')}}}
+async function refreshPortalInBackground(){try{await loadPortal()}catch(firstError){try{if(await restoreStoredLogin())return}catch(e){}console.warn('台帳のバックグラウンド更新を次回へ延期しました。')}}
 async function restoreStoredLogin(){
   const code=localStorage.getItem(STAFF_CODE_KEY)||'';
   const password=localStorage.getItem(STAFF_PASSWORD_KEY)||'';
   if(!code||!password)return false;
-  const out=await api('staffLogin',{code,password});
+  const out=await api('staffLogin',{code,password,systemPortalSessionToken:''});
   if(!out.success||!['2','3','4'].includes(String(out.permissionLevel))||!out.systemPortalSessionToken)return false;
   localStorage.setItem(AUTH_KEY,JSON.stringify({code,name:out.name||'',permissionLevel:out.permissionLevel,systemPortalSessionToken:out.systemPortalSessionToken,systemPortalExpiresAt:out.systemPortalExpiresAt||'',savedAt:new Date().toISOString()}));
   await loadPortal();
@@ -216,7 +219,7 @@ function scheduleAutoLogin(){
   autoLoginTimer=setTimeout(()=>{
     autoLoginAttemptedSignature=signature;
     performLogin(true);
-  },450);
+  },150);
 }
 async function login(event){event.preventDefault();await performLogin(false)}
 async function performLogin(isAuto){
@@ -228,7 +231,7 @@ async function performLogin(isAuto){
   loginInProgress=true;
   button.disabled=true;
   try{
-    const out=await api('staffLogin',{code,password});
+    const out=await api('staffLogin',{code,password,systemPortalSessionToken:''});
     if(!out.success)throw new Error(out.error||'ログインできませんでした。');
     if(!['2','3','4'].includes(String(out.permissionLevel))||!out.systemPortalSessionToken)throw new Error('STEP総合管理ポータルを利用する権限がありません。');
     localStorage.setItem(STAFF_CODE_KEY,code);
