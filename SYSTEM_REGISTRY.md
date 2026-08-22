@@ -12,7 +12,7 @@
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| ステップ＆ゴール進捗管理 | 本番（V3・D1直保存） | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `agent/step-progress-v3-implementation`（V3正本）／`main`（運用ワークフロー） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/public/index.html`、`cloudflare/wrangler.v3.production.jsonc` | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。進捗・目標範囲・宿題の編集状態はV3 D1を正本とし、ログイン・未移行管理操作のみ既存Google APIを利用 | 変更は1320等の限定データで確認後、V3 staging→最終スナップショット→本番Workerの順に反映。通常保存でGoogle応答を待たない | 2026-08-22 | 本番Version 92 `0503b822-cc27-4bcf-b15d-4ae16f8fcaed`。進捗707ms、目標889ms、宿題1231ms（サーバー処理）、再読込保持確認済み。最終スナップショット2026-08-22 13:37:31 JST、テストoverride 0件。旧本番Version 91 `7b84a8f6-3b25-4052-ab32-f02d6af55a51` と `agent/cloudflare-progress-migration` を復旧先として維持。詳細は `docs/learning-progress-v3-20260822.md` |
+| ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存）** | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `agent/step-progress-v3-implementation`（V3正本）／`main`（公開・切替ワークフロー） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/public/index.html`、`cloudflare/wrangler.v3.production.jsonc` | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。通常保存・再読込はV3 D1を正本とし、Google Apps Scriptは初回認証・互換用途 | V3実装→1320で進捗・目標範囲・宿題を保存／再読込確認→最終スナップショット→同一Worker URLへ切替 | 2026-08-22 | V3 Version `9b0443f2-5ad1-4827-8743-92f3671c9294`。旧Google経由版ロールバック候補 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。詳細 `docs/learning-progress-v3-cutover-20260822.md` |
 | フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/`、`data/japanese-units.json`、`tests/` | GitHub Pages＋Apps Script＋専用Google Sheet | Pagesと既存APIデプロイを更新し、health・3入口・国英数進行表・単元1,853件を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先。詳細は `docs/foresta-progress-v2-20260815.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
@@ -456,6 +456,24 @@
 - 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値、メールアドレスの実値は記録しない
 
 ## 登録詳細：ステップ＆ゴール進捗管理
+
+### 2026-08-22 現在状態：V3 D1直保存
+
+- **現在の正本**: Cloudflare Worker `step-progress-api` + D1 `step-progress-db` の V3 専用テーブル。通常の進捗・目標範囲・宿題の保存と再読込は D1 を正本とする。
+- **本番URL**: https://step-progress-api.stepkobetsu.workers.dev/ （URL変更なし）
+- **V3正本ブランチ**: `agent/step-progress-v3-implementation`
+- **主要ファイル**: `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/public/index.html`、`cloudflare/wrangler.v3.production.jsonc`。
+- **本番Version**: `9b0443f2-5ad1-4827-8743-92f3671c9294`。
+- **旧Google経由版へのロールバック候補**: `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。D1全体を戻したり削除したりせず、Worker Versionを戻す。
+- **保存方式**: 入力 → Cloudflare Worker → V3 D1。通常の保存成功は Google Apps Script の応答を待たない。初回ログインは既存認証との互換性を維持し、ログイン後の通常保存では V3 D1 セッションを使用する。
+- **自動保存**: 進捗300ms、目標範囲350msのdebounce。必須の保存ボタンに依存しない。
+- **1320実測**: 進捗707ms、目標範囲889ms、宿題1,231ms（Worker内処理）。通信込みでも各2秒未満。3項目とも保存後の再読込保持を確認。
+- **最終データコピー**: 2026-08-22T04:42:35.627Z。生徒34名、進捗1,267件、目標範囲7,011件、宿題2,271件。
+- **目標範囲の同一性**: `units.unit_id` が一意のため、V3では `unit_id` を中心にON/OFFを判定し、旧教材シリーズ表記の差で再読込時に戻る問題を解消。
+- **GitHub Actions**: staging / cutover は完了後 `workflow_dispatch` の手動実行だけに戻し、失敗通知メールの連続発生を防止。
+- **詳細**: `docs/learning-progress-v3-cutover-20260822.md`。
+- **次回の障害調査**: 保存遅延・再読込戻りは、まず `/health` の `mode=d1-isolated-autosave`、V3 D1行、`getStudentDashboard` のD1読込を確認する。Google Apps Scriptの速度調査から始めない。
+
 
 - ID: `learning-progress`
 - 正式名称: ステップ＆ゴール進捗管理
