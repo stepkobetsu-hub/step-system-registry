@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-20
+最終更新: 2026-08-22
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -12,7 +12,7 @@
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| ステップ＆ゴール進捗管理 | Cloudflare Worker本番復旧済み | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `agent/cloudflare-progress-migration`（Worker正本）／`main`（公開ワークフロー） | `cloudflare/src/index.ts`、`cloudflare/public/index.html`、`cloudflare/tests/`、`cloudflare/wrangler.jsonc`、`.github/workflows/deploy-step-progress.yml` | GitHub＋Cloudflare Worker＋D1 `step-progress-db`＋既存Google API | 共通学年回帰試験・型検査・本番HTMLハッシュ検査後、GitHub ActionsからWorkerを公開 | 2026-08-17 | 理科・国語・社会は `中1～中3共通`。現行Version `bbefb81b-9d7e-4b90-9480-b245a751cd6c`。旧表示名：学習進捗管理。通常授業用フォレスタとは別システム。詳細は `docs/learning-progress-common-grade-hotfix-20260817.md` |
+| ステップ＆ゴール進捗管理 | 本番（V3・D1直保存） | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `agent/step-progress-v3-implementation`（V3正本）／`main`（運用ワークフロー） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/public/index.html`、`cloudflare/wrangler.v3.production.jsonc` | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。進捗・目標範囲・宿題の編集状態はV3 D1を正本とし、ログイン・未移行管理操作のみ既存Google APIを利用 | 変更は1320等の限定データで確認後、V3 staging→最終スナップショット→本番Workerの順に反映。通常保存でGoogle応答を待たない | 2026-08-22 | 本番Version 92 `0503b822-cc27-4bcf-b15d-4ae16f8fcaed`。進捗707ms、目標889ms、宿題1231ms（サーバー処理）、再読込保持確認済み。最終スナップショット2026-08-22 13:37:31 JST、テストoverride 0件。旧本番Version 91 `7b84a8f6-3b25-4052-ab32-f02d6af55a51` と `agent/cloudflare-progress-migration` を復旧先として維持。詳細は `docs/learning-progress-v3-20260822.md` |
 | フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/`、`data/japanese-units.json`、`tests/` | GitHub Pages＋Apps Script＋専用Google Sheet | Pagesと既存APIデプロイを更新し、health・3入口・国英数進行表・単元1,853件を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先。詳細は `docs/foresta-progress-v2-20260815.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
@@ -495,6 +495,24 @@
 - 台帳正本への反映: 2026-07-31更新済み。公開カードの正本はGoogle Sheet「システム台帳」であり、本Markdownは構成確認・保守用の台帳文書。`getSystemRegistry` は正本Sheetを読み込む。登録前14件、登録後15件、ID `learning-progress` の重複なしを確認。
 - 調査根拠: Issue #1、対象GitHub `main`、GitHub Pages公開画面、公開コード。
 - 確認日: 2026-07-31
+
+
+### 2026-08-22 V3 D1直保存へ本番切替
+
+- 本番URL: https://step-progress-api.stepkobetsu.workers.dev/
+- Worker: `step-progress-api`
+- 本番Version: **92**／Version ID `0503b822-cc27-4bcf-b15d-4ae16f8fcaed`／traffic 100%
+- V3正本ブランチ: `agent/step-progress-v3-implementation`
+- 保存方針: 進捗・目標範囲・宿題の通常編集はCloudflare WorkerからD1へ直接保存し、Google Apps Scriptの応答完了を通常保存の成功条件にしない。
+- D1: 既存 `step-progress-db` 内の `v3_*` 専用テーブルを使用。旧本番テーブルは削除せず、ロールバック用として維持。
+- 最終データコピー: 2026-08-22 13:37:31 JST。生徒34名、進捗1,267件、目標7,011件、宿題2,271件。テストoverride・一時セッションは0件。
+- 自動保存: 進捗300ms debounce、目標350ms debounce。保存ボタンを前提にしない。
+- 1320スモークテスト: 進捗707ms／通信込み979ms、目標889ms／1,166ms、宿題1,231ms／1,452ms。3項目とも保存→再読込保持を確認。
+- 目標範囲識別: `教科 | 教材シリーズ | 単元ID` を基本キーとし、別教材・別教科の同一／類似ID混在による再読込戻りを防止。
+- 本番確認: `/health` は `ok=true`、`mode=d1-isolated-autosave`。
+- staging: https://step-progress-v3-staging.stepkobetsu.workers.dev/ を比較・検証用として維持。
+- ロールバック: V3直前Version 91 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`、旧正本ブランチ `agent/cloudflare-progress-migration`。V3テーブルを削除せずWorkerだけ旧版へ戻せる。
+- 詳細: `docs/learning-progress-v3-20260822.md`。
 
 ## 登録詳細：フォレスタ進捗管理
 
