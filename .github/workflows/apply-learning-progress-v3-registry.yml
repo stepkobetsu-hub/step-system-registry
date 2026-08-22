@@ -1,0 +1,41 @@
+name: Apply learning-progress V3 registry update
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: registry-learning-progress-v3-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'agent/trigger-learning-progress-v3-registry'
+    steps:
+      - name: Check out registry main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update registry document
+        run: python scripts/update-learning-progress-v3-20260822.py
+
+      - name: Commit registry update
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- SYSTEM_REGISTRY.md; then
+            echo 'Registry already current'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SYSTEM_REGISTRY.md
+          git commit -m 'Update learning progress registry for V3 cutover'
+          git push origin HEAD:main
