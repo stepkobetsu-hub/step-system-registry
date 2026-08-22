@@ -2178,5 +2178,31 @@ organizeEntryImport=function(items){
 };
 </script>
 
+
+<script id="learning-progress-v3-stabilized-20260822">
+const applyLearningProgressV3Stabilized20260822Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressV3Stabilized20260822Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='learning-progress'||name.includes('ステップ＆ゴール進捗管理')||name.includes('学習進捗管理')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    'システム名':'ステップ＆ゴール進捗管理',
+    '正式名称':'ステップ＆ゴール進捗管理',
+    '状態':'V3本番稼働中（D1直保存・旧進捗復元済み）',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
+    'Cloudflare Worker':'step-progress-api',
+    'D1':'step-progress-db（database ID 028f097c-2609-4bf7-9e9b-39b565606941）',
+    '本番Version':'fb49bfc7-73e9-4361-84ef-ef07768d1c27',
+    '直前Version':'df2838bf-7292-4f4b-a750-951e0e644084',
+    '本番ブランチ':'codex/homework-status-root-cause（現行本番）',
+    'V3基礎ブランチ':'agent/step-progress-v3-implementation',
+    '確認日':'2026年8月22日',
+    '概要':'Cloudflare D1直保存のV3。旧Supabaseの正しい目標範囲・学習進捗を復元し、宿題チェックはチェックボックス方式。未チェックは「チェック」、チェック後は「宿題済み」。',
+    '詳細記録':'docs/learning-progress-v3-stabilized-20260822.md',
+    '確認済み事項':[...new Set([...confirmed,'本番URLをstep-progress-apiへ固定','本番health: 生徒34・進捗3540・目標6555・宿題2271','旧スクショとの代表5名照合一致','1100:121/70','1097:55/112','1214:181/288','1276:293/581','1312:133/420','宿題2,271件の旧/V3 status監査で欠落・不一致0','生徒宿題チェックON=DECLARED_DONE／OFF=UNINPUT','先生確認済み後のみ生徒変更ロック'])]
+  });
+};
+</script>
 </body>
 </html>

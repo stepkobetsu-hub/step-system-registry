@@ -8,7 +8,7 @@
     },
     {
       "正式名称": "ステップ＆ゴール進捗管理",
-      "状態": "Cloudflare Worker本番復旧済み",
+      "状態": "V3本番稼働中（D1直保存・旧進捗復元済み）",
       "利用者向けURL": "https://step-progress-api.stepkobetsu.workers.dev/"
     },
     {
@@ -121,5 +121,6 @@
       "状態": "本番使用中",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-hub/"
     }
-  ]
+  ],
+  "generatedAt": "2026-08-22"
 }
