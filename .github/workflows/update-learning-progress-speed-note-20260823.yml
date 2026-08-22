@@ -1,0 +1,58 @@
+name: Update learning progress speed note 20260823
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.learning-progress-speed-note-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update registry and portal detail
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const current='b6ed5627-f360-4ba2-8e09-92e9d5d71340';
+          const previous='fb49bfc7-73e9-4361-84ef-ef07768d1c27';
+          const url='https://step-progress-api.stepkobetsu.workers.dev/';
+
+          let md=fs.readFileSync('SYSTEM_REGISTRY.md','utf8');
+          md=md.replace('最終更新: 2026-08-22','最終更新: 2026-08-23');
+          const lines=md.split(/\r?\n/);
+          const idx=lines.findIndex(line=>line.startsWith('| ステップ＆ゴール進捗管理 |'));
+          if(idx<0) throw new Error('learning-progress row not found');
+          lines[idx]=`| ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）** | ${url} | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | \`codex/homework-status-root-cause\`（現行本番）／\`agent/step-progress-v3-implementation\`（V3基礎） | \`cloudflare/src/v3.ts\`、\`cloudflare/src/dashboard.ts\`、\`cloudflare/src/summary.ts\`、\`cloudflare/scripts/apply-v3-autosave.mjs\`、\`cloudflare/scripts/apply-v3-homework-display-fix.mjs\`、D1 V3テーブル | GitHub＋Cloudflare Worker＋D1 \`step-progress-db\`。通常保存はD1直保存。旧Supabaseは復元元として保全 | 1320で最小確認。代表5名を旧スクショと本番APIで照合。田中1100のグラフAPIを3回実測（0.756秒／1.026秒／0.862秒）し、グラフ取得開始を前倒し。利用者実画面で高速化を確認 | 2026-08-23 | 現行Version \`${current}\`。直前Version \`${previous}\`。V3直前旧版 \`7b84a8f6-3b25-4052-ab32-f02d6af55a51\`。詳細 \`docs/learning-progress-v3-stabilized-20260822.md\` |`;
+          fs.writeFileSync('SYSTEM_REGISTRY.md',lines.join('\n'));
+
+          let html=fs.readFileSync('index.html','utf8');
+          const marker='learning-progress-graph-speed-20260823';
+          if(!html.includes(marker)){
+            const script=`\n<script id="${marker}">\nconst applyLearningProgressGraphSpeed20260823Base=applyAssetInfo;\napplyAssetInfo=function(item){\n  const base=applyLearningProgressGraphSpeed20260823Base(item);\n  const name=String(base['システム名']||base['正式名称']||'');\n  if(!(base['ID']==='learning-progress'||name.includes('ステップ＆ゴール進捗管理')||name.includes('学習進捗管理')))return base;\n  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];\n  return Object.assign({},base,{\n    '状態':'V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）',\n    '利用者向けURL':'${url}',\n    '本番Version':'${current}',\n    '直前Version':'${previous}',\n    '確認日':'2026年8月23日',\n    '概要':'Cloudflare D1直保存V3。旧進捗復元済み。宿題チェックはチェックボックス方式。生徒トップの進捗グラフは画面表示直後から先行取得し、宿題表示とは独立して高速表示する。',\n    '性能確認':'田中1100のgetStudentDashboardを3回実測：0.756秒／1.026秒／0.862秒。利用者実画面で高速化確認済み。',\n    '確認済み事項':[...new Set([...confirmed,'生徒トップ進捗グラフ先行読込','田中1100グラフAPI 0.756秒／1.026秒／0.862秒','宿題表示処理は変更せずグラフ取得のみ前倒し','利用者実画面でグラフ高速化確認済み'])]\n  });\n};\n</script>\n`;
+            if(!html.includes('</body>'))throw new Error('body end not found');
+            html=html.replace('</body>',script+'</body>');
+          }
+          fs.writeFileSync('index.html',html);
+          NODE
+      - name: Verify
+        run: |
+          grep -q 'b6ed5627-f360-4ba2-8e09-92e9d5d71340' SYSTEM_REGISTRY.md
+          grep -q 'グラフ高速化' SYSTEM_REGISTRY.md
+          grep -q 'learning-progress-graph-speed-20260823' index.html
+      - name: Commit
+        run: |
+          git config user.name 'stepkobetsu-hub'
+          git config user.email 'stepkobetsu@gmail.com'
+          git add SYSTEM_REGISTRY.md index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record learning progress graph speed optimization'
+          git push origin HEAD:main
