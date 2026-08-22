@@ -30,7 +30,7 @@ test('自己参照リンクを表示せず、実際の各サービス入口を�
   ])assert.match(html,new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
   assert.match(html,/このWebページからWindowsアプリ本体は起動できません/);
   const receiptBlock=html.split('const RECEIPT_COLLECTOR_RECORD=')[1].split('const STEP_WORKSPACE_CARD=')[0];
-  assert.doesNotMatch(receiptBlock,/'関連カード'/);
+  assert.match(receiptBlock,/'関連カード':\[\]/);
 });
 
 test('複数PC引継ぎとTCカード保留を秘密情報なしで記録する',()=>{
