@@ -21,7 +21,7 @@
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
 | お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
 | V-code ID＆Pass 印刷 | 本番使用中 | https://vcode-poster-maker.mintcocoajasmine.chatgpt.site | GitHub正本なし（ChatGPT Sites管理） | 該当なし | ChatGPT Sites管理ソース、固定ログインQR、月別V-code案内 | ChatGPT Sites（所有者限定公開）＋Gmail確認 | 新しい月の案内到着後、月別データを追加し、年月・ID・PW・QR・A4/PDF印刷を確認 | 2026-08-19 | 所有者限定公開。ID・PWの実値を台帳やGitHubへ記載しない |
-| 証憑自動回収 | Windows本番版 v1.5.2 | https://stepkobetsu-hub.github.io/step-system-registry/#system-receipt-collector | GitHub正本なし（Windowsローカルアプリ） | 該当なし | 配布ZIP `証憑自動回収アプリ_ChatGPT修正版_v1.5.2.zip`、デスクトップショートカット、月別保存フォルダ `証憑自動回収`、引継ぎ文書 `docs/evidence-collector-handoff.md` | Windows PC＋Playwrightブラウザー自動操作 | 配布ZIPを自宅PC・塾PCへ個別セットアップし、各PCのデスクトップアイコンから起動。認証セッションと取得PDFはPCごとに管理する | 2026-08-23 | Amazon、中部電力、Render、テレワープ、SPRIX、ChatGPTの正しい証憑PDFを対象月ごとに回収する専用アプリ。TCカードはカード追加認証が必要なため保留。秘密値・取得PDF・配布ZIPを公開GitHubへ置かない |
+| 証憑自動回収 | Windows本番版 v1.5.2 | Web起動URLなし（デスクトップアイコンから起動） | GitHub正本なし（Windowsローカルアプリ） | 該当なし | 配布ZIP `証憑自動回収アプリ_ChatGPT修正版_v1.5.2.zip`、デスクトップショートカット、月別保存フォルダ `証憑自動回収`、引継ぎ文書 `docs/evidence-collector-handoff.md` | Windows PC＋Playwrightブラウザー自動操作 | 配布ZIPを自宅PC・塾PCへ個別セットアップし、各PCのデスクトップアイコンから起動。認証セッションと取得PDFはPCごとに管理する | 2026-08-23 | Amazon、中部電力、Render、テレワープ、SPRIX、ChatGPTの正しい証憑PDFを対象月ごとに回収する専用アプリ。TCカードはカード追加認証が必要なため保留。秘密値・取得PDF・配布ZIPを公開GitHubへ置かない |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
 | STEP配信システム | 本番使用中（欠席一覧の低負荷自動更新・当日分はA列タイムスタンプ新着順） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（現行 `39882d1`／当日新着順 `81905b5`／キャッシュ更新 `39882d1`／低負荷自動更新 `0688178`／当日優先 `b02dafe`／元データリンク `74c4943`／1行表示 `13b7b4a`） | `index.html`、`app.js`、`api.js`、`style.css`、`Code.gs`、Apps Script Webアプリ v53（今回変更なし）。欠席・遅刻・早退の回答正本：[遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、Spreadsheet ID `1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ`、参照シート `★欠席遅刻` | GitHub Pages＋既存Apps Script v53＋Brevo＋Google Sheet | 欠席一覧はページ起動時に元データを1回更新、表示中は5分ごとにキャッシュ確認、10分ごとに元データを予備更新。当日分は元データA列タイムスタンプの新しい順。フォーム送信トリガーと手動更新を維持。API変更時だけApps Script既存デプロイIDを維持して新版へ更新 | 2026-08-20 | 当日分を最上部にまとめ、その中をA列タイムスタンプ降順（新着順）で表示。同時刻は元行番号の新しい順。未来日の既存順序、元Google Sheet、メール送信、Apps Scriptは変更なし。公開画面で 18:46→18:24→17:25→16:46→16:33 の順を確認。詳細は `docs/step-message-center-absence-refresh-20260817.md` |
@@ -58,7 +58,15 @@
 
 - 種別: Windows PC用デスクトップアプリ（v1.5.2）
 - 起動方法: セットアップ後、デスクトップの「証憑自動回収」アイコンをダブルクリック
+- Web起動URL: なし。この資産管理台帳からWindowsアプリ本体を起動することはできない。台帳自身へ戻るだけのリンクは表示しない
 - 配布物: `証憑自動回収アプリ_ChatGPT修正版_v1.5.2.zip`。配布ZIPや取得した証憑PDFは個人情報を含む可能性があるため、公開GitHubへ置かない
+- 各サービスの直接入口:
+  - Amazon注文履歴: https://www.amazon.co.jp/gp/css/order-history?ie=UTF8&ref_=ya_orders
+  - 中部電力ビジエネ明細: https://bizene.chuden.jp/member/list/ichiran.do?current.page=L2NoYXJnZS9zdGFydC5kbz9tZXRob2Q9ZG9JbmRleA==
+  - Render Billing: https://dashboard.render.com/w/tea-d8gi6h8g4nts739mdb4g/billing
+  - テレワープ: https://www.telwarp.com/mypage/
+  - SPRIX: https://access.foresta-order.jp/users/login
+  - ChatGPT: https://chatgpt.com/
 - 対象サービス:
   - Amazon.co.jp: 注文履歴の「領収書等」→「印刷可能な注文概要」をPDF化
   - 中部電力ミライズ「ビジエネ」: 対象4契約の「ご使用量のお知らせPDF」を取得
@@ -74,7 +82,7 @@
 - 保留: TCカード（MY TS CUBIC）はログイン・メール認証後、「過去のご利用明細（PDF）一覧」でカード有効期限とセキュリティコードによる追加認証が必要。カードが手元にないため実装・取得確認を保留し、カード情報は保存していない
 - PC間引継ぎ: 自宅PCと塾PCへ同じ版を個別セットアップする。ログインセッションは共有せず各PCで本人が認証する。コード・仕様・引継ぎ文書は秘密情報を除外した私有保管先で同期し、取得PDFは公開GitHubへ置かない
 - 引継ぎ文書: [`docs/evidence-collector-handoff.md`](docs/evidence-collector-handoff.md)
-- 注意: STEP業務ホームおよびスタッフ用アプリのカードはこの詳細を開く。Windowsアプリ本体は各PCのデスクトップアイコンから起動する
+- 注意: STEP業務ホームおよびスタッフ用アプリにも、資産管理台帳へ戻るだけのリンクを「アプリを開く」として表示しない。Windowsアプリ本体は各PCのデスクトップアイコンから起動する
 
 ## お友達紹介カード読み取り：本番仕様
 
@@ -135,7 +143,7 @@
 6. 講師・給与（7件）
 7. ポータル・ホーム（5件）
 
-合計43カード。利用者が貼り付けた2026-08-14時点の39カードを再作成基礎とし、「お友達紹介カード読み取り」「全県模試受験票作成」「V-code ID＆Pass 印刷」「証憑自動回収」の4件を管理・運営へ必須追加した。証憑自動回収カードはWindowsアプリ本体ではなく、本台帳の詳細へ移動する。既存35件と新規4件、合計39件のURLを、端末に残る同名カードまたは本台帳の正式URLから引き継いだ。URLを確定できなかった4件は、誤ったリンクを開かないようカード名の先頭へ「リンク切れ」を付け、鉛筆ボタンから後で正しいURLへ修正できるようにした。
+合計43カード。利用者が貼り付けた2026-08-14時点の39カードを再作成基礎とし、「お友達紹介カード読み取り」「全県模試受験票作成」「V-code ID＆Pass 印刷」「証憑自動回収」の4件を管理・運営へ必須追加した。証憑自動回収はWindowsデスクトップアプリであり、Web起動URLは設定しない。既存35件と新規4件、合計39件のURLを、端末に残る同名カードまたは本台帳の正式URLから引き継いだ。URLを確定できなかった4件は、誤ったリンクを開かないようカード名の先頭へ「リンク切れ」を付け、鉛筆ボタンから後で正しいURLへ修正できるようにした。
 
 ### URL要確認の4カード
 

@@ -14,6 +14,23 @@ test('証憑自動回収v1.5.2と6サービスを資産台帳へ記録する',()
   }
   const record=exported.apps.find(app=>app['正式名称']==='証憑自動回収');
   assert.equal(record?.['状態'],'Windows本番版 v1.5.2');
+  assert.equal(record?.['利用者向けURL'],'');
+});
+
+test('自己参照リンクを表示せず、実際の各サービス入口を表示する',()=>{
+  assert.doesNotMatch(html,/step-system-registry\/#system-receipt-collector/);
+  assert.doesNotMatch(registry,/step-system-registry\/#system-receipt-collector/);
+  for(const url of [
+    'https://www.amazon.co.jp/gp/css/order-history?ie=UTF8&ref_=ya_orders',
+    'https://bizene.chuden.jp/member/list/ichiran.do?current.page=',
+    'https://dashboard.render.com/w/tea-d8gi6h8g4nts739mdb4g/billing',
+    'https://www.telwarp.com/mypage/',
+    'https://access.foresta-order.jp/users/login',
+    'https://chatgpt.com/'
+  ])assert.match(html,new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+  assert.match(html,/このWebページからWindowsアプリ本体は起動できません/);
+  const receiptBlock=html.split('const RECEIPT_COLLECTOR_RECORD=')[1].split('const STEP_WORKSPACE_CARD=')[0];
+  assert.doesNotMatch(receiptBlock,/'関連カード'/);
 });
 
 test('複数PC引継ぎとTCカード保留を秘密情報なしで記録する',()=>{

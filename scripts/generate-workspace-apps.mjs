@@ -13,7 +13,8 @@ export function parseRegistry(markdown){
     const line=lines[index];if(!/^\s*\|/.test(line))break;
     const columns=line.replace(/^\s*\||\|\s*$/g,'').split('|').map(value=>value.trim().replace(/`/g,''));
     if(columns.length<3)continue;
-    apps.push({'正式名称':columns[0],'状態':columns[1],'利用者向けURL':columns[2]});
+    const publicUrl=columns[2]==='Web起動URLなし（デスクトップアイコンから起動）'?'':columns[2];
+    apps.push({'正式名称':columns[0],'状態':columns[1],'利用者向けURL':publicUrl});
   }
   return apps;
 }
