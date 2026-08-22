@@ -24,6 +24,7 @@ test('Webサイトをアプリ起動リンクとして表示せず、新しいPC
   for(const url of ['https://www.amazon.co.jp/','https://bizene.chuden.jp/','https://dashboard.render.com/','https://www.telwarp.com/','https://access.foresta-order.jp/','https://chatgpt.com/'])assert.doesNotMatch(receiptBlock,new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
   assert.match(receiptBlock,/OneDrive/);
   assert.match(receiptBlock,/デスクトップに設置して起動\.cmd/);
+  assert.match(receiptBlock,/Node\.jsの別途インストールは不要/);
   assert.match(receiptBlock,/'関連カード':\[\]/);
 });
 
