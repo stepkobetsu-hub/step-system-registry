@@ -2204,5 +2204,25 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="learning-progress-graph-speed-20260823">
+const applyLearningProgressGraphSpeed20260823Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressGraphSpeed20260823Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='learning-progress'||name.includes('ステップ＆ゴール進捗管理')||name.includes('学習進捗管理')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
+    '本番Version':'b6ed5627-f360-4ba2-8e09-92e9d5d71340',
+    '直前Version':'fb49bfc7-73e9-4361-84ef-ef07768d1c27',
+    '確認日':'2026年8月23日',
+    '概要':'Cloudflare D1直保存V3。旧進捗復元済み。宿題チェックはチェックボックス方式。生徒トップの進捗グラフは画面表示直後から先行取得し、宿題表示とは独立して高速表示する。',
+    '性能確認':'田中1100のgetStudentDashboardを3回実測：0.756秒／1.026秒／0.862秒。利用者実画面で高速化確認済み。',
+    '確認済み事項':[...new Set([...confirmed,'生徒トップ進捗グラフ先行読込','田中1100グラフAPI 0.756秒／1.026秒／0.862秒','宿題表示処理は変更せずグラフ取得のみ前倒し','利用者実画面でグラフ高速化確認済み'])]
+  });
+};
+</script>
 </body>
 </html>

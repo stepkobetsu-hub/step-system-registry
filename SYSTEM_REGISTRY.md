@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-22
+最終更新: 2026-08-23
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -12,7 +12,7 @@
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
-| ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存・旧進捗復元済み）** | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `codex/homework-status-root-cause`（現行本番）／`agent/step-progress-v3-implementation`（V3基礎） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/scripts/apply-v3-homework-display-fix.mjs`、D1 V3テーブル | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。通常保存はD1直保存。旧Supabaseは復元元として保全 | 1320で最小確認。代表5名を旧スクショと本番APIで照合。進捗・目標・宿題件数とhealthを確認して本番反映 | 2026-08-22 | 現行Version `fb49bfc7-73e9-4361-84ef-ef07768d1c27`。直前Version `df2838bf-7292-4f4b-a750-951e0e644084`。V3直前旧版 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。詳細 `docs/learning-progress-v3-stabilized-20260822.md` |
+| ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）** | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `codex/homework-status-root-cause`（現行本番）／`agent/step-progress-v3-implementation`（V3基礎） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/scripts/apply-v3-autosave.mjs`、`cloudflare/scripts/apply-v3-homework-display-fix.mjs`、D1 V3テーブル | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。通常保存はD1直保存。旧Supabaseは復元元として保全 | 1320で最小確認。代表5名を旧スクショと本番APIで照合。田中1100のグラフAPIを3回実測（0.756秒／1.026秒／0.862秒）し、グラフ取得開始を前倒し。利用者実画面で高速化を確認 | 2026-08-23 | 現行Version `b6ed5627-f360-4ba2-8e09-92e9d5d71340`。直前Version `fb49bfc7-73e9-4361-84ef-ef07768d1c27`。V3直前旧版 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。詳細 `docs/learning-progress-v3-stabilized-20260822.md` |
 | フォレスタ進捗管理 | 本番 | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main` | `index.html`、`styles.css`、`app.js`、`domain.js`、`config.js`、`manifest.webmanifest`、`apps-script/`、`data/japanese-units.json`、`tests/` | GitHub Pages＋Apps Script＋専用Google Sheet | Pagesと既存APIデプロイを更新し、health・3入口・国英数進行表・単元1,853件を確認 | 2026-08-15 | 学校授業を先取りする通常授業用。ステップ＆ゴール進捗管理とは別ID・別URL・別保存先。詳細は `docs/foresta-progress-v2-20260815.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
