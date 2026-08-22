@@ -17,19 +17,13 @@ test('証憑自動回収v1.5.2と6サービスを資産台帳へ記録する',()
   assert.equal(record?.['利用者向けURL'],'');
 });
 
-test('自己参照リンクを表示せず、実際の各サービス入口を表示する',()=>{
+test('Webサイトをアプリ起動リンクとして表示せず、新しいPCのセットアップ方法を示す',()=>{
   assert.doesNotMatch(html,/step-system-registry\/#system-receipt-collector/);
   assert.doesNotMatch(registry,/step-system-registry\/#system-receipt-collector/);
-  for(const url of [
-    'https://www.amazon.co.jp/gp/css/order-history?ie=UTF8&ref_=ya_orders',
-    'https://bizene.chuden.jp/member/list/ichiran.do?current.page=',
-    'https://dashboard.render.com/w/tea-d8gi6h8g4nts739mdb4g/billing',
-    'https://www.telwarp.com/mypage/',
-    'https://access.foresta-order.jp/users/login',
-    'https://chatgpt.com/'
-  ])assert.match(html,new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
-  assert.match(html,/このWebページからWindowsアプリ本体は起動できません/);
   const receiptBlock=html.split('const RECEIPT_COLLECTOR_RECORD=')[1].split('const STEP_WORKSPACE_CARD=')[0];
+  for(const url of ['https://www.amazon.co.jp/','https://bizene.chuden.jp/','https://dashboard.render.com/','https://www.telwarp.com/','https://access.foresta-order.jp/','https://chatgpt.com/'])assert.doesNotMatch(receiptBlock,new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+  assert.match(receiptBlock,/OneDrive/);
+  assert.match(receiptBlock,/デスクトップに設置して起動\.cmd/);
   assert.match(receiptBlock,/'関連カード':\[\]/);
 });
 

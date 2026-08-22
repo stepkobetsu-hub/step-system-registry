@@ -59,14 +59,8 @@
 - 種別: Windows PC用デスクトップアプリ（v1.5.2）
 - 起動方法: セットアップ後、デスクトップの「証憑自動回収」アイコンをダブルクリック
 - Web起動URL: なし。この資産管理台帳からWindowsアプリ本体を起動することはできない。台帳自身へ戻るだけのリンクは表示しない
-- 配布物: `証憑自動回収アプリ_ChatGPT修正版_v1.5.2.zip`。配布ZIPや取得した証憑PDFは個人情報を含む可能性があるため、公開GitHubへ置かない
-- 各サービスの直接入口:
-  - Amazon注文履歴: https://www.amazon.co.jp/gp/css/order-history?ie=UTF8&ref_=ya_orders
-  - 中部電力ビジエネ明細: https://bizene.chuden.jp/member/list/ichiran.do?current.page=L2NoYXJnZS9zdGFydC5kbz9tZXRob2Q9ZG9JbmRleA==
-  - Render Billing: https://dashboard.render.com/w/tea-d8gi6h8g4nts739mdb4g/billing
-  - テレワープ: https://www.telwarp.com/mypage/
-  - SPRIX: https://access.foresta-order.jp/users/login
-  - ChatGPT: https://chatgpt.com/
+- 配布物: OneDriveの `証憑自動回収アプリ/証憑自動回収アプリ_新しいPC用_v1.5.2.zip`。同じOneDriveアカウントで新しいPCへ同期する。配布ZIPや取得した証憑PDFは個人情報を含む可能性があるため、公開GitHubへ置かない
+- 新しいPCへのセットアップ: ZIPを右クリックして「すべて展開」し、展開したフォルダの「デスクトップに設置して起動.cmd」を1回だけ実行する。デスクトップに「証憑自動回収」アイコンが作られ、そのままアプリが起動する。2回目からはそのアイコンだけを使う
 - 対象サービス:
   - Amazon.co.jp: 注文履歴の「領収書等」→「印刷可能な注文概要」をPDF化
   - 中部電力ミライズ「ビジエネ」: 対象4契約の「ご使用量のお知らせPDF」を取得
@@ -82,7 +76,7 @@
 - 保留: TCカード（MY TS CUBIC）はログイン・メール認証後、「過去のご利用明細（PDF）一覧」でカード有効期限とセキュリティコードによる追加認証が必要。カードが手元にないため実装・取得確認を保留し、カード情報は保存していない
 - PC間引継ぎ: 自宅PCと塾PCへ同じ版を個別セットアップする。ログインセッションは共有せず各PCで本人が認証する。コード・仕様・引継ぎ文書は秘密情報を除外した私有保管先で同期し、取得PDFは公開GitHubへ置かない
 - 引継ぎ文書: [`docs/evidence-collector-handoff.md`](docs/evidence-collector-handoff.md)
-- 注意: STEP業務ホームおよびスタッフ用アプリにも、資産管理台帳へ戻るだけのリンクを「アプリを開く」として表示しない。Windowsアプリ本体は各PCのデスクトップアイコンから起動する
+- 注意: 資産管理台帳にはChatGPTや各サービスのWebサイトを「アプリを開く」として表示しない。Windowsアプリ本体は各PCのデスクトップアイコンから起動する
 
 ## お友達紹介カード読み取り：本番仕様
 
