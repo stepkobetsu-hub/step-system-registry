@@ -19,8 +19,8 @@ test('出退くんQR管理者アプリの2026-08-20改善記録を保持する',
   [
     '管理者QR登録',
     'docs/student-qr-admin-pc-20260820.md',
-    'QR確認は複数選択',
-    '通知先メールは1名選択',
+    '校舎、学年の複数選択',
+    'QR確認とは異なり対象は1名',
     '2026年8月31日（月）'
   ].forEach(marker => assert.ok(ledger.includes(marker), marker));
   [

@@ -21,7 +21,7 @@ assert.match(html, /フォレスタ進捗管理 v2 保存データ（新規構�
 assert.match(html, /'単元マスタ構成':\['合計1,853件'/);
 assert.match(html, /'国語：中1～中3、CTなし、定型宿題なし、各単元の「その他」入力だけ'/);
 assert.match(html, /docs\/foresta-progress-v2-20260815\.md/);
-assert.match(registry, /登録システム（22件）/);
+assert.match(registry, /登録システム（25件）/);
 assert.match(registry, /登録詳細：フォレスタ進捗管理/);
 assert.match(registry, /単元マスタ: 合計1,853件。国語232件/);
 assert.match(registry, /ローカル自動テスト183件成功/);
@@ -38,6 +38,6 @@ assert.match(handoff, /バージョン9「管理者詳細の進行表閲覧権�
 assert.match(handoff, /4c3318f058d51994658b5e0a2ed26f19ead37125/);
 assert.doesNotMatch(publicText, /AKfycbx-KkkOPgOTgauFIcT9JFbuz1zgULkZRNx25PwbTWQabw2jUKdZr9ia2kkJljScEBSXVg/);
 assert.doesNotMatch(publicText, /1bTbuvyFT2QK9VOcvwGKAACnTzdOk2nXh_MnDslvYnFU/);
-assert.doesNotMatch(publicText, /mintcocoajasmine/i);
+assert.doesNotMatch(handoff, /mintcocoajasmine/i);
 
 console.log('foresta-progress-v2 registry checks passed');

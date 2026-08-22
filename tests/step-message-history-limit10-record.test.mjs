@@ -27,7 +27,7 @@ test('Apps Script v53と開封確認撤去を記録する', () => {
 });
 
 test('SYSTEM_REGISTRY一覧にも今回の正本と運用を蓄積する', () => {
-  assert.match(registry, /STEP配信システム \| 本番使用中（履歴は直近10件版）/);
+  assert.match(registry, /STEP配信システム \| 本番使用中（欠席一覧の低負荷自動更新・当日分はA列タイムスタンプ新着順）/);
   assert.match(registry, /開封確認撤去 `159cecd`/);
   assert.match(registry, /履歴タブを開くと直近10件を新しい順に自動取得/);
   assert.match(registry, /Brevo Webhook・専用Script Properties・「開封キャッシュ」シートも削除済み/);

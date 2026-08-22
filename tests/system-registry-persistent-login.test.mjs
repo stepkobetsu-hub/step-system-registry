@@ -15,7 +15,7 @@ test('資産管理ポータルはID・パスワードを保存して自動ログ
 
 test('保存済みセッションを優先し、失効時は保存認証情報で再認証できる', () => {
   assert.match(html, /await loadPortal\(\);return/);
-  assert.match(html, /showLogin\(\);\s*scheduleAutoLogin\(\)/);
+  assert.match(html, /if\(hasStoredLogin\)await performLogin\(true\);else scheduleAutoLogin\(\)/);
   assert.match(html, /password\.value=localStorage\.getItem\(STAFF_PASSWORD_KEY\)\|\|''/);
 });
 
@@ -35,7 +35,7 @@ test('一時的な通信・JSON応答エラーではログイン情報を削除�
 test('通信できない場合は直近の台帳キャッシュを表示する', () => {
   assert.match(html, /const SYSTEMS_CACHE_KEY='stepSystemRegistryCacheV1'/);
   assert.match(html, /function loadPortalCache\(\)/);
-  assert.match(html, /if\(loadPortalCache\(\)\)return/);
+  assert.match(html, /if\(\(hasSession\|\|hasStoredLogin\)&&loadPortalCache\(\)\)/);
 });
 
 test('すべてのインラインJavaScriptが構文エラーなく読み込める', () => {

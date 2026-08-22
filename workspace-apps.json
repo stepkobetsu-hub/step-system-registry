@@ -8,7 +8,7 @@
     },
     {
       "正式名称": "ステップ＆ゴール進捗管理",
-      "状態": "V3本番稼働中（D1直保存・旧進捗復元済み）",
+      "状態": "**V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）**",
       "利用者向けURL": "https://step-progress-api.stepkobetsu.workers.dev/"
     },
     {
@@ -52,6 +52,11 @@
       "利用者向けURL": "https://vcode-poster-maker.mintcocoajasmine.chatgpt.site"
     },
     {
+      "正式名称": "証憑自動回収",
+      "状態": "Windows本番版 v1.5.2",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/step-system-registry/#system-receipt-collector"
+    },
+    {
       "正式名称": "受付カード読み取り",
       "状態": "本番使用中",
       "利用者向けURL": "https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit"
@@ -63,7 +68,7 @@
     },
     {
       "正式名称": "STEP配信システム",
-      "状態": "本番使用中（欠席一覧の低負荷自動更新・当日優先表示）",
+      "状態": "本番使用中（欠席一覧の低負荷自動更新・当日分はA列タイムスタンプ新着順）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-message-center/"
     },
     {
@@ -83,8 +88,8 @@
     },
     {
       "正式名称": "出退くんQR作成・読取",
-      "状態": "本番使用中",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/student-QR/my_qr.html"
+      "状態": "本番使用中（管理者アプリPC最適化・QR検索／カード印刷対応）",
+      "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html"
     },
     {
       "正式名称": "講師予定・夏休み出勤登録",
@@ -121,6 +126,5 @@
       "状態": "本番使用中",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-hub/"
     }
-  ],
-  "generatedAt": "2026-08-22"
+  ]
 }
