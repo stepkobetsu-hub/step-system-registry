@@ -441,7 +441,7 @@
 - 通常タブレット予備URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
 - 旧端末互換URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
 - Amazon Fire用インストールページ: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)
-- Amazon Fire互換版APK: [互換版1.0.1を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk)
+- Amazon Fire APK: [出退くん1.0.2を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk)
 - GitHub: https://github.com/stepkobetsu-hub/student-QR （本番ブランチ `main`）
 - Apps Script: 非公開の本番プロジェクト、バージョン48。既存の本番デプロイIDを維持
 - 旧v37参照プロジェクト: https://script.google.com/home/projects/1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR/edit 。正式なBrevo設定の旧保管先として確認し、同じ設定を現行本番プロジェクトへ復旧済み。`BREVO_API_KEY`の値は台帳・GitHub・ログへ保存しない
@@ -489,12 +489,12 @@
 - 分かりやすい入口: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)。インストール手順、バージョン、対応OS、ダウンロードボタンを1ページにまとめている。
 - 直接ダウンロード: [Shuttaikun-Fire-v1.0.2.apk](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk)。インストールページが利用できない場合の予備入口。
 - アプリ仕様: アプリ名「出退くん」、パッケージID `jp.stepkobetsu.dekakun`。現行Workerの `https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet` を全画面で開き、カメラ権限、使用中の自動消灯防止、端末に合わせた画面回転を設定する。
-- 対応版: 互換版 `1.0.1`。Fire OS 5（Android 5.0相当）以降向けとして `minSdk 21`、`targetSdk 28`、Java 8互換で生成。
-- 解析エラー対応: 初版 `1.0.0` はAndroid 6相当以上を前提にしていたため、古いFireで「パッケージの解析中に問題が発生しました」と表示。互換版1.0.1へ差し替え、旧版1.0.0は誤ダウンロード防止のため公開先から削除した。
+- 対応版: 出退くん `1.0.2`。Fire OS 5以降向けとして `minSdk 22`、`targetSdk 28` で生成。
+- アイコン: ユーザー指定の透明背景PNGを無加工で、APK・インストールページ・公開画像へ統一。指定PNGと公開画像のSHA-256一致を確認済み。
 - インストール手順: Fireで固定インストールページを開く → 「アプリをダウンロード」 → 必要な場合はSilkの「不明なアプリのインストール」を許可 → `Shuttaikun-Fire-v1.0.2.apk`を開いてインストール → 初回だけカメラを許可。
 - 検証: GitHub ActionsによるAPKビルド成功、APK圧縮内容検査合格、署名ブロックと対象URL内包を確認。固定ページとAPKはHTTP 200、APK MIMEは `application/vnd.android.package-archive`。公開版と生成版のSHA-256一致、旧版URLの404を確認。
 - 更新方法: 新しいAPKは別バージョン名で作成し、インストールページのダウンロード先と台帳の直接URLを同時に更新する。古いFire OS互換設定と公開APKのSHA-256一致確認を維持する。
-- 現在の確認状況: 互換版1.0.1の生成・破損検査・固定URL公開まで確認済み。Amazon Fire実機でのインストールとQR読取の最終確認待ち。
+- 現在の確認状況: 出退くん1.0.2の生成・破損検査・指定アイコン反映・固定URL公開まで確認済み。新旧APK URLは同一内容。Amazon Fire実機でのインストールとQR読取の最終確認待ち。
 
 ### 2026年8月25日：読取画面のランダム柑橘キャラクター
 

@@ -101,7 +101,7 @@ const INVESTIGATION_DEFINITIONS=[
   {id:'contact-management-apps-script-url',cardAnchor:'contact-management',cardName:'お問い合わせ管理',text:'Apps Script編集URL',legacyIds:['investigation-contact-management-1-e0fno3']}
 ];
 const GROUPS=[
-  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['Amazon FireインストールURL','Amazon Fireへインストール'],['Amazon Fire APK URL','互換版APKを直接ダウンロード'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く'],['時間割マスタ入力URL','時間割マスタ入力を開く']]},
+  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['Amazon FireインストールURL','Amazon Fireへインストール'],['Amazon Fire APK URL','出退くんAPKを直接ダウンロード'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く'],['時間割マスタ入力URL','時間割マスタ入力を開く']]},
   {title:'管理する',fields:[['管理者向けURL','管理者向けアプリを開く'],['Google Sheet URL','Google Sheetを開く'],['Google Sheet URL 2','Google Sheetを開く'],['Google Sheet URL 3','Google Sheetを開く'],['Supabase URL','Supabase管理画面を開く'],['入力フォームURL','登録画面を開く']]},
   {title:'修正する',fields:[['GitHub URL','GitHubを開く'],['Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL 2','Apps Scriptを編集'],['旧Apps Script編集URL 3','Apps Scriptを編集']]},
   {title:'メモ・保管場所',fields:[['DriveファイルURL','Driveファイルを開く'],['DriveフォルダURL','Driveフォルダを開く'],['仕様書URL','仕様書を開く'],['バックアップURL','バックアップを開く'],['GitHubドキュメントURL','GitHubドキュメントを開く'],['その他保管場所URL','その他の保管場所を開く']]},
@@ -2303,24 +2303,24 @@ applyAssetInfo=function(item){
   const name=String(base['システム名']||base['正式名称']||'');
   if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
   const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
-  const record='2026年8月25日：Amazon Fire標準ホーム画面ではWebページのショートカットを直接設置できないため、「出退くん」専用APKを作成。初版1.0.0は新しいOS向け設定のため古いFireで解析エラーとなり、Fire OS 5以降対応の互換版1.0.1（minSdk 21・targetSdk 28・Java 8互換）へ差し替えた。旧版1.0.0は誤ダウンロード防止のため公開先から削除済み。';
+  const record='2026年8月26日：Amazon Fire標準ホーム画面ではWebページのショートカットを直接設置できないため、「出退くん」専用APKを作成。Fire OS 5以降対応の出退くん1.0.2（minSdk 22・targetSdk 28）へ更新し、ユーザー指定の透明背景アイコンを無加工でAPK・インストールページへ統一した。旧URLも同じ新版APKを配信する。';
   return Object.assign({},base,{
     'Amazon FireインストールURL':'https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html',
     'Amazon Fire APK URL':'https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk',
-    'Amazon Fireアプリ':'出退くん互換版 1.0.1／Fire OS 5以降対応',
+    'Amazon Fireアプリ':'出退くん 1.0.2／Fire OS 5以降対応',
     '配布物':'Shuttaikun-Fire-v1.0.2.apk。固定インストールページからダウンロードする。旧版1.0.0は使用しない。',
-    '起動方法':'Amazon Fireでは固定インストールページから互換版APKを入れ、ホーム画面の緑色「出退くん」アイコンを押す。初回起動時はカメラを許可する。',
+    '起動方法':'Amazon Fireでは固定インストールページから出退くん1.0.2を入れ、ホーム画面の緑色「出退くん」アイコンを押す。初回起動時はカメラを許可する。',
     '主要機能':[...new Set([...toArray(base['主要機能']),'Amazon Fireホーム画面の専用アイコンから出退くん読取画面を直接起動','カメラ権限','全画面表示','使用中の自動消灯防止','端末に合わせた画面回転'])],
-    '確認手順':[...new Set([...toArray(base['確認手順']),'固定インストールページに「互換版 1.0.1｜Fire OS 5以降対応」と表示されることを確認','APKの応答がHTTP 200・application/vnd.android.package-archiveであることを確認','初回起動でカメラを許可しQR読取画面が開くことを確認'])],
-    '障害時の確認':[...new Set([...toArray(base['障害時の確認']),'パッケージ解析エラー：旧版1.0.0を削除し、互換版1.0.1を再ダウンロード','互換版でも解析できない：端末の機種名とFire OSバージョンを確認','カメラが開かない：Fireの設定で出退くんのカメラ権限を許可'])],
+    '確認手順':[...new Set([...toArray(base['確認手順']),'固定インストールページに「出退くん 1.0.2｜Fire OS 5以降対応」と表示されることを確認','APKの応答がHTTP 200・application/vnd.android.package-archiveであることを確認','初回起動でカメラを許可しQR読取画面が開くことを確認'])],
+    '障害時の確認':[...new Set([...toArray(base['障害時の確認']),'パッケージ解析エラー：旧版を削除し、出退くん1.0.2を再ダウンロード','新版でも解析できない：端末の機種名とFire OSバージョンを確認','カメラが開かない：Fireの設定で出退くんのカメラ権限を許可'])],
     '変更時の注意':[...new Set([...toArray(base['変更時の注意']),'APK更新時は別バージョン名で公開し、インストールページと直接ダウンロードURLを同時更新','古いFire OS互換設定（minSdk 21・Java 8互換）を維持','APKと公開ファイルのSHA-256一致を確認してから案内'])],
     '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'Amazon Fire用APKは出退くん本体を作り直すものではなく、現行Workerの /legacy-tablet を専用アイコンから全画面で開くラッパーアプリ。アプリ名は「出退くん」、パッケージIDは jp.stepkobetsu.dekakun。',
     '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+record,
     '確認日':'2026年8月25日',
-    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'互換版1.0.1のGitHub Actionsビルド成功、APK圧縮内容検査合格、署名ブロック・対象URL内包を確認。固定ページとAPKのHTTP 200、APK MIME、公開版と生成版のSHA-256一致、旧版URLの404を確認。',
-    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'Amazon Fire用固定インストールページ','互換版APK 1.0.1の直接ダウンロードURL','Fire OS 5以降対応','ホーム画面専用アイコン','カメラ権限・全画面・自動消灯防止','初版1.0.0の公開削除','公開APKと生成APKのSHA-256一致'])],
-    '未確認項目':[...new Set([...toArray(base['未確認項目']),'Amazon Fire実機での互換版1.0.1インストール・QR読取の最終確認'])],
-    '確認状況':'Amazon Fire用互換版1.0.1の生成・破損検査・固定URL公開を確認済み。Fire実機での最終確認待ち。'
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'出退くん1.0.2のGitHub Actionsビルド成功、application-label・package・versionCode 102・versionName 1.0.2を確認。指定PNGと公開アイコンのSHA-256一致、新旧APK URLのSHA-256一致、固定ページと各URLのHTTP 200を確認。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'Amazon Fire用固定インストールページ','出退くん1.0.2の直接ダウンロードURL','Fire OS 5以降対応','ユーザー指定の透明背景アイコン','カメラ権限・全画面・自動消灯防止','旧APK URLも同じ新版を配信','公開APKと生成APKのSHA-256一致'])],
+    '未確認項目':[...new Set([...toArray(base['未確認項目']),'Amazon Fire実機での出退くん1.0.2インストール・QR読取の最終確認'])],
+    '確認状況':'Amazon Fire用出退くん1.0.2の生成・破損検査・指定アイコン反映・固定URL公開を確認済み。Fire実機での最終確認待ち。'
   });
 };
 </script>
@@ -2331,7 +2331,10 @@ applyAssetInfo=function(item){
   const name=String(base['システム名']||base['正式名称']||'');
   if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
   const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
-  const previousUnconfirmed=toArray(base['未確認項目']).filter(value=>!String(value).includes('Amazon Fire実機での互換版1.0.1インストール・QR読取'));
+  const previousUnconfirmed=toArray(base['未確認項目']).filter(value=>{
+    const text=String(value);
+    return !text.includes('Amazon Fire実機での互換版1.0.1インストール・QR読取')&&!text.includes('Amazon Fire実機での出退くん1.0.2インストール・QR読取');
+  });
   const record='2026年8月25日：カメラ待機画面へ、みかん風の小型キャラクターを3種類の読取画面に共通実装。地上歩行・中段登り・上段登り・高所落下をランダムに選び、動きを約20%低速化。落下時は明るい断面のある左右2つへ割れて約2.4～3.5秒停止し、一瞬で元の姿へ復活する。QR処理中と結果表示中は非表示。';
   return Object.assign({},base,{
     '状態':'本番使用中（Amazon Fire・古い端末・ランダム柑橘キャラクター対応）',
