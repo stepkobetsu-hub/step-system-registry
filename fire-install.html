@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7b55">
+  <meta name="robots" content="noindex, nofollow">
+  <title>出退くん｜Amazon Fire用アプリ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --green: #0f7b55;
+      --green-dark: #09583d;
+      --ink: #17332a;
+      --muted: #60736c;
+      --line: #dce9e3;
+      --soft: #f2f8f5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px 48px;
+      background: linear-gradient(145deg, #edf8f3 0%, #ffffff 48%, #f5faf7 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+    }
+    main { width: min(680px, 100%); margin: 0 auto; }
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 18px 54px rgba(24, 82, 60, .12);
+    }
+    .hero { padding: 34px 28px 28px; text-align: center; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 18px;
+      border-radius: 22px;
+      background: var(--green);
+      box-shadow: 0 12px 26px rgba(15, 123, 85, .24);
+    }
+    .icon svg { width: 58px; height: 58px; }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 40px); letter-spacing: .02em; }
+    .lead { margin: 10px 0 22px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 62px;
+      padding: 14px 20px;
+      border-radius: 16px;
+      background: var(--green);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 9px 20px rgba(15, 123, 85, .22);
+    }
+    .download:active { background: var(--green-dark); transform: translateY(1px); }
+    .version { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+    .steps { padding: 26px 28px 30px; border-top: 1px solid var(--line); background: var(--soft); }
+    h2 { margin: 0 0 16px; font-size: 20px; }
+    ol { margin: 0; padding-left: 1.5em; }
+    li { margin: 0 0 12px; padding-left: .25em; line-height: 1.65; }
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid #cfe4da;
+      border-radius: 13px;
+      background: #fff;
+      color: #345348;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .browser-link { margin: 22px 0 0; text-align: center; }
+    .browser-link a { color: var(--green-dark); font-weight: 700; }
+    @media (max-width: 440px) {
+      body { padding: 14px 10px 32px; }
+      .card { border-radius: 18px; }
+      .hero, .steps { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" aria-labelledby="page-title">
+      <div class="hero">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path fill="#fff" d="M5 5h22v22H5V5Zm6 6v10h10V11H11Zm26-6h22v22H37V5Zm6 6v10h10V11H43ZM5 37h22v22H5V37Zm6 6v10h10V43H11Zm28-4h10v10H39V39Zm14 0h6v10h-6V39ZM39 53h10v6H39v-6Zm14 0h6v6h-6v-6Z"/>
+          </svg>
+        </div>
+        <h1 id="page-title">出退くん</h1>
+        <p class="lead">Amazon Fireタブレット専用アプリ<br>ホーム画面のアイコンから直接起動できます。</p>
+        <a class="download" href="./downloads/Dekakun-Fire-v1.0.0.apk" download>
+          アプリをダウンロード
+        </a>
+        <p class="version">バージョン 1.0.0</p>
+      </div>
+
+      <div class="steps">
+        <h2>インストール方法</h2>
+        <ol>
+          <li>上の「アプリをダウンロード」を押します。</li>
+          <li>インストールが禁止された場合は、設定からSilkブラウザの「不明なアプリのインストール」を許可します。</li>
+          <li>ダウンロードしたファイルを開き、「インストール」を押します。</li>
+          <li>初回起動時のカメラ確認では「許可」を選びます。</li>
+        </ol>
+        <div class="note">
+          Amazonアプリストア以外から入れるため警告が表示される場合があります。このページからダウンロードした「Dekakun-Fire-v1.0.0.apk」のみインストールしてください。
+        </div>
+        <p class="browser-link">
+          <a href="https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet">インストールせずブラウザで開く</a>
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
