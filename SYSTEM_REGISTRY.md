@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-08-25
+最終更新: 2026-08-26
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -29,7 +29,7 @@
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | 本番使用中（退室レアキャラ10%・Cloudflare現行Worker反映確認済み） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`assets/checkin/goodbye-rare-woman.webp`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Cloudflare Git連携＋Apps Script＋Google Sheet | QR受付基盤変更は `student-QR/main` へ反映後、Cloudflare Git連携による `step-checkin-edge-staging` のActive deploymentを確認し、`/legacy-tablet` を実URL確認。Apps Script変更時は既存デプロイIDを更新 | 2026-08-25 | 退室時は通常生徒のみ、女性レアキャラ10%・塾長10%・通常80%のランダム抽選。60秒以内の重複読取、講師、入室は抽選対象外。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |
+| 出退くんQR作成・読取 | 本番使用中（退室レアキャラ10%・重複30秒・入退室済み表示・Cloudflare/GAS反映済み） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`assets/checkin/goodbye-rare-woman.webp`、`cloudflare/checkin-edge/src/domain.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Cloudflare Git連携＋Apps Script＋Google Sheet | QR受付基盤変更は `student-QR/main` へ反映後、Cloudflare Git連携で `step-checkin-edge-staging` を更新し `/legacy-tablet` を確認。Apps Script変更時は既存デプロイIDを維持して新バージョンへ更新 | 2026-08-26 | 重複判定は30秒未満。重複時は生徒「入室済みです／退室済みです」、講師「出勤済みです／退勤済みです」。30秒以降は次の受付として処理。退室レアは女性10%・塾長10%・通常80%を維持 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
@@ -545,6 +545,20 @@
 - 更新方法: `student-QR/main` へ変更を反映 → Cloudflareの `step-checkin-edge-staging` → `Deployments` で最新GitHubコミット由来のActive deploymentを確認 → `/legacy-tablet` の実配信を確認する。Cloudflare APIトークンを台帳へ記録しない。
 - 調査履歴: GitHub Issue #42 に、実URL反映までを完了条件とした確認内容を記録。
 - 注意: Cloudflare APIキー、端末トークン、Apps Scriptの秘密情報、個人情報は台帳・公開GitHubへ記載しない。
+
+
+### 2026年8月26日：重複読取30秒・入退室済み表示
+
+- 目的: 重複受付の表示が「受付済みです」だけでは入室・退室のどちらか分からず、利用者が何度も読み直すことがあったため、状態を明示する。
+- 重複判定時間: 60秒から30秒へ短縮。Cloudflare正本 `cloudflare/checkin-edge/src/domain.ts` の `DUPLICATE_WINDOW_MS = 30_000`。30秒未満は重複、ちょうど30秒以降は次の受付として扱う。
+- 現行Worker軽量画面: `cloudflare/checkin-edge/src/legacy-tablet.html`。生徒の重複時は「入室済みです」または「退室済みです」。講師は「出勤済みです」または「退勤済みです」。補足文も「30秒以内の重複読取のため、記録とメール送信は追加していません」へ変更。
+- 通常タブレット: `tablet_checkin.html` のローカル重複判定も30秒へ変更し、同じ状態表示へ統一。
+- Apps Script正本: `student-QR/main / gas/コード.js` の `CHECKIN_DUPLICATE_WINDOW_MS = 30 * 1000` に変更。31〜59秒でCloudflareとGoogle側の判定がずれないよう統一。
+- Apps Script本番: 既存プロジェクト「生徒QR」を既存デプロイIDのまま新バージョンへ更新。Google Drive上のプロジェクト更新時刻は2026-08-26 00:18頃（JST）を確認。
+- 検証: Workerテストは変更後すべて成功。30秒境界の自動テストを追加し、30秒未満は重複、30秒ちょうどは新規受付になることを確認。
+- Cloudflare: GitHub `main` 連携による自動デプロイ経路を継続使用。現行読取URLは https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet 。
+- 既存仕様維持: 重複時は記録・通知メールを追加しない。退室レア表示（女性10%・塾長10%・通常80%）は重複時には抽選しない。
+- 秘密情報: デプロイID、APIキー、端末トークン、Apps Scriptの秘密値は台帳へ記載しない。
 
 ## 登録詳細：ステップ＆ゴール進捗管理
 
