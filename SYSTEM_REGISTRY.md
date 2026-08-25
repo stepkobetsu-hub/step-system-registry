@@ -588,10 +588,11 @@
 - 待機画面: みかん風キャラクターはカメラ待機中だけランダムに移動する。地上歩行、中段／上段移動、転倒、パラシュート、高所落下、左右2分割、停止後の復活を含む。QR処理中と結果表示中は非表示。
 - 重複防止: `cloudflare/checkin-edge/src/domain.ts` は `DUPLICATE_WINDOW_MS = 20_000`。通常版は `LOCAL_DUPLICATE_WINDOW_MS = 20 * 1000`。20秒未満は重複、ちょうど20秒以降は次の受付として処理する。
 - 重複表示: 生徒は氏名と「入室済みです／退室済みです」、講師は「出勤済みです／退勤済みです」を表示する。生徒の退室済みは藍色背景、表示時間は3.5秒。
-- Google側正本: `gas/コード.js` も `CHECKIN_DUPLICATE_WINDOW_MS = 20 * 1000` へ更新（GitHub main `40a0a6b5549407cb685803012536036545a024d2`）。既存Apps Scriptデプロイへの20秒反映は未確認のため、次回Apps Script更新時に既存デプロイIDを維持して新版へ反映し、20～39秒後の再読取を確認する。
+- Google側正本・本番: `gas/コード.js` は `CHECKIN_DUPLICATE_WINDOW_MS = 20 * 1000`（GitHub main `40a0a6b5549407cb685803012536036545a024d2`）。2026年8月26日、既存Apps ScriptデプロイIDを維持して20秒仕様の新バージョンへ更新完了したことをユーザー確認。
 - 反映コミット: Worker `d212ec09fe9ebcec871a76cfc78be76842d948f2`、通常版 `f5334f3e7d888b8bece65c9e3456ca89035a7c5d`、旧端末版 `e3ba566282cd130bfa7f1a1b6057a48d835d5f04`、重複20秒判定 `ce50265d72ed5b9a55160d3d60cb921d5aa9a586`、GAS GitHub正本 `40a0a6b5549407cb685803012536036545a024d2`。
 - 公開確認: 3つの公開URLで `PHOTO_EXIT_PROBABILITY = 0.10`、`RARE_EXIT_PROBABILITY = 0.05`、`MASCOT_EXIT_PROBABILITY = 0.05` を確認。通常80%は残りの確率。王冠が削除され、茎と左右の葉が残っていること、重複案内が20秒であることを確認。
 - Amazon Fire: APKは現行Worker URLを全画面で開くラッパー方式なので、今回の画面更新では再インストール不要。アプリを完全に閉じて開き直すと最新版を読み込む。
+- 本番反映状況: Cloudflare Worker、通常版、旧端末版、GAS GitHub正本、既存Apps Scriptデプロイのすべてを20秒仕様へ統一済み。
 - 過去記録との関係: 本節が現在仕様。上の30秒・40秒・女性10%等の節は変更履歴として残し、現在の運用判断には本節を使用する。
 
 ## 登録詳細：ステップ＆ゴール進捗管理
