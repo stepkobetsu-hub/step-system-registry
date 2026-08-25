@@ -438,6 +438,8 @@
 - 塾生用URL: https://stepkobetsu-hub.github.io/student-QR/my_qr.html
 - スタッフ用QR登録・発行URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html
 - タブレット読取URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+- Amazon Fire用インストールページ: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)
+- Amazon Fire互換版APK: [互換版1.0.1を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Dekakun-Fire-v1.0.1.apk)
 - GitHub: https://github.com/stepkobetsu-hub/student-QR （本番ブランチ `main`）
 - Apps Script: 非公開の本番プロジェクト、バージョン48。既存の本番デプロイIDを維持
 - 旧v37参照プロジェクト: https://script.google.com/home/projects/1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR/edit 。正式なBrevo設定の旧保管先として確認し、同じ設定を現行本番プロジェクトへ復旧済み。`BREVO_API_KEY`の値は台帳・GitHub・ログへ保存しない
@@ -478,6 +480,19 @@
 - 反映履歴: PR #19（未登録QR時の名簿自動更新）、#20（初回同期待機）、#21（古いAndroid軽量画面）、#22（Worker直結入口）、#23（受付表示改善）、#24〜#26（校舎設定・校舎別端末認証依存の撤廃）、#27（署名済みCookie認証）、#28（緑色カメラアイコン）をsquash merge
 - 検証: Worker試験33件、TypeScript／Wrangler型検査、古いAndroid互換試験4件に合格。本番HTML・マニフェスト・Cookie発行、保存トークンなし・古い校舎値でAPI認証通過、`/health` のHTTP 200・`ok=true`・`production-interim` を確認
 - 秘密情報: 端末トークン、同期トークン、名簿取得トークン、Cookie署名値の実値はGitHub・台帳へ記録しない。校舎別設定QRは過去方式で、現在のWorker配信軽量画面では使用しない
+
+### 2026年8月25日：Amazon Fire用ホーム画面アプリ
+
+- 目的: Amazon Fire標準ホーム画面ではSilkで開いたWebページを通常のAndroidのように直接アイコン化できないため、「出退くん」専用APKを使ってホーム画面から読取画面を直接起動する。
+- 分かりやすい入口: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)。インストール手順、バージョン、対応OS、ダウンロードボタンを1ページにまとめている。
+- 直接ダウンロード: [Dekakun-Fire-v1.0.1.apk](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Dekakun-Fire-v1.0.1.apk)。インストールページが利用できない場合の予備入口。
+- アプリ仕様: アプリ名「出退くん」、パッケージID `jp.stepkobetsu.dekakun`。現行Workerの `https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet` を全画面で開き、カメラ権限、使用中の自動消灯防止、端末に合わせた画面回転を設定する。
+- 対応版: 互換版 `1.0.1`。Fire OS 5（Android 5.0相当）以降向けとして `minSdk 21`、`targetSdk 28`、Java 8互換で生成。
+- 解析エラー対応: 初版 `1.0.0` はAndroid 6相当以上を前提にしていたため、古いFireで「パッケージの解析中に問題が発生しました」と表示。互換版1.0.1へ差し替え、旧版1.0.0は誤ダウンロード防止のため公開先から削除した。
+- インストール手順: Fireで固定インストールページを開く → 「アプリをダウンロード」 → 必要な場合はSilkの「不明なアプリのインストール」を許可 → `Dekakun-Fire-v1.0.1.apk`を開いてインストール → 初回だけカメラを許可。
+- 検証: GitHub ActionsによるAPKビルド成功、APK圧縮内容検査合格、署名ブロックと対象URL内包を確認。固定ページとAPKはHTTP 200、APK MIMEは `application/vnd.android.package-archive`。公開版と生成版のSHA-256一致、旧版URLの404を確認。
+- 更新方法: 新しいAPKは別バージョン名で作成し、インストールページのダウンロード先と台帳の直接URLを同時に更新する。古いFire OS互換設定と公開APKのSHA-256一致確認を維持する。
+- 現在の確認状況: 互換版1.0.1の生成・破損検査・固定URL公開まで確認済み。Amazon Fire実機でのインストールとQR読取の最終確認待ち。
 
 ### 2026年8月8日：退室時のレア人物写真を復活
 
