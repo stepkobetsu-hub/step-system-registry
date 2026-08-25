@@ -437,7 +437,9 @@
 - 状態: 本番使用中
 - 塾生用URL: https://stepkobetsu-hub.github.io/student-QR/my_qr.html
 - スタッフ用QR登録・発行URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html
-- タブレット読取URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+- 現行タブレット読取URL: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
+- 通常タブレット予備URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+- 旧端末互換URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
 - Amazon Fire用インストールページ: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)
 - Amazon Fire互換版APK: [互換版1.0.1を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Dekakun-Fire-v1.0.1.apk)
 - GitHub: https://github.com/stepkobetsu-hub/student-QR （本番ブランチ `main`）
@@ -468,10 +470,10 @@
 - 現在の運用読取URL: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
 - 従来のGitHub Pages読取URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
 - Worker: `step-checkin-edge-staging`。専用production Workerはまだ作成せず、検証済みWorkerを `production-interim` として暫定本番利用
-- 正本: https://github.com/stepkobetsu-hub/student-QR の `main`。最終確認コミット `8db0ce9`。主な正本は `cloudflare/checkin-edge/src/index.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/wrangler.jsonc`、`cloudflare/checkin-edge/tests/`、`gas/EdgeRosterSync.gs`、`gas/コード.js`
+- 正本: https://github.com/stepkobetsu-hub/student-QR の `main`。現在の画面最終設定はWorker `d212ec0`、通常版 `f5334f3`、旧端末版 `e3ba566`、重複20秒判定 `ce50265`、GAS GitHub正本 `40a0a6b`。主な正本は `cloudflare/checkin-edge/src/index.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/wrangler.jsonc`、`cloudflare/checkin-edge/tests/`、`gas/EdgeRosterSync.gs`、`gas/コード.js`
 - 状態共有: Durable Object `CAMPUS_CHECKIN` を使用。神領・大手町で別URL・別アプリにせず、どちらのタブレットで読んでも同じ入退室状態を参照
 - 校舎判定: 通常受付では端末保存の神領／大手町値を判定に使わない。古い値・空欄・大手町を含めて共通受付へ正規化し、神領名簿を主、大手町名簿を代替として同一処理で照合。`integration-test` だけは別名前空間・別認証を維持
-- 重複処理: 60秒以内の同一QRは追加記録・追加メールを行わず同じ受付として返す。その後の有効な読取で入室／退室を切り替える。異なる2台間でも状態を共有
+- 重複処理: 前回受付から20秒未満の同一人物は追加記録・追加メールを行わず同じ受付として返す。ちょうど20秒以降の有効な読取で入室／退室を切り替える。異なる2台間でも状態を共有
 - 名簿同期: Apps Script `EdgeRosterSync.gs` から神領・大手町名簿を取得。神領92名・大手町66名・重複0件を確認。毎朝7時（Cron `0 22 * * *`）に更新し、未登録QR読取時も同期を試みる
 - 古いタブレット: 古いAndroid用のES5軽量画面とQR解析ライブラリをWorkerから直接配信。外部PWA・外部CDNを経由せず、カメラ読取、入室・退室・重複表示を継続
 - 認証: Worker配信軽量画面は保存済み校舎・端末トークンを要求せず、Workerが発行する署名済み `HttpOnly`・`Secure`・`SameSite=Strict` Cookieを使用。通常のGitHub Pages画面のBearer認証と管理API認証は維持
@@ -574,6 +576,23 @@
 - 検証: Workerテストは変更後すべて成功。40秒境界テストを更新し、40秒未満は重複、40秒ちょうどは新規受付になることを確認。
 - 既存仕様維持: 重複時は記録・通知メールを追加しない。女性レアキャラ10%・塾長10%・通常80%の退室ランダム抽選は変更なし。
 - 秘密情報: デプロイID、APIキー、端末トークン、Apps Scriptの秘密値は台帳へ記載しない。
+
+## 2026年8月26日：みかん退室レア画面・最終出現率・重複20秒
+
+- 現行URL:
+  - Amazon Fire／Cloudflare Worker: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
+  - 通常タブレット: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+  - 旧端末互換版: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
+- 退室レア画面: 通常生徒の新しい退室受付ごとにランダム抽選し、通常80%、みかん5%、女性5%、塾長10%で表示する。入室、講師の出勤・退勤、重複受付は抽選対象外。
+- みかんの完成デザイン: 深緑と金色の椅子へ足を組んで座り、片手をひじ掛けへ置き、もう片方で手を振る。王冠は付けず、頭は元イラストと同じ茎と左右の葉だけにする。
+- 待機画面: みかん風キャラクターはカメラ待機中だけランダムに移動する。地上歩行、中段／上段移動、転倒、パラシュート、高所落下、左右2分割、停止後の復活を含む。QR処理中と結果表示中は非表示。
+- 重複防止: `cloudflare/checkin-edge/src/domain.ts` は `DUPLICATE_WINDOW_MS = 20_000`。通常版は `LOCAL_DUPLICATE_WINDOW_MS = 20 * 1000`。20秒未満は重複、ちょうど20秒以降は次の受付として処理する。
+- 重複表示: 生徒は氏名と「入室済みです／退室済みです」、講師は「出勤済みです／退勤済みです」を表示する。生徒の退室済みは藍色背景、表示時間は3.5秒。
+- Google側正本: `gas/コード.js` も `CHECKIN_DUPLICATE_WINDOW_MS = 20 * 1000` へ更新（GitHub main `40a0a6b5549407cb685803012536036545a024d2`）。既存Apps Scriptデプロイへの20秒反映は未確認のため、次回Apps Script更新時に既存デプロイIDを維持して新版へ反映し、20～39秒後の再読取を確認する。
+- 反映コミット: Worker `d212ec09fe9ebcec871a76cfc78be76842d948f2`、通常版 `f5334f3e7d888b8bece65c9e3456ca89035a7c5d`、旧端末版 `e3ba566282cd130bfa7f1a1b6057a48d835d5f04`、重複20秒判定 `ce50265d72ed5b9a55160d3d60cb921d5aa9a586`、GAS GitHub正本 `40a0a6b5549407cb685803012536036545a024d2`。
+- 公開確認: 3つの公開URLで `PHOTO_EXIT_PROBABILITY = 0.10`、`RARE_EXIT_PROBABILITY = 0.05`、`MASCOT_EXIT_PROBABILITY = 0.05` を確認。通常80%は残りの確率。王冠が削除され、茎と左右の葉が残っていること、重複案内が20秒であることを確認。
+- Amazon Fire: APKは現行Worker URLを全画面で開くラッパー方式なので、今回の画面更新では再インストール不要。アプリを完全に閉じて開き直すと最新版を読み込む。
+- 過去記録との関係: 本節が現在仕様。上の30秒・40秒・女性10%等の節は変更履歴として残し、現在の運用判断には本節を使用する。
 
 ## 登録詳細：ステップ＆ゴール進捗管理
 
