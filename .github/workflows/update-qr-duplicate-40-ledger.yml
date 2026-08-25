@@ -1,0 +1,68 @@
+name: Update QR duplicate 40s ledger
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: contains(github.event.head_commit.message, '[qr-dup40-ledger]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch registry
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          mdp=Path('SYSTEM_REGISTRY.md')
+          md=mdp.read_text(encoding='utf-8')
+          md=re.sub(r'^最終更新: .*$', '最終更新: 2026-08-26', md, count=1, flags=re.M)
+          lines=md.splitlines()
+          for i,line in enumerate(lines):
+              if line.startswith('| 出退くんQR作成・読取 |'):
+                  lines[i]='| 出退くんQR作成・読取 | 本番使用中（退室レアキャラ10%・重複40秒・重複表示拡大／退室済み藍色・Cloudflare/GAS反映済み） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`assets/checkin/goodbye-rare-woman.webp`、`cloudflare/checkin-edge/src/domain.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Cloudflare Git連携＋Apps Script＋Google Sheet | QR受付基盤変更は `student-QR/main` へ反映後、Cloudflare Git連携で `step-checkin-edge-staging` を更新し `/legacy-tablet` を確認。Apps Script変更時は既存デプロイIDを維持して新バージョンへ更新 | 2026-08-26 | 重複判定は40秒未満。重複時は生徒「入室済みです／退室済みです」を約2倍表示し、表示時間3.5秒。退室済みの背景は藍色。40秒以降は次の受付。退室レアは女性10%・塾長10%・通常80%を維持 |'
+                  break
+          md='\n'.join(lines)+'\n'
+
+          heading='## 登録詳細：出退くんQR作成・読取'
+          start=md.find(heading)
+          if start<0: raise SystemExit('QR detail section not found')
+          next_h2=md.find('\n## ', start+len(heading))
+          if next_h2<0: next_h2=len(md)
+          detail='''\n\n### 2026年8月26日：重複読取40秒・表示拡大・退室済み藍色\n\n- 重複判定時間: 30秒から40秒へ変更。Cloudflare正本 `cloudflare/checkin-edge/src/domain.ts` は `DUPLICATE_WINDOW_MS = 40_000`。40秒未満は重複、ちょうど40秒以降は次の受付として扱う。\n- 重複表示: 生徒の「〇〇さん」「入室済みです／退室済みです」を従来のおよそ2倍の大きさへ変更。現行Worker軽量画面では氏名72px・状態68px、通常タブレットでは氏名80px・状態60px。\n- 表示時間: 重複時は従来2.5秒から3.5秒へ延長。\n- 背景色: 生徒の「退室済みです」重複表示は藍色 `#165e83`。入室済みは従来の黄色系背景を維持。\n- 現行Worker軽量画面: `cloudflare/checkin-edge/src/legacy-tablet.html`。`duplicate-exit` クラスで退室済みの背景と文字色を切り替える。\n- 通常タブレット: `tablet_checkin.html` も `LOCAL_DUPLICATE_WINDOW_MS = 40 * 1000`、`DUPLICATE_RESUME_MS = 3500` とし、同じ拡大表示・藍色背景へ統一。\n- Apps Script正本: `student-QR/main / gas/コード.js` の `CHECKIN_DUPLICATE_WINDOW_MS = 40 * 1000` に変更。CloudflareとGoogle側の重複時間を統一。\n- Apps Script本番: 既存プロジェクト「生徒QR」を既存デプロイIDのまま新バージョンへ更新。Google Drive上のプロジェクト更新時刻は2026-08-26 00:43頃（JST）を確認。\n- 検証: Workerテストは変更後すべて成功。40秒境界テストを更新し、40秒未満は重複、40秒ちょうどは新規受付になることを確認。\n- 既存仕様維持: 重複時は記録・通知メールを追加しない。女性レアキャラ10%・塾長10%・通常80%の退室ランダム抽選は変更なし。\n- 秘密情報: デプロイID、APIキー、端末トークン、Apps Scriptの秘密値は台帳へ記載しない。\n'''
+          if '### 2026年8月26日：重複読取40秒・表示拡大・退室済み藍色' not in md:
+              md=md[:next_h2]+detail+md[next_h2:]
+          mdp.write_text(md,encoding='utf-8')
+
+          ip=Path('index.html')
+          html=ip.read_text(encoding='utf-8')
+          marker='student-qr-duplicate40-registration-20260826'
+          if marker not in html:
+              script=r'''\n<script id="student-qr-duplicate40-registration-20260826">\nconst applyStudentQrDuplicate40Registration20260826Base=applyAssetInfo;\napplyAssetInfo=function(item){\n  const base=applyStudentQrDuplicate40Registration20260826Base(item);\n  const name=String(base['システム名']||base['正式名称']||'');\n  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;\n  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);\n  const confirmed=toArray(base['確認済み事項']);\n  const note='2026年8月26日：重複読取を40秒へ変更。生徒の重複表示は氏名・入室済み／退室済みを約2倍に拡大し、表示時間を3.5秒へ延長。退室済みの背景は藍色。Cloudflare Worker、通常タブレット、Apps Script正本を40秒へ統一し、既存Apps Scriptデプロイを新バージョンへ更新済み。女性レア10%・塾長10%・通常80%は維持。';\n  return Object.assign({},base,{\n    '状態':'本番使用中（重複40秒・表示拡大・退室済み藍色・Cloudflare/GAS反映済み）',\n    '重複読取仕様':'同一人物の前回受付から40秒未満は重複。40秒以降は次の受付として処理。',\n    '重複時表示':'生徒：氏名＋入室済みです／退室済みですを約2倍表示。重複表示3.5秒。退室済みは藍色背景。',\n    'Apps Script本番':'既存デプロイIDを維持して40秒仕様へ新バージョン更新済み',\n    '確認日':'2026年8月26日',\n    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\\n\\n':'')+note,\n    '確認済み事項':[...new Set([...confirmed,'重複判定40秒','40秒境界テスト','重複時の氏名・状態表示を約2倍','重複表示3.5秒','退室済みの藍色背景','CloudflareとApps Scriptの重複時間統一','Apps Script既存デプロイ更新','女性レア10%・塾長10%・通常80%維持'])],\n    '確認状況':'重複40秒・表示拡大・退室済み藍色をCloudflare／通常タブレット／Apps Scriptへ反映済み'\n  });\n};\n</script>\n'''
+              html=html.replace('</body>',script+'</body>',1)
+              ip.write_text(html,encoding='utf-8')
+
+          md2=mdp.read_text(encoding='utf-8'); html2=ip.read_text(encoding='utf-8')
+          for n in ['重複読取40秒','退室済み藍色','3.5秒','女性レアキャラ10%']:
+              if n not in md2: raise SystemExit('missing md '+n)
+          for n in [marker,'重複40秒','退室済み藍色','3.5秒']:
+              if n not in html2: raise SystemExit('missing html '+n)
+          print('registry duplicate40 update verified')
+          PY
+      - name: Commit registry update
+        shell: bash
+        run: |
+          git config user.name "stepkobetsu-hub"
+          git config user.email "stepkobetsu@gmail.com"
+          git add SYSTEM_REGISTRY.md index.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Record 40 second duplicate display update in asset registry"
+          git push origin main
