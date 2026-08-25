@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId = "jp.stepkobetsu.dekakun"
-        minSdk = 23
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        minSdk = 21
+        targetSdk = 28
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     buildTypes {
@@ -21,7 +21,7 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }

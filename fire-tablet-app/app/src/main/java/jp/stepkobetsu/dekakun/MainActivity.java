@@ -81,8 +81,7 @@ public final class MainActivity extends Activity {
                     Uri origin = request.getOrigin();
                     boolean trustedOrigin = "https".equalsIgnoreCase(origin.getScheme())
                             && ALLOWED_HOST.equalsIgnoreCase(origin.getHost());
-                    boolean cameraGranted = checkSelfPermission(Manifest.permission.CAMERA)
-                            == PackageManager.PERMISSION_GRANTED;
+                    boolean cameraGranted = hasCameraPermission();
 
                     if (trustedOrigin && cameraGranted) {
                         for (String resource : request.getResources()) {
@@ -99,12 +98,18 @@ public final class MainActivity extends Activity {
     }
 
     private void requestCameraPermissionIfNeeded() {
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasCameraPermission()) {
             requestPermissions(
                     new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_REQUEST
             );
         }
+    }
+
+    private boolean hasCameraPermission() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || checkSelfPermission(Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
