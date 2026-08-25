@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const approvedSha256 = 'a0758473d3107e43156a059ac4c4f722cf4f5f6a4e31b7f278390320d3b6fecc';
+const approvedSha256 = '11e72b54df1f695f9fe721008838ed6ac4b2452e713f4df2a1048cc442aa574a';
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
