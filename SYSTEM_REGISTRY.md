@@ -20,7 +20,7 @@
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、成績管理共通GAS | GitHub＋Apps Script | Pages更新。GAS変更は成績管理への影響も確認 | 2026-07-22 | 成績管理と同じGASへ接続する現行版 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
 | お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
-| V-code ID＆Pass 印刷 | 本番使用中 | https://vcode-poster-maker.mintcocoajasmine.chatgpt.site | GitHub正本なし（ChatGPT Sites管理） | 該当なし | ChatGPT Sites管理ソース、固定ログインQR、月別V-code案内 | ChatGPT Sites（所有者限定公開）＋Gmail確認 | 新しい月の案内到着後、月別データを追加し、年月・ID・PW・QR・A4/PDF印刷を確認 | 2026-08-19 | 所有者限定公開。ID・PWの実値を台帳やGitHubへ記載しない |
+| V-code ID＆Pass 印刷 | 本番使用中（翌月分メール受信時の自動反映設定済み） | https://vcode-poster-maker.mintcocoajasmine.chatgpt.site | GitHub正本なし（ChatGPT Sites管理） | 該当なし | ChatGPT Sites管理ソース、固定ログインQR、月別V-code案内 | ChatGPT Sites（所有者限定公開）＋Gmail確認＋Gmail受信トリガー自動タスク | support@e-sia.jp の対象メール受信時に対象年月・ID・PWを読み取り、月別データと初期表示月を更新。所有者限定の本番反映と動作確認まで自動実行 | 2026-08-25 | 所有者限定公開。ID・PWの実値を台帳や公開GitHub、通知へ記載しない |
 | 証憑自動回収 | Windows本番版 v1.5.2 | Web起動URLなし（デスクトップアイコンから起動） | GitHub正本なし（Windowsローカルアプリ） | 該当なし | 正式配布保管先 [Google Drive](https://drive.google.com/drive/folders/17poPzft4YW7AIuLT6DzWDuWsxB5CXKuP?usp=drive_link)、配布ZIP `証憑自動回収アプリ_新しいPC用_v1.5.2.zip`、デスクトップショートカット、月別保存フォルダ `証憑自動回収`、引継ぎ文書 `docs/evidence-collector-handoff.md` | Windows PC＋Playwrightブラウザー自動操作 | Google Driveから配布ZIPを各PCへダウンロードして個別セットアップし、デスクトップアイコンから起動。認証セッションと取得PDFはPCごとに管理する | 2026-08-23 | Amazon、中部電力、Render、テレワープ、SPRIX、ChatGPTの正しい証憑PDFを対象月ごとに回収する専用アプリ。TCカードはカード追加認証が必要なため保留。秘密値・取得PDF・配布ZIPを公開GitHubへ置かない |
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
@@ -44,12 +44,12 @@
 - 公開範囲: ChatGPTの所有者アカウントだけが利用できる非公開アプリ。外部訪問者は許可しない
 - 用途: 対象年月を選び、V-code電子テキストの月別ID・パスワード、固定ログインQR、年月を配置したA4縦1ページの掲示物を作成する
 - 月別案内の確認元: `mintcocoajasmine@gmail.com` のGmailで、送信元 `support@e-sia.jp`、件名「【V-code】電子テキスト ログインID・PW変更のお知らせ」を確認
-- 登録済み範囲: 2026年1月～8月。対象月を選択すると該当月の登録済み内容を取得する
+- 登録済み範囲: 2026年1月～9月。対象月を選択すると該当月の登録済み内容を取得する
 - 表示・印刷: 「V-code」「YYYY年」「M月」「固定ログインQR」「ID」「PW」を大きく表示。A4プレビューからブラウザの印刷画面を開き、PDF保存または印刷する
 - PDFファイル名: `V-code YYYY年M月.pdf`
-- 毎月の更新: 新しい月の案内メール到着後、対象月データを追加し、年月・ID・PW・QR・A4/PDF印刷を確認して公開する
+- 毎月の更新: support@e-sia.jp から件名「【V-code】電子テキスト ログインID・PW変更のお知らせ（YYYY年M月）」が届くと、Gmail受信トリガーの自動タスク「V-code翌月分自動反映」が本文から対象年月・ID・PWを読み取り、月別データと初期表示月を更新する。既存月と印刷レイアウトを維持し、所有者限定の本番反映と確認まで行う。重複月は再反映しない
 - データ保護: ID・パスワードの実値は本台帳、GitHub、公開ページの説明へ記載しない。アプリ本体は所有者限定公開を維持する
-- 確認日: 2026-08-19。7月分の取得、年月表示、A4印刷画面を確認
+- 確認日: 2026-08-25。9月分の登録・初期表示・本番反映を確認し、今後の対象メール受信時に翌月分を自動反映するタスクを有効化
 - 関連入口:
   - スタッフ用アプリ: https://stepkobetsu-hub.github.io/seiseki-kanri/
   - STEP業務ホーム: https://stepkobetsu-hub.github.io/step-workspace/
