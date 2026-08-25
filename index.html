@@ -2324,5 +2324,33 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="dekakun-random-citrus-mascot-20260825">
+const applyDekakunRandomCitrusMascot20260825Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyDekakunRandomCitrusMascot20260825Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const previousUnconfirmed=toArray(base['未確認項目']).filter(value=>!String(value).includes('Amazon Fire実機での互換版1.0.1インストール・QR読取'));
+  const record='2026年8月25日：カメラ待機画面へ、みかん風の小型キャラクターを3種類の読取画面に共通実装。地上歩行・中段登り・上段登り・高所落下をランダムに選び、動きを約20%低速化。落下時は明るい断面のある左右2つへ割れて約2.4～3.5秒停止し、一瞬で元の姿へ復活する。QR処理中と結果表示中は非表示。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（Amazon Fire・古い端末・ランダム柑橘キャラクター対応）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    '従来読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    '古いAndroid互換URL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／Worker版 ca026cae／通常版 7bec4205／古いAndroid互換版 8d3c7a75',
+    '正本ファイル':['cloudflare/checkin-edge/src/legacy-tablet.html','tablet_checkin.html','tablet_checkin_compat.html'],
+    '主要機能':[...new Set([...toArray(base['主要機能']),'カメラ待機中のみ表示するみかん風キャラクター','地上歩行・中段登り・上段登り・高所落下のランダム経路','従来より約20%ゆっくりした移動','落下時に左右2つへ割れて約2.4～3.5秒停止','何事もなかったように一瞬で復活','QR処理中・結果表示中はキャラクターを非表示','Amazon Fire・通常タブレット・古いAndroid互換版で同じ演出'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'キャラクターは外部画像ではなくHTML／CSSで構成。通常経路は地上38%、中段25%、上段15%、落下22%。落下経路は20～29秒で、72～84%地点を左右に割れた停止状態、85%地点を瞬間復活に使用する。端末の「動きを減らす」設定ではアニメーションを止める。QR読取、受付保存、メール通知の処理は変更していない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+record,
+    '更新方法':(base['更新方法']?base['更新方法']+' ':'')+'画面演出だけの更新はstudent-QRの3つの正本HTMLへ同時反映する。Amazon Fire APKはWorker URLを開く方式のため再インストール不要で、アプリを閉じて開き直す。',
+    '確認日':'2026年8月25日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'3つの正本HTMLでJavaScript構文・CSS構造・左右分割要素・ランダム経路・低速化設定を確認し、Worker版、通常版、古いAndroid互換版の3公開URLで更新後ソースの配信を確認。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'Amazon Fire実機で専用アプリから読取画面とキャラクター表示を確認','みかん風キャラクターを3画面へ共通実装','ランダム4経路','約20%低速化','高所落下時の左右2分割','分割状態を約2.4～3.5秒保持','85%地点で瞬間復活','QR処理中・結果表示中の非表示','3公開URLへの反映','APK再インストール不要'])],
+    '未確認項目':previousUnconfirmed,
+    '確認状況':'Amazon Fire・通常タブレット・古いAndroid互換版へランダムキャラクターと左右分割落下演出を本番反映し、公開URLを確認済み。'
+  });
+};
+</script>
 </body>
 </html>
