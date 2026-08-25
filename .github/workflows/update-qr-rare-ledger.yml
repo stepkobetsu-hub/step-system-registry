@@ -1,0 +1,85 @@
+name: Update QR rare exit ledger
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: contains(github.event.head_commit.message, '[qr-rare-ledger]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch registry markdown and portal
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          md_path = Path('SYSTEM_REGISTRY.md')
+          md = md_path.read_text(encoding='utf-8')
+          md = re.sub(r'^最終更新: .*$', '最終更新: 2026-08-25', md, count=1, flags=re.M)
+
+          lines = md.splitlines()
+          for i, line in enumerate(lines):
+              if line.startswith('| 出退くんQR作成・読取 |'):
+                  lines[i] = '| 出退くんQR作成・読取 | 本番使用中（退室レアキャラ10%・Cloudflare現行Worker反映確認済み） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`assets/checkin/goodbye-rare-woman.webp`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Cloudflare Git連携＋Apps Script＋Google Sheet | QR受付基盤変更は `student-QR/main` へ反映後、Cloudflare Git連携による `step-checkin-edge-staging` のActive deploymentを確認し、`/legacy-tablet` を実URL確認。Apps Script変更時は既存デプロイIDを更新 | 2026-08-25 | 退室時は通常生徒のみ、女性レアキャラ10%・塾長10%・通常80%のランダム抽選。60秒以内の重複読取、講師、入室は抽選対象外。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持 |'
+                  break
+          md = '\n'.join(lines) + ('\n' if md.endswith('\n') else '')
+
+          heading = '## 登録詳細：出退くんQR作成・読取'
+          start = md.find(heading)
+          if start < 0:
+              raise SystemExit('QR detail section not found')
+          next_h2 = md.find('\n## ', start + len(heading))
+          if next_h2 < 0:
+              next_h2 = len(md)
+          detail = '''\n\n### 2026年8月25日：退室レアキャラ10%・Cloudflare反映確認\n\n- 現行タブレット読取URL: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet\n- 正本: `stepkobetsu-hub/student-QR` の `main`。主対象は `cloudflare/checkin-edge/src/legacy-tablet.html`。通常タブレット用 `tablet_checkin.html` にも同じ抽選仕様を反映。\n- レアキャラ画像: `assets/checkin/goodbye-rare-woman.webp`。表示文言は「レアキャラ登場！ ✨」「また明日も頑張ろうね！」。\n- 退室時の抽選: 通常の生徒退室ごとに、女性レアキャラ10%、塾長写真10%、通常退室キャラ80%。10回目に必ず出る固定周期ではなく、退室ごとのランダム抽選。\n- 抽選対象外: 60秒以内の重複読取、講師の退勤、入室。重複時は状態反転や追加メール送信を行わない既存仕様を維持。\n- 実装値: `RARE_EXIT_PROBABILITY = 0.10`、`PHOTO_EXIT_PROBABILITY = 0.10`。`useRareExitVariant` を先に判定し、次の10%枠を塾長写真へ割り当てる。\n- 検証: Cloudflare Worker関連試験は35件すべて合格。GitHub上の正本で女性10%・塾長10%・画像参照・抽選ロジックを確認。\n- Cloudflare反映: GitHub Actions経由のAPIトークン直接デプロイは認証情報未設定で失敗したが、Cloudflare Dashboard上でGitHub `main` 連携による `Trigger staging Worker deployment` がActive deploymentになっていることを確認。よって現行WorkerはGitHub連携で更新する。\n- 更新方法: `student-QR/main` へ変更を反映 → Cloudflareの `step-checkin-edge-staging` → `Deployments` で最新GitHubコミット由来のActive deploymentを確認 → `/legacy-tablet` の実配信を確認する。Cloudflare APIトークンを台帳へ記録しない。\n- 調査履歴: GitHub Issue #42 に、実URL反映までを完了条件とした確認内容を記録。\n- 注意: Cloudflare APIキー、端末トークン、Apps Scriptの秘密情報、個人情報は台帳・公開GitHubへ記載しない。\n'''
+          if '### 2026年8月25日：退室レアキャラ10%・Cloudflare反映確認' not in md:
+              md = md[:next_h2] + detail + md[next_h2:]
+          else:
+              # Keep a single canonical copy if rerun.
+              pass
+          md_path.write_text(md, encoding='utf-8')
+
+          index_path = Path('index.html')
+          html = index_path.read_text(encoding='utf-8')
+          marker = 'student-qr-rare-exit-registration-20260825'
+          if marker not in html:
+              script = r'''\n<script id="student-qr-rare-exit-registration-20260825">\nconst applyStudentQrRareExitRegistration20260825Base=applyAssetInfo;\napplyAssetInfo=function(item){\n  const base=applyStudentQrRareExitRegistration20260825Base(item);\n  const name=String(base['システム名']||base['正式名称']||'');\n  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;\n  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);\n  const confirmed=toArray(base['確認済み事項']);\n  const note='2026年8月25日：退室時のレア表示を現行Cloudflare Workerへ反映確認。通常生徒の退室ごとに女性レアキャラ10%、塾長10%、通常80%のランダム抽選。60秒以内の重複読取、講師の退勤、入室は対象外。正本はstudent-QR/mainのcloudflare/checkin-edge/src/legacy-tablet.html。画像はassets/checkin/goodbye-rare-woman.webp。Cloudflare DashboardでGitHub main由来のActive deploymentを確認。';\n  return Object.assign({},base,{\n    '状態':'本番使用中（退室レアキャラ10%・Cloudflare反映確認済み）',\n    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',\n    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',\n    '退室レアキャラ仕様':'通常生徒の退室ごとに女性レアキャラ10%／塾長10%／通常80%。固定の10回に1回ではなくランダム抽選。60秒以内の重複読取・講師・入室は対象外。',\n    'レアキャラ画像':'assets/checkin/goodbye-rare-woman.webp',\n    '正本ファイル':'student-QR main / cloudflare/checkin-edge/src/legacy-tablet.html（通常タブレット用 tablet_checkin.html にも同仕様）',\n    '更新方法':'student-QR mainへ反映後、Cloudflare Git連携でstep-checkin-edge-stagingへ自動デプロイ。Cloudflare Deploymentsで最新GitHubコミット由来のActive deploymentを確認し、/legacy-tabletを実URL確認する。',\n    '確認日':'2026年8月25日',\n    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\\n\\n':'')+note,\n    '確認済み事項':[...new Set([...confirmed,'退室レアキャラ画像 goodbye-rare-woman.webp','女性レアキャラ10%・塾長10%・通常80%の抽選','重複・講師・入室はレア抽選対象外','Worker関連試験35件合格','Cloudflare Git連携のActive deployment確認','現行読取入口 /legacy-tablet'])],\n    '確認状況':'退室レアキャラ10%・塾長10%・通常80%をCloudflare現行Workerへ反映確認済み'\n  });\n};\n</script>\n'''
+              if '</body>' not in html:
+                  raise SystemExit('body closing tag not found')
+              html = html.replace('</body>', script + '</body>', 1)
+              index_path.write_text(html, encoding='utf-8')
+
+          # Sanity checks
+          md2 = md_path.read_text(encoding='utf-8')
+          html2 = index_path.read_text(encoding='utf-8')
+          for needle in ['女性レアキャラ10%', '塾長写真10%', 'step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet']:
+              if needle not in md2:
+                  raise SystemExit('markdown verification failed: ' + needle)
+          for needle in [marker, '女性レアキャラ10%', 'step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet']:
+              if needle not in html2:
+                  raise SystemExit('index verification failed: ' + needle)
+          print('QR rare exit ledger update verified')
+          PY
+
+      - name: Commit registry update
+        shell: bash
+        run: |
+          git config user.name "stepkobetsu-hub"
+          git config user.email "stepkobetsu@gmail.com"
+          git add SYSTEM_REGISTRY.md index.html
+          if git diff --cached --quiet; then
+            echo "No registry changes needed"
+            exit 0
+          fi
+          git commit -m "Record QR rare exit deployment in asset registry"
+          git push origin main
