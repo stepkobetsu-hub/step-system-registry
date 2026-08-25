@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3ca77c"/>
+      <stop offset="1" stop-color="#278260"/>
+    </linearGradient>
+  </defs>
+  <rect x="55" y="55" width="914" height="914" rx="190" fill="url(#g)"/>
+  <g fill="none" stroke="#fff" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M175 270V175H310"/>
+    <path d="M714 175H849V270"/>
+    <path d="M175 754V849H310"/>
+    <path d="M714 849H849V754"/>
+    <path d="M320 333H410L455 286H617L661 333H757Q786 333 786 362V623Q786 652 757 652H320Q291 652 291 623V362Q291 333 320 333Z"/>
+    <circle cx="538" cy="493" r="111"/>
+  </g>
+  <circle cx="714" cy="389" r="22" fill="#fff"/>
+  <text x="365" y="824" fill="#fff" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="150" font-weight="700">出退</text>
+  <text x="665" y="822" fill="#fff" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="88" font-weight="700">くん</text>
+</svg>
