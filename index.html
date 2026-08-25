@@ -2370,5 +2370,39 @@ applyAssetInfo=function(item){
   return Object.assign({},base,patch);
 };
 </script>
+<script id="student-qr-expanded-waiting-motions-20260827">
+const applyStudentQrExpandedWaitingMotions20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrExpandedWaitingMotions20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：カメラ待機中のみかん風キャラクターのランダム動作を11種類へ拡張。ぴょんぴょん跳ねる5%、画面上へ消えて約6～10秒後に復活5%、葉と茎が外れて細長く不規則なオレンジ色の液体と飛沫を噴き出す5%、ころころ転がる5%、右下のQR読取白枠の上辺へ移動して足を揺らしながら座る20%。白枠着席は端末ごとに枠の実位置を測って合わせ、独立抽選の偏りを避けるため5動作を1組として必ず1回出す。初回は2回目の動作で表示する。従来動作は合計60%。Amazon Fire版・通常版・旧端末互換版の3公開URLへ共通反映した。退室レア画面の通常80%・みかん5%・女性5%・塾長10%、重複防止20秒は変更していない。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（重複20秒・退室レア最終設定・待機動作11種類・Amazon Fire対応）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    '通常タブレットURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    '旧端末互換URL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html',
+    '待機中みかん演出':'地上歩行、転倒、中段登り、上段移動、パラシュート、高所落下と左右2分割・復活、ぴょんぴょん跳ねる、画面上へ消えて復活、葉と茎が外れてオレンジ液を噴射、ころころ転がる、QR読取白枠の上に座る。QR処理中と結果表示中は非表示。',
+    '待機動作出現率':'白枠着席20%（5動作に必ず1回。初回は2回目に表示）。跳ねる5%／画面外へ消える5%／液体噴射5%／転がる5%。従来6動作は合計60%（地上歩行17%／転倒10%／中段登り12%／上段移動8%／パラシュート7%／高所落下・左右分割6%）。',
+    '白枠着席仕様':'右下のQR読取用白枠の位置と大きさを実行時に測定し、上辺中央付近へ移動。約18～26秒の経路内でしばらく腰掛け、足を交互に揺らしてから降りて戻る。5動作を1組として必ず1回選ぶため出現率は20%。画面を開いた直後の最初の組では2回目に必ず表示。',
+    'オレンジ液体噴射仕様':'頭の葉と茎が外れ、頭頂部から細く長いオレンジ色の液体柱を噴射。柱は途中が不規則に膨らみ、先端と周囲に小さな飛沫が散る。旧版の皿状に見える横長先端と濃い輪郭は削除。出現率5%。',
+    '退室レア画面の最終出現率':'通常80%／みかん5%／女性5%／塾長10%。通常生徒の新しい退室受付ごとのランダム抽選。',
+    '重複読取仕様':'同一人物の前回受付から20秒未満は重複。ちょうど20秒以降は次の受付として処理。重複時は追加記録・追加メールを行わない。',
+    'Amazon Fire更新方法':'APKはWorker画面を開く方式のため画面変更時の再インストール不要。アプリを完全に閉じて開き直す。',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／Worker f933e1b／通常版 d85f9e0／旧端末互換版 17f7f82／Cloudflare反映トリガー b8f4c44',
+    '正本ファイル':['cloudflare/checkin-edge/src/legacy-tablet.html','tablet_checkin.html','tablet_checkin_compat.html','cloudflare/checkin-edge/src/domain.ts','gas/コード.js'],
+    '主要機能':[...new Set([...toArray(base['主要機能']),'待機中みかんのランダム11動作','ぴょんぴょん跳ねる（5%）','画面上へ消えて復活（5%）','葉と茎が外れる細長いオレンジ液体噴射（5%）','ころころ転がる（5%）','QR読取白枠へ位置合わせして座る（5動作に必ず1回＝20%）'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '更新方法':'画面演出はstudent-QRのWorker版・通常版・旧端末互換版の3つの正本HTMLへ同時反映する。Amazon Fire APKはWorker URLを開くため再インストール不要。Worker版はCloudflare反映トリガー更新後、公開URLの配信内容を確認する。',
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'3つの正本HTMLでJavaScript構文、CSSの括弧対応、11経路、動作抽選閾値、液体上端の皿状要素削除、白枠の動的位置測定、5動作1組の着席選択、初回2回目の着席選択を確認。Amazon Fire Worker版・通常版・旧端末互換版の3公開URLで walker-route-sit、frameRectによる位置合わせ、新しい細長い液体CSS、各抽選閾値の配信を確認。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'待機中みかん11動作','跳ねる・画面外消失復活・液体噴射・転がるは各5%','白枠着席20%（5動作に必ず1回）','初回は2回目の動作で白枠着席','白枠位置の端末別自動測定','皿状の液体先端を削除','細長く不規則な液体柱と飛沫','従来6動作合計60%','Amazon Fire・通常版・旧端末版の3公開URLへ反映','退室レア通常80%・みかん5%・女性5%・塾長10%を維持','重複防止20秒を維持','APK再インストール不要'])],
+    '確認状況':'待機中みかん11動作、各出現率、細長い液体噴射、5動作に必ず1回の白枠着席（20%）を3画面へ反映し、公開URLで確認済み。退室レア最終出現率と重複20秒も維持。'
+  });
+};
+</script>
 </body>
 </html>
