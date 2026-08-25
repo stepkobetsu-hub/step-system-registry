@@ -29,21 +29,21 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Install Android SDK and icon renderer
+      - name: Install Android SDK
         shell: bash
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq librsvg2-bin fonts-noto-cjk
 
-      - name: Generate app source and unified icon
+      - name: Generate app source and use the approved icon unchanged
         shell: bash
         run: |
           bash fire-app/build-source.sh fire-app/generated
-          rsvg-convert -w 512 -h 512 fire-app/shuttaikun-icon.svg -o fire-app/generated/app/src/main/res/drawable-nodpi/shuttaikun_icon.png
           mkdir -p images
-          rsvg-convert -w 512 -h 512 fire-app/shuttaikun-icon.svg -o images/shuttaikun-icon.png
+          cp fire-app/shuttaikun-icon.png fire-app/generated/app/src/main/res/drawable-nodpi/shuttaikun_icon.png
+          cp fire-app/shuttaikun-icon.png images/shuttaikun-icon.png
+          cmp fire-app/shuttaikun-icon.png fire-app/generated/app/src/main/res/drawable-nodpi/shuttaikun_icon.png
+          cmp fire-app/shuttaikun-icon.png images/shuttaikun-icon.png
 
       - name: Build installable APK
         shell: bash
