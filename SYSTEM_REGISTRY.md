@@ -29,7 +29,7 @@
 | 不達メール管理 | 本番使用中 | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main` | `delivery_failures.html`、入退室ログ2「不達メール管理」 | GitHub＋Apps Script＋Brevo | Pages更新後、保存先Sheetと配信連携を確認 | 2026-07-21 | STEP配信システムとの関連機能として区別 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | 本番使用中（管理者アプリPC最適化・QR検索／カード印刷対応） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（管理者アプリ最新 `8d3894e`） | `student_qr_register.html`、`my_qr.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | 管理者画面はGitHub Pages `main`へ反映。QR受付基盤変更時はWorkerを自動デプロイし、Apps Script変更時は既存デプロイIDを更新する。管理者アプリはPC表示、検索、カード実寸印刷、現行／新規QR、通知先メール、勤怠CSVを回帰確認 | 2026-08-20 | 端末読取の現行入口はWorker `/legacy-tablet`。管理者QR登録は `student_qr_register.html`。旧GitHub Pages `tablet_checkin.html` とApps Script直接受付はフォールバックとして維持。今回の詳細は `docs/student-qr-admin-pc-20260820.md` |
+| 出退くんQR作成・読取 | 本番使用中（Amazon Fire・古い端末・ランダム柑橘キャラクター対応） | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（管理者アプリ最新 `8d3894e`） | `student_qr_register.html`、`my_qr.html`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`cloudflare/checkin-edge/src/checkin-do.ts`、`gas/EdgeRosterSync.gs`、`gas/コード.js`、入退室ログ2 | GitHub＋Cloudflare Workers/Durable Objects＋Apps Script＋Google Sheet | 管理者画面はGitHub Pages `main`へ反映。QR受付基盤変更時はWorkerを自動デプロイし、Apps Script変更時は既存デプロイIDを更新する。管理者アプリはPC表示、検索、カード実寸印刷、現行／新規QR、通知先メール、勤怠CSVを回帰確認 | 2026-08-25 | 端末読取の現行入口はWorker `/legacy-tablet`。Amazon Fire専用APKは再インストール不要で画面更新を反映。通常版・古いAndroid互換版にもランダム柑橘キャラクターを共通実装。管理者アプリの詳細は `docs/student-qr-admin-pc-20260820.md` |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求管理システムV3.1（学費計算・請求データ作成） | 本番使用中（Apps Script v74） | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec | GitHub正本なし（Apps Script管理） | 該当なし | Apps Script `請求システム2026NEW`、project `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp`、`コード.gs`、`BillingV31_Index.html`、`BillingV31_Auth.gs`、`BillingV31_InvoiceMail.gs` | Google SheetバインドApps Script | [Apps Script編集画面](https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit)から既存デプロイを新バージョンへ更新 | 2026-08-12 | **学費計算・請求データ作成用。下記PDF作成・メール配信システムとは別物。Cloudflare版コードを入れない** |
 | STEP請求書PDF作成・配信システム | 本番稼働中（明細連携・新規CSV取込最優先） | https://stepkobetsu-hub.github.io/invoice-pdf/ | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（最新確認 `c9f00a58`） | `index.html`、`assets/`、`apps-script/Code.gs`、`cloudflare/`、Apps Script `コード_v023.gs`、`Download.html`、`appsscript.json` | GitHub Pages＋Apps Script＋Google Sheet＋Cloudflare Worker/D1/非公開R2 | [専用Apps Script正本](https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit)の既存デプロイを維持。再送PDFを再生成せず、Cloudflareで100件の配信URLを一括発行してバックグラウンド送信する | 2026-08-12 | Worker `step-invoice-api` Version `a15d34ed-fe4d-494d-a677-79be2ca7bbac`、D1 `step-invoice-db`、R2 `step-invoice-pdfs`。全明細を保持し、新しいCSV取込グループを一覧最上段、同一取込内を生徒番号降順で表示。`請求システム2026NEW` は対象外。秘密値・個人情報・CSV・PDFはGitHubや台帳へ保存しない |
@@ -493,6 +493,22 @@
 - 検証: GitHub ActionsによるAPKビルド成功、APK圧縮内容検査合格、署名ブロックと対象URL内包を確認。固定ページとAPKはHTTP 200、APK MIMEは `application/vnd.android.package-archive`。公開版と生成版のSHA-256一致、旧版URLの404を確認。
 - 更新方法: 新しいAPKは別バージョン名で作成し、インストールページのダウンロード先と台帳の直接URLを同時に更新する。古いFire OS互換設定と公開APKのSHA-256一致確認を維持する。
 - 現在の確認状況: 互換版1.0.1の生成・破損検査・固定URL公開まで確認済み。Amazon Fire実機でのインストールとQR読取の最終確認待ち。
+
+### 2026年8月25日：読取画面のランダム柑橘キャラクター
+
+- 対象画面:
+  - 現行Amazon Fire／Worker版: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
+  - 通常タブレット版: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+  - 古いAndroid互換版: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
+- デザイン: 以前の緑色カメラアイコンを土台に、丸いみかん風の体、葉、目、頬、口、細い手足を持つ小型キャラクターをCSSで実装。外部画像を読まず、Amazon Fireと古いAndroidでも同じ姿を表示する。
+- 表示制御: カメラ待機中だけ画面内を移動し、QR処理中・入室／退室結果画面では非表示にする。結果表示後は、それまでのランダム移動を継続する。
+- ランダム移動: 地上歩行38%（11～18秒）、中段へ登る25%（16～24秒）、上段へ登る15%（18～27秒）、高所から落下22%（20～29秒）。初期版より全体を約20%ゆっくりに調整した。
+- 落下演出: 画面上部約50vhまで登った後に落下。着地時は本体が消え、中央に明るい断面線がある左右2つの果実へ分離し、それぞれが反対方向へ開いて押しつぶされた状態になる。約2.4～3.5秒停止後、85%地点で一瞬に元の姿へ復活し、そのまま歩行を再開する。
+- 安全性・互換性: 手書きCSSアニメーションとES5互換処理を使用。端末の「動きを減らす」設定ではアニメーションを停止する。QR読取・カメラ・受付保存・通知処理は変更していない。
+- 正本ファイル: `cloudflare/checkin-edge/src/legacy-tablet.html`、`tablet_checkin.html`、`tablet_checkin_compat.html`
+- 反映コミット: Worker版 `ca026cae91c7ea378edd45b6bc3c0303cbf80f93`、通常版 `7bec4205efe36b67f2fcfe8644bfd06dc76ed888`、古いAndroid互換版 `8d3c7a757e0386c06b1cf539469c3421184c8ca2`
+- 検証: 3ファイルのJavaScript構文、CSS波括弧、左右分割要素、ランダム経路、低速化設定を確認。上記3つの公開URLすべてで更新後ソースの配信を確認した。
+- Amazon Fireの更新方法: APKは現行Worker URLを全画面で開くラッパー方式のため、今回の画面更新ではAPKの再インストール不要。アプリまたはブラウザーを完全に閉じて開き直すと最新版を読み込む。
 
 ### 2026年8月8日：退室時のレア人物写真を復活
 
