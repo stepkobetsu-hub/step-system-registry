@@ -1,0 +1,3 @@
+jp.stepkobetsu.shuttaikun.fire:style/AppTheme = 0x7f030000
+jp.stepkobetsu.shuttaikun.fire:string/app_name = 0x7f020000
+jp.stepkobetsu.shuttaikun.fire:drawable/shuttaikun_icon = 0x7f010000

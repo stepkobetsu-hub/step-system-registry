@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">出退くん</string>
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:colorAccent">#2E8B65</item>
+    <item name="android:navigationBarColor">#000000</item>
+  </style>
+</resources>

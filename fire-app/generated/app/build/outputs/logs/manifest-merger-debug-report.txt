@@ -1,0 +1,75 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:1:1-13:12
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:1:1-13:12
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:1:1-13:12
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:1:1-13:12
+	package
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:1:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:2:3-65
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:2:20-62
+uses-permission#android.permission.CAMERA
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:3:3-63
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:3:20-60
+uses-feature#android.hardware.camera.any
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:3-87
+	android:required
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:60-84
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:17-59
+application
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:3-12:17
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:3-12:17
+	android:extractNativeLibs
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	android:supportsRtl
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:153-179
+	android:label
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:120-152
+	android:hardwareAccelerated
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:44-78
+	android:icon
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:79-119
+	android:allowBackup
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:16-43
+	android:theme
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:180-211
+	android:usesCleartextTraffic
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:212-248
+activity#jp.stepkobetsu.shuttaikun.fire.MainActivity
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:5-11:16
+	android:screenOrientation
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:130-167
+	android:exported
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:106-129
+	android:configChanges
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:44-105
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:15-43
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:7:7-10:23
+action#android.intent.action.MAIN
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:8:9-61
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:8:17-58
+category#android.intent.category.LAUNCHER
+ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:9:9-69
+	android:name
+		ADDED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:9:19-66
+uses-sdk
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml

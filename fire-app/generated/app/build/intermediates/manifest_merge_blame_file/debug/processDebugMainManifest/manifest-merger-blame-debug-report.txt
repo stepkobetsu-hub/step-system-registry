@@ -1,0 +1,66 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="jp.stepkobetsu.shuttaikun.fire"
+4    android:versionCode="102"
+5    android:versionName="1.0.2" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="22"
+9        android:targetSdkVersion="28" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:2:3-65
+11-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:2:20-62
+12    <uses-permission android:name="android.permission.CAMERA" />
+12-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:3:3-63
+12-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:3:20-60
+13
+14    <uses-feature
+14-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:3-87
+15        android:name="android.hardware.camera.any"
+15-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:17-59
+16        android:required="false" />
+16-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:4:60-84
+17
+18    <application
+18-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:3-12:17
+19        android:allowBackup="false"
+19-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:16-43
+20        android:debuggable="true"
+21        android:extractNativeLibs="true"
+22        android:hardwareAccelerated="true"
+22-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:44-78
+23        android:icon="@drawable/shuttaikun_icon"
+23-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:79-119
+24        android:label="@string/app_name"
+24-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:120-152
+25        android:supportsRtl="true"
+25-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:153-179
+26        android:theme="@style/AppTheme"
+26-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:180-211
+27        android:usesCleartextTraffic="false" >
+27-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:5:212-248
+28        <activity
+28-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:5-11:16
+29            android:name="jp.stepkobetsu.shuttaikun.fire.MainActivity"
+29-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:15-43
+30            android:configChanges="keyboardHidden|orientation|screenSize"
+30-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:44-105
+31            android:exported="true"
+31-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:106-129
+32            android:screenOrientation="landscape" >
+32-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:6:130-167
+33            <intent-filter>
+33-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:7:7-10:23
+34                <action android:name="android.intent.action.MAIN" />
+34-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:8:9-61
+34-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:8:17-58
+35
+36                <category android:name="android.intent.category.LAUNCHER" />
+36-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:9:9-69
+36-->/home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/AndroidManifest.xml:9:19-66
+37            </intent-filter>
+38        </activity>
+39    </application>
+40
+41</manifest>

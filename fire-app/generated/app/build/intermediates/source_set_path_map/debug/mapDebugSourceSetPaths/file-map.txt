@@ -1,0 +1,7 @@
+jp.stepkobetsu.shuttaikun.fire.app-pngs-0 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/build/generated/res/pngs/debug
+jp.stepkobetsu.shuttaikun.fire.app-resValues-1 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/build/generated/res/resValues/debug
+jp.stepkobetsu.shuttaikun.fire.app-packageDebugResources-2 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+jp.stepkobetsu.shuttaikun.fire.app-packageDebugResources-3 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+jp.stepkobetsu.shuttaikun.fire.app-debug-4 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/build/intermediates/merged_res/debug/mergeDebugResources
+jp.stepkobetsu.shuttaikun.fire.app-debug-5 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/debug/res
+jp.stepkobetsu.shuttaikun.fire.app-main-6 /home/runner/work/step-system-registry/step-system-registry/fire-app/generated/app/src/main/res
