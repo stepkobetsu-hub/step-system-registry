@@ -2452,5 +2452,35 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="student-qr-immediate-confirmation-20260827">
+const applyStudentQrImmediateConfirmation20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrImmediateConfirmation20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：通常の新規受付で「確認しています。少しお待ちください」が数秒表示される件を調査。ダミーSTEP-1001・STEP-1320でWorker APIを実測し、新規受付は約2.8～3.7秒。重複受付が端末上で一瞬なのは、20秒以内の同じQRを端末内で判定し通信を省略するため。みかん風キャラクターはサーバー結果が返った後にだけ抽選・表示されるため待ち時間の原因ではない。体感改善として、QR検出直後に全画面で「✓ QRを読み取りました」「受付を確認しています」「そのまま少しお待ちください」を即時表示し、裏側で従来の保存処理を継続。氏名と入室／退室・出勤／退勤は保存結果が返り次第表示する。Amazon Fire版・通常版・旧端末互換版の3画面へ公開反映し、公開ソースを確認済み。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（重複20秒・受付直後の即時確認表示・3画面公開済み）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    '通常タブレットURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    '旧端末互換URL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html',
+    '受付直後の表示':'QR検出直後に全画面で「✓ QRを読み取りました」「受付を確認しています」「そのまま少しお待ちください」を表示。保存と受付判定は裏側で継続し、結果受信後に氏名と入室／退室・出勤／退勤へ切り替える。',
+    '待ち時間の調査結果':'STEP-1001・STEP-1320のWorker API新規受付を実測し約2.8～3.7秒。重複表示が一瞬なのは端末内の20秒重複判定で通信を省略するため。みかん演出は結果受信後の抽選なので待ち時間の原因ではない。',
+    '表示上の注意':'QR検出時点では氏名と受付種別が未確定のため、まず読み取り完了を表示。氏名と入室／退室・出勤／退勤は保存結果が返った時点で表示する。',
+    '変更しない仕様':'重複防止20秒、退室レア通常80%・みかん5%・女性5%・塾長10%、待機中みかん11動作と各出現率は変更なし。',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／通常版 88c9b50／旧端末互換版 e020fcd／Worker表示 5ef82e2／Cloudflare再反映トリガー 607a0e5',
+    '正本ファイル':['tablet_checkin.html','tablet_checkin_compat.html','cloudflare/checkin-edge/src/legacy-tablet.html'],
+    '主要機能':[...new Set([...toArray(base['主要機能']),'QR検出直後の即時全画面確認','保存処理中の明確な進行表示','結果確定後の氏名・受付種別表示'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'ダミーSTEP-1001・STEP-1320でWorker API応答を実測。3つの正本HTMLのJavaScript構文を確認。3公開URLで「QRを読み取りました」「受付を確認しています」と processing 全画面表示の配信を確認。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'新規受付API応答約2.8～3.7秒を実測','重複受付の端末内即時判定を確認','みかん演出は待ち時間の原因ではない','QR検出直後の全画面即時表示','保存処理は裏側で継続','結果受信後に氏名と受付種別を表示','Amazon Fire・通常版・旧端末版の3公開URLへ反映','3画面のJavaScript構文確認','重複20秒と退室レア出現率は変更なし'])],
+    '確認状況':'原因調査、ダミー受付実測、QR検出直後の即時確認画面を3種類のタブレット画面へ反映し、公開URLで確認済み。'
+  });
+};
+</script>
 </body>
 </html>
