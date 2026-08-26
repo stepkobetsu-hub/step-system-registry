@@ -52,13 +52,13 @@ jobs:
           APK='fire-app/generated/app/build/outputs/apk/debug/app-debug.apk'
           test -s "$APK"
           mkdir -p downloads
-          cp "$APK" downloads/Shuttaikun-Fire-v1.0.2.apk
+          cp "$APK" downloads/Shuttaikun-Fire-v1.0.3.apk
           # Keep the former direct URL alive, but serve the rebuilt app there too.
           cp "$APK" downloads/Dekakun-Fire-v1.0.1.apk
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee /tmp/apk-badging.txt
-          grep -F "package: name='jp.stepkobetsu.shuttaikun.fire' versionCode='102' versionName='1.0.2'" /tmp/apk-badging.txt
+          grep -F "package: name='jp.stepkobetsu.shuttaikun.fire' versionCode='103' versionName='1.0.3'" /tmp/apk-badging.txt
           grep -F "application-label:'出退くん'" /tmp/apk-badging.txt
-          sha256sum downloads/Shuttaikun-Fire-v1.0.2.apk
+          sha256sum downloads/Shuttaikun-Fire-v1.0.3.apk
 
       - name: Update Fire installer and registry links
         shell: bash
@@ -71,25 +71,29 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('.icon svg { width: 58px; height: 58px; }', '.icon img { width: 92px; height: 92px; border-radius: 22px; display:block; }')
           s=re.sub(r'<div class="icon" aria-hidden="true">.*?</div>', '<div class="icon" aria-hidden="true"><img src="./images/shuttaikun-icon.png" alt=""></div>', s, count=1, flags=re.S)
-          s=s.replace('./downloads/Dekakun-Fire-v1.0.1.apk', './downloads/Shuttaikun-Fire-v1.0.2.apk')
-          s=s.replace('互換版 1.0.1｜Fire OS 5以降対応', '出退くん 1.0.2｜Fire OS 5以降対応')
-          s=s.replace('「Dekakun-Fire-v1.0.1.apk」のみインストールしてください。', '「Shuttaikun-Fire-v1.0.2.apk」のみインストールしてください。')
-          old_note='Amazonアプリストア以外から入れるため警告が表示される場合があります。'
-          new_note='Amazonアプリストア以外から入れるため警告が表示される場合があります。旧版が残っている場合は、旧アイコンをアンインストールしてから新しい「出退くん」を入れてください。'
-          s=s.replace(old_note,new_note)
+          s=re.sub(r'\\./downloads/(?:Shuttaikun-Fire-v1\\.0\\.2|Dekakun-Fire-v1\\.0\\.1)\\.apk', './downloads/Shuttaikun-Fire-v1.0.3.apk', s)
+          s=s.replace('互換版 1.0.1｜Fire OS 5以降対応', '出退くん 1.0.3｜Fire OS 5以降対応')
+          s=s.replace('「Dekakun-Fire-v1.0.1.apk」のみインストールしてください。', '「Shuttaikun-Fire-v1.0.3.apk」のみインストールしてください。')
+          s=re.sub(
+              r'<div class="note">.*?</div>',
+              '<div class="note">Amazonアプリストア以外から入れるため警告が表示される場合があります。旧版が残っている場合は旧アイコンをアンインストールしてから、新しい「出退くん」を入れてください。このページからダウンロードした「Shuttaikun-Fire-v1.0.3.apk」のみインストールしてください。5時間操作・QR読取がない場合はカメラを停止して休止し、画面タップで再開します。</div>',
+              s,
+              count=1,
+              flags=re.S,
+          )
           p.write_text(s,encoding='utf-8')
 
           for name in ['SYSTEM_REGISTRY.md','index.html']:
               q=Path(name)
               t=q.read_text(encoding='utf-8')
-              t=t.replace('downloads/Dekakun-Fire-v1.0.1.apk','downloads/Shuttaikun-Fire-v1.0.2.apk')
-              t=t.replace('Dekakun-Fire-v1.0.1.apk','Shuttaikun-Fire-v1.0.2.apk')
-              t=t.replace('互換版APK 1.0.1を直接ダウンロード','出退くん Fire APK 1.0.2を直接ダウンロード')
-              t=t.replace('Fire OS 5対応の互換版1.0.1','Fire OS 5対応の出退くん1.0.2')
+              t=t.replace('downloads/Dekakun-Fire-v1.0.1.apk','downloads/Shuttaikun-Fire-v1.0.3.apk')
+              t=t.replace('Dekakun-Fire-v1.0.1.apk','Shuttaikun-Fire-v1.0.3.apk')
+              t=t.replace('互換版APK 1.0.1を直接ダウンロード','出退くん Fire APK 1.0.3を直接ダウンロード')
+              t=t.replace('Fire OS 5対応の互換版1.0.1','Fire OS 5対応の出退くん1.0.3')
               q.write_text(t,encoding='utf-8')
 
           html=Path('fire-install.html').read_text(encoding='utf-8')
-          for needle in ['images/shuttaikun-icon.png','Shuttaikun-Fire-v1.0.2.apk','出退くん 1.0.2']:
+          for needle in ['images/shuttaikun-icon.png','Shuttaikun-Fire-v1.0.3.apk','出退くん 1.0.3']:
               if needle not in html: raise SystemExit('installer patch failed: '+needle)
           PY
 
@@ -98,6 +102,6 @@ jobs:
         run: |
           git config user.name 'stepkobetsu-hub'
           git config user.email 'stepkobetsu@gmail.com'
-          git add fire-app images/shuttaikun-icon.png downloads/Shuttaikun-Fire-v1.0.2.apk downloads/Dekakun-Fire-v1.0.1.apk fire-install.html SYSTEM_REGISTRY.md index.html
-          git commit -m 'Rebuild Fire app as 出退くん 1.0.2 with unified icon'
+          git add fire-app images/shuttaikun-icon.png downloads/Shuttaikun-Fire-v1.0.3.apk downloads/Dekakun-Fire-v1.0.1.apk fire-install.html SYSTEM_REGISTRY.md index.html
+          git commit -m 'Rebuild Fire app as 出退くん 1.0.3 with unified icon'
           git push origin main
