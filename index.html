@@ -2428,5 +2428,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="student-qr-teacher-duplicate-display-20260827">
+const applyStudentQrTeacherDuplicateDisplay20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrTeacherDuplicateDisplay20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：先生の重複受付を再確認。Worker、通常版の端末内判定、Apps Scriptはいずれも20秒。20秒以内の再読取では追加記録・追加メールを行わない。先生の受付済みイラスト表示では氏名と「出勤済みです／退勤済みです」を約2倍へ拡大。出勤済みの背景は従来の黄色系を維持し、退勤済みは藍色（#165e83）へ統一。Amazon Fire版・通常版・旧端末互換版へ共通反映。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（先生重複20秒・重複表示拡大・退勤済み藍色）',
+    '先生重複受付仕様':'同じ先生の前回受付から20秒未満は重複として受付しない。ちょうど20秒以降は次の出勤・退勤受付として処理。重複時は追加記録・追加メールなし。',
+    '先生重複表示':'受付済みイラストを表示し、氏名と「出勤済みです／退勤済みです」は通常の約2倍。出勤済みは従来の黄色系背景を維持。退勤済みは藍色（#165e83）。表示時間3.5秒。',
+    '重複時表示':'生徒・先生とも氏名＋入室済み／退室済み／出勤済み／退勤済みを約2倍表示。入室済み・出勤済みは従来の黄色系背景。退室済み・退勤済みは藍色背景。表示時間3.5秒。',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／Worker表示 bd9e3bf／通常版 f74b8a8／旧端末互換版 80e56c2／Cloudflare反映トリガー 7669455',
+    '主要機能':[...new Set([...toArray(base['主要機能']),'先生の重複受付20秒','先生の重複受付済み表示を約2倍','先生の退勤済み背景を藍色'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'domain.ts の DUPLICATE_WINDOW_MS = 20_000、通常版の LOCAL_DUPLICATE_WINDOW_MS = 20 * 1000、gas/コード.js の CHECKIN_DUPLICATE_WINDOW_MS = 20 * 1000 を確認。3公開画面で先生重複の拡大文字CSS、退勤時 duplicate-exit、旧端末版の先生重複イラスト配信を確認。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'先生の重複受付20秒','20秒境界は受付可能','先生の氏名・出勤済み／退勤済み表示を約2倍','出勤済み背景は従来色を維持','退勤済み背景を藍色 #165e83','Amazon Fire・通常版・旧端末版へ共通反映'])],
+    '確認状況':'先生重複20秒、受付済み表示約2倍、出勤済み従来色、退勤済み藍色を3画面へ反映し公開確認済み。'
+  });
+};
+</script>
 </body>
 </html>
