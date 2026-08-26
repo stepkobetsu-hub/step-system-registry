@@ -71,7 +71,7 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('.icon svg { width: 58px; height: 58px; }', '.icon img { width: 92px; height: 92px; border-radius: 22px; display:block; }')
           s=re.sub(r'<div class="icon" aria-hidden="true">.*?</div>', '<div class="icon" aria-hidden="true"><img src="./images/shuttaikun-icon.png" alt=""></div>', s, count=1, flags=re.S)
-          s=re.sub(r'\\./downloads/(?:Shuttaikun-Fire-v1\\.0\\.2|Dekakun-Fire-v1\\.0\\.1)\\.apk', './downloads/Shuttaikun-Fire-v1.0.3.apk', s)
+          s=re.sub(r'\./downloads/(?:Shuttaikun-Fire-v1\.0\.2|Dekakun-Fire-v1\.0\.1)\.apk', './downloads/Shuttaikun-Fire-v1.0.3.apk', s)
           s=s.replace('互換版 1.0.1｜Fire OS 5以降対応', '出退くん 1.0.3｜Fire OS 5以降対応')
           s=s.replace('出退くん 1.0.2｜Fire OS 5以降対応', '出退くん 1.0.3｜Fire OS 5以降対応')
           s=s.replace('「Dekakun-Fire-v1.0.1.apk」のみインストールしてください。', '「Shuttaikun-Fire-v1.0.3.apk」のみインストールしてください。')
