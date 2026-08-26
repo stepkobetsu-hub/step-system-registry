@@ -1,1 +1,2 @@
-trigger: 2026-08-26T04:20:00+09:00
+Build trigger: 2026-08-27T00:46:00+09:00
+Reason: build Fire app 1.0.3 with five-hour camera rest and screen-sleep bridge.
