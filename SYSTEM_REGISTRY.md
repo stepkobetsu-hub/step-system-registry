@@ -441,7 +441,7 @@
 - 通常タブレット予備URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
 - 旧端末互換URL: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
 - Amazon Fire用インストールページ: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)
-- Amazon Fire APK: [出退くん1.0.2を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk)
+- Amazon Fire APK: [出退くん1.0.2を直接ダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk)
 - GitHub: https://github.com/stepkobetsu-hub/student-QR （本番ブランチ `main`）
 - Apps Script: 非公開の本番プロジェクト、バージョン48。既存の本番デプロイIDを維持
 - 旧v37参照プロジェクト: https://script.google.com/home/projects/1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR/edit 。正式なBrevo設定の旧保管先として確認し、同じ設定を現行本番プロジェクトへ復旧済み。`BREVO_API_KEY`の値は台帳・GitHub・ログへ保存しない
@@ -487,11 +487,11 @@
 
 - 目的: Amazon Fire標準ホーム画面ではSilkで開いたWebページを通常のAndroidのように直接アイコン化できないため、「出退くん」専用APKを使ってホーム画面から読取画面を直接起動する。
 - 分かりやすい入口: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)。インストール手順、バージョン、対応OS、ダウンロードボタンを1ページにまとめている。
-- 直接ダウンロード: [Shuttaikun-Fire-v1.0.2.apk](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.2.apk)。インストールページが利用できない場合の予備入口。
+- 直接ダウンロード: [Shuttaikun-Fire-v1.0.3.apk](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk)。インストールページが利用できない場合の予備入口。
 - アプリ仕様: アプリ名「出退くん」、パッケージID `jp.stepkobetsu.dekakun`。現行Workerの `https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet` を全画面で開き、カメラ権限、使用中の自動消灯防止、端末に合わせた画面回転を設定する。
 - 対応版: 出退くん `1.0.2`。Fire OS 5以降向けとして `minSdk 22`、`targetSdk 28` で生成。
 - アイコン: ユーザー指定の透明背景PNGを無加工で、APK・インストールページ・公開画像へ統一。指定PNGと公開画像のSHA-256一致を確認済み。
-- インストール手順: Fireで固定インストールページを開く → 「アプリをダウンロード」 → 必要な場合はSilkの「不明なアプリのインストール」を許可 → `Shuttaikun-Fire-v1.0.2.apk`を開いてインストール → 初回だけカメラを許可。
+- インストール手順: Fireで固定インストールページを開く → 「アプリをダウンロード」 → 必要な場合はSilkの「不明なアプリのインストール」を許可 → `Shuttaikun-Fire-v1.0.3.apk`を開いてインストール → 初回だけカメラを許可。
 - 検証: GitHub ActionsによるAPKビルド成功、APK圧縮内容検査合格、署名ブロックと対象URL内包を確認。固定ページとAPKはHTTP 200、APK MIMEは `application/vnd.android.package-archive`。公開版と生成版のSHA-256一致、旧版URLの404を確認。
 - 更新方法: 新しいAPKは別バージョン名で作成し、インストールページのダウンロード先と台帳の直接URLを同時に更新する。古いFire OS互換設定と公開APKのSHA-256一致確認を維持する。
 - 現在の確認状況: 出退くん1.0.2の生成・破損検査・指定アイコン反映・固定URL公開まで確認済み。新旧APK URLは同一内容。Amazon Fire実機でのインストールとQR読取の最終確認待ち。

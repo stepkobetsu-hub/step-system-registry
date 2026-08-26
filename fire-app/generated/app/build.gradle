@@ -6,7 +6,7 @@ android {
         applicationId 'jp.stepkobetsu.shuttaikun.fire'
         minSdk 22
         targetSdk 28
-        versionCode 102
-        versionName '1.0.2'
+        versionCode 103
+        versionName '1.0.3'
     }
 }
