@@ -614,6 +614,22 @@
 - 過去記録との関係: 本節が現行仕様。台帳内の「QR検出直後の即時全画面確認」は撤回済みの変更履歴として扱い、現在の運用判断には使用しない。
 
 
+
+### 2026年8月27日：5時間無操作で休止・タップ復帰
+
+- 対象: Amazon Fire／Worker読取画面、通常タブレット画面、旧端末互換画面の3種類。
+- 休止条件: 最後の画面操作またはQR読取から5時間。タップ・マウス・キー操作・QR検出のいずれかで5時間を数え直す。受付処理中または結果表示中に期限へ達した場合は、処理を中断せず休止を延期する。
+- 休止動作: QR解析を停止し、カメラのMediaStreamを終了、みかん風キャラクターの動作と30秒ごとの接続予熱も停止。画面全体を黒くして「休止中／画面をタップすると再開します」を表示する。
+- 復帰動作: 休止画面のタップで、接続予熱、カメラ、QR解析、待機中キャラクター、5時間タイマーを再開する。ページやアプリを探して開き直す必要はない。
+- Amazon専用アプリ: バージョン1.0.3（package `jp.stepkobetsu.shuttaikun.fire`、versionCode 103）。Web画面の休止開始をJavaScript bridge `SleepControl` で受け、休止中だけ `FLAG_KEEP_SCREEN_ON` を解除する。これによりFire本体の設定時間に従って画面消灯でき、復帰時に点灯維持を戻す。bridgeを許可するWebView遷移先は現行WorkerのHTTPSホストだけに制限する。
+- 更新版APK: [出退くん Fire 1.0.3をダウンロード](https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk)
+- インストール案内: [Amazon Fireへ「出退くん」をインストール](https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html)
+- 更新時の注意: 1.0.2からは同じアプリとして上書き更新できる。1.0.1以前の旧アイコン版が別に残っている場合だけ、旧版をアンインストールしてから1.0.3を入れる。Web側のカメラ休止は再インストールなしでも反映されるが、休止中の画面自動消灯には1.0.3への更新が必要。
+- 正本: `student-QR/tablet_checkin.html`、`student-QR/tablet_checkin_compat.html`、`student-QR/cloudflare/checkin-edge/src/legacy-tablet.html`、`step-system-registry/fire-app/build-source.sh`。
+- 検証: 通常版・旧端末互換版のNode回帰試験5件合格。WorkerのTypeScript型検査と自動試験36件合格。3公開画面で5時間定数、休止画面、カメラ停止、タップ復帰、native bridge呼出を確認。Android APK 1.0.3はGitHub Actionsでビルド成功し、package・versionCode・versionName・アプリ名を検査済み。
+- 変更しない仕様: 重複受付20秒、受付結果画面、退室レア出現率、待機中みかんの動作と各出現率は変更なし。
+
+
 ## 登録詳細：ステップ＆ゴール進捗管理
 
 ### 2026-08-22 現在状態：V3 D1直保存
