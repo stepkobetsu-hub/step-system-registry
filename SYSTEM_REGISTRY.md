@@ -595,6 +595,25 @@
 - 本番反映状況: Cloudflare Worker、通常版、旧端末版、GAS GitHub正本、既存Apps Scriptデプロイのすべてを20秒仕様へ統一済み。
 - 過去記録との関係: 本節が現在仕様。上の30秒・40秒・女性10%等の節は変更履歴として残し、現在の運用判断には本節を使用する。
 
+
+### 2026年8月27日：受付高速化・全画面の即時確認を撤去
+
+- 対象URL:
+  - Amazon Fire／現行読取: https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet
+  - 通常タブレット: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+  - 旧端末互換: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
+- 表示変更: QR読取直後の「QRを読み取りました／受付を確認しています／そのまま少しお待ちください」という全画面表示は邪魔になるため撤去。カメラ映像と白い読取枠を表示したまま、画面下部に小さく「受付中です…」だけを表示する。保存結果が返った後の氏名・入室／退室・出勤／退勤結果画面は従来どおり表示する。
+- 原因調査: ダミー STEP-1001・STEP-1320 の新規受付を実測。Worker内部の受付処理は74～148msまで短縮できており、初回通信全体2.96～4.00秒の大半はTLS接続開始2.73～3.76秒だった。みかん風キャラクターの描画は結果受信後に行うため、受付待ちの原因ではない。
+- サーバー高速化: Apps Script書き戻し用outboxのアラーム予約をDurable Objectの受付応答後へ分離し、Workerの `ctx.waitUntil()` でバックグラウンド実行。受付応答へ `timings.edgeMs` を追加し、サーバー内部処理時間を匿名化ログで確認できるようにした。
+- 接続高速化: 通常版・旧端末互換版・Amazon Fire版でWorkerへ `preconnect`（通常版・旧端末版は `dns-prefetch` も併用）。起動時、30秒ごと、画面復帰時に `/health` を非同期取得し、QR読取前から通信接続を予熱する。予熱失敗は受付を妨げない。
+- 変更しない仕様: 重複受付20秒、重複時の拡大表示と背景色、退室レア通常80%・みかん5%・女性5%・塾長10%、待機中みかんの動作と出現率は変更なし。
+- 正本: https://github.com/stepkobetsu-hub/student-QR の `main`。主要ファイルは `cloudflare/checkin-edge/src/index.ts`、`cloudflare/checkin-edge/src/checkin-do.ts`、`cloudflare/checkin-edge/src/legacy-tablet.html`、`tablet_checkin.html`、`tablet_checkin_compat.html`、`cloudflare/checkin-edge/tests/legacy-tablet-page.test.ts`。
+- 反映: Worker応答高速化 `807cfa4`・`88fc888`、3画面の全画面表示撤去、接続予熱、再配信トリガー `cdfeb842` を `main` へ反映。
+- 検証: TypeScript型検査合格。Worker自動試験36件合格。3画面のインラインJavaScript構文検査合格。3公開URLで接続予熱、30秒間隔、小さい「受付中です…」、旧全画面文言なしを確認。
+- Amazon Fire: APKの再インストールは不要。アプリを完全に終了して開き直すと最新のWorker画面を読み込む。
+- 過去記録との関係: 本節が現行仕様。台帳内の「QR検出直後の即時全画面確認」は撤回済みの変更履歴として扱い、現在の運用判断には使用しない。
+
+
 ## 登録詳細：ステップ＆ゴール進捗管理
 
 ### 2026-08-22 現在状態：V3 D1直保存
