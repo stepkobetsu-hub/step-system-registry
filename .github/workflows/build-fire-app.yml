@@ -73,6 +73,7 @@ jobs:
           s=re.sub(r'<div class="icon" aria-hidden="true">.*?</div>', '<div class="icon" aria-hidden="true"><img src="./images/shuttaikun-icon.png" alt=""></div>', s, count=1, flags=re.S)
           s=re.sub(r'\\./downloads/(?:Shuttaikun-Fire-v1\\.0\\.2|Dekakun-Fire-v1\\.0\\.1)\\.apk', './downloads/Shuttaikun-Fire-v1.0.3.apk', s)
           s=s.replace('互換版 1.0.1｜Fire OS 5以降対応', '出退くん 1.0.3｜Fire OS 5以降対応')
+          s=s.replace('出退くん 1.0.2｜Fire OS 5以降対応', '出退くん 1.0.3｜Fire OS 5以降対応')
           s=s.replace('「Dekakun-Fire-v1.0.1.apk」のみインストールしてください。', '「Shuttaikun-Fire-v1.0.3.apk」のみインストールしてください。')
           s=re.sub(
               r'<div class="note">.*?</div>',
@@ -87,6 +88,10 @@ jobs:
               q=Path(name)
               t=q.read_text(encoding='utf-8')
               t=t.replace('downloads/Dekakun-Fire-v1.0.1.apk','downloads/Shuttaikun-Fire-v1.0.3.apk')
+              t=t.replace('downloads/Shuttaikun-Fire-v1.0.2.apk','downloads/Shuttaikun-Fire-v1.0.3.apk')
+              t=t.replace('Shuttaikun-Fire-v1.0.2.apk','Shuttaikun-Fire-v1.0.3.apk')
+              t=t.replace('出退くん Fire APK 1.0.2を直接ダウンロード','出退くん Fire APK 1.0.3を直接ダウンロード')
+              t=t.replace('Fire OS 5対応の出退くん1.0.2','Fire OS 5対応の出退くん1.0.3')
               t=t.replace('Dekakun-Fire-v1.0.1.apk','Shuttaikun-Fire-v1.0.3.apk')
               t=t.replace('互換版APK 1.0.1を直接ダウンロード','出退くん Fire APK 1.0.3を直接ダウンロード')
               t=t.replace('Fire OS 5対応の互換版1.0.1','Fire OS 5対応の出退くん1.0.3')
