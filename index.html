@@ -2517,5 +2517,36 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="student-qr-five-hour-rest-20260827">
+const applyStudentQrFiveHourRest20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrFiveHourRest20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：最後の画面操作またはQR読取から5時間経過すると、カメラ・QR解析・待機中キャラクター・接続予熱を停止し、黒い「休止中」画面へ移行。画面タップで接続予熱、カメラ、QR解析、キャラクター、5時間タイマーを再開する。受付処理中と結果表示中は中断せず休止を延期する。Amazon専用アプリ1.0.3は休止中だけ画面点灯維持を解除し、Fire本体設定に従った画面消灯を許可する。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（受付高速化・5時間無操作で省電力休止・タップ復帰）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    'Amazon FireインストールURL':'https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html',
+    'Amazon Fire APK URL':'https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk',
+    'Amazon Fireアプリ版':'1.0.3（package jp.stepkobetsu.shuttaikun.fire／versionCode 103）',
+    '5時間休止仕様':'最後のタップ・マウス・キー操作・QR検出から5時間で休止。カメラMediaStream、QR解析、みかん動作、接続予熱を停止し、黒い休止画面を表示。受付処理中・結果表示中は中断しない。',
+    '休止からの復帰':'黒い休止画面の「画面をタップすると再開します」をタップすると、接続予熱、カメラ、QR解析、みかん動作、5時間タイマーを再開。',
+    'Amazon Fire省電力制御':'専用アプリ1.0.3ではWeb側SleepControl通知に合わせ、休止中だけFLAG_KEEP_SCREEN_ONを解除。Fire本体の画面消灯設定を有効にし、復帰後は点灯維持へ戻す。WebView遷移は現行WorkerのHTTPSホストだけを許可。',
+    '更新時の注意':'Web側のカメラ休止はアプリ再インストールなしでも反映。休止中の画面自動消灯には1.0.3へ更新が必要。1.0.2からは上書き更新可能。1.0.1以前の別アイコン版が残る場合だけ旧版をアンインストール。',
+    '最新版の場所':'student-QR main（3画面の5時間休止）／step-system-registry main（Fireアプリ1.0.3・APK・インストール案内）',
+    '正本ファイル':['tablet_checkin.html','tablet_checkin_compat.html','cloudflare/checkin-edge/src/legacy-tablet.html','fire-app/build-source.sh','.github/workflows/build-fire-app.yml'],
+    '主要機能':[...new Set([...toArray(base['主要機能']),'5時間無操作でカメラ停止','黒い省電力休止画面','画面タップでQR読取再開','Fire休止中の画面点灯維持解除'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'Node回帰試験5件、Worker型検査、自動試験36件に合格。3公開画面で5時間定数、休止画面、カメラ停止、タップ復帰、SleepControl呼出を確認。APK 1.0.3はGitHub Actionsでビルドしpackage・versionCode 103・versionName 1.0.3・アプリ名を検査。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'5時間無操作で休止','休止時のカメラMediaStream停止','休止時のQR解析・みかん動作・接続予熱停止','黒い休止画面','タップでカメラとQR読取を再開','受付処理中は休止を延期','Fire 1.0.3で休止中の画面点灯維持を解除','Fire 1.0.2から上書き更新可能','APK 1.0.3ビルド・識別情報検査','3公開画面へ反映'])],
+    '確認状況':'3画面の5時間休止・タップ復帰とFireアプリ1.0.3を公開し、Web試験・Worker試験・APKビルド検査を完了。'
+  });
+};
+</script>
 </body>
 </html>
