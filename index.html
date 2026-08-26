@@ -2482,5 +2482,40 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+
+<script id="student-qr-latency-compact-processing-20260827">
+const applyStudentQrLatencyCompactProcessing20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrLatencyCompactProcessing20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：QR読取直後の全画面「QRを読み取りました／受付を確認しています／そのまま少しお待ちください」は邪魔になるため撤去。カメラ映像と白い読取枠を残したまま、画面下部へ小さく「受付中です…」だけを表示する。ダミーSTEP-1001・STEP-1320でWorker内部74～148msを確認。新規接続全体2.96～4.00秒の大半がTLS接続開始2.73～3.76秒だったため、起動時・30秒ごと・画面復帰時にWorker /healthへ非同期接続し、QR読取前から通信を予熱する。Apps Script書き戻し用outboxの予約も受付応答後のバックグラウンド処理へ移した。';
+  const features=toArray(base['主要機能']).filter(value=>!String(value).includes('即時全画面')&&!String(value).includes('全画面確認'));
+  const confirmed=toArray(base['確認済み事項']).filter(value=>!String(value).includes('全画面即時表示')&&!String(value).includes('QR検出直後の全画面')&&!String(value).includes('QRを読み取りました'));
+  return Object.assign({},base,{
+    '状態':'本番使用中（受付高速化・カメラ継続表示・接続予熱）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    '通常タブレットURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    '旧端末互換URL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html',
+    '受付直後の表示':'カメラ映像と白い読取枠を表示したまま、画面下部に小さく「受付中です…」だけを表示。処理中の全画面表示は使用しない。保存結果受信後に氏名と入室／退室・出勤／退勤を表示する。',
+    '待ち時間の調査結果':'ダミーSTEP-1001・STEP-1320でWorker内部74～148ms。新規接続全体2.96～4.00秒の大半はTLS接続開始2.73～3.76秒。みかん演出は結果受信後のため待ち時間の原因ではない。',
+    '通信高速化':'Workerのoutbox予約を受付応答後のctx.waitUntilへ分離。3画面でpreconnectを設定し、起動時・30秒ごと・画面復帰時に/healthを非同期取得して接続を予熱。予熱失敗は受付を妨げない。',
+    '表示上の注意':'QR処理中もカメラ画面を維持する。小さい「受付中です…」は受付結果が返るまでの状態表示で、結果画面そのものではない。',
+    '変更しない仕様':'重複防止20秒、重複表示、退室レア通常80%・みかん5%・女性5%・塾長10%、待機中みかん11動作と各出現率は変更なし。',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／Worker応答 807cfa4・88fc888／全画面表示撤去と接続予熱／再配信 cdfeb842',
+    '正本ファイル':['cloudflare/checkin-edge/src/index.ts','cloudflare/checkin-edge/src/checkin-do.ts','cloudflare/checkin-edge/src/legacy-tablet.html','tablet_checkin.html','tablet_checkin_compat.html','cloudflare/checkin-edge/tests/legacy-tablet-page.test.ts'],
+    '主要機能':[...new Set([...features,'受付中もカメラ映像と白枠を継続表示','画面下部の小さい受付中表示','QR読取前のEdge接続予熱','受付後処理のバックグラウンド化'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '過去仕様の扱い':'以前登録したQR検出直後の即時全画面確認は撤回済み。現行はカメラ継続表示＋下部の小さい「受付中です…」。',
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'TypeScript型検査合格。Worker自動試験36件合格。3画面のインラインJavaScript構文検査合格。3公開URLでwarmEdgeConnection、30秒間隔、小さい受付中表示、旧全画面文言なしを確認。',
+    '確認済み事項':[...new Set([...confirmed,'Worker内部受付74～148ms','outbox予約を受付応答後へ分離','3画面のEdge接続予熱','30秒ごとの接続維持','受付中もカメラ映像を継続','画面下部の小さい受付中表示','処理中の全画面表示を撤去','Amazon Fire・通常版・旧端末版へ公開反映','重複20秒と退室レア出現率は変更なし'])],
+    '確認状況':'受付内部処理の高速化、接続予熱、全画面表示撤去を3画面へ反映。3公開URLと自動試験36件で確認済み。'
+  });
+};
+</script>
 </body>
 </html>
