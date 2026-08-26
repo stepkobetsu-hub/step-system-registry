@@ -2404,5 +2404,29 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="student-qr-juice-route-2pct-20260827">
+const applyStudentQrJuiceRoute2Pct20260827Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrJuiceRoute2Pct20260827Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const note='2026年8月27日：待機中みかんのオレンジ液体噴射を5%から約2%へ変更。減らした3%は地上歩行へ配分。白枠着席20%、跳ねる5%、画面外へ消えて復活5%、転がる5%は維持。5動作に必ず1回の白枠着席と、初回2回目の着席も維持した。Amazon Fire版・通常版・旧端末互換版へ共通反映。';
+  const features=toArray(base['主要機能']).filter(value=>!String(value).includes('液体噴射（5%）'));
+  const confirmed=toArray(base['確認済み事項']).filter(value=>!String(value).includes('液体噴射・転がるは各5%')&&!String(value).includes('液体噴射（5%）'));
+  return Object.assign({},base,{
+    '待機動作出現率':'白枠着席20%（5動作に必ず1回。初回は2回目に表示）。跳ねる5%／画面外へ消える5%／液体噴射2%／転がる5%。従来6動作は合計63%（地上歩行20%／転倒10%／中段登り12%／上段移動8%／パラシュート7%／高所落下・左右分割6%）。',
+    'オレンジ液体噴射仕様':'頭の葉と茎が外れ、頭頂部から細く長いオレンジ色の液体柱を噴射。柱は途中が不規則に膨らみ、先端と周囲に小さな飛沫が散る。旧版の皿状に見える横長先端と濃い輪郭は削除。出現率約2%。',
+    '最新版の場所':'stepkobetsu-hub/student-QR main／Worker b46d8d1／通常版 e90d89f／旧端末互換版 fe35b1b／Cloudflare反映トリガー 1dfdcc9',
+    '主要機能':[...new Set([...features,'葉と茎が外れる細長いオレンジ液体噴射（約2%）'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '確認日':'2026年8月27日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'3画面の抽選閾値を確認し、100万回相当の抽選試験で液体噴射2.01%、白枠着席20.00%、跳ねる5.01%、画面外消失5.00%、転がる4.97%を確認。JavaScript構文確認済み。',
+    '確認済み事項':[...new Set([...confirmed,'液体噴射を約2%へ変更','減らした3%を地上歩行へ配分','白枠着席20%を維持','跳ねる5%・画面外消失5%・転がる5%を維持','3画面の抽選閾値を統一'])],
+    '確認状況':'液体噴射約2%への変更を3画面へ反映。白枠着席20%とほかの動作割合を維持し、公開URL確認済み。'
+  });
+};
+</script>
 </body>
 </html>
