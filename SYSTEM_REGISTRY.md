@@ -943,3 +943,10 @@
 - 台帳文書: `SYSTEM_REGISTRY.md`
 - 認証API: `seiseki-kanri` のApps Script。権限2・3・4、API呼び出しごとのセッショントークン再確認を維持する。
 - 更新方法: このリポジトリの `main` に反映し、GitHub Pagesの公開結果をPC／スマートフォン幅で確認する。
+
+
+### 講師名札印刷 管理情報（2026-08-31確認）
+- 本番: https://step-name-badge.mintcocoajasmine.chatgpt.site
+- 管理方式: ChatGPT Sites（所有者限定公開）
+- GitHub正本: なし。資産管理画面に誤って表示されていた「GitHubを開く」導線は削除。
+- 画面修正: ChatGPT Sites「名札出力アプリ」で行う。
