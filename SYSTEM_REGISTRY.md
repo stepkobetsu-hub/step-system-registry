@@ -948,5 +948,5 @@
 ### 講師名札印刷 管理情報（2026-08-31確認）
 - 本番: https://step-name-badge.mintcocoajasmine.chatgpt.site
 - 管理方式: ChatGPT Sites（所有者限定公開）
-- GitHub正本: なし。資産管理画面に誤って表示されていた「GitHubを開く」導線は削除。
+- GitHub正本: 名札アプリ本体はChatGPT Sites管理のため専用GitHub正本なし。資産管理画面のGitHub URLは、本登録情報を保管する `https://github.com/stepkobetsu-hub/step-system-registry` を使用。
 - 画面修正: ChatGPT Sites「名札出力アプリ」で行う。
