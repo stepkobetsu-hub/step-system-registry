@@ -1,0 +1,35 @@
+name: Remove invalid ChatGPT Sites GitHub link
+
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-bad-chatgpt-sites-link.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove all invalid GitHub URL values
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          bad="'GitHub URL':'なし（ChatGPT Sites管理）',"
+          count=s.count(bad)
+          if count==0:
+              raise SystemExit('bad GitHub URL value not found')
+          s=s.replace(bad,"'GitHub URL':'',")
+          p.write_text(s,encoding='utf-8')
+          print(f'replaced {count} occurrences')
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Remove invalid GitHub link from name badge registry"
+          git push
