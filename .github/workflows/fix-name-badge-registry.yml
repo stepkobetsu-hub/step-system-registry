@@ -1,0 +1,44 @@
+name: Fix name badge registry
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-name-badge-registry.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Correct name badge registry metadata
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="'GitHub URL':'なし（ChatGPT Sites管理）',"
+          if old not in s:
+              raise SystemExit('target GitHub URL field not found')
+          s=s.replace(old,"'GitHub URL':'',",1)
+          s=s.replace("'最新版の場所':'ChatGPT Sites「名札出力アプリ」',","'最新版の場所':'ChatGPT Sites「名札出力アプリ」（GitHub正本なし）',",1)
+          s=s.replace("'更新方法':'講師の追加・退職・氏名・よみ・QR変更時は講師マスターを正本として、在籍者だけを名札アプリへ反映する。反映後は検索、QR、左右同一表示、A4一枚印刷を確認する。',","'更新方法':'画面修正はChatGPT Sites「名札出力アプリ」で行う（GitHub正本なし）。講師の追加・退職・氏名・よみ・QR変更時は講師マスターを正本として、在籍者だけを名札アプリへ反映する。反映後は検索、QR、左右同一表示、A4一枚印刷を確認する。',",1)
+          p.write_text(s,encoding='utf-8')
+
+          md=Path('SYSTEM_REGISTRY.md')
+          if md.exists():
+              t=md.read_text(encoding='utf-8')
+              note='\n\n### 講師名札印刷 管理情報（2026-08-31確認）\n- 本番: https://step-name-badge.mintcocoajasmine.chatgpt.site\n- 管理方式: ChatGPT Sites（所有者限定公開）\n- GitHub正本: なし。資産管理画面に誤って表示されていた「GitHubを開く」導線は削除。\n- 画面修正: ChatGPT Sites「名札出力アプリ」で行う。\n'
+              if '### 講師名札印刷 管理情報（2026-08-31確認）' not in t:
+                  t += note
+                  md.write_text(t,encoding='utf-8')
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html SYSTEM_REGISTRY.md
+          git diff --cached --quiet && exit 0
+          git commit -m "Correct name badge registry metadata"
+          git push
