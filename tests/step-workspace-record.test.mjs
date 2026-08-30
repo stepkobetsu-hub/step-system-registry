@@ -6,7 +6,7 @@ const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const registry=fs.readFileSync(new URL('../SYSTEM_REGISTRY.md',import.meta.url),'utf8');
 
 test('STEP業務ホームを正式な本番システムとして登録する',()=>{
-  assert.match(registry,/登録システム（25件）/);
+  assert.match(registry,/登録システム（26件）/);
   assert.match(registry,/\| STEP業務ホーム \| 本番（全端末共有・版競合防止） \| https:\/\/stepkobetsu-hub\.github\.io\/step-workspace\//);
   assert.match(html,/const STEP_WORKSPACE_CARD=/);
   assert.match(html,/'ID':'step-workspace'/);

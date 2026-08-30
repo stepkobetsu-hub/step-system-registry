@@ -48,7 +48,7 @@
     },
     {
       "正式名称": "V-code ID＆Pass 印刷",
-      "状態": "本番使用中",
+      "状態": "本番使用中（翌月分メール受信時の自動反映設定済み）",
       "利用者向けURL": "https://vcode-poster-maker.mintcocoajasmine.chatgpt.site"
     },
     {
@@ -65,6 +65,11 @@
       "正式名称": "過去問保管DB",
       "状態": "本番使用中",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html"
+    },
+    {
+      "正式名称": "遅刻・欠席・早退連絡",
+      "状態": "本番使用中（フォーム更新済み／Apps Script再デプロイ確認待ち）",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/step-form/"
     },
     {
       "正式名称": "STEP配信システム",
@@ -88,8 +93,8 @@
     },
     {
       "正式名称": "出退くんQR作成・読取",
-      "状態": "本番使用中（管理者アプリPC最適化・QR検索／カード印刷対応）",
-      "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html"
+      "状態": "本番使用中（講師メールP列対応 Apps Script v21／QR機能維持）",
+      "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec"
     },
     {
       "正式名称": "講師予定・夏休み出勤登録",

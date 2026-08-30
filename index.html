@@ -2550,5 +2550,41 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="student-qr-teacher-email-canonical-20260831">
+const applyStudentQrTeacherEmailCanonical20260831Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrTeacherEmailCanonical20260831Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const projectId='1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR';
+  const deploymentId='AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ';
+  const detailUrl='docs/student-qr-teacher-email-20260831.md';
+  const note='2026年8月31日：Issue #43。講師QR作成画面のメールを給与明細2026-6-「講師マスター」P列へ統一。本番Apps Scriptの同一デプロイをv21へ更新し、/exec URLを維持。登録済み・未登録レスポンス、本番公開HTML、QR表示・新規発行・印刷を回帰確認。講師ポータルへのフォールバックなし。個人メール実値は記録しない。';
+  return Object.assign({},base,{
+    '状態':'本番使用中（講師メールP列対応・Apps Script v21）',
+    '講師QR作成URL':'https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html',
+    'Apps Script本番URL':'https://script.google.com/macros/s/'+deploymentId+'/exec',
+    'Apps Script正本編集画面':'https://script.google.com/home/projects/'+projectId+'/edit',
+    'Apps Script project ID':projectId,
+    'Apps Script deployment ID':deploymentId,
+    'Apps Scriptバージョン':'v21（Issue #43 講師マスターP列メール表示）',
+    '講師データ正本':'Google Sheet「給与明細2026-6-」の「講師マスター」。A列=講師コード、B列=氏名、P列=メール、Q列=QR。',
+    '講師メール表示':'本番APIのemail／teacherEmailを優先。P列空欄は赤字「メールアドレス未登録」。講師ポータルへのフォールバックなし。',
+    '更新方法':'GitHub Pagesはstudent-QR/mainを更新。Apps Scriptはproject IDを確認してclasp pull・push・versionを行い、既存deployment IDを指定して新版へ更新。新規デプロイを作らず/exec URLを維持。',
+    '最新版の場所':'student-QR main ea46ba9d22148506a371801b21c5240f33dd9278／Apps Script v21／'+detailUrl,
+    '正本ファイル':[...new Set([...toArray(base['正本ファイル']),'teacher_qr_create.html','Apps Script コード.js',detailUrl])],
+    '主要機能':[...new Set([...toArray(base['主要機能']),'講師マスターP列メール表示','未登録メールの赤字表示','QR表示・新規発行・印刷'])],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+note,
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+note,
+    '確認日':'2026年8月31日',
+    '確認根拠':(base['確認根拠']?base['確認根拠']+'\n\n':'')+'Issue #43向け試験4件、Apps Script v21ローカル契約試験、GitHub Pages workflow 33337330422、公開HTMLを確認。認証済み講師画面のブラウザ操作はスタッフセッション未提供のため未実施。',
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'登録済み講師のP列メール応答','未登録講師の空メール応答とemailChecked','同一Apps Scriptデプロイのv21更新','GitHub Pages公開成功','講師ポータルへのフォールバックなし','QR表示・新規発行・印刷フック維持'])],
+    '未確認項目':'スタッフログイン済みブラウザによる、認証後の登録済み／未登録画面の目視操作。公開HTML・本番v21レスポンス契約・正本Sheet条件は確認済み。',
+    '関連Issue':'https://github.com/stepkobetsu-hub/student-QR/issues/43',
+    '確認状況':'同一/execのApps Script v21とGitHub Pagesを公開済み。登録済み／未登録のAPI契約とQR回帰を確認。認証済み画面の最終目視だけはスタッフセッションで実施する。'
+  });
+};
+</script>
 </body>
 </html>
