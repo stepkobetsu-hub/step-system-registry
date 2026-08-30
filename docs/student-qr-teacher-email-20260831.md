@@ -1,37 +1,63 @@
-# 出退くんQR 講師メール表示・Apps Script正本（2026-08-31）
+# 出退くんQR 講師メール表示・通知先メール安全化（2026-08-31）
 
 ## 対象と公開先
 
-- 作業依頼: [student-QR Issue #43](https://github.com/stepkobetsu-hub/student-QR/issues/43)
-- 画面正本: [stepkobetsu-hub/student-QR](https://github.com/stepkobetsu-hub/student-QR) `main`
-- 反映コミット: `ea46ba9d22148506a371801b21c5240f33dd9278`
-- 講師QR作成画面: https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html
-- Apps Script正本編集画面: https://script.google.com/home/projects/1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR/edit
-- Apps Script project ID: `1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR`
+- 作業依頼: student-QR Issue #43
+- 画面正本: `stepkobetsu-hub/student-QR` main
+- 講師QR作成画面: `teacher_qr_create.html`
+- 統合管理画面: `student_qr_register.html`
+- Apps Script正本 project ID: `1jZRwuaEqbhgg6xRQq63ke5QO9Wc2ulsGOA_gbmHfiehQIsr9NQLLqSZR`
 - 既存本番 deployment ID: `AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ`
-- 本番Webアプリ: https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec
-- 現行Apps Scriptバージョン: `v21`（説明: `Issue #43 講師マスターP列メール表示`）
+- 現行Apps Scriptバージョン: v21（Issue #43 講師マスターP列メール表示）
 
 ## データ正本
 
-- Google Sheet: [給与明細2026-6-](https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit)
+- Google Sheet: `給与明細2026-6-`
 - 対象タブ: `講師マスター`（sheet ID `2020620808`）
 - A列: 講師コード
 - B列: 氏名
 - P列: メールアドレス
 - Q列: QR情報
 
-メールアドレスの正本はP列だけとする。個人の氏名・メール実値・QR実値はGitHubや本台帳へ記録しない。
+講師メールアドレスの正本はP列だけとする。個人の氏名・メール実値・QR実値はGitHubや台帳へ記録しない。
 
-## 本番APIと画面の契約
+## 講師メール表示・変更リンク
 
-- 講師検索と通知先確認は同じ本番Apps Script APIを使用する。
-- 講師レスポンスは `email` と `teacherEmail` にP列の表示値を返し、確認済みであることを `emailChecked: true`、参照元を `emailSource: 講師マスターP列` で示す。
-- P列が空の場合も確認済みレスポンスとし、`email` と `teacherEmail` は空文字を返す。画面は赤字で「メールアドレス未登録」と表示する。
-- `teacher_qr_create.html` は本番APIの `email`／`teacherEmail` を優先し、講師ポータルAPIへフォールバックしない。
-- QR表示、新規QR発行、印刷の既存処理は維持する。
+- 講師検索と通知先確認は本番Apps Script APIを使用する。
+- 講師レスポンスは `email` / `teacherEmail` にP列の表示値を返す。
+- P列が空なら赤字で「メールアドレス未登録」と表示する。
+- 講師ポータルAPIをメール参照のフォールバックとして使用しない。
+- 「メールアドレス登録・変更」ボタンは `給与明細2026-6-` の `講師マスター` タブを直接開く。リンクには `?gid=2020620808#gid=2020620808` を指定する。
+- QR表示・新規QR発行・印刷の既存処理は維持する。
 
-## デプロイ手順
+## 通知先メール画面の安全化（生徒）
+
+2026-08-31に以下を追加・調整した。
+
+- 生徒検索はコード・氏名・フリガナ・ローマ字に対応。
+- 検索結果が複数の場合は「クリックして確定してください。」を赤字・太字で表示し、行クリック後に対象を確定する。
+- 検索結果が1人だけの場合は、クリック不要で自動確定し、その生徒の現在登録済みメールアドレス取得へ進む仕様へ変更。
+- 検索中・未確定状態では前の生徒のメールを残さず、メール欄を空にする。
+- 現在登録されているメールを取得中はポップアップを表示し、取得完了まで保存させない。
+- 通知先メール保存ボタンはオレンジ色。押下時に「本当に保存しますか？」の確認を出し、キャンセル可能とする。
+- メール未登録時は保存ボタン横に「⚠ メールアドレス未登録」を大きな太字・赤字・赤枠・薄赤背景で表示する。
+- 未登録状態からメールアドレスを入力し始めても警告は消さない。実際の保存成功を確認した時点で初めて警告を消す。
+- 別生徒を検索し始めた場合は未登録警告・選択状態・入力欄をリセットする。
+- 安全化処理の正本JSは `notify_email_safety.js`。`student_qr_register.html` から読み込む。
+
+## QR管理画面のUI整理（2026-08-31）
+
+- 従来の「新規QR発行・名札印刷」を2ページへ分離。
+  - `生徒用：新規QR発行`
+  - `講師用：新規QR発行・名札印刷`
+- 生徒用ページから名札印刷機能を削除。
+- 新規2ページにも既存画面と同じ左メニューを残し、画面幅・配置を統一。
+- ページ更新時に「入退くんQR取込」へ戻らず、現在のタブ/ページに留まるようハッシュによるタブ保持を追加。
+- QR印刷はカードサイズを前提とし、管理画面全体やメニューを印刷対象に含めない。
+- 生徒用QRの登録済み通知先メールをQR情報付近に表示し、未登録時は明瞭な赤字警告を表示。
+- 「メールアドレス登録・変更」導線を通知先メール画面へ接続。
+
+## 本番APIとデプロイ手順
 
 1. project IDを明示した作業コピーへ `clasp pull` し、現在の本番バージョンも別ディレクトリへ保全する。
 2. 変更差分を確認し、対象コードだけを `clasp push --force` する。
@@ -39,20 +65,24 @@
 4. `clasp deploy --deploymentId AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ --versionNumber <新バージョン>` で既存デプロイを更新する。
 5. `clasp deployments` で同じdeployment IDが新バージョンを指すことを確認する。
 
-新しいデプロイを作成せず、既存の `/exec` URLを維持する。GitHub Pages側は `student-QR/main` へのpush後、Pages workflow成功と公開HTMLを確認する。
+新しいデプロイを作成せず既存 `/exec` URLを維持する。GitHub Pages側は `student-QR/main` へのpush後、Pages workflow成功と公開HTMLを確認する。
 
-## 2026-08-31の反映・確認記録
+## 2026-08-31の確認記録
 
-- Apps Script本番deploymentを同じIDのまま `v20` から `v21` へ更新した。
-- GitHub Pages workflow run `33337330422` が成功し、公開HTMLで本番API優先、講師ポータルフォールバックなし、未登録文言、QR表示・発行・印刷フックを確認した。
-- 生データの実値を記録せず、登録済み代表コード `7001` はP列あり・Q列あり、未登録代表コード `7068` はP列空・Q列空であることを正本Sheetで確認した。
-- 本番v21ソースをSheetモックで実行し、登録済みはメールとQRを返し、未登録は空メールを `emailChecked: true` で返すことを確認した。
-- `student-QR` のIssue #43向け自動試験4件に合格。リポジトリ全体の既存失敗16件は変更前後で増加していない。
-- 認証済み講師画面のブラウザ操作は、作業環境にスタッフログインセッションがなかったため未実施。認証後の表示は上記の公開HTML・本番v21レスポンス契約・正本Sheet代表条件の組み合わせで検証した。
+- Apps Script本番deploymentを同じIDのまま v20 → v21へ更新。
+- 講師メールは講師マスターP列参照へ統一。
+- 登録済み／未登録API応答を確認。
+- QR表示・新規発行・印刷を回帰確認。
+- GitHub Pages公開成功。
+- 講師メール変更リンクを講師マスタータブ直リンクへ変更。
+- 通知先メール画面で「メールアドレス未登録」の強調表示と保存まで警告保持する変更を公開画面で確認。
+- 通知先メールの検索結果1人時の自動確定・メール取得仕様を追加。
 
 ## 回帰時の注意
 
-- P列以外や講師ポータルをメールの正本として再導入しない。
+- 講師メールの正本としてP列以外や講師ポータルを再導入しない。
+- メール未登録警告は「入力しただけ」で消さず、「保存成功」でのみ消す。
+- 生徒検索が複数候補なら自動確定しない。1人だけの場合のみ自動確定する。
 - ソース、Issue、テスト、台帳へ個人メール、パスワード、セッショントークン、QR実値を残さない。
-- Apps Script更新時はproject IDと既存deployment IDの両方を確認する。名前が似た別プロジェクトへpushしない。
-- QR関連の変更を伴う場合は、表示、新規発行、印刷の3経路を必ず回帰確認する。
+- Apps Script更新時はproject IDと既存deployment IDの両方を確認する。
+- QR関連変更時は、表示・新規発行・印刷・通知先メール取得/保存を回帰確認する。
