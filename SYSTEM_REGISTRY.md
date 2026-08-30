@@ -950,3 +950,8 @@
 - 管理方式: ChatGPT Sites（所有者限定公開）
 - GitHub正本: 名札アプリ本体はChatGPT Sites管理のため専用GitHub正本なし。資産管理画面のGitHub URLは、本登録情報を保管する `https://github.com/stepkobetsu-hub/step-system-registry` を使用。
 - 画面修正: ChatGPT Sites「名札出力アプリ」で行う。
+- 追加導線: 名札画面に濃緑色・白文字の「講師用：新規QR発行・名札印刷へ」ボタンを追加。遷移先は `https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html`。印刷時は非表示。
+- 印刷ボタン: 「この名札を印刷」は高さ80px、文字32px。
+- 印刷上余白: Chromeでは `@page` の上余白指定が印刷プレビューへ反映されなかったため、印刷領域の先頭に10mmの空白を直接追加。用紙設定だけに依存しない。
+- 変更時の注意: 展開時約200.2mm×68.2mm、左右4mm相当、印刷領域先頭10mmの空白を維持する。
+- 確認結果: 2026年8月31日、利用者が実際に印刷し、上余白を含め正常に印刷できることを確認。
