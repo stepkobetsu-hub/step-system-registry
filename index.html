@@ -2678,6 +2678,7 @@ organizeEntryImport=function(items){
 })();
 </script>
 
+
 <script id="foresta-progress-qr-button-20260831">
 (() => {
   const FORESTA_URL = 'https://stepkobetsu-hub.github.io/foresta-progress-v2/';
@@ -2706,18 +2707,36 @@ organizeEntryImport=function(items){
   const patch = () => {
     ensureStyle();
     const card = [...document.querySelectorAll('.card')].find((node) => node.querySelector('h2')?.textContent.trim() === 'フォレスタ進捗管理');
-    if (!card || card.querySelector('.foresta-qr-btn')) return;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'btn foresta-qr-btn';
-    button.textContent = 'QRコード';
-    button.onclick = showQr;
-    const target = card.querySelector('.card-body') || card;
-    const row = document.createElement('div');
-    row.className = 'link-row';
-    row.innerHTML = '<span class="link-name">利用者向けQRコード</span>';
-    row.appendChild(button);
-    target.prepend(row);
+    if (!card) return;
+
+    let button = card.querySelector('.foresta-qr-btn');
+    let row = button?.closest('.link-row');
+    if (!row) {
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn foresta-qr-btn';
+      button.textContent = 'QRコード';
+      button.onclick = showQr;
+      row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML = '<span class="link-name">利用者向けQRコード</span>';
+      row.appendChild(button);
+    } else {
+      button.onclick = showQr;
+    }
+
+    const appRow = [...card.querySelectorAll('.link-row')].find((candidate) =>
+      candidate !== row && candidate.querySelector('.link-name')?.textContent.trim() === '利用者向けアプリを開く'
+    );
+    if (appRow) {
+      if (row.nextElementSibling !== appRow || row.parentNode !== appRow.parentNode) {
+        appRow.parentNode.insertBefore(row, appRow);
+      }
+      return;
+    }
+
+    const target = card.querySelector('.daily-links') || card.querySelector('.card-body') || card;
+    if (!row.isConnected || row.parentNode !== target) target.prepend(row);
   };
   patch();
   let queued = false;
