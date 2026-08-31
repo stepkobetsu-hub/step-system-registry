@@ -1,0 +1,42 @@
+name: Add Foresta QR button
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/add-foresta-qr-button-20260831.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply QR button patch
+        run: node scripts/add-foresta-qr-button-20260831.mjs
+      - name: Verify marker
+        run: |
+          grep -q 'foresta-progress-qr-button-20260831' index.html
+          grep -q 'quickchart.io/qr' index.html
+      - name: Commit update
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- index.html; then
+            echo 'No changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Add Foresta QR button to registry'
+          git push origin HEAD:main
