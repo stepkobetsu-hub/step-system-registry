@@ -3,7 +3,6 @@ import fs from 'node:fs';
 const path = 'index.html';
 let html = fs.readFileSync(path, 'utf8');
 const marker = 'foresta-progress-qr-button-20260831';
-if (html.includes(marker)) process.exit(0);
 
 const block = `
 <script id="${marker}">
@@ -34,18 +33,36 @@ const block = `
   const patch = () => {
     ensureStyle();
     const card = [...document.querySelectorAll('.card')].find((node) => node.querySelector('h2')?.textContent.trim() === 'フォレスタ進捗管理');
-    if (!card || card.querySelector('.foresta-qr-btn')) return;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'btn foresta-qr-btn';
-    button.textContent = 'QRコード';
-    button.onclick = showQr;
-    const target = card.querySelector('.card-body') || card;
-    const row = document.createElement('div');
-    row.className = 'link-row';
-    row.innerHTML = '<span class="link-name">利用者向けQRコード</span>';
-    row.appendChild(button);
-    target.prepend(row);
+    if (!card) return;
+
+    let button = card.querySelector('.foresta-qr-btn');
+    let row = button?.closest('.link-row');
+    if (!row) {
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn foresta-qr-btn';
+      button.textContent = 'QRコード';
+      button.onclick = showQr;
+      row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML = '<span class="link-name">利用者向けQRコード</span>';
+      row.appendChild(button);
+    } else {
+      button.onclick = showQr;
+    }
+
+    const appRow = [...card.querySelectorAll('.link-row')].find((candidate) =>
+      candidate !== row && candidate.querySelector('.link-name')?.textContent.trim() === '利用者向けアプリを開く'
+    );
+    if (appRow) {
+      if (row.nextElementSibling !== appRow || row.parentNode !== appRow.parentNode) {
+        appRow.parentNode.insertBefore(row, appRow);
+      }
+      return;
+    }
+
+    const target = card.querySelector('.daily-links') || card.querySelector('.card-body') || card;
+    if (!row.isConnected || row.parentNode !== target) target.prepend(row);
   };
   patch();
   let queued = false;
@@ -58,6 +75,12 @@ const block = `
 </script>
 `;
 
-if (!html.includes('</body>')) throw new Error('body closing tag not found');
-html = html.replace('</body>', block + '\n</body>');
+const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const existing = new RegExp(`<script id=["']${escapedMarker}["']>[\\s\\S]*?<\\/script>\\s*`, 'm');
+if (existing.test(html)) {
+  html = html.replace(existing, block + '\n');
+} else {
+  if (!html.includes('</body>')) throw new Error('body closing tag not found');
+  html = html.replace('</body>', block + '\n</body>');
+}
 fs.writeFileSync(path, html);
