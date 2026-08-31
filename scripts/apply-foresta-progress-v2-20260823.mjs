@@ -2,61 +2,50 @@ import fs from 'node:fs';
 
 const path = 'index.html';
 let text = fs.readFileSync(path, 'utf8');
-const marker = 'foresta-progress-v2-three-rounds-20260823';
+const marker = 'foresta-progress-v2-qr-20260831';
 if (text.includes(marker)) {
-  console.log('Foresta three-round registry patch already applied.');
+  console.log('Foresta QR registry patch already applied.');
   process.exit(0);
 }
 
-const anchor = '<script id="foresta-progress-v2-registration-20260815">';
-const start = text.indexOf(anchor);
-if (start < 0) throw new Error('Foresta base registration block not found');
-const end = text.indexOf('</script>', start);
-if (end < 0) throw new Error('Foresta base registration closing script not found');
-const insertAt = end + '</script>'.length;
-
-const patch = `
+const block = `
 <script id="${marker}">
-const organizeForestaProgressV220260823Base=organizeEntryImport;
-organizeEntryImport=function(items){
-  const list=organizeForestaProgressV220260823Base(items);
-  const record=list.find(item=>item['ID']==='foresta-progress-v2');
-  if(record){
-    record['状態']='本番';
-    record['概要']='学校授業の先取りを目的とした通常授業用フォレスタ進捗管理。2026-08-23に3周進捗、生徒自身の周回入力、テスト範囲外確認、宿題UI改善を本番反映済み。ステップ＆ゴール進捗管理とは別システム。';
-    record['Apps Script概要']='生徒・講師・管理者認証、進行表、テスト範囲、学校進度、授業、CT、宿題、目標点、コメント、注意事項、特訓部屋、監査履歴に加え、1〜3周目の日付・生徒周回入力・範囲外確認済み保存を処理。';
-    const actions=Array.isArray(record['APIアクション'])?record['APIアクション']:[];
-    record['APIアクション']=[...new Set([...actions,'saveStudentRoundProgress'])];
-    record['最新版の場所']='stepkobetsu-hub/foresta-progress-v2（main）／3周対応本体マージ 0a0ca9bce9e48dcbe718571decbb2813b9eb02eb／2026-08-23 01:39 JST 本番API確認済み';
-    record['GitHubドキュメントURL']='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v2-three-rounds-20260823.md';
-    record['Apps Script現行版']='2026-08-23 3周対応版（既存デプロイIDを更新・本番API確認済み）';
-    record['保存先シート数']='22';
-    record['追加保存シート']='生徒周回進捗';
-    record['3周進捗仕様']='100%=1周目、200%=2周目、300%=3周目。表示上は100%をグラフ70%位置に置き、残り30%で2・3周目を表示。各周回の日付を保存。';
-    record['テスト範囲外入力']='範囲外単元も選択可能。ただし「次回テスト範囲外です」→「それでもすすみました／いいえ」を表示し、前者のみ保存。中1〜中3共通。';
-    record['2周目以降の宿題']='数学：TRYの赤×直し＋エクササイズの赤×直し。英語：KEYWORDSの暗記＋TRYの赤×直し＋エクササイズの赤×直し。';
-    const confirmed=Array.isArray(record['確認済み事項'])?record['確認済み事項']:[];
-    record['確認済み事項']=[...new Set([...confirmed,
-      'ログイン画面右上に管理者画面へを追加',
-      '端末種類未選択の警告を強化',
-      '進行表の章・難度等を単元名の前へ移動し1〜2行表示',
-      '予想範囲／決定範囲ラベルと範囲設定自動保存',
-      '進行表先読み・短時間キャッシュ',
-      'テスト範囲外は確認後に入力可能',
-      '生徒自身が1〜3周目を入力し日付保存',
-      '100%=70%位置の3周進捗グラフ',
-      '2周目以降の宿題自動作成',
-      '生徒宿題カードUIをステップ＆ゴール系書式へ改善',
-      '保存Spreadsheetに生徒周回進捗シートを追加（計22シート）',
-      'saveStudentRoundProgress API本番稼働確認',
-      '既存Apps ScriptデプロイIDのまま本番更新確認'
-    ])];
-    record['確認状況']='2026-08-23 01:39 JST、GET・health・新API saveStudentRoundProgress の実リクエストで本番デプロイ切替を確認済み。';
+(() => {
+  const APP_URL='https://stepkobetsu-hub.github.io/foresta-progress-v2/';
+  const QR_URL='https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data='+encodeURIComponent(APP_URL);
+  function showQr(){
+    let dialog=document.getElementById('forestaProgressQrDialog');
+    if(!dialog){
+      dialog=document.createElement('dialog');
+      dialog.id='forestaProgressQrDialog';
+      dialog.style.cssText='border:0;border-radius:18px;padding:0;max-width:390px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(0,0,0,.28)';
+      dialog.innerHTML='<div style="padding:22px;text-align:center"><h2 style="margin:0 0 8px;color:#102a43">フォレスタ進捗管理 QRコード</h2><p style="margin:0 0 14px;color:#627d98;font-size:13px">通常利用URL</p><img alt="フォレスタ進捗管理 QRコード" style="width:min(280px,80vw);height:auto;border:1px solid #d8e2ec;border-radius:12px;background:#fff;padding:8px" src="'+QR_URL+'"><p style="font-size:12px;overflow-wrap:anywhere;color:#486581">'+APP_URL+'</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="open" target="_blank" rel="noopener" href="'+APP_URL+'">ページを開く</a><button type="button" class="btn" id="closeForestaProgressQr">閉じる</button></div></div>';
+      document.body.appendChild(dialog);
+      dialog.querySelector('#closeForestaProgressQr').onclick=()=>dialog.close();
+      dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
+    }
+    if(!dialog.open)dialog.showModal();
   }
-  return list;
-};
+  function install(){
+    const card=[...document.querySelectorAll('.card')].find(card=>card.querySelector('h2')?.textContent.trim()==='フォレスタ進捗管理');
+    if(!card||card.querySelector('.forestaProgressQrButton'))return !!card;
+    const body=card.querySelector('.card-body')||card;
+    const group=document.createElement('div');
+    group.className='group forestaProgressQrGroup';
+    group.innerHTML='<h3>教室端末・スマホ用QR</h3><div class="link-row"><span class="link-name">フォレスタ進捗管理をQRで開く</span><button type="button" class="copy forestaProgressQrButton">QRコード表示</button></div>';
+    body.prepend(group);
+    group.querySelector('.forestaProgressQrButton').onclick=showQr;
+    return true;
+  }
+  if(!install()){
+    const observer=new MutationObserver(()=>{if(install())observer.disconnect();});
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+})();
 </script>`;
 
-text = text.slice(0, insertAt) + patch + text.slice(insertAt);
+const insertAt = text.lastIndexOf('</body>');
+if (insertAt < 0) throw new Error('body closing tag not found');
+text = text.slice(0, insertAt) + block + '\n' + text.slice(insertAt);
 fs.writeFileSync(path, text);
-console.log('Applied Foresta three-round registry patch.');
+console.log('Applied Foresta QR registry patch.');
