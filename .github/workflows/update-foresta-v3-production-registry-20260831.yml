@@ -1,0 +1,46 @@
+name: Update Foresta V3 production registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/update-foresta-v3-production-registry-20260831.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply Foresta V3 production registry patch
+        run: node scripts/update-foresta-v3-production-registry-20260831.mjs
+      - name: Verify production registry content
+        run: |
+          grep -q 'V3本番稼働中（Supabase標準経路' SYSTEM_REGISTRY.md
+          grep -q 'foresta-progress-v3-production-20260831.md' SYSTEM_REGISTRY.md
+          grep -q 'foresta-progress-v3-production-20260831' index.html
+          grep -q '7ae277815d380eb3a07504593c0fd43f677e8f1a' index.html
+          grep -q '289スナップショット' index.html
+          grep -q 'legacy=1' index.html
+      - name: Commit registry production update
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- SYSTEM_REGISTRY.md index.html; then
+            echo 'No registry changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SYSTEM_REGISTRY.md index.html
+          git commit -m 'Record Foresta V3 production cutover'
+          git push origin HEAD:main
