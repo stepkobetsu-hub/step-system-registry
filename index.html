@@ -2811,6 +2811,8 @@ organizeEntryImport=function(items){
     'デプロイID':'AKfycbz6_kf6oXCUycashVMMQ9-hrA73CtopL7xwPsm0DYkE5MxXJyxJrhkdnghIS70_KC641w',
     '公開URL':'https://script.google.com/macros/s/AKfycbz6_kf6oXCUycashVMMQ9-hrA73CtopL7xwPsm0DYkE5MxXJyxJrhkdnghIS70_KC641w/exec',
     'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563',
+    'Google Sheet URL 2':'https://docs.google.com/spreadsheets/d/1VPTdCQ2_Mws19r0xEPmic4qM65NK-BhLqmgtc-EUFVg/edit?gid=606739455#gid=606739455',
+    'Google Sheet 2':'講師出勤確認（回答）／フォームの回答 1（講師が送信した授業コマ数報告データ）',
     '正本スプレッドシート':'講師LINE通知管理（1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA）',
     '使用シート名':'講師LINE連携、講師LINE通知履歴',
     '参照データ':'講師勤怠ログの当日「出勤」、講師出勤確認（回答）の当日授業報告、給与明細2026-6- の講師マスター。',
@@ -2850,7 +2852,7 @@ organizeEntryImport=function(items){
     '関連カード':['講師ポータル','出退くんQR作成・読取'],
     '確認日':'2026年9月1日',
     '確認根拠':'2026年8月28日の実データでドライランし、出勤8名・報告済み7名・未報告1名を抽出。講師コード7001・加瀬俊介先生へのテスト送信成功、日付・曜日表示を確認。毎日の時間ベーストリガー1件を確認。',
-    '確認済み事項':['LINE登録画面を講師ポータル最上部へ掲載','採用時登録メールへの6桁確認番号','LINE利用者IDと講師コードの連携','当日出勤と授業報告の照合','毎日22:10ごろの自動確認','同日同一講師の重複送信防止','LINE未連携者への誤送信防止','日付・曜日付き通知文面','講師LINE通知管理シートへの履歴保存','既存LINE公式アカウントの共用','既存アプリと分離した通知処理','登録済み再訪時の完了表示','ページを閉じる／再登録するボタン','講師ポータル詳細から管理Googleシートを開く導線'],
+    '確認済み事項':['LINE登録画面を講師ポータル最上部へ掲載','採用時登録メールへの6桁確認番号','LINE利用者IDと講師コードの連携','当日出勤と授業報告の照合','毎日22:10ごろの自動確認','同日同一講師の重複送信防止','LINE未連携者への誤送信防止','日付・曜日付き通知文面','講師LINE通知管理シートへの履歴保存','既存LINE公式アカウントの共用','既存アプリと分離した通知処理','登録済み再訪時の完了表示','ページを閉じる／再登録するボタン','講師ポータル詳細から管理Googleシートを開く導線','講師ポータル詳細から授業コマ数報告データを開く導線'],
     '確認状況':'本番公開・定時トリガー設定・実データドライラン・講師7001へのテスト送信まで確認済み'
   };
   const portalIndex=out.findIndex(item=>String(item['システム名']||item['正式名称']||'').includes('講師ポータル'));
@@ -2880,10 +2882,16 @@ appendDailyLinks=function(item,article){
       if(reportRow)reportRow.before(reminderRow);else section.append(reminderRow);
     }
     const sheetLabel='講師LINE通知管理シート';
-    const sheetRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
+    let sheetRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
     if(!sheetRow){
-      const row=linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563');
-      reminderRow.after(row);
+      sheetRow=linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563');
+      reminderRow.after(sheetRow);
+    }
+    const reportDataLabel='授業コマ数報告データ';
+    const reportDataRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===reportDataLabel);
+    if(!reportDataRow){
+      const row=linkRow(reportDataLabel,'https://docs.google.com/spreadsheets/d/1VPTdCQ2_Mws19r0xEPmic4qM65NK-BhLqmgtc-EUFVg/edit?gid=606739455#gid=606739455');
+      if(reportRow)reportRow.after(row);else sheetRow.after(row);
     }
   }
   if(name==='コマ数報告してない連絡'){
