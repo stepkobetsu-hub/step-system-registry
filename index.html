@@ -2810,7 +2810,7 @@ organizeEntryImport=function(items){
     'Apps Script編集URL':'https://script.google.com/home/projects/17u-ZS8sGfq68L6vTOxCQkKL4l0RXn36Z_OkT0UmyXOYnxR_rC1eGvhKa/edit',
     'デプロイID':'AKfycbz6_kf6oXCUycashVMMQ9-hrA73CtopL7xwPsm0DYkE5MxXJyxJrhkdnghIS70_KC641w',
     '公開URL':'https://script.google.com/macros/s/AKfycbz6_kf6oXCUycashVMMQ9-hrA73CtopL7xwPsm0DYkE5MxXJyxJrhkdnghIS70_KC641w/exec',
-    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563',
     '正本スプレッドシート':'講師LINE通知管理（1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA）',
     '使用シート名':'講師LINE連携、講師LINE通知履歴',
     '参照データ':'講師勤怠ログの当日「出勤」、講師出勤確認（回答）の当日授業報告、給与明細2026-6- の講師マスター。',
@@ -2865,11 +2865,17 @@ appendDailyLinks=function(item,article){
   const section=article.querySelector('.daily-links');
   if(!section)return;
   if(name.includes('講師ポータル')){
-    const existing=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()==='コマ数報告してない連絡');
-    if(!existing){
-      const row=linkRow('コマ数報告してない連絡','https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html');
-      const reportRow=[...section.querySelectorAll('.link-row')].find(candidate=>candidate.querySelector('.link-name')?.textContent.trim()==='授業報告');
-      if(reportRow)reportRow.before(row);else section.append(row);
+    let reminderRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()==='コマ数報告してない連絡');
+    const reportRow=[...section.querySelectorAll('.link-row')].find(candidate=>candidate.querySelector('.link-name')?.textContent.trim()==='授業報告');
+    if(!reminderRow){
+      reminderRow=linkRow('コマ数報告してない連絡','https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html');
+      if(reportRow)reportRow.before(reminderRow);else section.append(reminderRow);
+    }
+    const sheetLabel='講師LINE通知管理シート';
+    const sheetRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
+    if(!sheetRow){
+      const row=linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563');
+      reminderRow.after(row);
     }
   }
   if(name==='コマ数報告してない連絡'){
