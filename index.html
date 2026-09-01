@@ -2957,14 +2957,14 @@ appendDailyLinks=function(item,article){
     article.insertBefore(section,toggle||null);
   }
   const entries=[
-    ['請求管理システム','学費計算・請求データ作成','請求管理システムを開く',item['請求管理システムURL']],
-    ['STEP請求書PDF作成・配信システム','請求書配信・PDF作成','請求書配信・PDF作成システムを開く',item['請求書配信PDF作成URL']]
+    ['学費計算・請求データ作成','請求管理システムを開く',item['請求管理システムURL']],
+    ['請求書配信・PDF作成','請求書配信・PDF作成システムを開く',item['請求書配信PDF作成URL']]
   ];
-  entries.forEach(([title,description,label,url])=>{
+  entries.forEach(([description,label,url])=>{
     if(!url)return;
     const entry=el('div','billing-system-entry');
     const heading=el('div','billing-system-entry-heading');
-    heading.append(el('strong','',title),el('span','',description));
+    heading.append(el('span','',description));
     entry.append(heading,linkRow(label,url));
     section.append(entry);
   });
@@ -2990,7 +2990,6 @@ const billingSystemsCardStyle=document.createElement('style');
 billingSystemsCardStyle.textContent=`
   .billing-system-entry{margin-top:10px;padding:12px;border:1px solid #bdd2ee;border-radius:12px;background:#f7fbff}
   .billing-system-entry-heading{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px;color:#102a43}
-  .billing-system-entry-heading strong{font-size:15px}
   .billing-system-entry-heading span{font-size:12px;color:#627d98}
   .billing-system-entry .link-row{margin:0}
   .billing-system-details{margin:12px 0 18px;padding:14px;border:2px solid #c7d9ee;border-radius:14px;background:#fbfdff}

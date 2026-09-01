@@ -42,6 +42,14 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
   assert.equal(result[0]['請求書配信PDF作成URL'],'https://example.com/pdf');
 });
 
+test('入口上部は小さい説明だけを残す',()=>{
+  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
+  assert.ok(script.includes("heading.append(el('span','',description))"));
+  assert.equal(script.includes("heading.append(el('strong','',title)"),false);
+  assert.ok(script.includes("['学費計算・請求データ作成','請求管理システムを開く'"));
+  assert.ok(script.includes("['請求書配信・PDF作成','請求書配信・PDF作成システムを開く'"));
+});
+
 test('台帳本文も請求システム1行として記録する',()=>{
   assert.match(registry,/\| 請求システム \| 本番使用中 \|/);
   assert.doesNotMatch(registry,/^\| 請求管理システムV3\.1/m);
