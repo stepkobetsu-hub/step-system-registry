@@ -102,14 +102,9 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html"
     },
     {
-      "正式名称": "請求管理システムV3.1（学費計算・請求データ作成）",
-      "状態": "本番使用中（Apps Script v74）",
+      "正式名称": "請求システム",
+      "状態": "本番使用中",
       "利用者向けURL": "https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec"
-    },
-    {
-      "正式名称": "STEP請求書PDF作成・配信システム",
-      "状態": "本番稼働中（明細連携・新規CSV取込最優先）",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/invoice-pdf/"
     },
     {
       "正式名称": "お問い合わせ管理",
