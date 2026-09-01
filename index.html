@@ -2611,9 +2611,9 @@ organizeEntryImport=function(items){
   const record=list.find(item=>item['ID']==='foresta-progress-v2');
   if(record){
     record['状態']='V3本番稼働中（管理者一覧もSupabase高速経路）';
-    record['概要']='学校授業の先取りを行う通常授業用フォレスタ進捗管理。生徒・講師・管理者の通常読込はSupabase V3スナップショット、保存は耐久mutation queueへ先に受付し、GAS反映は非同期。旧GASは明示ロールバック用に保全。';
-    record['本番構成']='GitHub Pages → Supabase Edge Function foresta-runtime-v3 → foresta_v3_snapshots / foresta_v3_mutations 等。管理者一覧は__global__スナップショット。ログインとGoogle互換ミラーはApps Script v19を利用。';
-    record['最新版の場所']='stepkobetsu-hub/foresta-progress-v2 main／cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a／PR #11マージ済み／Apps Script v19／GitHub Pages run 33404387829成功';
+    record['概要']='学校授業の先取りを行う通常授業用フォレスタ進捗管理。通常読込はSupabase V3スナップショット、通常保存は耐久mutation queue。管理者のテスト範囲保存saveRangeだけは信頼性優先でGAS同期保存とし、実保存完了後にだけ画面を閉じる。';
+    record['本番構成']='GitHub Pages → Supabase Edge Function foresta-runtime-v3 v8 → foresta_v3_snapshots / foresta_v3_mutations 等。管理者一覧は__global__スナップショット。saveRangeは非同期queue対象外でApps Script v20へ同期保存。';
+    record['最新版の場所']='stepkobetsu-hub/foresta-progress-v2 main／f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f／PR #12マージ済み／Apps Script v20／Runtime v8／GitHub Pages run 33500353501成功';
     record['GitHubドキュメントURL']='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v3-production-20260831.md';
     record['旧高速化試験資料']='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v3-fast-runtime-20260831.md（本番切替前の途中経過）';
     record['Apps Script現行版']='v19（V3生徒別・管理者__global__スナップショット生成、秘密鍵認証ミラー、mutation ID冪等化、旧GASロールバック）';
@@ -2637,12 +2637,12 @@ organizeEntryImport=function(items){
     record['役割色']='生徒＝やわらかい青、講師＝落ち着いた青緑、管理＝紫グレー。通常・hover・activeを区別し、保存・危険操作の意味色は維持。モバイル横スクロール対策済み。';
     record['ダミー確認']='1001 加瀬壮真（小5）と1320 加瀬智子（中2）を使用。小5絞り込み、1320 ID検索、一覧97行を確認。';
     record['管理者性能確認']='本日の速報 約14.5秒→約6.9秒（セッション復元込み）、全生徒 約17.3秒→約2.9秒。';
-    record['公開確認']='2026-08-31 GitHub Pages run 33404387829成功。main cf3fc3b0。npm test全件成功。生徒・講師既存高速経路と小学生仕様の回帰なし。';
+    record['公開確認']='2026-09-01 GitHub Pages run 33500353501（#475）成功。main f6e138a。npm test全件成功。Apps Script v20、Runtime v8、GAS health、公開app.jsの同期保存・queued拒否を確認。';
     record['保存先シート数']='22（旧Google保存Sheet。V3本番では復旧・非同期ミラー用として保全）';
     record['確認状況']='2026-09-01 V3本番・管理者高速経路を確認。1001小学生、1320中学生、管理者速報・全生徒、役割色、小学生専用宿題ページ、学校単元テストUI、Pages deploy成功まで確認。';
     record['Apps Scriptバージョン']='v19（管理者__global__スナップショット生成・既存デプロイID維持／2026年8月31日）';
     record['確認日']='2026年9月1日';
-    record['確認根拠']='foresta-progress-v2 main cf3fc3b0、PR #11、GitHub Pages run 33404387829、Apps Script v19、本番画面の1001 加瀬壮真（小5）・1320 加瀬智子（中2）、npm test全件成功。';
+    record['確認根拠']='foresta-progress-v2 main f6e138a、PR #12、GitHub Pages run 33500353501、Apps Script v20、foresta-runtime-v3 v8、saveRange cancelled_stale 66件・mirrored 253件・再試行対象0件、npm test全件成功。';
     const features=Array.isArray(record['主要機能'])?record['主要機能']:[];
     record['主要機能']=[...new Set([...features,
       '小学生：「次回の宿題を確認」から生徒ID・科目を引き継いで専用宿題ページへ遷移',
@@ -2672,7 +2672,10 @@ organizeEntryImport=function(items){
       '1205・1317を不整合データとしてquarantine',
       '1320でaccepted→mirrored保存と再生成確認',
       '認証付き読込約1.1秒',
-      'Apps Script v19 / foresta-runtime-v3 / foresta-timetable-sync',
+      'Apps Script v20 / foresta-runtime-v3 v8 / foresta-timetable-sync',
+      'saveRangeを同期GAS保存へ変更し、queuedを完了扱いしない',
+      'saveRangeの直列latest-wins・selector/testId整合性・保存完了後のみ閉じる',
+      '旧saveRange mutationをcancelled_staleへ隔離し再試行対象0件',
       '管理者getAdminDashboard / getAdminStudentsを__global__スナップショットへ移行',
       '1001 加瀬壮真（小5）・1320 加瀬智子（中2）の本番表示確認',
       '小学生専用宿題ページ・学校単元テストUI・役割色の回帰なし',

@@ -13,8 +13,8 @@
     },
     {
       "正式名称": "フォレスタ進捗管理",
-      "状態": "本番",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/"
+      "状態": "**V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）**",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/<br>緊急時: https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1"
     },
     {
       "正式名称": "定期テスト進捗管理",
@@ -28,7 +28,7 @@
     },
     {
       "正式名称": "成績管理",
-      "状態": "本番使用中",
+      "状態": "**本番稼働中（Supabase先行自動保存＋Google Sheet非同期ミラー）**",
       "利用者向けURL": "**講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html"
     },
     {

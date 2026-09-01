@@ -11,7 +11,7 @@
 - 本番URL: https://stepkobetsu-hub.github.io/foresta-progress-v2/
 - 本番GitHub: https://github.com/stepkobetsu-hub/foresta-progress-v2
 - 本番ブランチ: `main`
-- 現在のmain: `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`
+- 現在のmain: `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`
 - V3本番切替コミット: `7ae277815d380eb3a07504593c0fd43f677e8f1a`
 - 本番Supabase project: `wisedgcgwaebtkprdhth`
 - 本番Edge Function: `foresta-runtime-v3`（v4確認）
@@ -336,7 +336,7 @@ https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1
 PR #11「管理者一覧をSupabase高速経路へ移行」を `main` へマージした。
 
 - PR: https://github.com/stepkobetsu-hub/foresta-progress-v2/pull/11
-- マージ後main: `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`
+- マージ後main: `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`（PR #12まで反映）
 - 実装コミット: `6d9c54da9eae78db62d5d29617a2423f373e9c9b`
 - 同期後更新コミット: `157a08e216a1c5dc993caf28430a678470eacad8`
 - GitHub Pages run: https://github.com/stepkobetsu-hub/foresta-progress-v2/actions/runs/33404387829
@@ -389,7 +389,17 @@ Apps Scriptの `exportSnapshotsV3_` は一時的な管理者サービスセッ�
 
 ## 23. 最新main基準と回帰防止
 
-今後の変更は、古い小学生PRや古いブランチではなく、必ず最新の `main` を取得してから開始する。2026-09-01時点の基準は `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`。旧PR #2は未マージのまま閉鎖済みであり、そこから機能を戻さない。
+今後の変更は、古い小学生PRや古いブランチではなく、必ず最新の `main` を取得してから開始する。2026-09-01時点の基準は `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`。旧PR #2は未マージのまま閉鎖済みであり、そこから機能を戻さない。
+
+## 2026-09-01 テスト範囲保存の信頼性修正（PR #12）
+
+- 症状: 管理者画面で「保存して閉じる」を押しても、選択したテスト範囲が残らない場合があった。
+- 原因: `saveRange` を450ms間隔で非同期mutation queueへ送り、`queued:true` を保存完了扱いしていた一方、GAS側では30秒のScriptLockが競合していた。学校・学年変更後に古いtestIdが送られるケースもあった。
+- 修正: `saveRange` だけをV3非同期queueから外し、GAS同期保存の実完了を待つ。自動保存を直列latest-wins化し、保存直前にschool/grade/subject/testId/rangeTypeを再検証する。失敗時は画面を閉じない。
+- stale対策: GAS v20で旧saveRange mutationの再適用を拒否。Runtime v8で新規queue受付を停止し、migrationで旧saveRangeを`cancelled_stale`へ隔離した。
+- 反映順序: Apps Script v20 → foresta-runtime-v3 v8 → cleanup migration → PR #12マージ → GitHub Pages。
+- 本番結果: main `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`、Pages run `33500353501`（#475）成功。saveRangeは`cancelled_stale` 66件、`mirrored` 253件、再試行対象0件。
+- 検証: `npm test`全件、`node --check app.js`、`git diff --check`成功。GAS healthと公開app.jsへの同期保存・queued拒否反映を確認。
 
 特に次を回帰させない。
 
