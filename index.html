@@ -2608,13 +2608,13 @@ organizeEntryImport=function(items){
   const list=organizeForestaV3Production20260831Base(items);
   const record=list.find(item=>item['ID']==='foresta-progress-v2');
   if(record){
-    record['状態']='本番';
-    record['概要']='学校授業の先取りを行う通常授業用フォレスタ進捗管理。2026-08-31にSupabase V3を通常経路へ本番切替。読込は事前生成スナップショット、保存は耐久mutation queueへ先に受付し、GAS反映は非同期。旧GASは明示ロールバック用に保全。';
-    record['本番構成']='GitHub Pages → Supabase Edge Function foresta-runtime-v3 → foresta_v3_snapshots / foresta_v3_mutations 等。ログインとGoogle互換ミラーはApps Script v17を利用。';
-    record['最新版の場所']='stepkobetsu-hub/foresta-progress-v2 main／本番切替 7ae277815d380eb3a07504593c0fd43f677e8f1a／Supabase Edge Function v4／Apps Script v17／GitHub Pages deploy成功';
+    record['状態']='V3本番稼働中（管理者一覧もSupabase高速経路）';
+    record['概要']='学校授業の先取りを行う通常授業用フォレスタ進捗管理。生徒・講師・管理者の通常読込はSupabase V3スナップショット、保存は耐久mutation queueへ先に受付し、GAS反映は非同期。旧GASは明示ロールバック用に保全。';
+    record['本番構成']='GitHub Pages → Supabase Edge Function foresta-runtime-v3 → foresta_v3_snapshots / foresta_v3_mutations 等。管理者一覧は__global__スナップショット。ログインとGoogle互換ミラーはApps Script v19を利用。';
+    record['最新版の場所']='stepkobetsu-hub/foresta-progress-v2 main／cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a／PR #11マージ済み／Apps Script v19／GitHub Pages run 33404387829成功';
     record['GitHubドキュメントURL']='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v3-production-20260831.md';
     record['旧高速化試験資料']='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/foresta-progress-v3-fast-runtime-20260831.md（本番切替前の途中経過）';
-    record['Apps Script現行版']='v17（V3スナップショット生成・秘密鍵認証ミラー・mutation ID冪等化・旧GASロールバック）';
+    record['Apps Script現行版']='v19（V3生徒別・管理者__global__スナップショット生成、秘密鍵認証ミラー、mutation ID冪等化、旧GASロールバック）';
     record['Supabase本番']='project wisedgcgwaebtkprdhth／foresta-runtime-v3 v4／foresta-timetable-sync／service-role専用V3テーブル';
     record['通常利用']='https://stepkobetsu-hub.github.io/foresta-progress-v2/ （V3が既定ON。fastv3指定不要）';
     record['緊急ロールバック']='https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1 （旧GAS経路。Supabase・Googleデータを削除しない非破壊ロールバック）';
@@ -2628,10 +2628,16 @@ organizeEntryImport=function(items){
     record['受講科目確認']='1180は実データを変更せずREAD ONLYで算数・国語の両方を確認。V3移行前の原因は時間割ではなく受講科目キャッシュの陳腐化だった。';
     record['セキュリティ']='生パスワード・生セッショントークン・service role key・同期secretは公開コード／台帳へ保存しない。セッションはトークンハッシュ。V3テーブルはanon/authenticatedから直接アクセス不可。';
     record['Codex前に実施した高速化']='旧app.jsのGAS全依存と保存後の全画面再取得を原因特定。foresta-runtime-v3-staging、セッションハッシュ、SWR、read snapshot、mutation queue、再試行を先行試作し、?fastv3=1で通常運用を壊さず実測。その後Supabase正本化へ進んだ。';
-    record['Codex本番移行']='PR #8で時間割マスタ→Supabase同期、読込スナップショット、保存キュー、GASミラー、再試行、冪等化、隔離、安全条件、テストを実装。最終コミット7ae2778をmainへfast-forward。';
-    record['公開確認']='2026-08-31 GitHub Pages run 33352221976: build / report-build-status / deploy すべてsuccess。npm test全件成功。Supabase Security AdvisorのForesta V3 ERROR解消。';
+    record['Codex本番移行']='PR #8でV3基礎を本番切替。PR #11で管理者getAdminDashboard / getAdminStudentsをSupabase __global__スナップショットへ移行し、時間割同期成功後の自動更新を追加。';
+    record['管理者高速経路']='getAdminDashboard / getAdminStudentsは通常アクセスでforesta-runtime-v3へ送信。管理者権限確認後、student_id=__global__のスナップショットを返す。GASへの自動フォールバックは行わない。';
+    record['小学生確定仕様']='「次回の宿題を確認」から専用宿題ページへ遷移。旧確認・調整モーダルと旧関数を復活させない。国語自由記述、NEW小学ワーク光村 小1〜小6、国語／算数／英語の自動宿題を維持。';
+    record['学校単元テストUI']='表面の点数／表面の満点／裏面の点数／裏面の満点の短いラベルと、4入力欄下の「※裏面がないテストは、裏面の点数・満点は空欄でかまいません。」を上部欄・進行表内ダイアログの両方に表示。';
+    record['役割色']='生徒＝やわらかい青、講師＝落ち着いた青緑、管理＝紫グレー。通常・hover・activeを区別し、保存・危険操作の意味色は維持。モバイル横スクロール対策済み。';
+    record['ダミー確認']='1001 加瀬壮真（小5）と1320 加瀬智子（中2）を使用。小5絞り込み、1320 ID検索、一覧97行を確認。';
+    record['管理者性能確認']='本日の速報 約14.5秒→約6.9秒（セッション復元込み）、全生徒 約17.3秒→約2.9秒。';
+    record['公開確認']='2026-08-31 GitHub Pages run 33404387829成功。main cf3fc3b0。npm test全件成功。生徒・講師既存高速経路と小学生仕様の回帰なし。';
     record['保存先シート数']='22（旧Google保存Sheet。V3本番では復旧・非同期ミラー用として保全）';
-    record['確認状況']='2026-08-31 V3本番切替済み。75名289スナップショット、1320保存、1180算数＋国語、約1.1秒読込、Pages deploy成功まで確認。';
+    record['確認状況']='2026-09-01 V3本番・管理者高速経路を確認。1001小学生、1320中学生、管理者速報・全生徒、役割色、小学生専用宿題ページ、学校単元テストUI、Pages deploy成功まで確認。';
     const confirmed=Array.isArray(record['確認済み事項'])?record['確認済み事項']:[];
     record['確認済み事項']=[...new Set([...confirmed,
       '旧GAS経路の保存後全画面再取得が遅延要因と特定',

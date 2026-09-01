@@ -1,7 +1,7 @@
 # フォレスタ進捗管理 V3 本番移行・高速化 完全引継ぎ資料
 
-最終更新: 2026-08-31
-状態: **V3本番稼働中（Supabase標準経路／旧GASロールバック可）**
+最終更新: 2026-09-01
+状態: **V3本番稼働中（管理者一覧もSupabase標準経路／旧GASロールバック可）**
 台帳ID: `foresta-progress-v2`
 
 ## 1. 現在の結論
@@ -11,10 +11,11 @@
 - 本番URL: https://stepkobetsu-hub.github.io/foresta-progress-v2/
 - 本番GitHub: https://github.com/stepkobetsu-hub/foresta-progress-v2
 - 本番ブランチ: `main`
-- 本番切替コミット: `7ae277815d380eb3a07504593c0fd43f677e8f1a`
+- 現在のmain: `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`
+- V3本番切替コミット: `7ae277815d380eb3a07504593c0fd43f677e8f1a`
 - 本番Supabase project: `wisedgcgwaebtkprdhth`
 - 本番Edge Function: `foresta-runtime-v3`（v4確認）
-- Apps Script: v17確認
+- Apps Script: v19確認
 - 緊急ロールバック: 通常URL末尾に `?legacy=1` を付けると旧GAS経路を使用
 - 旧Google Sheet・旧GASは削除せず、移行期間の互換・復旧用として保全
 
@@ -330,4 +331,72 @@ https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1
 - 時間割同期仕様: `foresta-progress-v2/docs/FORESTA_V3_TIMETABLE_SYNC.md`
 - 本番PR: `foresta-progress-v2` PR #8
 
-この資料を2026-08-31以降の「フォレスタ進捗管理」V3運用の優先引継ぎ資料とする。
+## 19. 2026-08-31 PR #11 管理者一覧のSupabase高速経路
+
+PR #11「管理者一覧をSupabase高速経路へ移行」を `main` へマージした。
+
+- PR: https://github.com/stepkobetsu-hub/foresta-progress-v2/pull/11
+- マージ後main: `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`
+- 実装コミット: `6d9c54da9eae78db62d5d29617a2423f373e9c9b`
+- 同期後更新コミット: `157a08e216a1c5dc993caf28430a678470eacad8`
+- GitHub Pages run: https://github.com/stepkobetsu-hub/foresta-progress-v2/actions/runs/33404387829
+- Apps Script: v19（既存デプロイIDを維持）
+
+通常アクセスでは、管理者の `getAdminDashboard` と `getAdminStudents` も `foresta-runtime-v3` へ送る。Edge Functionは管理者権限を確認したうえで、`foresta_v3_snapshots` の `student_id='__global__'`、view `getAdminDashboard` / `getAdminStudents` を返す。権限不足は `FORBIDDEN` とする。
+
+Apps Scriptの `exportSnapshotsV3_` は一時的な管理者サービスセッションを使って両方の全体スナップショットを生成する。`foresta-timetable-sync` は時間割・受講科目同期成功後に内部認証で `refreshSnapshotsV3` を呼び、既存の15分同期周期内で管理者スナップショットも更新する。通常画面で失敗した場合にGASへ自動フォールバックする構成には戻していない。明示的な `?legacy=1` は緊急保守用として維持する。
+
+## 20. 現在の小学生UIと役割色の確定仕様
+
+小学生側では次の仕様を維持する。
+
+- 進行表右上は「次回の宿題を確認」。その場で調整モーダルを開かず、小学生専用の次回宿題ページへ移動する。可能な範囲で生徒ID・科目を引き継ぐ。
+- 小学生画面には「次回宿題を確認・調整」「宿題・進行表を訂正」を表示しない。
+- 旧 `saveElementaryTodayHomework` / `openElementaryHomeworkConfirm` を復活させない。
+- 国語自由記述「教科書漢字ドリルなど」、NEW小学ワーク光村 小1〜小6、国語／算数／英語の自動宿題を維持する。
+- 学校単元テスト入力は「表面の点数」「表面の満点」「裏面の点数」「裏面の満点」の短いラベルを使用する。4入力欄の下に「※裏面がないテストは、裏面の点数・満点は空欄でかまいません。」を表示する。上部入力欄と進行表内ダイアログの両方が対象。
+- ラベル文字は小さめ・原則1行表示とし、モバイルで横スクロールを発生させない。
+
+役割色は、生徒＝やわらかい青、講師＝落ち着いた青緑、管理＝紫グレー。通常・hover・activeを区別し、見出しや主要アクセントにも反映する。保存・危険操作の意味色は変更しない。
+
+中学生側の「次回宿題を確認・調整」と既存動作は変更対象外であり、小学生の旧文言を残してよいという意味ではない。
+
+## 21. PR #11 本番確認と実測
+
+本番に実データがまだないため、指定されたダミー生徒を使用した。
+
+- `1001 加瀬壮真`: 小5として一覧表示、小学生サマリー統合、学年「小5」絞り込みを確認。
+- `1320 加瀬智子`: 中2として一覧表示、生徒ID検索を確認。
+- 確認時の全生徒行数: 97。
+- 管理者「本日の速報」: 旧GAS約14.5秒 → V3約6.9秒（管理者セッション復元を含む）。
+- 管理者「全生徒」切替: 旧GAS約17.3秒 → V3約2.9秒。
+- 生徒・講師の既存Supabase高速経路を維持。
+- `npm test` 全件成功、`node --check app.js`、Apps Script構文確認、両Edge Functionの `deno check`、`git diff --check` を成功確認。
+
+管理者の初回セッション復元はログイン系の既存構成を含むため、上記約6.9秒にはその時間も含まれる。画面切替後の全生徒取得はSupabase全体スナップショットから約2.9秒だった。
+
+## 22. 現在のデプロイ情報
+
+- GitHub Pages: https://stepkobetsu-hub.github.io/foresta-progress-v2/
+- GitHub Pages成功run: https://github.com/stepkobetsu-hub/foresta-progress-v2/actions/runs/33404387829
+- Apps Script project ID: `1-hDf82U2uQ1zVL7WBXTyXyXXJxWsJvBHeOiTLj-N0AG3NAqXZcp6wv0M`
+- Apps Script deployment ID: `AKfycbz0z2FeM1jWUSs7LTzwi9N12kPoTmSTP_hRjTaf3wQlf5kX5hR_W9E37ON63L_dhbIZ`
+- Apps Script version: v19「Admin Supabase V3 global snapshots PR11」
+- Supabase project: `wisedgcgwaebtkprdhth`
+- Edge Functions: `foresta-runtime-v3` / `foresta-timetable-sync`
+
+秘密鍵、service role key、同期secret、パスワード、生セッショントークンは本資料に記録しない。
+
+## 23. 最新main基準と回帰防止
+
+今後の変更は、古い小学生PRや古いブランチではなく、必ず最新の `main` を取得してから開始する。2026-09-01時点の基準は `cf3fc3b0f26a4dae985fb40225b6d16ddfe0510a`。旧PR #2は未マージのまま閉鎖済みであり、そこから機能を戻さない。
+
+特に次を回帰させない。
+
+- 管理者・講師・生徒のSupabase高速読込をGASの画面表示ホットパスへ戻さない。
+- 小学生専用宿題ページと「次回の宿題を確認」を旧調整モーダルへ戻さない。
+- 小学生の自動宿題、教材、自由記述、学校単元テストUIを削らない。
+- 生徒＝青、講師＝青緑、管理＝紫グレーの区別とモバイル横スクロール対策を壊さない。
+- 変更ごとに `npm test` を全件成功させる。
+
+この資料を2026-09-01以降の「フォレスタ進捗管理」V3運用の優先引継ぎ資料とする。
