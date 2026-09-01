@@ -2638,7 +2638,24 @@ organizeEntryImport=function(items){
     record['公開確認']='2026-08-31 GitHub Pages run 33404387829成功。main cf3fc3b0。npm test全件成功。生徒・講師既存高速経路と小学生仕様の回帰なし。';
     record['保存先シート数']='22（旧Google保存Sheet。V3本番では復旧・非同期ミラー用として保全）';
     record['確認状況']='2026-09-01 V3本番・管理者高速経路を確認。1001小学生、1320中学生、管理者速報・全生徒、役割色、小学生専用宿題ページ、学校単元テストUI、Pages deploy成功まで確認。';
-    const confirmed=Array.isArray(record['確認済み事項'])?record['確認済み事項']:[];
+    record['Apps Scriptバージョン']='v19（管理者__global__スナップショット生成・既存デプロイID維持／2026年8月31日）';
+    record['確認日']='2026年9月1日';
+    record['確認根拠']='foresta-progress-v2 main cf3fc3b0、PR #11、GitHub Pages run 33404387829、Apps Script v19、本番画面の1001 加瀬壮真（小5）・1320 加瀬智子（中2）、npm test全件成功。';
+    const features=Array.isArray(record['主要機能'])?record['主要機能']:[];
+    record['主要機能']=[...new Set([...features,
+      '小学生：「次回の宿題を確認」から生徒ID・科目を引き継いで専用宿題ページへ遷移',
+      '小学生：国語自由記述、NEW小学ワーク光村 小1〜小6、国語／算数／英語の自動宿題',
+      '小学生学校単元テスト：短い4ラベルと裏面なし注意文を上部欄・進行表内ダイアログへ表示',
+      '役割色：生徒は青、講師は青緑、管理は紫グレー。通常・hover・activeを区別'
+    ])];
+    const cautions=Array.isArray(record['変更時の注意'])?record['変更時の注意']:[];
+    record['変更時の注意']=[...new Set([...cautions,
+      '必ず最新mainから開始し、閉鎖済み旧PR #2を基準にしない',
+      '小学生の旧確認・調整モーダル、saveElementaryTodayHomework、openElementaryHomeworkConfirmを復活させない',
+      'GASを生徒・講師・管理者の画面表示ホットパスへ戻さない',
+      'モバイル横スクロール対策と役割色を維持し、変更ごとにnpm testを全件成功させる'
+    ])];
+    const confirmed=(Array.isArray(record['確認済み事項'])?record['確認済み事項']:[]).filter(item=>item!=='Apps Script v17 / Supabase Edge Function v4');
     record['確認済み事項']=[...new Set([...confirmed,
       '旧GAS経路の保存後全画面再取得が遅延要因と特定',
       'Codex前にSupabase V3 stagingと?fastv3=1を実装・実測',
@@ -2653,7 +2670,10 @@ organizeEntryImport=function(items){
       '1205・1317を不整合データとしてquarantine',
       '1320でaccepted→mirrored保存と再生成確認',
       '認証付き読込約1.1秒',
-      'Apps Script v17 / Supabase Edge Function v4',
+      'Apps Script v19 / foresta-runtime-v3 / foresta-timetable-sync',
+      '管理者getAdminDashboard / getAdminStudentsを__global__スナップショットへ移行',
+      '1001 加瀬壮真（小5）・1320 加瀬智子（中2）の本番表示確認',
+      '小学生専用宿題ページ・学校単元テストUI・役割色の回帰なし',
       '通常URLをV3既定ONへ切替',
       '?legacy=1による旧GASロールバック',
       'GitHub Pages本番deploy成功',

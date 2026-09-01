@@ -29,5 +29,8 @@ test('Foresta admin fast path and preserved elementary specifications are record
   assert.match(registry, /管理者一覧もSupabase高速経路/);
   assert.match(html, /管理者高速経路/);
   assert.match(html, /学校単元テストUI/);
-  assert.match(html, /Apps Script v19/);
+  assert.match(html, /Apps Scriptバージョン.*v19/);
+  assert.match(html, /確認日.*2026年9月1日/);
+  assert.match(html, /必ず最新mainから開始/);
+  assert.match(html, /GASを生徒・講師・管理者の画面表示ホットパスへ戻さない/);
 });
