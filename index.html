@@ -2913,7 +2913,7 @@ organizeEntryImport=function(items){
   const out=organizeBillingSystemsCard20260901Base(items);
   const managementIndex=out.findIndex(item=>{
     const name=String(item['システム名']||item['正式名称']||'');
-    return name.includes('請求管理システムV3.1');
+    return name.includes('請求管理システム');
   });
   const deliveryIndex=out.findIndex(item=>{
     const name=String(item['システム名']||item['正式名称']||'');
@@ -2937,7 +2937,7 @@ organizeEntryImport=function(items){
     '請求書配信PDF作成URL':String(delivery['利用者向けURL']||''),
     '__billingSystems':[
       {title:'請求管理システム',description:'学費計算・請求データ作成',item:management},
-      {title:'STEP請求PDF作成・配信システム',description:'請求書配信・PDF作成',item:delivery}
+      {title:'STEP請求書PDF作成・配信システム',description:'請求書配信・PDF作成',item:delivery}
     ]
   };
   const filtered=out.filter((item,index)=>index!==managementIndex&&index!==deliveryIndex);
@@ -2958,7 +2958,7 @@ appendDailyLinks=function(item,article){
   }
   const entries=[
     ['請求管理システム','学費計算・請求データ作成','請求管理システムを開く',item['請求管理システムURL']],
-    ['STEP請求PDF作成・配信システム','請求書配信・PDF作成','請求書配信・PDF作成システムを開く',item['請求書配信PDF作成URL']]
+    ['STEP請求書PDF作成・配信システム','請求書配信・PDF作成','請求書配信・PDF作成システムを開く',item['請求書配信PDF作成URL']]
   ];
   entries.forEach(([title,description,label,url])=>{
     if(!url)return;

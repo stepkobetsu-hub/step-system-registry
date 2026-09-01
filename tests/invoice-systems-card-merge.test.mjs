@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 
 const page=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const registry=fs.readFileSync(new URL('../SYSTEM_REGISTRY.md',import.meta.url),'utf8');
@@ -11,10 +12,34 @@ test('請求関連の2システムを1枚の請求システムカードへまと
     '請求管理システムを開く',
     '請求書配信・PDF作成システムを開く',
     'billing-system-details',
-    'STEP請求PDF作成・配信システム'
+    'STEP請求書PDF作成・配信システム'
   ])assert.match(page,new RegExp(text));
+  assert.ok(page.includes("name.includes('請求管理システム')"));
   assert.match(page,/filter\(\(item,index\)=>index!==managementIndex&&index!==deliveryIndex\)/);
   assert.match(page,/filtered\.splice\(insertAt,0,merged\)/);
+});
+
+test('実画面のカード名でも2枚を1枚へ統合する',()=>{
+  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(script);
+  const sandbox={
+    CARD_ANCHORS:[],
+    organizeEntryImport:items=>items.map(item=>({...item})),
+    applyAssetInfo:item=>item,
+    applyConfirmedInfo:item=>item,
+    appendDailyLinks:()=>{},
+    addStandardContent:()=>{},
+    document:{createElement:()=>({textContent:''}),head:{appendChild:()=>{}}}
+  };
+  vm.runInNewContext(script,sandbox);
+  const result=sandbox.organizeEntryImport([
+    {'ID':'billing','システム名':'請求管理システム','利用者向けURL':'https://example.com/billing'},
+    {'ID':'step-invoice-pdf','システム名':'STEP請求書PDF作成・配信システム','利用者向けURL':'https://example.com/pdf'}
+  ]);
+  assert.equal(result.length,1);
+  assert.equal(result[0]['システム名'],'請求システム');
+  assert.equal(result[0]['請求管理システムURL'],'https://example.com/billing');
+  assert.equal(result[0]['請求書配信PDF作成URL'],'https://example.com/pdf');
 });
 
 test('台帳本文も請求システム1行として記録する',()=>{
