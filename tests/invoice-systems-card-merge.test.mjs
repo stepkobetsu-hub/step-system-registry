@@ -50,6 +50,13 @@ test('入口上部は小さい説明だけを残す',()=>{
   assert.ok(script.includes("['請求書配信・PDF作成','請求書配信・PDF作成システムを開く'"));
 });
 
+test('小さい説明と入口タイトルの隙間をなくし枠を低くする',()=>{
+  assert.match(page,/\.billing-system-entry\{margin-top:7px;padding:6px 10px/);
+  assert.match(page,/\.billing-system-entry-heading\{[^}]*margin-bottom:0;line-height:1\.2/);
+  assert.match(page,/\.billing-system-entry \.link-row\{margin:0\}/);
+  assert.match(page,/\.billing-system-entry \.open,\.billing-system-entry \.copy\{padding:6px 9px\}/);
+});
+
 test('台帳本文も請求システム1行として記録する',()=>{
   assert.match(registry,/\| 請求システム \| 本番使用中 \|/);
   assert.doesNotMatch(registry,/^\| 請求管理システムV3\.1/m);
