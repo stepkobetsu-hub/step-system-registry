@@ -2872,6 +2872,11 @@ appendDailyLinks=function(item,article){
       if(reportRow)reportRow.before(row);else section.append(row);
     }
   }
+  if(name==='コマ数報告してない連絡'){
+    const sheetLabel='講師LINE通知管理シート（Googleシート）';
+    const existing=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
+    if(!existing)section.append(linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit'));
+  }
 };
 </script>
 
