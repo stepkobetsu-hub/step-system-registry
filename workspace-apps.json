@@ -14,7 +14,8 @@
     {
       "正式名称": "フォレスタ進捗管理",
       "状態": "**V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）**",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/<br>緊急時: https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1"
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/",
+      "緊急時URL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1"
     },
     {
       "正式名称": "定期テスト進捗管理",
