@@ -8,6 +8,7 @@
   let draft=[];
   let saveTimer=null;
   let saving=false;
+  let dirtySinceSharedLoad=false;
 
   function clone(value){return JSON.parse(JSON.stringify(value));}
   function normalizeLink(link){
@@ -87,14 +88,15 @@
       const item=findItemForArticle(article);if(!item)return;
       const key=itemKey(item);
       let section=article.querySelector('.daily-links');
+      if(!section)section=ensureDailySection(article);
       if(hasOverride(key)){
-        section=ensureDailySection(article);
         section.querySelectorAll('.link-row,.registry-daily-empty').forEach(node=>node.remove());
         const links=config.cards[key];
         links.forEach(link=>section.append(createCustomLinkRow(link)));
         if(!links.length){const empty=document.createElement('p');empty.className='meta registry-daily-empty';empty.textContent='日常利用リンクはありません。';section.append(empty);}
+      }else if(!section.querySelector('.link-row')&&!section.querySelector('.registry-daily-empty')){
+        const empty=document.createElement('p');empty.className='meta registry-daily-empty';empty.textContent='日常利用リンクはありません。';section.append(empty);
       }
-      if(!section)return;
       const heading=section.querySelector('h3');if(!heading)return;
       if(!heading.querySelector('.registry-daily-edit')){
         const button=document.createElement('button');button.type='button';button.className='registry-daily-edit';button.textContent='✎ 編集';button.setAttribute('aria-label','日常利用のリンクを編集');button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();openEditor(key,article);});heading.append(button);
@@ -115,7 +117,8 @@
     try{
       const result=await api('getWorkspaceConfig');if(!result?.success)return;
       const remote=result.sharedState?.[SHARED_KEY];
-      if(remote){config=normalizeConfig(remote);persistLocal();render();setSync('全パソコンで共有中','ready');}
+      if(remote&&!dirtySinceSharedLoad){config=normalizeConfig(remote);persistLocal();render();setSync('全パソコンで共有中','ready');}
+      else if(remote){setSync('この端末の変更を保存待ちです','saving');}
       else setSync('編集内容は保存時に全パソコンへ共有されます','local');
     }catch(_){setSync('現在はこの端末の設定を表示しています','error');}
   }
@@ -131,7 +134,7 @@
         if(saved?.code==='WORKSPACE_VERSION_CONFLICT'){setSync('別端末の更新と重なりました。再保存します…','conflict');saveTimer=setTimeout(saveShared,900);return;}
         throw new Error(saved?.error||'共有設定を保存できませんでした。');
       }
-      setSync(`全パソコンへ保存しました（版 ${saved.version||expectedVersion+1}）`,'ready');
+      dirtySinceSharedLoad=false;setSync(`全パソコンへ保存しました（版 ${saved.version||expectedVersion+1}）`,'ready');
     }catch(error){setSync(error.message||'共有設定を保存できませんでした','error');}
     finally{saving=false;}
   }
@@ -145,7 +148,7 @@
     document.getElementById('registryDailyClose').addEventListener('click',closeEditor);document.getElementById('registryDailyCancel').addEventListener('click',closeEditor);document.getElementById('registryDailyAdd').addEventListener('click',()=>{draft.push({title:'',openUrl:'',copyUrl:''});renderDraft();});document.getElementById('registryDailySave').addEventListener('click',saveDraft);document.getElementById('registryDailyReset').addEventListener('click',resetDraft);panel.addEventListener('click',event=>{if(event.target===panel)closeEditor();});
   }
   function openEditor(key,article){
-    editingKey=key;draft=linksForKey(key,article).map(normalizeLink);const item=systems.find(entry=>itemKey(entry)===key);document.getElementById('registryDailyCardName').textContent=item?`${cardDisplayValues(item).title} の「日常利用」`:'日常利用';renderDraft();document.getElementById('registryDailyPanel').classList.remove('hidden');document.body.style.overflow='hidden';loadShared();
+    editingKey=key;draft=linksForKey(key,article).map(normalizeLink);const item=systems.find(entry=>itemKey(entry)===key);document.getElementById('registryDailyCardName').textContent=item?`${cardDisplayValues(item).title} の「日常利用」`:'日常利用';renderDraft();document.getElementById('registryDailyPanel').classList.remove('hidden');document.body.style.overflow='hidden';
   }
   function closeEditor(){document.getElementById('registryDailyPanel').classList.add('hidden');document.body.style.overflow='';editingKey='';draft=[];}
   function renderDraft(){
@@ -163,12 +166,12 @@
   function saveDraft(){
     if(!editingKey)return;
     const normalized=draft.map(link=>{const openUrl=String(link.openUrl||'').trim();return {title:String(link.title||'').trim()||'名称未設定',openUrl,copyUrl:String(link.copyUrl||'').trim()||openUrl};});
-    config.cards[editingKey]=normalized;persistLocal();render();scheduleSharedSave();const toast=document.getElementById('toast');if(toast){toast.textContent='日常利用を保存しました';toast.classList.remove('hidden');setTimeout(()=>{toast.classList.add('hidden');toast.textContent='URLをコピーしました';},1800);}closeEditor();
+    config.cards[editingKey]=normalized;dirtySinceSharedLoad=true;persistLocal();render();scheduleSharedSave();const toast=document.getElementById('toast');if(toast){toast.textContent='日常利用を保存しました';toast.classList.remove('hidden');setTimeout(()=>{toast.classList.add('hidden');toast.textContent='URLをコピーしました';},1800);}closeEditor();
   }
   function resetDraft(){
     if(!editingKey)return;
     if(!confirm('このカードの日常利用を元の内容に戻しますか？'))return;
-    delete config.cards[editingKey];persistLocal();render();scheduleSharedSave();closeEditor();
+    delete config.cards[editingKey];dirtySinceSharedLoad=true;persistLocal();render();scheduleSharedSave();closeEditor();
   }
 
   injectUi();
