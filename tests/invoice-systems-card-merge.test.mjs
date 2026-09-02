@@ -10,7 +10,7 @@ test('請求関連の2システムを1枚の請求システムカードへまと
   for(const text of [
     "'システム名':'請求システム'",
     '請求管理システムを開く',
-    '請求書配信・PDF作成システムを開く',
+    '請求書：作成・配信システムを開く',
     'billing-system-details',
     'STEP請求書PDF作成・配信システム'
   ])assert.match(page,new RegExp(text));
@@ -47,7 +47,7 @@ test('入口上部は小さい説明だけを残す',()=>{
   assert.ok(script.includes("heading.append(el('span','',description))"));
   assert.equal(script.includes("heading.append(el('strong','',title)"),false);
   assert.ok(script.includes("['学費計算・請求データ作成','請求管理システムを開く'"));
-  assert.ok(script.includes("['請求書配信・PDF作成','請求書配信・PDF作成システムを開く'"));
+  assert.ok(script.includes("['請求書配信・PDF作成','請求書：作成・配信システムを開く'"));
 });
 
 test('小さい説明と入口タイトルの隙間をなくし枠を低くする',()=>{
