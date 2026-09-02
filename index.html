@@ -3002,5 +3002,34 @@ billingSystemsCardStyle.textContent=`
 document.head.appendChild(billingSystemsCardStyle);
 </script>
 
+<script>
+const applyLearningProgress20260801Version82RecoveryBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgress20260801Version82RecoveryBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('学習進捗管理'))return base;
+  const unresolved=(Array.isArray(base['未確認項目'])?base['未確認項目']:[]).filter(value=>
+    !String(value).includes('保存') && !String(value).includes('ログイン障害')
+  );
+  return Object.assign({},base,{
+    '状態':'本番',
+    'Apps Script概要':'生徒認証はGoogle Sheetの生徒マスタ正本を使用。講師・管理者認証は従来どおり。進捗・目標範囲・宿題はApps Script経由でSupabaseへ保存する。期限付きセッション、本人studentId照合、差分一括保存、読込の並列化、短時間キャッシュ、宿題作成の重複防止を実装。',
+    '保存基盤':'認証：Google Sheet（生徒マスタ）／Supabase：学習進捗・生徒別目標・宿題・生徒プロフィール／Google Sheet：単元等のマスタ・監査・復旧用原本',
+    'データベース名':'Supabase learning-progress（Northeast Asia / Tokyo）',
+    'Supabase URL':'https://wisedgcgwaebtkprdth.supabase.co',
+    '使用シート名':'Supabase：learning_progress／student_targets／homework／student_profiles。student_authは保持するが本番の生徒認証には使用しない。Google Sheet：生徒マスタ認証、単元・標準範囲等のマスタ、操作履歴、エラーログ、達成節目および復旧用データ。',
+    'Webアプリ一覧':['v82（2026/08/01 6:48） 進捗保存・宿題作成のSupabase高速化／権限承認後の再公開。既存デプロイID AKfycbwu8lfhiH3_7m4ogHNtbgeo3ehx_VBMnt1mPXsvIlL_kMSpxFdrRD4rO_I6q_JUXIWHmg を維持'],
+    '正本ファイル':'stepkobetsu-hub/foresta-step-progress：index.html／apps-script/code.gs／apps-script/SupabaseStorage.gs／apps-script/DevelopmentRepair.gs／apps-script/appsscript.json。Apps Script本番には追加ファイル HomeworkFastPath.gs が存在。',
+    '確認日':'2026年8月1日',
+    '確認根拠':'Apps Script v82を既存デプロイへ反映。所有者がUrlFetchAppの外部リクエスト権限を承認後、testSupabaseStudentTargetDeltaWriteが success=true、changedRows=1、restored=true（約2.1秒）で完了。公開画面で生徒ログイン、目標範囲保存、進捗入力保存を順に確認し、利用者から最終的に「だいじょうぶでした」と確認を得た。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\\n\\n':'')+'2026年8月1日：高速保存経路の本番切替後に、生徒ログイン失敗と進捗・目標範囲の保存失敗が発生。いったん旧バージョンへ戻してログインを復旧し、原因を切り分けた。保存失敗の主因は、Apps Script所有者にUrlFetchApp.fetch（script.external_request）の承認が不足していたこと。権限承認後に直接差分保存テストを実行し正常化した。宿題テーブルは27重複グループ・余分33行・競合0件を確認し、public.homework_backup_before_dedupe_20260801へ1,109行をバックアップ後、1,076行へ重複整理して残存重複0件を確認。homework_assignment_unique_idxを再作成し、student_id・unit_id・school_year・round_number・assigned_date・homework_typeの複合キーで重複作成を防止。宿題作成は全件事前読込を避け、PostgRESTのon_conflictによる一括登録へ高速化した。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\\n\\n':'')+'現在の本番経路は GitHub Pages → Apps Script v82 → Supabase。SUPABASE_URL、SUPABASE_SERVICE_ROLE_KEY、SUPABASE_ENABLEDはApps ScriptのScript Propertiesで管理し、サービスロールキーの値はGitHub・台帳・画面へ保存しない。SupabaseはRLS有効、anon/authenticatedの直接権限なし。生徒ログインはGoogle Sheet正本を使用し、student_authは本番未使用。外部リクエスト権限の再承認が必要になるコード変更時は、公開前に所有者アカウントで診断関数を実行する。',
+    '確認済み事項':[...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script本番v82','既存デプロイID維持','UrlFetchApp外部リクエスト権限の承認','生徒ログイン成功','目標範囲保存成功','進捗入力保存成功','宿題重複27グループ・余分33行・競合0件の診断','宿題バックアップ1,109行','宿題重複整理後1,076行・残存重複0件','homework_assignment_unique_idx再作成','宿題作成の全件事前読込廃止・一括登録高速化','サービスロールキー非記載'],
+    '未確認項目':unresolved,
+    '確認状況':'Apps Script v82で本番復旧完了。生徒ログイン、目標範囲保存、進捗入力保存がすべて正常。Supabase高速化、宿題重複防止、Google Sheet認証・復旧経路を維持。'
+  });
+};
+</script>
+
 </body>
 </html>
