@@ -3070,5 +3070,90 @@ appendDailyLinks=function(item,article){
 };
 </script>
 
+<script id="canonical-app-links-20260902">
+(() => {
+  const URLS = Object.freeze({
+    payroll: 'https://script.google.com/macros/s/AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9/exec?app=payroll',
+    stepGoal: 'https://step-progress-api.stepkobetsu.workers.dev/',
+    foresta: 'https://stepkobetsu-hub.github.io/foresta-progress-v2/'
+  });
+
+  function canonicalApp(item){
+    const id=String(item['ID']||'');
+    const name=String(item['システム名']||item['正式名称']||'');
+    if(id==='teacher-payroll-processing'||name==='講師給与計算・出力アプリ'){
+      return {
+        key:'payroll',
+        url:URLS.payroll,
+        label:'講師給与計算・出力アプリを開く',
+        note:'現行のApps Script給与アプリ（app=payroll）です。'
+      };
+    }
+    if(id==='learning-progress'||name.includes('ステップ＆ゴール進捗管理')){
+      return {
+        key:'stepGoal',
+        url:URLS.stepGoal,
+        label:'ステップ＆ゴール進捗管理を開く（Cloudflare）',
+        note:'現行のCloudflare Worker本番入口です。旧GitHub Pages入口ではありません。'
+      };
+    }
+    if(id==='foresta-progress-v2'||name==='フォレスタ進捗管理'){
+      return {
+        key:'foresta',
+        url:URLS.foresta,
+        label:'フォレスタ進捗管理を開く（Supabase接続版）',
+        note:'画面はGitHub Pages、通常の読込・保存はSupabase V3へ接続する現行入口です。'
+      };
+    }
+    return null;
+  }
+
+  const applyCanonicalAppLinksBase=applyAssetInfo;
+  applyAssetInfo=function(item){
+    const base=applyCanonicalAppLinksBase(item);
+    const target=canonicalApp(base);
+    if(!target)return base;
+    const patch={
+      '利用者向けURL':target.url,
+      'URL確認日':'2026年9月2日',
+      'URL確認結果':target.note
+    };
+    if(target.key==='payroll'){
+      patch['Apps Script WebアプリURL']=target.url;
+    }else if(target.key==='stepGoal'){
+      patch['GitHub Pages URL']=target.url;
+    }else if(target.key==='foresta'){
+      patch['GitHub Pages URL']=target.url;
+    }
+    return Object.assign({},base,patch);
+  };
+
+  const canonicalAppLinkLabelBase=linkLabel;
+  linkLabel=function(item,field,fallback){
+    const target=canonicalApp(item);
+    if(target&&field==='利用者向けURL')return target.label;
+    if(target?.key==='payroll'&&field==='Apps Script WebアプリURL')return '講師給与計算・出力アプリを開く';
+    if(target?.key==='stepGoal'&&field==='Apps Script WebアプリURL')return '旧GAS API（通常利用しない）';
+    if(target?.key==='foresta'&&field==='Apps Script WebアプリURL')return 'GAS同期API（通常利用しない）';
+    return canonicalAppLinkLabelBase(item,field,fallback);
+  };
+
+  const addCanonicalAppDetailsBase=addStandardContent;
+  addStandardContent=function(item,body){
+    const target=canonicalApp(item);
+    if(target){
+      const section=el('section','group canonical-app-link');
+      section.append(
+        el('h3','','【現行アプリ入口（確認済み）】'),
+        linkRow(target.label,target.url),
+        el('p','technical-note',target.note+' 「アプリを開く」と、この詳細欄の入口は同じURLです。')
+      );
+      body.append(section);
+    }
+    addCanonicalAppDetailsBase(item,body);
+  };
+})();
+</script>
+
 </body>
 </html>
