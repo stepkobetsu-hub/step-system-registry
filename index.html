@@ -1615,7 +1615,7 @@ applyAssetInfo=function(item){
     '模試一括処理':'全員チェック・全解除は1人ずつ通信せず、一括更新サーバー関数を1回呼ぶ。個人変更は1名単位で保存可能。保存中／保存完了を表示する。同じ模試・同じ請求月の重複レコード大量作成を防ぐ。',
     '模試削除仕様':'通常の受験者選択は削除ではなく請求対象OFFを使う。チェック済み申込の一括削除は誤登録レコードの管理操作として提供する。削除後も対象学年の在籍生徒一覧は残り、請求対象OFFとして表示する。模試マスタは申込生徒の削除とは別管理で、名称変更・無効化・削除操作を区別する。',
     '特別調整仕様':'今月だけの調整、継続調整、旧データ確認、アーカイブ／復元を管理する。生徒は最新の在籍生徒から選択する。加算・減額、税抜金額、対象請求月を明示し、請求計算へ反映する。',
-    '料金特別調整専用URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
+    '料金特別調整専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html',
     '料金特別調整直接URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
     '専用画面仕様':'請求システムと同じデータ・認証・権限を使う特別調整専用入口。他機能の左ナビを非表示にし、スマホでは料金特別調整だけを全画面表示する。青い上部バー右端に小型ログアウトボタンを配置し、画面内の大きなログアウト欄は専用画面のみ非表示。',
     'スタッフ用アプリ連携':'stepkobetsu-hub/seiseki-kanri のスタッフ用アプリに「料金特別調整／イレギュラーな割引・加算を、気づいた時点で入力」カードを追加。AK=2・3・4だけ表示し、スマホ用入口を開く。',
@@ -2111,7 +2111,7 @@ applyAssetInfo=function(item){
     && !name.includes('PDF')&&!formalName.includes('PDF');
   if(!isBillingManagement)return base;
   return Object.assign({},base,{
-    '料金特別調整専用URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments'
+    '料金特別調整専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html'
   });
 };
 </script>
@@ -2934,7 +2934,7 @@ organizeEntryImport=function(items){
     '利用者':'STEPスタッフ',
     '運用担当':'管理者',
     '概要':'料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。',
-    '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
+    '料金特別調整URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html',
     '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
     '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
     '__billingSystems':[
