@@ -1,0 +1,32 @@
+name: Fix STEP workspace home button
+on:
+  push:
+    paths:
+      - .github/fix-workspace-home-button-20260903.trigger
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update STEP business home button
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '<div class="top-actions"><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="index.html">スタッフ用アプリへ戻る</a><button class="btn" id="logoutBtn" type="button">ログアウト</button></div>'
+          new = '<div class="top-actions"><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="https://stepkobetsu-hub.github.io/step-workspace/" style="display:inline-flex;align-items:center;gap:7px"><img src="https://stepkobetsu-hub.github.io/step-workspace/favicon-32x32.png" alt="" width="18" height="18" style="border-radius:3px">STEP業務ホームへ</a><button class="btn" id="logoutBtn" type="button">ログアウト</button></div>'
+          if old not in s:
+              raise SystemExit('target header action not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+          rm -f .github/fix-workspace-home-button-20260903.trigger
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+users.noreply.github.com'
+          git add index.html .github/fix-workspace-home-button-20260903.trigger
+          git commit -m 'fix: link registry header to STEP business home'
+          git push
