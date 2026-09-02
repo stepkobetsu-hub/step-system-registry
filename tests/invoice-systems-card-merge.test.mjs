@@ -38,7 +38,7 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
   ]);
   assert.equal(result.length,1);
   assert.equal(result[0]['システム名'],'請求システム');
-  assert.equal(result[0]['請求管理システムURL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#adjustments');
+  assert.equal(result[0]['請求管理システムURL'],'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec');
   assert.equal(result[0]['請求書配信PDF作成URL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices');
 });
 
