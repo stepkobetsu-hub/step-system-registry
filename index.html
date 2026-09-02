@@ -3051,6 +3051,23 @@ linkLabel=function(item,field,fallback){
   }
   return gradeManagementSupabaseLinkLabel20260902Base(item,field,fallback);
 };
+
+const appendGradeManagementSupabaseLinks20260902Base=appendDailyLinks;
+appendDailyLinks=function(item,article){
+  appendGradeManagementSupabaseLinks20260902Base(item,article);
+  const name=String(item['システム名']||item['正式名称']||'');
+  if(!(name.includes('成績管理')&&!name.includes('塾生アプリ')))return;
+  const labels=new Map([
+    ['https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html','生徒用 成績管理（Supabase移行済み）'],
+    ['https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html','講師・管理者用 成績管理（PR #16マージ後に移行版へ切替）'],
+    ['https://docs.google.com/spreadsheets/d/1Zq3AbL9Fx_skBUibh2F73kyWlw9Ionh3-dTOtots0D8/edit?gid=0#gid=0','Google Sheet（Supabase非同期ミラー確認用）']
+  ]);
+  article.querySelectorAll('.daily-links .link-row').forEach(row=>{
+    const href=row.querySelector('a.open')?.href;
+    const label=labels.get(href);
+    if(label)row.querySelector('.link-name').textContent=label;
+  });
+};
 </script>
 
 </body>
