@@ -1,0 +1,37 @@
+name: Enable registry detail editor
+on:
+  push:
+    paths:
+      - .github/enable-registry-detail-editor-20260903.trigger
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check and enable detail editor
+        run: |
+          node --check registry-detail-editor.js
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="registry-detail-editor.js?v=20260903-1"></script>'
+          if tag not in s:
+              anchor='<script src="registry-daily-links-editor.js?v=20260903-1"></script>'
+              if anchor not in s:
+                  raise SystemExit('daily links editor script tag not found')
+              s=s.replace(anchor, anchor+'\n'+tag, 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+          rm -f .github/enable-registry-detail-editor-20260903.trigger
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+users.noreply.github.com'
+          git add index.html .github/enable-registry-detail-editor-20260903.trigger
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: enable editable detail links and memos'
+            git push
+          fi
