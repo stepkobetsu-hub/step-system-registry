@@ -38,8 +38,8 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
   ]);
   assert.equal(result.length,1);
   assert.equal(result[0]['システム名'],'請求システム');
-  assert.equal(result[0]['請求管理システムURL'],'https://example.com/billing');
-  assert.equal(result[0]['請求書配信PDF作成URL'],'https://example.com/pdf');
+  assert.equal(result[0]['請求管理システムURL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#adjustments');
+  assert.equal(result[0]['請求書配信PDF作成URL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices');
 });
 
 test('入口上部は小さい説明だけを残す',()=>{
@@ -58,7 +58,7 @@ test('小さい説明と入口タイトルの隙間をなくし枠を低くす�
 });
 
 test('台帳本文も請求システム1行として記録する',()=>{
-  assert.match(registry,/\| 請求システム \| 本番使用中 \|/);
+  assert.match(registry,/\| 請求システム \| \*\*Cloudflare完全統合・本番稼働中（本番送信は無効）\*\* \|/);
   assert.doesNotMatch(registry,/^\| 請求管理システムV3\.1/m);
   assert.doesNotMatch(registry,/^\| STEP請求書PDF作成・配信システム/m);
   assert.match(registry,/請求・会計（3件）/);
