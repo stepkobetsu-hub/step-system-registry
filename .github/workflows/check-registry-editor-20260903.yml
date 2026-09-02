@@ -1,0 +1,12 @@
+name: Check registry editor
+on:
+  push:
+    paths:
+      - .github/check-registry-editor-20260903.trigger
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check registry-editor.js
