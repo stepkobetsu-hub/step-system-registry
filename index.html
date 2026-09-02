@@ -2933,7 +2933,8 @@ organizeEntryImport=function(items){
     '状態':'本番',
     '利用者':'STEPスタッフ',
     '運用担当':'管理者',
-    '概要':'学費計算・請求データ作成と、請求書配信・PDF作成の2つをまとめた請求業務の入口。',
+    '概要':'料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。',
+    '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
     '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
     '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
     '__billingSystems':[
@@ -2958,6 +2959,7 @@ appendDailyLinks=function(item,article){
     article.insertBefore(section,toggle||null);
   }
   const entries=[
+    ['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く',item['料金特別調整URL']],
     ['学費計算・請求データ作成','請求管理システムを開く',item['請求管理システムURL']],
     ['請求書配信・PDF作成','請求書：作成・配信システムを開く',item['請求書配信PDF作成URL']]
   ];

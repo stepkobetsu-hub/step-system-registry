@@ -10,6 +10,7 @@ test('請求関連の2システムを1枚の請求システムカードへまと
   for(const text of [
     "'システム名':'請求システム'",
     '請求管理システムを開く',
+    '料金特別調整を開く',
     '請求書：作成・配信システムを開く',
     'billing-system-details',
     'STEP請求書PDF作成・配信システム'
@@ -38,6 +39,7 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
   ]);
   assert.equal(result.length,1);
   assert.equal(result[0]['システム名'],'請求システム');
+  assert.equal(result[0]['料金特別調整URL'],'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec');
   assert.equal(result[0]['請求管理システムURL'],'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec');
   assert.equal(result[0]['請求書配信PDF作成URL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices');
 });
@@ -45,6 +47,7 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
 test('入口上部は小さい説明だけを残す',()=>{
   const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
   assert.ok(script.includes("heading.append(el('span','',description))"));
+  assert.ok(script.indexOf("['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く'")<script.indexOf("['学費計算・請求データ作成','請求管理システムを開く'"));
   assert.equal(script.includes("heading.append(el('strong','',title)"),false);
   assert.ok(script.includes("['学費計算・請求データ作成','請求管理システムを開く'"));
   assert.ok(script.includes("['請求書配信・PDF作成','請求書：作成・配信システムを開く'"));
