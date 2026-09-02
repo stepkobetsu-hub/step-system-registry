@@ -3003,5 +3003,55 @@ billingSystemsCardStyle.textContent=`
 document.head.appendChild(billingSystemsCardStyle);
 </script>
 
+<script id="grade-management-admin-supabase-links-20260902">
+for(let index=INVESTIGATION_DEFINITIONS.length-1;index>=0;index--){
+  if(INVESTIGATION_DEFINITIONS[index].cardAnchor==='grade-management')INVESTIGATION_DEFINITIONS.splice(index,1);
+}
+
+const applyGradeManagementAdminSupabase20260902Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyGradeManagementAdminSupabase20260902Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('成績管理')&&!name.includes('塾生アプリ')))return base;
+  return Object.assign({},base,{
+    '状態':'Supabase完全移行準備完了（管理者画面はPR #16マージ待ち）',
+    '概要':'テスト成績・通知表・志望校・学校マスタをSupabaseで管理し、Google Sheetへ非同期ミラーする',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html',
+    '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Zq3AbL9Fx_skBUibh2F73kyWlw9Ionh3-dTOtots0D8/edit?gid=0#gid=0',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/seiseki-kanri/pull/16',
+    '保存基盤':'Supabase Edge Functions＋Postgres/RLS（正本）＋Google Sheet非同期ミラー',
+    'Supabaseプロジェクト':'wisedgcgwaebtkprdhth',
+    'Supabase Edge Function':['生徒：seiseki-runtime-v1','管理者：seiseki-admin-runtime-v1 v6'],
+    'Google Sheet名':'成績管理（非同期ミラー確認用）',
+    '正式Spreadsheet名':'成績管理',
+    '使用シート名':['成績データ','通知表データ','志望校データ'],
+    '正本ファイル':['admin.html','juku_app.html','supabase/functions/seiseki-admin-runtime-v1/index.ts','supabase/functions/seiseki-admin-runtime-v1/storage.ts','supabase/migrations/'],
+    '最新版の場所':'管理者移行版：seiseki-kanri PR #16／branch feat/issue-15-admin-supabase-migration／commit bc1da80（未マージ）。生徒移行版：mainへ反映済み。',
+    '確認日':'2026年9月2日',
+    '更新日':'2026-09-02',
+    '確認根拠':'公開生徒画面は稼働Supabaseとseiseki-runtime-v1への接続を確認済み。管理者Runtime v6とDB migration 4件は本番反映済み。公開管理者画面はPR #16未マージのため、レビュー・マージ後に同じURLで移行版へ切り替わる。',
+    '仕様メモ':'管理者APIはSTEP職員セッションをサーバー側で再検証し、権限2・3・4だけを許可する。ブラウザーへservice_roleを配布しない。書込はmutation IDで冪等化し、Google Sheetへ順序保証付きで非同期ミラーする。',
+    '作業メモ':'Issue #15、PR #16。管理者RuntimeとDBは本番反映済みだが、admin.htmlの公開切替はPR #16のレビュー・マージ待ち。PRは自動マージしない。',
+    '注意事項':'生徒用リンクはSupabase移行済み。講師・管理者用リンクはURLとして正しいが、PR #16のマージまでは旧公開画面。Google Sheetは正本ではなく非同期ミラー確認先。認証情報・秘密鍵・個人情報の実値は記録しない。',
+    '確認済み事項':['生徒用リンクは稼働Supabaseへ接続済み','管理者用の恒久URLはadmin.html','管理者Runtime v6は本番稼働済み','管理者移行版ソースはPR #16','Google Sheetリンクは非同期ミラー確認先','生徒337件','テスト成績180件','通知表126件','志望校14件','学校マスタ6件','自動試験26件合格','ダミー生徒1320でE2E確認','検証用データ復元済み'],
+    '未確認項目':['PR #16マージ後の公開admin.htmlとseiseki-admin-runtime-v1の接続'],
+    '確認状況':'生徒画面・管理者Runtime・DB移行は本番反映済み。公開管理者画面はPR #16マージ待ち。'
+  });
+};
+
+const gradeManagementSupabaseLinkLabel20260902Base=linkLabel;
+linkLabel=function(item,field,fallback){
+  const name=String(item['システム名']||item['正式名称']||'');
+  if(name.includes('成績管理')&&!name.includes('塾生アプリ')){
+    if(field==='利用者向けURL')return '生徒用 成績管理（Supabase移行済み）';
+    if(field==='管理者向けURL')return '講師・管理者用 成績管理（PR #16マージ後に移行版へ切替）';
+    if(field==='Google Sheet URL')return 'Google Sheet（Supabase非同期ミラー確認用）';
+    if(field==='GitHub URL')return '管理者Supabase移行版 PR #16を開く';
+  }
+  return gradeManagementSupabaseLinkLabel20260902Base(item,field,fallback);
+};
+</script>
+
 </body>
 </html>
