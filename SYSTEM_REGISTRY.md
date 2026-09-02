@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-01
+最終更新: 2026-09-02
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -16,7 +16,7 @@
 | フォレスタ進捗管理 | **V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）** | https://stepkobetsu-hub.github.io/foresta-progress-v2/<br>緊急時: https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1 | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main`（本番 `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`） | `app.js`、`config.js`、`apps-script/Code.gs`、Supabase Edge Functions `foresta-runtime-v3` / `foresta-timetable-sync`、`foresta_v3_*` テーブル | GitHub Pages＋Supabase V3 Runtime v8＋Apps Script v20＋旧Google Sheet（ロールバック・ミラー用） | 通常読込はSupabaseスナップショット、通常保存はmutation queue。ただし管理者の `saveRange` は信頼性優先でGAS同期保存とし、実保存完了後だけ画面を閉じる。queuedを完了扱いせず、直列latest-wins、selector/testId整合性、旧キュー再適用拒否を実装。`?legacy=1` は旧GAS経路 | 2026-09-01 | PR #12をmainへマージ。Apps Script v20→Runtime v8→stale cleanup migration→Pages run 33500353501（#475）の順で本番反映。旧saveRangeはcancelled_stale 66件、mirrored 253件、再試行対象0件。`npm test` 全件成功、GAS health・公開app.jsを確認。詳細 `docs/foresta-progress-v3-production-20260831.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
-| 成績管理 | **本番稼働中（Supabase先行自動保存＋Google Sheet非同期ミラー）** | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main`（PR [#14](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/14)、merge `0d7a407524d56d8e57d3a860a94d4f3faf8ae58e`） | `admin.html`、`juku_app.html`、Supabase Edge Function `seiseki-runtime-v1`、Google Sheetミラー | GitHub Pages＋Supabase先行保存＋Google Sheet非同期ミラー | 生徒画面は点数・通知表を約0.5秒、志望校を約0.8秒で自動保存。保存中も入力継続可。緊急時は `SEISEKI_SUPABASE_AUTOSAVE=false` で旧Google方式へ復旧 | 2026-08-31 | ダミー生徒1320で、入力→自動保存→再読込保持→Supabase確認→Google Sheet反映を確認。テストデータ削除済み。秘密値・個人情報は台帳へ記録しない |
+| 成績管理 | **Supabase完全移行準備完了（管理者Runtime本番稼働・画面切替PR確認待ち）** | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main`（生徒用PR [#14](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/14)反映済み／管理者用PR [#16](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/16)未マージ） | `admin.html`、`juku_app.html`、Edge Functions `seiseki-runtime-v1` / `seiseki-admin-runtime-v1`、Supabase migrations、Google Sheetミラー | GitHub Pages＋Supabase Edge Functions＋Postgres/RLS＋Google Sheet非同期ミラー | 生徒・管理者ともSupabaseを正本経路とし、書込はmutation IDで冪等化。管理者APIはSTEP職員セッションをサーバー側で再検証し、権限2・3・4だけを許可。ミラー失敗は永続キューから順序保証付きで再試行 | 2026-09-02 | 稼働プロジェクト `wisedgcgwaebtkprdhth`。管理者Runtime v6とDB移行は本番反映済み。生徒337、成績180、通知表126、志望校14、学校6を移行・重複排除済み。1320でE2E確認後、テストデータを復元。画面切替はPR #16のレビュー・マージ後にmainへ反映 |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、`student_search_index.json`、成績管理共通GAS | GitHub Pages＋Apps Script＋STEP配信システム生徒検索情報 | Pages更新。検索索引は同一Pages内を先に読み込み、STEP配信システムの最新フリガナを非同期で補完。GAS変更時は成績管理への影響も確認 | 2026-08-26 | 漢字・ひらがな・カタカナ・ローマ字・生徒番号で検索可能。検索欄の下へ生徒一覧を表示し、名前を1回押して選択。検索結果は薄いクリーム色、選択後は青色＋チェック表示 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`を現行版とする。資産管理ページでは「受付カード・エントリーシート読み取り」カードに集約し、「エントリーシート（デジタル版）」も同カードの日常利用に表示する |
 | お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
@@ -48,6 +48,21 @@
 - 検証: ダミー生徒1320で点数・通知表・志望校を保存し、画面再読込後の保持、Supabaseの保存内容、Google Sheetミラーを確認した。確認後、点数・通知表・志望校のテスト痕跡を削除した。
 - 保存先Google Sheet: 「成績管理」。対象シートは「成績データ」「通知表データ」「志望校データ」。
 - 運用上の注意: 認証情報、秘密鍵、セッショントークン、生徒個人情報の実値はGitHub・台帳へ記載しない。
+
+## 成績管理：講師・管理者画面のSupabase完全移行（2026-09-02）
+
+- 対象: Issue [#15](https://github.com/stepkobetsu-hub/seiseki-kanri/issues/15)、PR [#16](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/16)。実装ブランチは `feat/issue-15-admin-supabase-migration`、コミットは `bc1da80`。PRは未マージで、自動マージも設定していない。
+- 稼働基盤: Supabaseプロジェクト `wisedgcgwaebtkprdhth`。旧プロジェクトは使用しない。管理者用Edge Function `seiseki-admin-runtime-v1` v6とマイグレーション4件は本番反映済み。
+- 管理者認証: ブラウザーから受け取ったSTEP職員セッションをEdge Functionが共通APIで再検証し、権限2・3・4だけを許可する。セッションキャッシュはトークンのSHA-256ハッシュだけを短時間保持し、トークン実値はDBへ保存しない。
+- データ保護: `service_role` はEdge Function内だけで使用する。成績関連テーブルはRLSを有効にし、`anon`／`authenticated` の直接権限を撤回した。ブラウザーへ秘密鍵を配布しない。
+- 管理対象: 生徒、テスト成績、通知表、志望校、学校マスタ。管理画面の取得・追加・更新・削除は管理者Runtimeへ集約する。
+- 移行結果: 生徒337件、テスト成績180件、通知表126件、志望校14件、学校マスタ6件。自然キー重複を排除し、生徒マスタに存在しない旧関連IDは参照整合性維持のため無効生徒プレースホルダー5件として保存した。
+- Google Sheetミラー: Supabase書込を先に確定し、mutation IDで冪等化する。Google Sheet反映は永続キューへ登録し、同一生徒の順序を保証して指数バックオフで再試行する。ミラー失敗を画面の保存失敗と混同しない。
+- 障害時: 認証エラーは旧APIへ迂回しない。管理画面の読み取りは `SEISEKI_ADMIN_SUPABASE=false` または明示的legacy切替で旧経路へ戻せる。書き込みは旧GASへのフォールバックを成功扱いにしない。
+- 検証: 自動試験26件合格。管理者権限、学生セッション拒否、ページング、校舎絞込、成績・通知表の作成／更新／削除、志望校の更新／復元、生徒画面からの再読込、Google Sheetミラーを確認した。検証用変更は削除または元の値へ復元済み。
+- 既知事項: 生徒ID 1001はマスタ上「小5」だが、既存共通認証APIが中学生の学年を要求するためログインできない。今回の管理者Supabase移行とは独立した既存の認証・マスタ不整合として扱う。最終E2Eは正常ログイン可能なダミー生徒1320で実施した。
+- 本番切替条件: PR #16をレビューしてmainへマージし、GitHub Pagesの `admin.html` が管理者Runtimeを利用することを再確認する。PRは自動マージしない。
+- 運用上の注意: 認証情報、パスワード、秘密鍵、セッショントークン、生徒個人情報の実値はGitHub・公開台帳へ記載しない。
 
 ## V-code ID＆Pass 印刷：本番仕様
 

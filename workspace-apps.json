@@ -28,7 +28,7 @@
     },
     {
       "正式名称": "成績管理",
-      "状態": "**本番稼働中（Supabase先行自動保存＋Google Sheet非同期ミラー）**",
+      "状態": "**Supabase完全移行準備完了（管理者Runtime本番稼働・画面切替PR確認待ち）**",
       "利用者向けURL": "**講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html"
     },
     {

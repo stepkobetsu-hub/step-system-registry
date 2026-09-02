@@ -527,21 +527,22 @@ applyAssetInfo=function(item){
   if(name.includes('成績管理'))Object.assign(patch,{
     '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html',
     '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
-    '保存基盤':'Supabase先行保存＋Google Sheet非同期ミラー',
+    '保存基盤':'Supabase Edge Functions＋Postgres/RLS＋Google Sheet非同期ミラー',
     'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Zq3AbL9Fx_skBUibh2F73kyWlw9Ionh3-dTOtots0D8/edit?gid=0#gid=0',
     'Google Sheet名':'成績管理',
     '正式Spreadsheet名':'成績管理',
     '保存先Spreadsheet ID':'1Zq3AbL9Fx_skBUibh2F73kyWlw9Ionh3-dTOtots0D8',
-    'Supabase Edge Function':'seiseki-runtime-v1',
-    '正本ファイル':'admin.html / juku_app.html（index.html はスタッフ用ポータル）',
-    '最新版の場所':'stepkobetsu-hub/seiseki-kanri main（PR #14／merge 0d7a407524d56d8e57d3a860a94d4f3faf8ae58e）',
-    '仕様メモ':'生徒用 juku_app.html は、点数・通知表を約0.5秒、志望校を約0.8秒のdebounceで自動保存する。Supabaseへ先に保存して画面入力を止めず、Google Sheetへ裏側で非同期ミラーする。保存後の全データ再取得は行わず、送信済みデータを画面内へ反映する。通信中も続けて入力できる。',
-    '復旧方法':'緊急時は feature flag SEISEKI_SUPABASE_AUTOSAVE を false にし、従来の共通API／Google方式・手動保存へ戻す。',
-    '確認根拠':'2026年8月31日、ダミー生徒1320で点数・通知表・志望校を保存し、Supabase再取得、画面再読込保持、Google Sheetミラーを確認。テストデータは確認後に削除済み。',
-    '作業メモ':'Issue #13、PR #14で別ブランチ実装・E2E検証後にmainへマージ。認証情報・秘密鍵・生徒個人情報の実値はGitHubへ記録しない。',
-    '確認済み事項':['講師・管理者用直接入口：admin.html','生徒用直接入口：juku_app.html','Supabase先行自動保存','点数・通知表：約0.5秒で自動保存','志望校：約0.8秒で自動保存','保存中も入力継続可能','保存後の全データ再取得を廃止','Google Sheet非同期ミラー','再読込後の保存保持','ダミー生徒だけでE2E確認','旧Google方式への復旧フラグ'],
-    '未確認項目':[],
-    '確認状況':'Supabase先行自動保存＋Google Sheetミラーを本番稼働中（2026-08-31確認）'
+    'Supabaseプロジェクト':'wisedgcgwaebtkprdhth',
+    'Supabase Edge Function':'生徒：seiseki-runtime-v1／管理者：seiseki-admin-runtime-v1 v6',
+    '正本ファイル':'admin.html / juku_app.html / supabase/functions/seiseki-admin-runtime-v1 / supabase/migrations（index.html はスタッフ用ポータル）',
+    '最新版の場所':'stepkobetsu-hub/seiseki-kanri main（生徒用PR #14反映済み）／管理者用PR #16・branch feat/issue-15-admin-supabase-migration・commit bc1da80（未マージ）',
+    '仕様メモ':'生徒用に加え、講師・管理者用の生徒・成績・通知表・志望校・学校マスタ操作を管理者Edge Functionへ集約した。STEP職員セッションをサーバー側で再検証し、権限2・3・4のみ許可する。書込はmutation IDで冪等化し、Google Sheetへ永続キューから順序保証付きで非同期ミラーする。',
+    '復旧方法':'生徒画面は SEISEKI_SUPABASE_AUTOSAVE=false、管理画面の読み取りは SEISEKI_ADMIN_SUPABASE=false または明示的legacy切替で旧経路へ戻す。認証エラーと管理画面の書込は旧APIへ成功扱いでフォールバックしない。',
+    '確認根拠':'2026年9月2日、管理者Runtime v6とDB migration 4件を本番反映。生徒337・成績180・通知表126・志望校14・学校6を移行し、ダミー生徒1320で管理画面と生徒画面、Google SheetミラーまでE2E確認。検証用変更は復元済み。',
+    '作業メモ':'Issue #15、PR #16で別ブランチ実装。PRは未マージ・自動マージなし。ブラウザーへservice_roleを配布せず、対象テーブルはRLSと直接権限撤回で保護。1001のログイン不可は既存共通認証APIと小5マスタの不整合。認証情報・秘密鍵・生徒個人情報の実値は記録しない。',
+    '確認済み事項':['講師・管理者用直接入口：admin.html','生徒用直接入口：juku_app.html','稼働Supabaseプロジェクトへの統一','管理者Runtime v6本番反映','STEP職員セッションのサーバー側再検証','権限2・3・4のみ許可','service_roleのブラウザー非公開','対象テーブルのRLSと直接権限撤回','生徒337件移行','テスト成績180件移行','通知表126件移行','志望校14件移行','学校マスタ6件移行','mutation IDによる冪等化','Google Sheet順序保証付き非同期ミラー','自動試験26件合格','ダミー生徒1320でE2E確認','検証用データ復元済み','旧経路への読取復旧フラグ'],
+    '未確認項目':['PR #16のレビュー・mainへのマージ・Pages反映後の管理画面再確認'],
+    '確認状況':'管理者Runtime・DB移行は本番反映済み。画面切替はPR #16のレビュー・マージ待ち（2026-09-02確認）'
   });
   if(name.includes('過去問'))Object.assign(patch,{
     '保存基盤':'Google Sheet＋Google Drive','Google Sheet URL':'https://docs.google.com/spreadsheets/d/1r3u0hvgv7SRBmuhpldEWyRpdahHPISkU1aioaYC4gU0/edit?gid=985838583#gid=985838583','Google Sheet名':'過去問保管DB','正式Spreadsheet名':'過去問保管DB','保存先Spreadsheet ID':'1r3u0hvgv7SRBmuhpldEWyRpdahHPISkU1aioaYC4gU0','使用シート名':'data','DriveフォルダURL':'https://drive.google.com/drive/folders/1201W051sgBNe3t7sVEcfKA3stXjXhdeR',
