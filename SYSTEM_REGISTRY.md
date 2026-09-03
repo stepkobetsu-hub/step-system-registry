@@ -981,6 +981,14 @@
 - 認証API: `seiseki-kanri` のApps Script。権限2・3・4、API呼び出しごとのセッショントークン再確認を維持する。
 - 更新方法: このリポジトリの `main` に反映し、GitHub Pagesの公開結果をPC／スマートフォン幅で確認する。
 
+### 請求書作成・配信：PDFライブラリ遅延読込（2026-09-03）
+
+- 対象: https://stepkobetsu-hub.github.io/invoice-pdf/#invoices
+- 変更: 通常の一覧表示では `html2canvas` と `jsPDF`（合計約563KB）を読み込まない。請求書または領収書のPDFを初めて作成するときだけ2ライブラリを並行読込し、2回目以降は読み込み済みのものを再利用する。
+- 正本: `stepkobetsu-hub/invoice-pdf` の `main`、PR [#30](https://github.com/stepkobetsu-hub/invoice-pdf/pull/30)、merge commit `c167d71715d70fe917d40a665edba4c1c40bdf64`。
+- 確認結果: 請求書PDF、領収書、保存・送信、遅延読込の自動テストに合格。公開初期画面で両ライブラリが読み込まれていないことを確認済み。
+- 運用上の注意: 最初のPDF作成時だけライブラリ取得時間が加わる。2回目以降のPDF作成では再取得しない。
+
 
 ### 講師名札印刷 管理情報（2026-08-31確認）
 - 本番: https://step-name-badge.mintcocoajasmine.chatgpt.site

@@ -67,3 +67,12 @@ test('台帳本文も請求システム1行として記録する',()=>{
   assert.match(registry,/請求・会計（3件）/);
   assert.match(registry,/合計42カード/);
 });
+
+test('PDFライブラリをPDF作成時だけ読み込む本番仕様を記録する',()=>{
+  assert.match(page,/invoice-pdf-lazy-library-registration-20260903/);
+  assert.match(page,/PDFライブラリをPDF作成時のみ遅延読込/);
+  assert.match(page,/PR #30/);
+  assert.match(page,/c167d71715d70fe917d40a665edba4c1c40bdf64/);
+  assert.match(registry,/請求書作成・配信：PDFライブラリ遅延読込（2026-09-03）/);
+  assert.match(registry,/最初のPDF作成時だけライブラリ取得時間が加わる/);
+});

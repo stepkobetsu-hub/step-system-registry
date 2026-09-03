@@ -2934,7 +2934,7 @@ organizeEntryImport=function(items){
     '利用者':'STEPスタッフ',
     '運用担当':'管理者',
     '概要':'料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。',
-    '料金特別調整URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html',
+    '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
     '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
     '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
     '__billingSystems':[
@@ -3153,6 +3153,28 @@ appendDailyLinks=function(item,article){
       body.append(section);
     }
     addCanonicalAppDetailsBase(item,body);
+  };
+})();
+</script>
+
+<script id="invoice-pdf-lazy-library-registration-20260903">
+(() => {
+  const applyInvoicePdfLazyLibraryBase=applyAssetInfo;
+  applyAssetInfo=function(item){
+    const base=applyInvoicePdfLazyLibraryBase(item);
+    const id=String(base['ID']||'');
+    const name=String(base['システム名']||base['正式名称']||'');
+    if(!(id==='step-invoice-pdf'||id==='billing-systems'||name.includes('STEP請求書PDF作成・配信システム')||name==='請求システム'))return base;
+    const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+    const note='2026年9月3日：請求書作成・配信画面の初期表示から html2canvas と jsPDF（合計約563KB）を除外。請求書または領収書のPDFを初めて作成するときだけ2ライブラリを並行読込し、2回目以降は読み込み済みのものを再利用する。invoice-pdf PR #30、merge commit c167d71715d70fe917d40a665edba4c1c40bdf64。';
+    return Object.assign({},base,{
+      'PDFライブラリ読込仕様':'html2canvas・jsPDFは通常の一覧表示では読み込まない。請求書／領収書のPDF作成時に初回だけ並行読込し、以降は再利用する。',
+      '最新版の場所':'stepkobetsu-hub/invoice-pdf main、PR #30、merge commit c167d71715d70fe917d40a665edba4c1c40bdf64',
+      '本番更新履歴':(base['本番更新履歴']?base['本番更新履歴']+'\n\n':'')+note,
+      '確認日':'2026年9月3日',
+      '確認済み事項':[...new Set([...confirmed,'PDFライブラリをPDF作成時のみ遅延読込','請求書・領収書の両方へ適用','2回目以降は読み込み済みライブラリを再利用','公開初期画面でhtml2canvas・jsPDF未読込を確認','invoice-pdf PR #30反映'])],
+      '確認状況':'PDFライブラリの遅延読込を本番反映し、通常表示で未読込・PDF関連自動テスト合格を確認済み'
+    });
   };
 })();
 </script>
