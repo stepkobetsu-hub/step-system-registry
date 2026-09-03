@@ -2905,6 +2905,9 @@ appendDailyLinks=function(item,article){
     }
   }
   if(name==='コマ数報告してない連絡'){
+    const bizLabel='LINE登録用URL（LINE BIZ貼り付け用）';
+    const bizExisting=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===bizLabel);
+    if(!bizExisting)section.append(linkRow(bizLabel,'https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html'));
     const sheetLabel='講師LINE通知管理シート（Googleシート）';
     const existing=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
     if(!existing)section.append(linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit'));
