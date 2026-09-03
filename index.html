@@ -2862,7 +2862,7 @@ organizeEntryImport=function(items){
   const portalIndex=out.findIndex(item=>String(item['システム名']||item['正式名称']||'').includes('講師ポータル'));
   if(portalIndex>=0){
     const portalItem=out[portalIndex];
-    const memo='「コマ数報告してない連絡」：講師LINE登録ページでは、登録済みの講師が再度開くと「登録完了済みです」を大きく表示し、「ページを閉じる」「再登録する」を選べる。講師ポータルの日常利用には、LINE登録ページの直下に「講師LINE通知管理シート」、その下に「授業報告」を配置。';
+    const memo='「コマ数報告してない連絡」：講師LINE登録ページでは、登録済みの講師が再度開くと「登録完了済みです」を大きく表示し、「ページを閉じる」「再登録する」を選べる。講師ポータルの日常利用には「LINE登録用URL（LINE BIZ貼り付け用）」を掲載。貼り付ける正しいURLは https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html 。欠席・遅刻連絡用のLIFF URLは使用しない。管理シートと授業コマ数報告データへのリンクも掲載。';
     const current=portalItem['仕様メモ'];
     const memos=Array.isArray(current)?current.slice():(current?[current]:[]);
     if(!memos.includes(memo))memos.push(memo);
@@ -2885,11 +2885,17 @@ appendDailyLinks=function(item,article){
       reminderRow=linkRow('コマ数報告してない連絡','https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html');
       if(reportRow)reportRow.before(reminderRow);else section.append(reminderRow);
     }
+    const bizLabel='LINE登録用URL（LINE BIZ貼り付け用）';
+    let bizRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===bizLabel);
+    if(!bizRow){
+      bizRow=linkRow(bizLabel,'https://stepkobetsu-hub.github.io/step-form/teacher_line_register.html');
+      reminderRow.after(bizRow);
+    }
     const sheetLabel='講師LINE通知管理シート';
     let sheetRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===sheetLabel);
     if(!sheetRow){
       sheetRow=linkRow(sheetLabel,'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit?gid=390023563#gid=390023563');
-      reminderRow.after(sheetRow);
+      bizRow.after(sheetRow);
     }
     const reportDataLabel='授業コマ数報告データ';
     const reportDataRow=[...section.querySelectorAll('.link-row')].find(row=>row.querySelector('.link-name')?.textContent.trim()===reportDataLabel);
