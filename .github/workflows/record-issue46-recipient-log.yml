@@ -1,0 +1,31 @@
+name: Record Issue 46 recipient log updates
+on:
+  push:
+    paths:
+      - 'scripts/record-issue46-recipient-log.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply registry update
+        run: node scripts/record-issue46-recipient-log.mjs
+      - name: Basic checks
+        run: |
+          grep -q 'Apps Script「生徒QR」v86' SYSTEM_REGISTRY.md
+          grep -q '送信先別結果' SYSTEM_REGISTRY.md
+          grep -q 'student-qr-multi-recipient-log-20260904' index.html
+          grep -q 'Issue #46' docs/student-qr-multi-recipient-log-20260904.md
+      - name: Commit registry changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SYSTEM_REGISTRY.md index.html docs/student-qr-multi-recipient-log-20260904.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record Issue 46 multi-recipient mail logging'
+          git push
