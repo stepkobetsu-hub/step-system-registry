@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'scripts/record-issue46-recipient-log.mjs'
+      - '.github/workflows/record-issue46-recipient-log.yml'
   workflow_dispatch:
 permissions:
   contents: write
