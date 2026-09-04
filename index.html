@@ -3255,6 +3255,50 @@ appendDailyLinks=function(item,article){
 })();
 </script>
 
+
+<script id="student-qr-multi-recipient-log-20260904">
+(() => {
+  const baseApply=applyAssetInfo;
+  const arr=v=>Array.isArray(v)?v:(v?[String(v)]:[]);
+  const merge=(base,key,items)=>[...new Set([...arr(base[key]),...items])];
+  const append=(base,key,note)=>[base[key],note].filter(Boolean).join('\n\n');
+  applyAssetInfo=function(item){
+    const base=baseApply(item);
+    const name=String(base['システム名']||base['正式名称']||'');
+    if(name.includes('不達メール')){
+      const note='2026年9月4日 Issue #46：Apps Script v86。複数宛先ではBrevo Webhookを該当メールアドレスだけに反映し、別宛先の成功状態を維持する。送信先別結果と不達管理の対象アドレスを一致させる。';
+      return Object.assign({},base,{
+        '状態':'本番使用中（請求書不達集約・一時エラー自動再試行・宛先別Webhook追跡）',
+        '現在のApps Script版':'バージョン86（2026年9月4日）',
+        'Apps Scriptバージョン':'86',
+        '最新版の場所':'stepkobetsu-hub/student-QR main 499db6e4ca56e04840b24ec0a2a12584de207bfb／Apps Script「生徒QR」v86／Issue #46',
+        '仕様メモ':append(base,'仕様メモ',note),
+        '作業メモ':append(base,'作業メモ',note),
+        '確認日':'2026年9月4日',
+        '確認済み事項':merge(base,'確認済み事項',['宛先別Webhook更新','別宛先の成功状態を維持','Apps Script v86','Issue #46完了・クローズ','既存deployment ID・WebアプリURL維持','HTTP 200確認']),
+        '未確認項目':[],
+        '確認状況':'複数宛先の宛先別Webhook追跡をApps Script v86へ本番反映済み'
+      });
+    }
+    if(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')){
+      const note='2026年9月4日 Issue #46：入退室ログのメール送信結果を件数付き表示へ変更し、送信先メールを実キュー宛先で記録。末尾に送信先別結果列を追加し、最大4件までメール1：配信完了／メール2：一時エラー等を表示。Webhookは該当宛先だけ更新。過去ログは推測で書き換えない。追加テスト6/6合格。全体テスト17件の旧期待値不一致は今回差分外。';
+      return Object.assign({},base,{
+        '状態':'本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）',
+        '現在のApps Script版':'バージョン86（2026年9月4日）',
+        'Apps Scriptバージョン':'86',
+        '最新版の場所':'stepkobetsu-hub/student-QR main 499db6e4ca56e04840b24ec0a2a12584de207bfb／Apps Script「生徒QR」v86／Issue #46',
+        '仕様メモ':append(base,'仕様メモ',note),
+        '作業メモ':append(base,'作業メモ',note),
+        '確認日':'2026年9月4日',
+        '確認済み事項':merge(base,'確認済み事項',['メール送信結果を件数付き表示','送信先メールを実キュー宛先で保存','送信先別結果列を追加','最大4宛先対応','宛先別Webhook更新','他宛先成功状態を維持','過去ログの推測書換えなし','追加テスト6/6合格','Apps Script v86','既存deployment ID・WebアプリURL維持','HTTP 200確認']),
+        '未確認項目':['今回差分外の旧期待値テスト17件の整理'],
+        '確認状況':'複数通知先ログ・宛先別WebhookをApps Script v86へ本番反映済み。追加テスト6/6合格。'
+      });
+    }
+    return base;
+  };
+})();
+</script>
 <script src="registry-editor.js?v=20260903-1"></script>
 <script src="registry-daily-links-editor.js?v=20260903-1"></script>
 <script src="registry-detail-editor.js?v=20260903-1"></script>
