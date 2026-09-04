@@ -1,0 +1,34 @@
+import fs from 'node:fs';
+
+const mdPath='SYSTEM_REGISTRY.md';
+const htmlPath='index.html';
+const docPath='docs/student-qr-multi-recipient-log-20260904.md';
+
+let md=fs.readFileSync(mdPath,'utf8');
+const deliveryRow='| 不達メール管理 | **本番使用中（請求書不達も集約・一時エラー自動再試行・宛先別Webhook追跡）** | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（複数宛先ログ `499db6e4ca56e04840b24ec0a2a12584de207bfb`） | `delivery_failures.html`、`gas/DeliveryFailures.js`、`gas/コード.js`、入退室ログ2「不達メール管理」 | GitHub Pages＋Apps Script「生徒QR」v86＋Brevo＋Google Sheet | GitHub正本をApps Scriptの同名ファイルへ同期し、既存WebアプリのデプロイID／URLを維持して新バージョンへ更新。Brevo Webhookは宛先単位で更新し、請求書不達はinvoice-pdfのD1配信イベントから同画面へ集約 | 2026-09-04 | 一時エラー `soft_bounce` / `deferred` / `error` は24時間「一時停止（自動）」後、次の新しい通知だけを1回自動再試行。複数宛先では該当アドレスだけ状態更新し、他宛先の成功状態を維持。Issue [#46](https://github.com/stepkobetsu-hub/student-QR/issues/46) でApps Script v86へ本番反映。詳細 `docs/student-qr-multi-recipient-log-20260904.md` |';
+const qrRow='| 出退くんQR作成・読取 | **本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）** | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（Issue #46 `499db6e4ca56e04840b24ec0a2a12584de207bfb`） | `teacher_qr_create.html`、`student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`cloudflare/checkin-edge/`、`gas/コード.js`、`gas/DeliveryFailures.js`、`tests/checkin-multi-recipient-log.test.mjs`、Apps Script「生徒QR」 | GitHub Pages＋Cloudflare Workers/Durable Objects＋Apps Script v86＋Google Sheet＋Brevo | 画面は `student-QR/main`、GASはGitHub正本と同期し、既存デプロイIDを維持して新バージョンへ更新。入退室ログはキューの宛先配列を正本として件数・宛先別状態を集計 | 2026-09-04 | `メール送信結果` を `送信成功 2/2件` 等の件数付き表示にし、`送信先メール` を実際にキューへ入った宛先で保存、末尾へ `送信先別結果` 列を追加。最大4件まで `メール1：配信完了 / メール2：一時エラー` のように表示。Webhookは対象宛先だけ更新。過去ログは推測で書き換えない。Issue #46追加テスト6/6合格、Apps Script v86、既存URL維持・HTTP 200確認。全体テスト17件の旧期待値不一致は今回差分外。詳細 `docs/student-qr-multi-recipient-log-20260904.md` |';
+md=md.replace(/^\| 不達メール管理 \|.*$/m,deliveryRow);
+md=md.replace(/^\| 出退くんQR作成・読取 \|.*$/m,qrRow);
+const section=`\n## 出退くんQR：複数通知先ログ・宛先別Webhook（2026-09-04）\n\n- Issue [#46](https://github.com/stepkobetsu-hub/student-QR/issues/46) を完了。GitHub main commit \`499db6e4ca56e04840b24ec0a2a12584de207bfb\`、Apps Script「生徒QR」v86へ本番反映。既存deployment ID／WebアプリURLを維持し、本番URL HTTP 200を確認。\n- \`メール送信結果\` は \`送信成功 2/2件\`、\`一部送信 1/2件\`、\`送信失敗 0/2件\` など件数付きで記録。\n- \`送信先メール\` は、その通知で実際にメール送信キューへ入った宛先だけを記録。\n- ログ末尾へ \`送信先別結果\` 列を追加し、最大4件まで \`メール1：配信完了 / メール2：一時エラー\` のように宛先別状態を表示。\n- Brevo Webhookは messageId または対象メールで該当宛先だけを更新し、別宛先の成功状態を上書きしない。\n- 一時停止・恒久不達・手動停止の既存仕様、入退室保存、ポイント、重複20秒、メールキューは維持。\n- 過去ログは推測で書き換えない。2026-09-03の1226の1件送信履歴もそのまま保全。2026-09-04 14:35の既存キューは2宛先SENTとして参照確認。個人メールアドレスの実値は台帳へ記載しない。\n- 追加テスト6/6合格、JavaScript構文チェック・git diff --check合格。リポジトリ全体70/87で、残る17件は今回差分外の旧期待値不一致として記録。\n`;
+if(!md.includes('## 出退くんQR：複数通知先ログ・宛先別Webhook（2026-09-04）')){
+  const marker='\n## 成績管理：';
+  const pos=md.indexOf(marker);
+  md=pos>=0?md.slice(0,pos)+section+md.slice(pos):md+section;
+}
+fs.writeFileSync(mdPath,md);
+
+const doc=`# 出退くんQR 複数通知先ログ・宛先別Webhook（2026-09-04）\n\n## 本番反映\n- student-QR main: \`499db6e4ca56e04840b24ec0a2a12584de207bfb\`\n- Apps Script「生徒QR」: v86\n- 既存deployment ID／WebアプリURLを維持\n- 本番URL HTTP 200確認\n- Issue #46: completed / closed\n\n## 仕様\n- 生徒マスタ通知先はX・BA・BB・BCの最大4件。\n- メール送信キューの宛先配列を正本として、ログへ実際の送信対象と件数を反映する。\n- \`メール送信結果\`: 件数付きサマリー。\n- \`送信先メール\`: 実際にキューへ入った宛先。\n- \`送信先別結果\`: 宛先ごとの最終状態。\n- Brevo Webhookは対象宛先だけを更新し、他宛先の成功状態を保持する。\n- 過去ログを推測で書き換えない。\n\n## 検証\n- 追加テスト6/6合格。\n- Apps Script変更2ファイルのJavaScript構文チェック合格。\n- git diff --check合格。\n- 全体テスト70/87。残る17件は今回差分外の現行実装と旧期待値の不一致。\n- 保護者への実メール送信なし。\n\n個人メールアドレスの実値、APIキー、トークン等はこの文書へ記録しない。\n`;
+fs.writeFileSync(docPath,doc);
+
+let html=fs.readFileSync(htmlPath,'utf8');
+const id='student-qr-multi-recipient-log-20260904';
+if(!html.includes(`id="${id}"`)){
+  const patch=`\n<script id="${id}">\n(() => {\n  const baseApply=applyAssetInfo;\n  const arr=v=>Array.isArray(v)?v:(v?[String(v)]:[]);\n  const merge=(base,key,items)=>[...new Set([...arr(base[key]),...items])];\n  const append=(base,key,note)=>[base[key],note].filter(Boolean).join('\\n\\n');\n  applyAssetInfo=function(item){\n    const base=baseApply(item);\n    const name=String(base['システム名']||base['正式名称']||'');\n    if(name.includes('不達メール')){\n      const note='2026年9月4日 Issue #46：Apps Script v86。複数宛先ではBrevo Webhookを該当メールアドレスだけに反映し、別宛先の成功状態を維持する。送信先別結果と不達管理の対象アドレスを一致させる。';\n      return Object.assign({},base,{\n        '状態':'本番使用中（請求書不達集約・一時エラー自動再試行・宛先別Webhook追跡）',\n        '現在のApps Script版':'バージョン86（2026年9月4日）',\n        'Apps Scriptバージョン':'86',\n        '最新版の場所':'stepkobetsu-hub/student-QR main 499db6e4ca56e04840b24ec0a2a12584de207bfb／Apps Script「生徒QR」v86／Issue #46',\n        '仕様メモ':append(base,'仕様メモ',note),\n        '作業メモ':append(base,'作業メモ',note),\n        '確認日':'2026年9月4日',\n        '確認済み事項':merge(base,'確認済み事項',['宛先別Webhook更新','別宛先の成功状態を維持','Apps Script v86','Issue #46完了・クローズ','既存deployment ID・WebアプリURL維持','HTTP 200確認']),\n        '未確認項目':[],\n        '確認状況':'複数宛先の宛先別Webhook追跡をApps Script v86へ本番反映済み'\n      });\n    }\n    if(base['ID']==='qr-register'||name.includes('出退くんQR作成・読取')){\n      const note='2026年9月4日 Issue #46：入退室ログのメール送信結果を件数付き表示へ変更し、送信先メールを実キュー宛先で記録。末尾に送信先別結果列を追加し、最大4件までメール1：配信完了／メール2：一時エラー等を表示。Webhookは該当宛先だけ更新。過去ログは推測で書き換えない。追加テスト6/6合格。全体テスト17件の旧期待値不一致は今回差分外。';\n      return Object.assign({},base,{\n        '状態':'本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）',\n        '現在のApps Script版':'バージョン86（2026年9月4日）',\n        'Apps Scriptバージョン':'86',\n        '最新版の場所':'stepkobetsu-hub/student-QR main 499db6e4ca56e04840b24ec0a2a12584de207bfb／Apps Script「生徒QR」v86／Issue #46',\n        '仕様メモ':append(base,'仕様メモ',note),\n        '作業メモ':append(base,'作業メモ',note),\n        '確認日':'2026年9月4日',\n        '確認済み事項':merge(base,'確認済み事項',['メール送信結果を件数付き表示','送信先メールを実キュー宛先で保存','送信先別結果列を追加','最大4宛先対応','宛先別Webhook更新','他宛先成功状態を維持','過去ログの推測書換えなし','追加テスト6/6合格','Apps Script v86','既存deployment ID・WebアプリURL維持','HTTP 200確認']),\n        '未確認項目':['今回差分外の旧期待値テスト17件の整理'],\n        '確認状況':'複数通知先ログ・宛先別WebhookをApps Script v86へ本番反映済み。追加テスト6/6合格。'\n      });\n    }\n    return base;\n  };\n})();\n</script>\n`;
+  const marker='<script src="registry-editor.js';
+  const pos=html.indexOf(marker);
+  if(pos<0) throw new Error('registry editor marker not found');
+  html=html.slice(0,pos)+patch+html.slice(pos);
+  fs.writeFileSync(htmlPath,html);
+}
+
+console.log('Issue #46 registry update applied');
