@@ -9,8 +9,8 @@ function setupSpreadsheet() {
 }
 
 function doGet() {
-  return HtmlService.createTemplateFromFile('Index')
-    .evaluate()
+  // This page has no server-side scriptlets. Serve its JavaScript unchanged.
+  return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
