@@ -2,6 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
+const APP_VERSION = '2026-09-07-pw-order-1';
 
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
@@ -21,7 +22,7 @@ function getAppData() {
     const ss = getSpreadsheet_();
     const sheet = getSheet_(ss);
     const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl() };
+    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION };
 
     ensureOrderHeader_(sheet);
     const values = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
@@ -31,7 +32,7 @@ function getAppData() {
     const seen = new Set();
     let idsChanged = false;
     let ordersChanged = false;
-    let nextOrder = 1;
+    let nextOrder = values.reduce((max, r) => Math.max(max, parseOrder_(r[11])), 0) + 1;
 
     const entries = values.map((r, i) => {
       const meaningful = [r[0], r[1], r[3], r[4], r[8]].some(Boolean);
@@ -63,7 +64,7 @@ function getAppData() {
 
     entries.sort((a, b) => (a.sortOrder - b.sortOrder) || (a._sheetRow - b._sheetRow));
     entries.forEach(e => delete e._sheetRow);
-    return { entries, sheetUrl: ss.getUrl() };
+    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION };
   } finally {
     SpreadsheetApp.flush();
     lock.releaseLock();
@@ -78,6 +79,7 @@ function saveEntry(payload) {
   validateUrl_(item.logoUrl, 'ロゴURL');
 
   const passwordAction = clean_(payload.passwordAction, 20) || 'keep';
+  if (!['keep', 'set', 'clear'].includes(passwordAction)) throw new Error('パスワード操作が不正です。');
   const password = String(payload.password == null ? '' : payload.password);
   if (passwordAction === 'set' && !password) throw new Error('パスワードを入力してください。');
   if (password.length > 500) throw new Error('パスワードが長すぎます。');
@@ -115,7 +117,7 @@ function saveEntry(payload) {
   }
 }
 
-function saveCardOrder(ids) {
+function saveCardOrder(ids, expectedIds) {
   if (!Array.isArray(ids) || !ids.length) throw new Error('並べ替えデータがありません。');
   ids = ids.map(id => clean_(id, 100)).filter(Boolean);
   if (new Set(ids).size !== ids.length) throw new Error('並べ替えデータが重複しています。');
@@ -139,6 +141,12 @@ function saveCardOrder(ids) {
       throw new Error('別の画面で項目が追加・削除されています。再読み込みしてから並べ替えてください。');
     }
 
+    const currentIds = rows.map((r,i) => ({id:r[9], order:parseOrder_(r[11]) || 999999, row:i}))
+      .filter(x=>idToRow.has(x.id)).sort((a,b)=>a.order-b.order || a.row-b.row).map(x=>x.id);
+    if (!Array.isArray(expectedIds) || JSON.stringify(currentIds) !== JSON.stringify(expectedIds)) {
+      throw new Error('別の画面で並び順が更新されています。再読み込みしてください。');
+    }
+
     ids.forEach((id, index) => sheet.getRange(idToRow.get(id), 12).setValue(index + 1));
     SpreadsheetApp.flush();
     return { ok: true };
@@ -160,10 +168,14 @@ function getPassword(id) {
 function clearPassword(id) {
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
-  const sheet = getSheet_(getSpreadsheet_());
-  if (!findRowById_(sheet, id)) throw new Error('対象データが見つかりません。');
-  PropertiesService.getUserProperties().deleteProperty(secretKey_(id));
-  return { ok: true };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sheet = getSheet_(getSpreadsheet_());
+    if (!findRowById_(sheet, id)) throw new Error('対象データが見つかりません。');
+    PropertiesService.getUserProperties().deleteProperty(secretKey_(id));
+    return { ok: true };
+  } finally { lock.releaseLock(); }
 }
 
 function deleteEntry(id, revision) {

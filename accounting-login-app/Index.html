@@ -36,14 +36,14 @@
       <div class="chips" id="chips"></div>
       <div class="reorderHint" id="reorderHint">並べ替え中：カードをドラッグするか、各カードの ↑ ↓ で移動してください。変更は自動保存されます。</div>
     </div>
-    <main class="grid" id="grid"></main>
+    <main class="grid" id="grid"></main><div id="appVersion" class="help" style="margin-top:18px"></div>
   </div>
 
-  <dialog id="memoDialog"><div class="modal"><div class="modalHead"><h2 id="memoTitle">詳細</h2><button class="x" onclick="memoDialog.close()">×</button></div><div class="detailGrid" id="memoBody"></div></div></dialog>
+  <dialog id="memoDialog" aria-labelledby="memoTitle"><div class="modal"><div class="modalHead"><h2 id="memoTitle">詳細</h2><button class="x" aria-label="閉じる" onclick="memoDialog.close()">×</button></div><div class="detailGrid" id="memoBody"></div></div></dialog>
 
-  <dialog id="secretDialog"><div class="modal"><div class="modalHead"><h2 id="secretTitle">パスワード</h2><button class="x" onclick="closeSecretDialog()">×</button></div><div class="secretBox" id="secretValue"></div><div class="secretBtns"><button class="btn" onclick="copyShownPassword()">PWコピー</button><button class="btn" onclick="closeSecretDialog()">閉じる</button></div></div></dialog>
+  <dialog id="secretDialog" aria-labelledby="secretTitle"><div class="modal"><div class="modalHead"><h2 id="secretTitle">パスワード</h2><button class="x" aria-label="閉じる" onclick="closeSecretDialog()">×</button></div><div class="secretBox" id="secretValue"></div><div class="secretBtns"><button class="btn" onclick="copyShownPassword()">PWコピー</button><button class="btn" onclick="closeSecretDialog()">閉じる</button></div></div></dialog>
 
-  <dialog id="editDialog"><form class="modal" id="editForm" onsubmit="submitEntry(event)"><div class="modalHead"><h2 id="editTitle">追加</h2><button type="button" class="x" onclick="editDialog.close()">×</button></div>
+  <dialog id="editDialog" aria-labelledby="editTitle"><form class="modal" id="editForm" onsubmit="submitEntry(event)"><div class="modalHead"><h2 id="editTitle">追加</h2><button type="button" class="x" aria-label="閉じる" onclick="editDialog.close()">×</button></div>
     <div class="formGrid">
       <div class="field"><label for="fCategory">カテゴリ</label><input id="fCategory" list="categoryList"></div>
       <div class="field"><label for="fService">サービス名 *</label><input id="fService" required></div>
@@ -63,6 +63,7 @@
 <script>
   const CATEGORIES=['教材・仕入','IT・クラウド','事務用品','リース・回収','カード・決済','採用・求人','光熱費','通信','銀行','通販','メール配信','その他'];
   let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', pending=false, shownPassword='', reorderMode=false, draggedId='';
+  let loadedOrder=[], secretTimer;
   const $=id=>document.getElementById(id);
   const memoDialog=$('memoDialog'), editDialog=$('editDialog'), secretDialog=$('secretDialog');
 
@@ -70,13 +71,17 @@
     $('search').addEventListener('input',render);
     $('sheetBtn').addEventListener('click',()=>sheetUrl&&window.open(sheetUrl,'_blank','noopener'));
     $('categoryList').innerHTML=CATEGORIES.map(x=>`<option value="${attr(x)}"></option>`).join('');
+    secretDialog.addEventListener('close',()=>{shownPassword='';$('secretValue').textContent='';clearTimeout(secretTimer);});
+    editDialog.addEventListener('close',()=>{$('fSecret').value='';$('fSecret').type='password';});
+    editDialog.addEventListener('cancel',ev=>{if(pending)ev.preventDefault();});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){if(secretDialog.open)closeSecretDialog();$('fSecret').value='';$('fSecret').type='password';}});
     load();
   });
 
   function load(){
     if(pending)return; busy(true);
     google.script.run.withSuccessHandler(data=>{
-      entries=(data.entries||[]).sort((a,b)=>(Number(a.sortOrder)||999999)-(Number(b.sortOrder)||999999)); sheetUrl=data.sheetUrl||''; busy(false); renderChips(); render();
+      entries=(data.entries||[]).sort((a,b)=>(Number(a.sortOrder)||999999)-(Number(b.sortOrder)||999999)); loadedOrder=entries.map(e=>e.id);sheetUrl=data.sheetUrl||''; $('appVersion').textContent=data.version||''; busy(false); renderChips(); render();
     }).withFailureHandler(fail).getAppData();
   }
 
@@ -94,7 +99,7 @@
     return entries.filter(e=>{
       if(activeCategory!=='すべて'&&e.category!==activeCategory)return false;
       if(!q)return true;
-      return norm([e.category,e.serviceName,e.account,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
+      return norm([e.category,e.serviceName,e.account,e.passwordManager,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
     });
   }
 
@@ -105,7 +110,7 @@
   }
 
   function cardHtml(e,index){
-    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     const logo=logoSrc(e);
     const initial=esc((e.serviceName||'?').trim().slice(0,1).toUpperCase());
     const idText=e.account?esc(e.account):'<span class="emptyId">ID未登録</span>';
@@ -136,7 +141,7 @@
     if(!reorderMode||pending)return;const i=entries.findIndex(e=>e.id===id);const j=i+delta;if(i<0||j<0||j>=entries.length)return;
     [entries[i],entries[j]]=[entries[j],entries[i]];render();persistOrder();
   }
-  function dragStart(ev,id){if(!reorderMode)return;draggedId=id;ev.dataTransfer.effectAllowed='move';ev.currentTarget.classList.add('dragging')}
+  function dragStart(ev,id){if(!reorderMode||pending){ev.preventDefault();return;}ev.dataTransfer.setData('text/plain',id);draggedId=id;ev.dataTransfer.effectAllowed='move';ev.currentTarget.classList.add('dragging')}
   function dragEnd(ev){ev.currentTarget.classList.remove('dragging');draggedId=''}
   function dragOver(ev){if(reorderMode){ev.preventDefault();ev.dataTransfer.dropEffect='move'}}
   function dropCard(ev,targetId){
@@ -146,21 +151,21 @@
   }
   function persistOrder(){
     if(pending)return;busy(true);const ids=entries.map(e=>e.id);
-    google.script.run.withSuccessHandler(()=>{busy(false);toast('カード順を保存しました');load()}).withFailureHandler(fail).saveCardOrder(ids);
+    google.script.run.withSuccessHandler(()=>{busy(false);toast('カード順を保存しました');load()}).withFailureHandler(err=>{fail(err);load();}).saveCardOrder(ids,loadedOrder);
   }
 
   function logoSrc(e){
     if(e.logoUrl)return safeUrl(e.logoUrl);
-    const u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     if(!u)return '';
-    return 'https://www.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
+    return 'https:\x2f\x2fwww.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
   }
 
   function findEntry(id){return entries.find(x=>x.id===id)}
   async function copyId(id){const e=findEntry(id);if(!e?.account)return;try{await copyText(e.account);toast('IDをコピーしました')}catch{toast('IDをコピーできませんでした')}}
   async function openAndCopy(id){
     const e=findEntry(id);if(!e)return;
-    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     const copying=e.account?copyText(e.account):Promise.resolve();
     if(target)window.open(target,'_blank','noopener');
     try{await copying;toast(e.account?'IDをコピーしてサイトを開きました':'サイトを開きました')}catch{toast('サイトを開きました。IDコピーだけ再度押してください。')}
@@ -168,11 +173,11 @@
 
   function copyPassword(id){
     if(pending)return;busy(true);
-    google.script.run.withSuccessHandler(async r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}try{await copyText(r.password);toast('パスワードをコピーしました')}catch{toast('PWをコピーできませんでした')}}).withFailureHandler(fail).getPassword(id);
+    google.script.run.withSuccessHandler(async r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}try{await copyText(r.password);toast('パスワードをコピーしました')}catch{shownPassword=r.password;$('secretTitle').textContent='PWコピー';$('secretValue').textContent='コピーの準備ができました。下の「PWコピー」を押してください。';secretDialog.showModal();clearTimeout(secretTimer);secretTimer=setTimeout(closeSecretDialog,60000);}}).withFailureHandler(fail).getPassword(id);
   }
   function showPassword(id){
     if(pending)return;const e=findEntry(id);busy(true);
-    google.script.run.withSuccessHandler(r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}shownPassword=r.password;$('secretTitle').textContent=(e?.serviceName||'')+' のパスワード';$('secretValue').textContent=r.password;secretDialog.showModal();}).withFailureHandler(fail).getPassword(id);
+    google.script.run.withSuccessHandler(r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}shownPassword=r.password;$('secretTitle').textContent=(e?.serviceName||'')+' のパスワード';$('secretValue').textContent=r.password;secretDialog.showModal();clearTimeout(secretTimer);secretTimer=setTimeout(closeSecretDialog,60000);}).withFailureHandler(fail).getPassword(id);
   }
   function closeSecretDialog(){shownPassword='';$('secretValue').textContent='';secretDialog.close()}
   async function copyShownPassword(){if(!shownPassword)return;try{await copyText(shownPassword);toast('パスワードをコピーしました')}catch{toast('PWをコピーできませんでした')}}
@@ -192,7 +197,7 @@
   function toggleSecretInput(){const f=$('fSecret');f.type=f.type==='password'?'text':'password'}
   function clearPasswordNow(){
     if(!editingId||pending||!confirm('登録済みパスワードを削除しますか？'))return;busy(true);
-    google.script.run.withSuccessHandler(()=>{busy(false);const e=findEntry(editingId);if(e)e.hasPassword=false;$('secretState').textContent='PW未登録';$('secretState').className='secretState none';$('clearSecretBtn').style.display='none';$('fSecret').placeholder='パスワードを入力';toast('パスワードを削除しました');render();}).withFailureHandler(fail).clearPassword(editingId);
+    google.script.run.withSuccessHandler(()=>{busy(false);const e=findEntry(editingId);if(e)e.hasPassword=false;$('secretState').textContent='PW未登録';$('secretState').className='secretState none';$('clearSecretBtn').style.display='none';$('fSecret').value='';$('fSecret').type='password';$('fSecret').placeholder='パスワードを入力';toast('パスワードを削除しました');render();}).withFailureHandler(fail).clearPassword(editingId);
   }
   function submitEntry(ev){
     ev.preventDefault();if(pending)return;const password=$('fSecret').value;const e=findEntry(editingId);const payload={revision:editingRevision,id:editingId,sortOrder:e?.sortOrder||0,category:$('fCategory').value,serviceName:$('fService').value,url:$('fUrl').value,account:$('fAccount').value,passwordManager:e?.passwordManager||'アプリ内保存',accountTitle:$('fAccountTitle').value,amountNote:$('fAmount').value,memo:$('fMemo').value,logoUrl:$('fLogo').value,passwordAction:password?'set':'keep',password};
@@ -203,12 +208,20 @@
   }
 
   async function copyText(text){
-    if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(text);return}catch{}}
-    const previous=document.activeElement,t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';(document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);try{if(!document.execCommand('copy'))throw new Error('copy failed')}finally{t.remove();previous?.focus()}
+    const previous=document.activeElement,t=document.createElement('textarea');
+    t.value=text;t.readOnly=true;t.style.position='fixed';t.style.opacity='0';
+    (document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);
+    const onCopy=e=>{if(e.clipboardData){e.clipboardData.setData('text/plain',text);e.preventDefault();}};
+    document.addEventListener('copy',onCopy);
+    let copied=false;
+    try{copied=document.execCommand('copy')}catch{}finally{document.removeEventListener('copy',onCopy);t.remove();previous?.focus()}
+    if(copied)return;
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return}
+    throw new Error('copy failed');
   }
-  function busy(v){pending=!!v;$('loading').classList.toggle('show',pending);$('grid').setAttribute('aria-busy',String(pending))}
+  function busy(v){pending=!!v;document.querySelectorAll('#editDialog button').forEach(b=>b.disabled=pending);$('loading').classList.toggle('show',pending);$('grid').setAttribute('aria-busy',String(pending))}
   function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
-  function jsArg(value){return JSON.stringify(String(value)).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026')}
+  function jsArg(value){return esc(JSON.stringify(String(value)))}
   function fail(err){busy(false);alert((err&&err.message)||'処理に失敗しました。')}
   let tt;function toast(msg){clearTimeout(tt);$('toast').textContent=msg;$('toast').classList.add('show');tt=setTimeout(()=>$('toast').classList.remove('show'),1800)}
   function norm(s){return String(s||'').normalize('NFKC').toLocaleLowerCase('ja').replace(/\s+/g,' ').trim()}
