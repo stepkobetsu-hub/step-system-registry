@@ -4,28 +4,29 @@
   <base target="_top">
   <meta charset="UTF-8">
   <style>
-    :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--blue2:#1d4ed8;--danger:#dc2626;--shadow:0 8px 24px rgba(15,23,42,.08)}
+    :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--blue2:#1d4ed8;--green:#15803d;--danger:#dc2626;--shadow:0 8px 24px rgba(15,23,42,.08)}
     *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
     button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:1320px;margin:auto;padding:24px}
     .top{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}.title h1{font-size:28px;margin:0 0 5px}.title p{margin:0;color:var(--muted);font-size:14px}
     .top-actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 14px;font-weight:700}.btn:hover{background:#f8fafc}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:var(--blue2)}.btn.danger{color:var(--danger);border-color:#fecaca;background:#fff}
     .toolbar{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;box-shadow:0 2px 12px rgba(15,23,42,.04);position:sticky;top:0;z-index:4}.searchrow{display:flex;gap:10px;align-items:center}.search{flex:1;display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fafafa}.search input{border:0;outline:0;background:transparent;width:100%;font-size:16px}.count{color:var(--muted);font-size:14px;white-space:nowrap}.chips{display:flex;gap:7px;overflow:auto;padding-top:11px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:14px;white-space:nowrap}.chip.active{color:#fff;background:#334155;border-color:#334155}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}.cardhead{display:flex;gap:12px;align-items:flex-start}.logo{width:52px;height:52px;border:1px solid #e8edf3;border-radius:13px;background:#fff;display:grid;place-items:center;flex:0 0 auto;overflow:hidden}.logo img{width:34px;height:34px;object-fit:contain}.fallback{font-weight:900;font-size:21px;color:#64748b}.namebox{min-width:0;flex:1}.name{font-weight:800;font-size:17px;line-height:1.35}.badge{display:inline-block;margin-top:5px;border-radius:999px;padding:4px 8px;font-size:14px;background:#eef2ff;color:#4338ca}.editIcon{border:0;background:transparent;color:#64748b;padding:6px;border-radius:8px}.editIcon:hover{background:#f1f5f9}
-    .account{margin:14px 0 10px;border:1px solid var(--line);border-radius:11px;background:#f8fafc;padding:9px 10px;display:flex;gap:8px;align-items:center}.account .val{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.mini{border:0;background:#e2e8f0;border-radius:8px;padding:6px 8px;font-size:14px;font-weight:700}.mini:hover{background:#cbd5e1}.emptyId{color:#94a3b8}
-    .meta{display:flex;gap:7px;flex-wrap:wrap;min-height:27px}.tag{font-size:14px;padding:5px 8px;border-radius:8px;background:#f1f5f9;color:#475569}.memoPreview{font-size:14px;color:#64748b;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:18px}
-    .actions{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:13px}.openBtn{border:0;border-radius:10px;background:var(--blue);color:#fff;padding:10px 11px;font-weight:800}.openBtn:hover{background:var(--blue2)}.smallBtn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;font-weight:700}.smallBtn:hover{background:#f8fafc}.disabled{opacity:.45;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}.cardhead{display:flex;gap:12px;align-items:flex-start}.logo{width:52px;height:52px;border:1px solid #e8edf3;border-radius:13px;background:#fff;display:grid;place-items:center;flex:0 0 auto;overflow:hidden;position:relative}.logo img{width:34px;height:34px;object-fit:contain;position:absolute}.fallback{font-weight:900;font-size:21px;color:#64748b}.namebox{min-width:0;flex:1}.name{font-weight:800;font-size:17px;line-height:1.35;overflow-wrap:anywhere}.badge{display:inline-block;margin-top:5px;border-radius:999px;padding:4px 8px;font-size:13px;background:#eef2ff;color:#4338ca}.editIcon{border:0;background:transparent;color:#64748b;padding:6px;border-radius:8px}.editIcon:hover{background:#f1f5f9}
+    .account{margin:14px 0 9px;border:1px solid var(--line);border-radius:11px;background:#f8fafc;padding:9px 10px;display:flex;gap:8px;align-items:center}.account .val{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.mini{border:0;background:#e2e8f0;border-radius:8px;padding:6px 8px;font-size:13px;font-weight:700}.mini:hover{background:#cbd5e1}.emptyId{color:#94a3b8}
+    .pwline{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}.pwok{color:var(--green);font-weight:800}.pwnone{color:#94a3b8}.meta{display:flex;gap:7px;flex-wrap:wrap;min-height:27px}.tag{font-size:13px;padding:5px 8px;border-radius:8px;background:#f1f5f9;color:#475569}.memoPreview{font-size:13px;color:#64748b;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:18px}
+    .actions{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:13px}.openBtn{border:0;border-radius:10px;background:var(--blue);color:#fff;padding:10px 11px;font-weight:800}.openBtn:hover{background:var(--blue2)}.smallBtn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;font-weight:700}.smallBtn:hover{background:#f8fafc}.smallBtn.secret{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.disabled{opacity:.45;cursor:not-allowed}
     .empty{grid-column:1/-1;text-align:center;padding:55px 20px;color:var(--muted)}
-    dialog{border:0;padding:0;border-radius:18px;box-shadow:0 24px 80px rgba(15,23,42,.25);width:min(650px,calc(100vw - 28px));color:var(--text)}dialog::backdrop{background:rgba(15,23,42,.42)}.modal{padding:20px}.modalHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.modalHead h2{margin:0;font-size:20px}.x{border:0;background:#f1f5f9;width:34px;height:34px;border-radius:10px;font-size:20px}.detailGrid{display:grid;grid-template-columns:130px 1fr;gap:9px 12px;font-size:14px}.detailGrid .label{color:var(--muted)}.detailGrid .value{white-space:pre-wrap;overflow-wrap:anywhere}.detailGrid .wide{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:3px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:14px;color:#475569;font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}.field textarea{min-height:92px;resize:vertical}.help{font-size:14px;color:#94a3b8}.modalFoot{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.rightBtns{display:flex;gap:9px}.loading{position:fixed;inset:0;background:rgba(255,255,255,.72);z-index:50;display:none;place-items:center;font-weight:800}.loading.show{display:grid}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(15px);background:#0f172a;color:#fff;padding:10px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:.18s;z-index:80;font-size:14px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.wrap{padding:14px}.top{display:block}.top-actions{margin-top:12px}.grid{grid-template-columns:1fr}.toolbar{top:0}.searchrow{align-items:stretch}.count{display:none}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{grid-template-columns:1fr auto}.actions .pwBtn{display:none}.detailGrid{grid-template-columns:100px 1fr}}
-    button:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}.logo{position:relative}.logo img{position:absolute}.name{overflow-wrap:anywhere}.loading{pointer-events:all}
+    dialog{border:0;padding:0;border-radius:18px;box-shadow:0 24px 80px rgba(15,23,42,.25);width:min(650px,calc(100vw - 28px));color:var(--text)}dialog::backdrop{background:rgba(15,23,42,.42)}.modal{padding:20px}.modalHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.modalHead h2{margin:0;font-size:20px}.x{border:0;background:#f1f5f9;width:34px;height:34px;border-radius:10px;font-size:20px}.detailGrid{display:grid;grid-template-columns:130px 1fr;gap:9px 12px;font-size:14px}.detailGrid .label{color:var(--muted)}.detailGrid .value{white-space:pre-wrap;overflow-wrap:anywhere}.detailGrid .wide{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:3px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:14px;color:#475569;font-weight:700}.field input,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;background:#fff}.field input:focus,.field textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}.field textarea{min-height:92px;resize:vertical}.help{font-size:12px;color:#64748b}.passwordRow{display:grid;grid-template-columns:1fr auto;gap:7px}.secretState{font-size:12px;font-weight:700}.secretState.ok{color:var(--green)}.secretState.none{color:#94a3b8}.modalFoot{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.rightBtns{display:flex;gap:9px}.loading{position:fixed;inset:0;background:rgba(255,255,255,.72);z-index:50;display:none;place-items:center;font-weight:800;pointer-events:all}.loading.show{display:grid}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(15px);background:#0f172a;color:#fff;padding:10px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:.18s;z-index:80;font-size:14px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .secretBox{font-family:Consolas,monospace;font-size:18px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-wrap:anywhere;word-break:break-all;margin:12px 0}.secretBtns{display:flex;gap:8px;justify-content:flex-end}
+    button:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+    @media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.wrap{padding:14px}.top{display:block}.top-actions{margin-top:12px}.grid{grid-template-columns:1fr}.searchrow{align-items:stretch}.count{display:none}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{grid-template-columns:1fr auto auto}.detailGrid{grid-template-columns:100px 1fr}}
   </style>
 </head>
 <body>
-  <div class="loading" id="loading">読み込み中…</div>
+  <div class="loading" id="loading">処理中…</div>
   <div class="wrap">
     <div class="top">
-      <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。パスワード自体は Google Password Manager で管理します。</p></div>
-      <div class="top-actions"><button class="btn" onclick="load()">再読み込み</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn" onclick="openPasswordManager()">パスワード管理</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
+      <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。パスワードはこのアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
+      <div class="top-actions"><button class="btn" onclick="load()">再読み込み</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
     <div class="toolbar">
       <div class="searchrow"><div class="search">🔎<input aria-label="検索" id="search" placeholder="サービス名、ID、勘定科目、メモなどを検索" autocomplete="off"></div><span class="count" id="count"></span></div>
@@ -34,19 +35,22 @@
     <main class="grid" id="grid"></main>
   </div>
 
-  <dialog id="memoDialog" aria-labelledby="memoTitle"><div class="modal"><div class="modalHead"><h2 id="memoTitle">詳細</h2><button class="x" aria-label="閉じる" onclick="memoDialog.close()">×</button></div><div class="detailGrid" id="memoBody"></div></div></dialog>
+  <dialog id="memoDialog"><div class="modal"><div class="modalHead"><h2 id="memoTitle">詳細</h2><button class="x" onclick="memoDialog.close()">×</button></div><div class="detailGrid" id="memoBody"></div></div></dialog>
 
-  <dialog id="editDialog" aria-labelledby="editTitle"><form class="modal" id="editForm" onsubmit="submitEntry(event)"><div class="modalHead"><h2 id="editTitle">追加</h2><button type="button" class="x" aria-label="閉じる" onclick="editDialog.close()">×</button></div>
+  <dialog id="secretDialog"><div class="modal"><div class="modalHead"><h2 id="secretTitle">パスワード</h2><button class="x" onclick="closeSecretDialog()">×</button></div><div class="secretBox" id="secretValue"></div><div class="secretBtns"><button class="btn" onclick="copyShownPassword()">PWコピー</button><button class="btn" onclick="closeSecretDialog()">閉じる</button></div></div></dialog>
+
+  <dialog id="editDialog"><form class="modal" id="editForm" onsubmit="submitEntry(event)"><div class="modalHead"><h2 id="editTitle">追加</h2><button type="button" class="x" onclick="editDialog.close()">×</button></div>
     <div class="formGrid">
-      <div class="field"><label>カテゴリ</label><select id="fCategory"></select></div>
-      <div class="field"><label>サービス名 *</label><input id="fService" required></div>
-      <div class="field full"><label>URL</label><input id="fUrl" placeholder="https://..."></div>
-      <div class="field full"><label>ログインID / アカウント</label><input id="fAccount"></div>
-      <div class="field"><label>パスワード管理</label><select id="fPassword"><option>Google Password Manager</option><option>Googleアカウント</option><option>Gmail</option><option>別途管理</option></select></div>
-      <div class="field"><label>勘定科目・用途</label><input id="fAccountTitle" placeholder="例：通信費、仕入高"></div>
-      <div class="field full"><label>金額・補足</label><input id="fAmount" placeholder="例：440円 / Google One 200GB"></div>
-      <div class="field full"><label>メモ</label><textarea id="fMemo" placeholder="領収書の場所、確認方法、注意事項など"></textarea></div>
-      <div class="field full"><label>ロゴURL（任意）</label><input id="fLogo" placeholder="空欄ならサイトのアイコンを自動表示"><div class="help">通常は空欄のままで構いません。公式ロゴ画像を固定したい場合だけURLを指定します。</div></div>
+      <div class="field"><label for="fCategory">カテゴリ</label><input id="fCategory" list="categoryList"></div>
+      <div class="field"><label for="fService">サービス名 *</label><input id="fService" required></div>
+      <datalist id="categoryList"></datalist>
+      <div class="field full"><label for="fUrl">URL</label><input id="fUrl" placeholder="https://..."></div>
+      <div class="field full"><label for="fAccount">ログインID / アカウント</label><input id="fAccount"></div>
+      <div class="field full"><label for="fSecret">パスワード</label><div class="passwordRow"><input id="fSecret" type="password" autocomplete="new-password" placeholder="パスワードを入力"><button type="button" class="btn" onclick="toggleSecretInput()">表示</button></div><div id="secretState" class="secretState none"></div><div class="help">登録済みの場合、空欄のまま保存すると現在のパスワードを変更しません。新しい文字を入力して保存すると更新します。</div><button type="button" class="btn danger" id="clearSecretBtn" style="display:none;margin-top:6px;align-self:flex-start" onclick="clearPasswordNow()">登録済みPWを削除</button></div>
+      <div class="field"><label for="fAccountTitle">勘定科目・用途</label><input id="fAccountTitle" placeholder="例：通信費、仕入高"></div>
+      <div class="field"><label for="fAmount">金額・補足</label><input id="fAmount" placeholder="例：440円 / Google One 200GB"></div>
+      <div class="field full"><label for="fMemo">メモ</label><textarea id="fMemo" placeholder="領収書の場所、確認方法、注意事項など"></textarea></div>
+      <div class="field full"><label for="fLogo">ロゴURL（任意）</label><input id="fLogo" placeholder="空欄ならサイトのアイコンを自動表示"><div class="help">通常は空欄のままで構いません。公式ロゴ画像を固定したい場合だけURLを指定します。</div></div>
     </div>
     <div class="modalFoot"><button type="button" class="btn danger" id="deleteBtn" onclick="removeEntry()">削除</button><div class="rightBtns"><button type="button" class="btn" onclick="editDialog.close()">キャンセル</button><button class="btn primary" type="submit">保存</button></div></div>
   </form></dialog>
@@ -54,16 +58,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
   const CATEGORIES=['教材・仕入','IT・クラウド','事務用品','リース・回収','カード・決済','採用・求人','光熱費','通信','銀行','通販','メール配信','その他'];
-  let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', pending=false;
+  let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', pending=false, shownPassword='';
   const $=id=>document.getElementById(id);
-  const memoDialog=$('memoDialog'), editDialog=$('editDialog');
+  const memoDialog=$('memoDialog'), editDialog=$('editDialog'), secretDialog=$('secretDialog');
 
   document.addEventListener('DOMContentLoaded',()=>{
     $('search').addEventListener('input',render);
     $('sheetBtn').addEventListener('click',()=>sheetUrl&&window.open(sheetUrl,'_blank','noopener'));
-    $('fCategory').innerHTML=CATEGORIES.map(x=>`<option>${esc(x)}</option>`).join('');
-    document.querySelectorAll('.field').forEach(f=>{const label=f.querySelector('label'), input=f.querySelector('input,select,textarea');if(label&&input)label.htmlFor=input.id;});
-    editDialog.addEventListener('cancel',e=>{if(pending)e.preventDefault();});
+    $('categoryList').innerHTML=CATEGORIES.map(x=>`<option value="${attr(x)}"></option>`).join('');
     load();
   });
 
@@ -87,7 +89,7 @@
     return entries.filter(e=>{
       if(activeCategory!=='すべて'&&e.category!==activeCategory)return false;
       if(!q)return true;
-      return norm([e.category,e.serviceName,e.account,e.passwordManager,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
+      return norm([e.category,e.serviceName,e.account,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
     });
   }
 
@@ -98,55 +100,78 @@
   }
 
   function cardHtml(e){
-    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
+    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
     const logo=logoSrc(e);
     const initial=esc((e.serviceName||'?').trim().slice(0,1).toUpperCase());
     const idText=e.account?esc(e.account):'<span class="emptyId">ID未登録</span>';
     const meta=[e.accountTitle,e.amountNote].filter(Boolean).map(v=>`<span class="tag">${esc(v)}</span>`).join('');
     const preview=esc(e.memo||'');
+    const pwState=e.hasPassword?'<span class="pwok">● PW登録済み</span>':'<span class="pwnone">○ PW未登録</span>';
     return `<article class="card">
       <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img referrerpolicy="no-referrer" loading="lazy" src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div><button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button></div>
       <div class="account"><span class="val">${idText}</span><button class="mini ${e.account?'':'disabled'}" ${e.account?'':'disabled'} onclick="copyId(${jsArg(e.id)})">IDコピー</button></div>
+      <div class="pwline">${pwState}${e.hasPassword?`<button class="mini" onclick="showPassword(${jsArg(e.id)})">表示</button>`:''}</div>
       <div class="meta">${meta}</div><div class="memoPreview">${preview||' '}</div>
-      <div class="actions"><button class="openBtn ${target?'':'disabled'}" ${target?'':'disabled'} onclick="openAndCopy(${jsArg(e.id)})">開く＋IDコピー</button><button class="smallBtn" onclick="showMemo(${jsArg(e.id)})">メモ</button><button class="smallBtn pwBtn" onclick="openPasswordManager()">PW</button></div>
+      <div class="actions"><button class="openBtn ${target?'':'disabled'}" ${target?'':'disabled'} onclick="openAndCopy(${jsArg(e.id)})">開く＋IDコピー</button><button class="smallBtn secret ${e.hasPassword?'':'disabled'}" ${e.hasPassword?'':'disabled'} onclick="copyPassword(${jsArg(e.id)})">PWコピー</button><button class="smallBtn" onclick="showMemo(${jsArg(e.id)})">メモ</button></div>
     </article>`;
   }
 
   function logoSrc(e){
     if(e.logoUrl)return safeUrl(e.logoUrl);
-    let u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
+    const u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
     if(!u)return '';
-    return 'https:\x2f\x2fwww.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
+    return 'https://www.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
   }
 
   function findEntry(id){return entries.find(x=>x.id===id)}
-  async function copyId(id){const e=findEntry(id);if(!e?.account)return;try{await copyText(e.account);toast('IDをコピーしました')}catch{toast('コピーできませんでした。メモ画面からIDを選択してコピーしてください。')}}
+  async function copyId(id){const e=findEntry(id);if(!e?.account)return;try{await copyText(e.account);toast('IDをコピーしました')}catch{toast('IDをコピーできませんでした')}}
   async function openAndCopy(id){
     const e=findEntry(id);if(!e)return;
-    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
+    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https://mail.google.com/':'');
     const copying=e.account?copyText(e.account):Promise.resolve();
     if(target)window.open(target,'_blank','noopener');
-    try{await copying;toast(e.account?'IDをコピーしました。新しいタブをご確認ください。':'新しいタブをご確認ください。')}
-    catch{toast('IDをコピーできませんでした。IDコピーを再度押してください。')}
+    try{await copying;toast(e.account?'IDをコピーしてサイトを開きました':'サイトを開きました')}catch{toast('サイトを開きました。IDコピーだけ再度押してください。')}
   }
-  function openPasswordManager(){window.open('https:\x2f\x2fpasswords.google.com/','_blank','noopener')}
+
+  function copyPassword(id){
+    if(pending)return; busy(true);
+    google.script.run.withSuccessHandler(async r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}try{await copyText(r.password);toast('パスワードをコピーしました')}catch{toast('PWをコピーできませんでした')}}).withFailureHandler(fail).getPassword(id);
+  }
+
+  function showPassword(id){
+    if(pending)return; const e=findEntry(id); busy(true);
+    google.script.run.withSuccessHandler(r=>{busy(false);if(!r.hasPassword){toast('パスワードは未登録です');return}shownPassword=r.password;$('secretTitle').textContent=(e?.serviceName||'')+' のパスワード';$('secretValue').textContent=r.password;secretDialog.showModal();}).withFailureHandler(fail).getPassword(id);
+  }
+  function closeSecretDialog(){shownPassword='';$('secretValue').textContent='';secretDialog.close()}
+  async function copyShownPassword(){if(!shownPassword)return;try{await copyText(shownPassword);toast('パスワードをコピーしました')}catch{toast('PWをコピーできませんでした')}}
 
   function showMemo(id){
     const e=findEntry(id); if(!e)return; $('memoTitle').textContent=e.serviceName;
-    const rows=[['カテゴリ',e.category],['ログインID',e.account],['パスワード管理',e.passwordManager],['勘定科目・用途',e.accountTitle],['金額・補足',e.amountNote],['URL',e.url]];
+    const rows=[['カテゴリ',e.category],['ログインID',e.account],['パスワード',e.hasPassword?'登録済み':'未登録'],['勘定科目・用途',e.accountTitle],['金額・補足',e.amountNote],['URL',e.url]];
     $('memoBody').innerHTML=rows.filter(x=>x[1]).map(x=>`<div class="label">${esc(x[0])}</div><div class="value">${esc(x[1])}</div>`).join('')+`<div class="wide"><div class="label" style="margin-bottom:6px">メモ</div><div class="value">${esc(e.memo||'メモはありません')}</div></div>`;
     memoDialog.showModal();
   }
 
   function openEditor(id=''){
-    if(pending)return; editingId=id; editingRevision=findEntry(id)?.revision||''; const e=id?findEntry(id):null; $('editTitle').textContent=e?'登録内容を編集':'新しい項目を追加'; $('deleteBtn').style.visibility=e?'visible':'hidden';
-    for(const [key,select] of [['category',$('fCategory')],['passwordManager',$('fPassword')]]){if(e?.[key]&&![...select.options].some(o=>o.value===e[key]))select.add(new Option(e[key],e[key]));}
-    $('fCategory').value=e?.category||'その他'; $('fService').value=e?.serviceName||''; $('fUrl').value=e?.url||''; $('fAccount').value=e?.account||''; $('fPassword').value=e?.passwordManager||'Google Password Manager'; $('fAccountTitle').value=e?.accountTitle||''; $('fAmount').value=e?.amountNote||''; $('fMemo').value=e?.memo||''; $('fLogo').value=e?.logoUrl||''; editDialog.showModal(); setTimeout(()=>$('fService').focus(),50);
+    if(pending)return; editingId=id; const e=id?findEntry(id):null; editingRevision=e?.revision||'';
+    $('editTitle').textContent=e?'登録内容を編集':'新しい項目を追加'; $('deleteBtn').style.visibility=e?'visible':'hidden';
+    $('fCategory').value=e?.category||'その他'; $('fService').value=e?.serviceName||''; $('fUrl').value=e?.url||''; $('fAccount').value=e?.account||''; $('fAccountTitle').value=e?.accountTitle||''; $('fAmount').value=e?.amountNote||''; $('fMemo').value=e?.memo||''; $('fLogo').value=e?.logoUrl||''; $('fSecret').value=''; $('fSecret').type='password';
+    $('fSecret').placeholder=e?.hasPassword?'登録済み（変更する場合だけ入力）':'パスワードを入力';
+    $('secretState').textContent=e?.hasPassword?'PW登録済み':'PW未登録'; $('secretState').className='secretState '+(e?.hasPassword?'ok':'none'); $('clearSecretBtn').style.display=e?.hasPassword?'inline-block':'none';
+    editDialog.showModal(); setTimeout(()=>$('fService').focus(),50);
+  }
+
+  function toggleSecretInput(){const f=$('fSecret');f.type=f.type==='password'?'text':'password'}
+
+  function clearPasswordNow(){
+    if(!editingId||pending||!confirm('登録済みパスワードを削除しますか？'))return; busy(true);
+    google.script.run.withSuccessHandler(()=>{busy(false);const e=findEntry(editingId);if(e)e.hasPassword=false;$('secretState').textContent='PW未登録';$('secretState').className='secretState none';$('clearSecretBtn').style.display='none';$('fSecret').placeholder='パスワードを入力';toast('パスワードを削除しました');render();}).withFailureHandler(fail).clearPassword(editingId);
   }
 
   function submitEntry(ev){
-    ev.preventDefault(); if(pending)return; const payload={revision:editingRevision,id:editingId,category:$('fCategory').value,serviceName:$('fService').value,url:$('fUrl').value,account:$('fAccount').value,passwordManager:$('fPassword').value,accountTitle:$('fAccountTitle').value,amountNote:$('fAmount').value,memo:$('fMemo').value,logoUrl:$('fLogo').value};
-    busy(true); google.script.run.withSuccessHandler(()=>{busy(false);editDialog.close();toast('保存しました');load()}).withFailureHandler(fail).saveEntry(payload);
+    ev.preventDefault(); if(pending)return; const password=$('fSecret').value;
+    const e=findEntry(editingId); const payload={revision:editingRevision,id:editingId,category:$('fCategory').value,serviceName:$('fService').value,url:$('fUrl').value,account:$('fAccount').value,passwordManager:e?.passwordManager||'アプリ内保存',accountTitle:$('fAccountTitle').value,amountNote:$('fAmount').value,memo:$('fMemo').value,logoUrl:$('fLogo').value,passwordAction:password?'set':'keep',password};
+    busy(true); google.script.run.withSuccessHandler(()=>{busy(false);editDialog.close();toast(password?'保存しました（PWも更新）':'保存しました');load()}).withFailureHandler(fail).saveEntry(payload);
   }
 
   function removeEntry(){
@@ -154,14 +179,12 @@
   }
 
   async function copyText(text){
-    try{fallbackCopy(text);return}catch{}
-    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return}
-    throw new Error('copy failed');
+    if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(text);return}catch{}}
+    const previous=document.activeElement;const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';(document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);try{if(!document.execCommand('copy'))throw new Error('copy failed')}finally{t.remove();previous?.focus()}
   }
-  function fallbackCopy(text){const previous=document.activeElement;const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';(document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);try{if(!document.execCommand('copy'))throw new Error('copy failed')}finally{t.remove();previous?.focus()}}
-  function busy(v){pending=!!v;$('loading').classList.toggle('show',pending);document.querySelectorAll('#editDialog button').forEach(b=>b.disabled=pending);$('grid').setAttribute('aria-busy',String(pending))}
+  function busy(v){pending=!!v;$('loading').classList.toggle('show',pending);$('grid').setAttribute('aria-busy',String(pending))}
   function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
-  function jsArg(value){return esc(JSON.stringify(String(value)))}
+  function jsArg(value){return JSON.stringify(String(value)).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026')}
   function fail(err){busy(false);alert((err&&err.message)||'処理に失敗しました。')}
   let tt; function toast(msg){clearTimeout(tt);$('toast').textContent=msg;$('toast').classList.add('show');tt=setTimeout(()=>$('toast').classList.remove('show'),1800)}
   function norm(s){return String(s||'').normalize('NFKC').toLocaleLowerCase('ja').replace(/\s+/g,' ').trim()}
