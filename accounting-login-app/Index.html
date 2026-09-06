@@ -63,7 +63,7 @@
 <script>
   const CATEGORIES=['教材・仕入','IT・クラウド','事務用品','リース・回収','カード・決済','採用・求人','光熱費','通信','銀行','通販','メール配信','その他'];
   let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', pending=false, shownPassword='', reorderMode=false, draggedId='';
-  let loadedOrder=[], secretTimer;
+  let loadedOrder=[], secretTimer, pointerDrag=null;
   const $=id=>document.getElementById(id);
   const memoDialog=$('memoDialog'), editDialog=$('editDialog'), secretDialog=$('secretDialog');
 
@@ -75,6 +75,18 @@
     editDialog.addEventListener('close',()=>{$('fSecret').value='';$('fSecret').type='password';});
     editDialog.addEventListener('cancel',ev=>{if(pending)ev.preventDefault();});
     document.addEventListener('visibilitychange',()=>{if(document.hidden){if(secretDialog.open)closeSecretDialog();$('fSecret').value='';$('fSecret').type='password';}});
+    $('grid').addEventListener('pointerdown',ev=>{
+      if(!reorderMode||pending||ev.pointerType!=='mouse'||ev.button!==0||ev.target.closest('button,a,input'))return;
+      const card=ev.target.closest('.card');if(!card)return;
+      ev.preventDefault();card.setPointerCapture(ev.pointerId);pointerDrag={id:card.dataset.id,x:ev.clientX,y:ev.clientY};card.classList.add('dragging');
+    });
+    $('grid').addEventListener('pointerup',ev=>{
+      if(!pointerDrag)return;const start=pointerDrag;pointerDrag=null;
+      const card=ev.target.closest('.card');if(card){card.classList.remove('dragging');if(card.hasPointerCapture(ev.pointerId))card.releasePointerCapture(ev.pointerId);}
+      const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('.card');
+      if(target&&Math.hypot(ev.clientX-start.x,ev.clientY-start.y)>8){draggedId=start.id;dropCard(ev,target.dataset.id);}
+    });
+    $('grid').addEventListener('pointercancel',()=>{pointerDrag=null;document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));});
     load();
   });
 
@@ -208,6 +220,7 @@
   }
 
   async function copyText(text){
+    if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(text);return}catch{}}
     const previous=document.activeElement,t=document.createElement('textarea');
     t.value=text;t.readOnly=true;t.style.position='fixed';t.style.opacity='0';
     (document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);
