@@ -98,7 +98,7 @@
   }
 
   function cardHtml(e){
-    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     const logo=logoSrc(e);
     const initial=esc((e.serviceName||'?').trim().slice(0,1).toUpperCase());
     const idText=e.account?esc(e.account):'<span class="emptyId">ID未登録</span>';
@@ -114,22 +114,22 @@
 
   function logoSrc(e){
     if(e.logoUrl)return safeUrl(e.logoUrl);
-    let u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    let u=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     if(!u)return '';
-    return 'https://www.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
+    return 'https:\x2f\x2fwww.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(new URL(u).origin);
   }
 
   function findEntry(id){return entries.find(x=>x.id===id)}
   async function copyId(id){const e=findEntry(id);if(!e?.account)return;try{await copyText(e.account);toast('IDをコピーしました')}catch{toast('コピーできませんでした。メモ画面からIDを選択してコピーしてください。')}}
   async function openAndCopy(id){
     const e=findEntry(id);if(!e)return;
-    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const target=safeUrl(e.url)||(e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     const copying=e.account?copyText(e.account):Promise.resolve();
     if(target)window.open(target,'_blank','noopener');
     try{await copying;toast(e.account?'IDをコピーしました。新しいタブをご確認ください。':'新しいタブをご確認ください。')}
     catch{toast('IDをコピーできませんでした。IDコピーを再度押してください。')}
   }
-  function openPasswordManager(){window.open('https://passwords.google.com/','_blank','noopener')}
+  function openPasswordManager(){window.open('https:\x2f\x2fpasswords.google.com/','_blank','noopener')}
 
   function showMemo(id){
     const e=findEntry(id); if(!e)return; $('memoTitle').textContent=e.serviceName;
