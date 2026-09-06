@@ -2,6 +2,14 @@
 
 Google Sheets の「経理ログイン管理」シートをデータ源にした、Google Apps Script Web アプリです。
 
+## 利用URL
+
+[経理ログイン管理を開く](https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec)
+
+2026年9月7日公開。デプロイしたGoogleアカウントでログインして利用してください。アクセス設定は「自分のみ」です。
+
+[Apps Scriptプロジェクト](https://script.google.com/home/projects/1icAh38Pk7hdINs3CucB6uwyEy_uFighmfcqOOhkvvQZbh0ohkdAuTxSt/edit)のサーバーファイル名は `コード.gs`、画面は `Index.html` です。更新時は既存のデプロイを新バージョンへ更新すると、利用URLを維持できます。
+
 ## 機能
 
 - カード型表示
@@ -64,3 +72,5 @@ J列はアプリが各項目を安定して識別するための内部IDです�
 - コピー完了を確認してから通知し、失敗時はその旨を表示します。
 - 全角英数字も検索でき、独自カテゴリとパスワード管理方式も編集時に保持します。
 - ローカル検証: `node accounting-login-app/test.cjs`。Googleサービスを模したテストでCRUD・競合・ID・入力安全性・検索を検証します。実際の権限と公開URLの検証は、Googleログイン後に別途必要です。
+- 実環境で26件の読み込み、検索、メモ表示、ロゴ表示を確認しました。確認用項目の追加・編集・削除はGoogle Sheetsの読み戻しでも検証し、確認用項目は削除済みです。
+- HTMLはサーバーテンプレートを使わず直接出力します。クライアントJavaScript内のURLのスラッシュは `\x2f` で表記し、HTMLサービスによるコメントとしての誤解釈を避けています。
