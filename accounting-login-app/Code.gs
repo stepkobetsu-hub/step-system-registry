@@ -1,15 +1,14 @@
 const SHEET_NAME = '経理ログイン管理';
 const COLS = 11;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
+const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
 
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
-  const ss = SpreadsheetApp.openById(DEFAULT_SPREADSHEET_ID);
-  return ss.getUrl();
+  return SpreadsheetApp.openById(DEFAULT_SPREADSHEET_ID).getUrl();
 }
 
 function doGet() {
-  // This page has no server-side scriptlets. Serve its JavaScript unchanged.
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
@@ -19,31 +18,33 @@ function getAppData() {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-  const ss = getSpreadsheet_();
-  const sheet = getSheet_(ss);
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl() };
+    const ss = getSpreadsheet_();
+    const sheet = getSheet_(ss);
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl() };
 
-  const range = sheet.getRange(2, 1, lastRow - 1, COLS);
-  const values = range.getDisplayValues();
-  const ids = values.map(r => [r[9]]);
-  let idsChanged = false;
+    const values = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
+    const ids = values.map(r => [r[9]]);
+    const props = PropertiesService.getScriptProperties().getProperties();
+    const seen = new Set();
+    let idsChanged = false;
 
-  const seen = new Set();
-  const entries = values.map((r, i) => {
-    const meaningful = [r[0], r[1], r[3], r[4], r[8]].some(Boolean);
-    if (!meaningful) return null;
-    if (!r[9] || seen.has(r[9])) {
-      r[9] = makeId_();
-      ids[i][0] = r[9];
-      idsChanged = true;
-    }
-    seen.add(r[9]);
-    return rowToEntry_(r);
-  }).filter(Boolean);
+    const entries = values.map((r, i) => {
+      const meaningful = [r[0], r[1], r[3], r[4], r[8]].some(Boolean);
+      if (!meaningful) return null;
+      if (!r[9] || seen.has(r[9])) {
+        r[9] = makeId_();
+        ids[i][0] = r[9];
+        idsChanged = true;
+      }
+      seen.add(r[9]);
+      const entry = rowToEntry_(r);
+      entry.hasPassword = Object.prototype.hasOwnProperty.call(props, secretKey_(entry.id));
+      return entry;
+    }).filter(Boolean);
 
-  if (idsChanged) sheet.getRange(2, 10, ids.length, 1).setValues(ids);
-  return { entries, sheetUrl: ss.getUrl() };
+    if (idsChanged) sheet.getRange(2, 10, ids.length, 1).setValues(ids);
+    return { entries, sheetUrl: ss.getUrl() };
   } finally {
     SpreadsheetApp.flush();
     lock.releaseLock();
@@ -51,10 +52,16 @@ function getAppData() {
 }
 
 function saveEntry(payload) {
-  const item = normalizeEntry_(payload || {});
+  payload = payload || {};
+  const item = normalizeEntry_(payload);
   if (!item.serviceName) throw new Error('サービス名を入力してください。');
   validateUrl_(item.url, 'URL');
   validateUrl_(item.logoUrl, 'ロゴURL');
+
+  const passwordAction = clean_(payload.passwordAction, 20) || 'keep';
+  const password = String(payload.password == null ? '' : payload.password);
+  if (passwordAction === 'set' && !password) throw new Error('パスワードを入力してください。');
+  if (password.length > 500) throw new Error('パスワードが長すぎます。');
 
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -64,18 +71,43 @@ function saveEntry(payload) {
     let row = item.id ? findRowById_(sheet, item.id) : 0;
     if (item.id && !row) throw new Error('この項目は削除されています。再読み込みしてください。');
     if (row) checkRevision_(sheet, row, payload.revision);
-    const isNew = !row;
-    if (isNew) {
+
+    if (!row) {
       row = Math.max(sheet.getLastRow() + 1, 2);
       item.id = makeId_();
       prepareNewRow_(sheet, row);
     }
+
+    if (passwordAction === 'set') item.passwordManager = 'アプリ内保存';
     writeRow_(sheet, row, item);
+    updateSecret_(item.id, passwordAction, password);
     SpreadsheetApp.flush();
-    return { ok: true, entry: rowToEntry_(sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0]) };
+
+    const entry = rowToEntry_(sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0]);
+    entry.hasPassword = hasSecret_(entry.id);
+    return { ok: true, entry };
   } finally {
     lock.releaseLock();
   }
+}
+
+function getPassword(id) {
+  id = clean_(id, 100);
+  if (!id) throw new Error('管理IDがありません。');
+  const sheet = getSheet_(getSpreadsheet_());
+  if (!findRowById_(sheet, id)) throw new Error('対象データが見つかりません。');
+  const value = PropertiesService.getScriptProperties().getProperty(secretKey_(id));
+  if (value === null) return { ok: true, hasPassword: false, password: '' };
+  return { ok: true, hasPassword: true, password: value };
+}
+
+function clearPassword(id) {
+  id = clean_(id, 100);
+  if (!id) throw new Error('管理IDがありません。');
+  const sheet = getSheet_(getSpreadsheet_());
+  if (!findRowById_(sheet, id)) throw new Error('対象データが見つかりません。');
+  PropertiesService.getScriptProperties().deleteProperty(secretKey_(id));
+  return { ok: true };
 }
 
 function deleteEntry(id, revision) {
@@ -89,6 +121,7 @@ function deleteEntry(id, revision) {
     if (!row) throw new Error('対象データが見つかりません。再読み込みしてください。');
     checkRevision_(sheet, row, revision);
     sheet.deleteRow(row);
+    PropertiesService.getScriptProperties().deleteProperty(secretKey_(id));
     SpreadsheetApp.flush();
     return { ok: true };
   } finally {
@@ -141,7 +174,7 @@ function normalizeEntry_(p) {
     serviceName: clean_(p.serviceName, 200),
     url: clean_(p.url, 1500),
     account: clean_(p.account, 500),
-    passwordManager: clean_(p.passwordManager, 100) || 'Google Password Manager',
+    passwordManager: clean_(p.passwordManager, 100) || 'アプリ内保存',
     accountTitle: clean_(p.accountTitle, 200),
     amountNote: clean_(p.amountNote, 500),
     memo: clean_(p.memo, 2000),
@@ -191,7 +224,6 @@ function writeRow_(sheet, row, item) {
     item.id,
     item.logoUrl
   ]];
-  // Sheets treats leading '=' as a formula. Store user text literally and preserve ID zeros.
   sheet.getRange(row, 5).setNumberFormat('@');
   sheet.getRange(row, 1, 1, COLS).setValues(values.map(r => r.map(v => /^[=+\-@']/.test(v) ? "'" + v : v)));
   const openCell = sheet.getRange(row, 3);
@@ -202,6 +234,20 @@ function writeRow_(sheet, row, item) {
   } else {
     openCell.clearContent();
   }
+}
+
+function updateSecret_(id, action, password) {
+  const props = PropertiesService.getScriptProperties();
+  if (action === 'set') props.setProperty(secretKey_(id), password);
+  if (action === 'clear') props.deleteProperty(secretKey_(id));
+}
+
+function hasSecret_(id) {
+  return PropertiesService.getScriptProperties().getProperty(secretKey_(id)) !== null;
+}
+
+function secretKey_(id) {
+  return SECRET_PREFIX + id;
 }
 
 function makeId_() {
