@@ -154,10 +154,11 @@
   }
 
   async function copyText(text){
-    if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(text);return}catch{}}
-    fallbackCopy(text);
+    try{fallbackCopy(text);return}catch{}
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return}
+    throw new Error('copy failed');
   }
-  function fallbackCopy(text){const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';(document.querySelector('dialog[open]')||document.body).appendChild(t);t.select();try{if(!document.execCommand('copy'))throw new Error('copy failed')}finally{t.remove()}}
+  function fallbackCopy(text){const previous=document.activeElement;const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';(document.querySelector('dialog[open]')||document.body).appendChild(t);t.focus();t.select();t.setSelectionRange(0,text.length);try{if(!document.execCommand('copy'))throw new Error('copy failed')}finally{t.remove();previous?.focus()}}
   function busy(v){pending=!!v;$('loading').classList.toggle('show',pending);document.querySelectorAll('#editDialog button').forEach(b=>b.disabled=pending);$('grid').setAttribute('aria-busy',String(pending))}
   function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
   function jsArg(value){return esc(JSON.stringify(String(value)))}
