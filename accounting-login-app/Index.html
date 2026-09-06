@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--blue2:#1d4ed8;--danger:#dc2626;--shadow:0 8px 24px rgba(15,23,42,.08)}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{max-width:1320px;margin:auto;padding:24px}
+    .top{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}.title h1{font-size:28px;margin:0 0 5px}.title p{margin:0;color:var(--muted);font-size:14px}
+    .top-actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 14px;font-weight:700}.btn:hover{background:#f8fafc}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:var(--blue2)}.btn.danger{color:var(--danger);border-color:#fecaca;background:#fff}
+    .toolbar{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;box-shadow:0 2px 12px rgba(15,23,42,.04);position:sticky;top:0;z-index:4}.searchrow{display:flex;gap:10px;align-items:center}.search{flex:1;display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fafafa}.search input{border:0;outline:0;background:transparent;width:100%;font-size:16px}.count{color:var(--muted);font-size:13px;white-space:nowrap}.chips{display:flex;gap:7px;overflow:auto;padding-top:11px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;white-space:nowrap}.chip.active{color:#fff;background:#334155;border-color:#334155}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}.cardhead{display:flex;gap:12px;align-items:flex-start}.logo{width:52px;height:52px;border:1px solid #e8edf3;border-radius:13px;background:#fff;display:grid;place-items:center;flex:0 0 auto;overflow:hidden}.logo img{width:34px;height:34px;object-fit:contain}.fallback{font-weight:900;font-size:21px;color:#64748b}.namebox{min-width:0;flex:1}.name{font-weight:800;font-size:17px;line-height:1.35}.badge{display:inline-block;margin-top:5px;border-radius:999px;padding:4px 8px;font-size:11px;background:#eef2ff;color:#4338ca}.editIcon{border:0;background:transparent;color:#64748b;padding:6px;border-radius:8px}.editIcon:hover{background:#f1f5f9}
+    .account{margin:14px 0 10px;border:1px solid var(--line);border-radius:11px;background:#f8fafc;padding:9px 10px;display:flex;gap:8px;align-items:center}.account .val{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.mini{border:0;background:#e2e8f0;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700}.mini:hover{background:#cbd5e1}.emptyId{color:#94a3b8}
+    .meta{display:flex;gap:7px;flex-wrap:wrap;min-height:27px}.tag{font-size:12px;padding:5px 8px;border-radius:8px;background:#f1f5f9;color:#475569}.memoPreview{font-size:12px;color:#64748b;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:18px}
+    .actions{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:13px}.openBtn{border:0;border-radius:10px;background:var(--blue);color:#fff;padding:10px 11px;font-weight:800}.openBtn:hover{background:var(--blue2)}.smallBtn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;font-weight:700}.smallBtn:hover{background:#f8fafc}.disabled{opacity:.45;cursor:not-allowed}
+    .empty{grid-column:1/-1;text-align:center;padding:55px 20px;color:var(--muted)}
+    dialog{border:0;padding:0;border-radius:18px;box-shadow:0 24px 80px rgba(15,23,42,.25);width:min(650px,calc(100vw - 28px));color:var(--text)}dialog::backdrop{background:rgba(15,23,42,.42)}.modal{padding:20px}.modalHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.modalHead h2{margin:0;font-size:20px}.x{border:0;background:#f1f5f9;width:34px;height:34px;border-radius:10px;font-size:20px}.detailGrid{display:grid;grid-template-columns:130px 1fr;gap:9px 12px;font-size:14px}.detailGrid .label{color:var(--muted)}.detailGrid .value{white-space:pre-wrap;overflow-wrap:anywhere}.detailGrid .wide{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:3px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:#475569;font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}.field textarea{min-height:92px;resize:vertical}.help{font-size:11px;color:#94a3b8}.modalFoot{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.rightBtns{display:flex;gap:9px}.loading{position:fixed;inset:0;background:rgba(255,255,255,.72);z-index:50;display:none;place-items:center;font-weight:800}.loading.show{display:grid}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(15px);background:#0f172a;color:#fff;padding:10px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:.18s;z-index:80;font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.wrap{padding:14px}.top{display:block}.top-actions{margin-top:12px}.grid{grid-template-columns:1fr}.toolbar{top:0}.searchrow{align-items:stretch}.count{display:none}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{grid-template-columns:1fr auto}.actions .pwBtn{display:none}.detailGrid{grid-template-columns:100px 1fr}}
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">読み込み中…</div>
+  <div class="wrap">
+    <div class="top">
+      <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。パスワード自体は Google Password Manager で管理します。</p></div>
+      <div class="top-actions"><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn" onclick="openPasswordManager()">パスワード管理</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
+    </div>
+    <div class="toolbar">
+      <div class="searchrow"><div class="search">🔎<input id="search" placeholder="サービス名、ID、勘定科目、メモなどを検索" autocomplete="off"></div><span class="count" id="count"></span></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <main class="grid" id="grid"></main>
+  </div>
+
+  <dialog id="memoDialog"><div class="modal"><div class="modalHead"><h2 id="memoTitle">詳細</h2><button class="x" onclick="memoDialog.close()">×</button></div><div class="detailGrid" id="memoBody"></div></div></dialog>
+
+  <dialog id="editDialog"><form class="modal" id="editForm" onsubmit="submitEntry(event)"><div class="modalHead"><h2 id="editTitle">追加</h2><button type="button" class="x" onclick="editDialog.close()">×</button></div>
+    <div class="formGrid">
+      <div class="field"><label>カテゴリ</label><select id="fCategory"></select></div>
+      <div class="field"><label>サービス名 *</label><input id="fService" required></div>
+      <div class="field full"><label>URL</label><input id="fUrl" placeholder="https://..."></div>
+      <div class="field full"><label>ログインID / アカウント</label><input id="fAccount"></div>
+      <div class="field"><label>パスワード管理</label><select id="fPassword"><option>Google Password Manager</option><option>Googleアカウント</option><option>Gmail</option><option>別途管理</option></select></div>
+      <div class="field"><label>勘定科目・用途</label><input id="fAccountTitle" placeholder="例：通信費、仕入高"></div>
+      <div class="field full"><label>金額・補足</label><input id="fAmount" placeholder="例：440円 / Google One 200GB"></div>
+      <div class="field full"><label>メモ</label><textarea id="fMemo" placeholder="領収書の場所、確認方法、注意事項など"></textarea></div>
+      <div class="field full"><label>ロゴURL（任意）</label><input id="fLogo" placeholder="空欄ならサイトのアイコンを自動表示"><div class="help">通常は空欄のままで構いません。公式ロゴ画像を固定したい場合だけURLを指定します。</div></div>
+    </div>
+    <div class="modalFoot"><button type="button" class="btn danger" id="deleteBtn" onclick="removeEntry()">削除</button><div class="rightBtns"><button type="button" class="btn" onclick="editDialog.close()">キャンセル</button><button class="btn primary" type="submit">保存</button></div></div>
+  </form></dialog>
+
+  <div class="toast" id="toast"></div>
+<script>
+  const CATEGORIES=['教材・仕入','IT・クラウド','事務用品','リース・回収','カード・決済','採用・求人','光熱費','通信','銀行','通販','メール配信','その他'];
+  let entries=[], activeCategory='すべて', sheetUrl='', editingId='';
+  const $=id=>document.getElementById(id);
+  const memoDialog=$('memoDialog'), editDialog=$('editDialog');
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    $('search').addEventListener('input',render);
+    $('sheetBtn').addEventListener('click',()=>sheetUrl&&window.open(sheetUrl,'_blank','noopener'));
+    $('fCategory').innerHTML=CATEGORIES.map(x=>`<option>${esc(x)}</option>`).join('');
+    load();
+  });
+
+  function load(){
+    busy(true);
+    google.script.run.withSuccessHandler(data=>{
+      entries=data.entries||[]; sheetUrl=data.sheetUrl||''; busy(false); renderChips(); render();
+    }).withFailureHandler(fail).getAppData();
+  }
+
+  function renderChips(){
+    const present=[...new Set(entries.map(x=>x.category).filter(Boolean))];
+    const cats=['すべて',...CATEGORIES.filter(x=>present.includes(x)),...present.filter(x=>!CATEGORIES.includes(x))];
+    $('chips').innerHTML=cats.map(c=>`<button class="chip ${c===activeCategory?'active':''}" onclick="setCategory('${attr(c)}')">${esc(c)}</button>`).join('');
+  }
+  function setCategory(c){activeCategory=c;renderChips();render()}
+
+  function filtered(){
+    const q=norm($('search').value);
+    return entries.filter(e=>{
+      if(activeCategory!=='すべて'&&e.category!==activeCategory)return false;
+      if(!q)return true;
+      return norm([e.category,e.serviceName,e.account,e.passwordManager,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
+    });
+  }
+
+  function render(){
+    const list=filtered(); $('count').textContent=`${list.length} / ${entries.length}件`;
+    if(!list.length){$('grid').innerHTML='<div class="empty">該当する項目がありません。<br>「＋追加」から新しく登録できます。</div>';return}
+    $('grid').innerHTML=list.map(cardHtml).join('');
+  }
+
+  function cardHtml(e){
+    const target=e.url || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    const logo=logoSrc(e);
+    const initial=esc((e.serviceName||'?').trim().slice(0,1).toUpperCase());
+    const idText=e.account?esc(e.account):'<span class="emptyId">ID未登録</span>';
+    const meta=[e.accountTitle,e.amountNote].filter(Boolean).map(v=>`<span class="tag">${esc(v)}</span>`).join('');
+    const preview=esc(e.memo||'');
+    return `<article class="card">
+      <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div><button class="editIcon" title="編集" onclick="openEditor('${attr(e.id)}')">✎</button></div>
+      <div class="account"><span class="val">${idText}</span><button class="mini ${e.account?'':'disabled'}" ${e.account?'':'disabled'} onclick="copyId('${attr(e.id)}')">IDコピー</button></div>
+      <div class="meta">${meta}</div><div class="memoPreview">${preview||' '}</div>
+      <div class="actions"><button class="openBtn ${target?'':'disabled'}" ${target?'':'disabled'} onclick="openAndCopy('${attr(e.id)}')">開く＋IDコピー</button><button class="smallBtn" onclick="showMemo('${attr(e.id)}')">メモ</button><button class="smallBtn pwBtn" onclick="openPasswordManager()">PW</button></div>
+    </article>`;
+  }
+
+  function logoSrc(e){
+    if(e.logoUrl)return e.logoUrl;
+    let u=e.url || (e.passwordManager==='Gmail'?'https://mail.google.com/':'');
+    if(!u)return '';
+    return 'https://www.google.com/s2/favicons?sz=128&domain_url='+encodeURIComponent(u);
+  }
+
+  function findEntry(id){return entries.find(x=>x.id===id)}
+  function copyId(id){const e=findEntry(id);if(e&&e.account){copyText(e.account);toast('IDをコピーしました')}}
+  function openAndCopy(id){const e=findEntry(id);if(!e)return; if(e.account)copyText(e.account); const target=e.url||(e.passwordManager==='Gmail'?'https://mail.google.com/':''); if(target)window.open(target,'_blank','noopener'); toast(e.account?'IDをコピーしてサイトを開きました':'サイトを開きました')}
+  function openPasswordManager(){window.open('https://passwords.google.com/','_blank','noopener')}
+
+  function showMemo(id){
+    const e=findEntry(id); if(!e)return; $('memoTitle').textContent=e.serviceName;
+    const rows=[['カテゴリ',e.category],['ログインID',e.account],['パスワード管理',e.passwordManager],['勘定科目・用途',e.accountTitle],['金額・補足',e.amountNote],['URL',e.url]];
+    $('memoBody').innerHTML=rows.filter(x=>x[1]).map(x=>`<div class="label">${esc(x[0])}</div><div class="value">${esc(x[1])}</div>`).join('')+`<div class="wide"><div class="label" style="margin-bottom:6px">メモ</div><div class="value">${esc(e.memo||'メモはありません')}</div></div>`;
+    memoDialog.showModal();
+  }
+
+  function openEditor(id=''){
+    editingId=id; const e=id?findEntry(id):null; $('editTitle').textContent=e?'登録内容を編集':'新しい項目を追加'; $('deleteBtn').style.visibility=e?'visible':'hidden';
+    $('fCategory').value=e?.category||'その他'; $('fService').value=e?.serviceName||''; $('fUrl').value=e?.url||''; $('fAccount').value=e?.account||''; $('fPassword').value=e?.passwordManager||'Google Password Manager'; $('fAccountTitle').value=e?.accountTitle||''; $('fAmount').value=e?.amountNote||''; $('fMemo').value=e?.memo||''; $('fLogo').value=e?.logoUrl||''; editDialog.showModal(); setTimeout(()=>$('fService').focus(),50);
+  }
+
+  function submitEntry(ev){
+    ev.preventDefault(); const payload={id:editingId,category:$('fCategory').value,serviceName:$('fService').value,url:$('fUrl').value,account:$('fAccount').value,passwordManager:$('fPassword').value,accountTitle:$('fAccountTitle').value,amountNote:$('fAmount').value,memo:$('fMemo').value,logoUrl:$('fLogo').value};
+    busy(true); google.script.run.withSuccessHandler(()=>{editDialog.close();toast('保存しました');load()}).withFailureHandler(fail).saveEntry(payload);
+  }
+
+  function removeEntry(){
+    if(!editingId||!confirm('この項目を削除しますか？'))return; busy(true); google.script.run.withSuccessHandler(()=>{editDialog.close();toast('削除しました');load()}).withFailureHandler(fail).deleteEntry(editingId);
+  }
+
+  function copyText(text){
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));}else fallbackCopy(text);
+  }
+  function fallbackCopy(text){const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  function busy(v){$('loading').classList.toggle('show',!!v)}
+  function fail(err){busy(false);alert((err&&err.message)||'処理に失敗しました。')}
+  let tt; function toast(msg){clearTimeout(tt);$('toast').textContent=msg;$('toast').classList.add('show');tt=setTimeout(()=>$('toast').classList.remove('show'),1800)}
+  function norm(s){return String(s||'').toLocaleLowerCase('ja').replace(/\s+/g,' ').trim()}
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function attr(s){return esc(s).replace(/`/g,'&#96;')}
+</script>
+</body>
+</html>
