@@ -1,10 +1,10 @@
 const SHEET_NAME = '経理ログイン管理';
 const COLS = 11;
+const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 
 function setupSpreadsheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) throw new Error('このスプレッドシートに紐づいたApps Scriptとして実行してください。');
-  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', ss.getId());
+  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
+  const ss = SpreadsheetApp.openById(DEFAULT_SPREADSHEET_ID);
   return ss.getUrl();
 }
 
@@ -83,15 +83,7 @@ function deleteEntry(id) {
 }
 
 function getSpreadsheet_() {
-  let id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
-  if (!id) {
-    const active = SpreadsheetApp.getActiveSpreadsheet();
-    if (active) {
-      id = active.getId();
-      PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', id);
-    }
-  }
-  if (!id) throw new Error('初期設定が必要です。Apps Scriptで setupSpreadsheet() を1回実行してください。');
+  const id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || DEFAULT_SPREADSHEET_ID;
   return SpreadsheetApp.openById(id);
 }
 
