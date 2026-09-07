@@ -72,6 +72,10 @@
     config.customCards.forEach((custom,index)=>{
       const key=customKey(custom);
       if(archived.has(key))return;
+      const customTitle=String(custom.title||'').trim();
+      const customUrl=String(custom.url||'').trim().replace(/\/$/,'');
+      if(base.some(item=>String(item['システム名']||'').trim()===customTitle||
+        (customUrl&&String(item['利用者向けURL']||'').trim().replace(/\/$/,'')===customUrl)))return;
       base.push({
         'ID':`registry-user-${custom.id}`,
         'システム名':custom.title||'名称未設定',

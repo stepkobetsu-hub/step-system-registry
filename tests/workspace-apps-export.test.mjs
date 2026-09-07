@@ -8,7 +8,7 @@ const exported=JSON.parse(fs.readFileSync(new URL('../workspace-apps.json',impor
 
 test('業務ホーム公開JSONはSYSTEM_REGISTRY.mdから機械生成した内容と一致する',()=>{
   assert.deepEqual(exported,buildExport(markdown));
-  assert.equal(exported.apps.length,25);
+  assert.equal(exported.apps.length,26);
 });
 
 test('公開JSONには業務ホーム自身を含み秘密情報を含めない',()=>{

@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "経理ログイン管理",
+      "状態": "本番使用中",
+      "利用者向けURL": "https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec"
+    },
+    {
       "正式名称": "生徒マスタ",
       "状態": "本番使用中",
       "利用者向けURL": "要確認"
@@ -14,8 +19,7 @@
     {
       "正式名称": "フォレスタ進捗管理",
       "状態": "**V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）**",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/",
-      "緊急時URL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1"
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/foresta-progress-v2/"
     },
     {
       "正式名称": "定期テスト進捗管理",
@@ -79,8 +83,8 @@
     },
     {
       "正式名称": "不達メール管理",
-      "状態": "本番使用中",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html?v=575679fd"
+      "状態": "**本番使用中（請求書不達も集約・一時エラー自動再試行・宛先別Webhook追跡）**",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html"
     },
     {
       "正式名称": "講師ポータル",
@@ -94,7 +98,7 @@
     },
     {
       "正式名称": "出退くんQR作成・読取",
-      "状態": "本番使用中（講師メールP列対応 Apps Script v21／QR機能維持）",
+      "状態": "**本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）**",
       "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec"
     },
     {
@@ -104,8 +108,8 @@
     },
     {
       "正式名称": "請求システム",
-      "状態": "本番使用中",
-      "利用者向けURL": "https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec"
+      "状態": "**Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）**",
+      "利用者向けURL": "**請求管理:** https://stepkobetsu-hub.github.io/invoice-pdf/#adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html"
     },
     {
       "正式名称": "お問い合わせ管理",
