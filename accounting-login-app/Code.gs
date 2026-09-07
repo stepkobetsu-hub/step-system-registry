@@ -3,7 +3,22 @@ const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
 const APP_VERSION = '2026-09-07-pw-order-2-favicon';
-const FAVICON_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.png';
+const FAVICON_SOURCE_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
+const FAVICON_FILE_ID_KEY = 'ACCOUNTING_FAVICON_DRIVE_FILE_ID';
+
+function getFaviconUrl_() {
+  const props = PropertiesService.getScriptProperties();
+  let fileId = props.getProperty(FAVICON_FILE_ID_KEY);
+  if (!fileId) {
+    const response = UrlFetchApp.fetch(FAVICON_SOURCE_URL, { muteHttpExceptions: false });
+    const blob = response.getBlob().setName('accounting-login-favicon.png');
+    const file = DriveApp.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    fileId = file.getId();
+    props.setProperty(FAVICON_FILE_ID_KEY, fileId);
+  }
+  return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&.png';
+}
 
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
@@ -13,7 +28,7 @@ function setupSpreadsheet() {
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
-    .setFaviconUrl(FAVICON_URL)
+    .setFaviconUrl(getFaviconUrl_())
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 

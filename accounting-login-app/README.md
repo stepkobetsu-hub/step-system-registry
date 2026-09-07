@@ -73,3 +73,10 @@ J列はアプリが各項目を安定して識別するための内部IDです�
 3. 既存の `/exec` URLを開き、機能を確認する。
 
 既存デプロイを更新すれば、利用URLはそのまま維持できます。
+
+## ファビコン
+
+- 経理ログイン管理専用の青い「￥＋帳簿」PNGを使用します。
+- 初回アクセス時にApps Scriptが画像をGoogle Driveへコピーし、「リンクを知っている全員（閲覧者）」として公開します。
+- `setFaviconUrl()` には `https://drive.google.com/uc?id=...&.png` 形式を渡します。
+- DriveファイルIDはScript Propertiesの `ACCOUNTING_FAVICON_DRIVE_FILE_ID` に保存するため、毎回ファイルは作成しません。
