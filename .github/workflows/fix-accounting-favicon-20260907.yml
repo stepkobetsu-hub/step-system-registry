@@ -15,88 +15,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Create favicon and attach it
-        shell: bash
+      - name: Apply favicon patch
+        run: python scripts/fix-accounting-favicon.py
+      - name: Commit changes
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          icon_path = Path('images/accounting-login-favicon.svg')
-          icon_path.parent.mkdir(parents=True, exist_ok=True)
-          icon_path.write_text('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-            <rect x="2" y="2" width="60" height="60" rx="14" fill="#0b63ce"/>
-            <rect x="8" y="8" width="48" height="48" rx="10" fill="#176fde"/>
-            <path d="M18 17h7l7 11 7-11h7L35.5 32H44v5h-9v4h9v5h-9v7h-6v-7h-9v-5h9v-4h-9v-5h8.5L18 17z" fill="#fff"/>
-            <path d="M43 25h9v24H40" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M43 33h6M43 40h6" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-          </svg>\n''', encoding='utf-8')
-
-          code = Path('accounting-login-app/Code.gs')
-          text = code.read_text(encoding='utf-8')
-          favicon_const = "const FAVICON_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.svg';"
-          if favicon_const not in text:
-              text = text.replace(
-                  "const APP_VERSION = '2026-09-07-pw-order-2';",
-                  "const APP_VERSION = '2026-09-07-pw-order-2-favicon';\n" + favicon_const,
-                  1,
-              )
-          if '.setFaviconUrl(FAVICON_URL)' not in text:
-              text = text.replace(
-                  ".setTitle('経理ログイン管理')\n    .addMetaTag('viewport', 'width=device-width, initial-scale=1');",
-                  ".setTitle('経理ログイン管理')\n    .setFaviconUrl(FAVICON_URL)\n    .addMetaTag('viewport', 'width=device-width, initial-scale=1');",
-                  1,
-              )
-          code.write_text(text, encoding='utf-8')
-
-          index = Path('index.html')
-          html = index.read_text(encoding='utf-8')
-          marker = 'accounting-login-favicon-20260907'
-          if marker not in html:
-              injection = r'''
-<script id="accounting-login-favicon-20260907">
-(() => {
-  const targetName = '経理ログイン管理';
-  const iconUrl = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.svg';
-  function attachAccountingFavicon() {
-    document.querySelectorAll('#cards .card, .card').forEach(card => {
-      if (!String(card.textContent || '').includes(targetName)) return;
-      let img = card.querySelector('img');
-      if (!img) {
-        const holder = card.querySelector('.logo, .favicon, .card-icon, .icon, .card-logo');
-        if (!holder) return;
-        img = document.createElement('img');
-        img.alt = '';
-        holder.prepend(img);
-      }
-      if (img.getAttribute('src') !== iconUrl) img.setAttribute('src', iconUrl);
-      img.removeAttribute('srcset');
-      img.removeAttribute('onerror');
-      img.onerror = null;
-      img.dataset.accountingFavicon = 'true';
-    });
-  }
-  document.addEventListener('DOMContentLoaded', attachAccountingFavicon);
-  const start = () => {
-    attachAccountingFavicon();
-    const root = document.getElementById('cards') || document.body;
-    new MutationObserver(attachAccountingFavicon).observe(root, { childList: true, subtree: true });
-  };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
-  else start();
-})();
-</script>
-'''
-              if '</body>' not in html:
-                  raise SystemExit('index.html has no </body>')
-              html = html.replace('</body>', injection + '\n</body>', 1)
-              index.write_text(html, encoding='utf-8')
-          PY
-      - name: Commit favicon change
-        shell: bash
-        run: |
-          rm -f .github/workflows/fix-accounting-favicon-20260907.yml
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html accounting-login-app/Code.gs images/accounting-login-favicon.svg .github/workflows/fix-accounting-favicon-20260907.yml
-          git commit -m 'Add favicon for accounting login management'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/fix-accounting-favicon-20260907.yml scripts/fix-accounting-favicon.py
+          git add -A
+          git diff --cached --quiet || git commit -m "Attach accounting login favicon"
           git push
