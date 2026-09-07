@@ -2,7 +2,8 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-07-pw-order-2';
+const APP_VERSION = '2026-09-07-pw-order-2-favicon';
+const FAVICON_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.svg';
 
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
@@ -12,6 +13,7 @@ function setupSpreadsheet() {
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
+    .setFaviconUrl(FAVICON_URL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 

@@ -3327,5 +3327,38 @@ appendDailyLinks=function(item,article){
 <script src="registry-editor.js?v=20260907-accounting"></script>
 <script src="registry-daily-links-editor.js?v=20260903-1"></script>
 <script src="registry-detail-editor.js?v=20260903-1"></script>
+
+<script id="accounting-login-favicon-20260907">
+(() => {
+  const targetName = '経理ログイン管理';
+  const iconUrl = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.svg';
+  function attachAccountingFavicon() {
+    document.querySelectorAll('#cards .card, .card').forEach(card => {
+      if (!String(card.textContent || '').includes(targetName)) return;
+      let img = card.querySelector('img');
+      if (!img) {
+        const holder = card.querySelector('.logo, .favicon, .card-icon, .icon, .card-logo');
+        if (!holder) return;
+        img = document.createElement('img');
+        img.alt = '';
+        holder.prepend(img);
+      }
+      if (img.getAttribute('src') !== iconUrl) img.setAttribute('src', iconUrl);
+      img.removeAttribute('srcset');
+      img.removeAttribute('onerror');
+      img.onerror = null;
+      img.dataset.accountingFavicon = 'true';
+    });
+  }
+  const start = () => {
+    attachAccountingFavicon();
+    const root = document.getElementById('cards') || document.body;
+    new MutationObserver(attachAccountingFavicon).observe(root, { childList: true, subtree: true });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+})();
+</script>
+
 </body>
 </html>
