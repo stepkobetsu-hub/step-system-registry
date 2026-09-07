@@ -1,0 +1,40 @@
+name: Cleanup accounting favicon experiment 20260907
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-accounting-favicon-experiment-20260907.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove experimental Apps Script favicon code
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('accounting-login-app/Code.gs')
+          s = p.read_text(encoding='utf-8')
+          start = s.find("const FAVICON_SOURCE_URL =")
+          end = s.find("function setupSpreadsheet() {")
+          if start != -1 and end != -1 and end > start:
+              s = s[:start] + s[end:]
+          s = s.replace("    .setFaviconUrl(getFaviconUrl_())\n", "")
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          rm -f .github/workflows/cleanup-accounting-favicon-experiment-20260907.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add accounting-login-app/Code.gs .github/workflows/cleanup-accounting-favicon-experiment-20260907.yml
+          git diff --cached --quiet || git commit -m 'Remove experimental Apps Script favicon workaround'
+          git push
