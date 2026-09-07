@@ -3,7 +3,7 @@ const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
 const APP_VERSION = '2026-09-07-pw-order-2-favicon';
-const FAVICON_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.svg';
+const FAVICON_URL = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.png';
 
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
