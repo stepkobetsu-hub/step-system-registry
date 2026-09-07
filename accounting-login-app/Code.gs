@@ -17,7 +17,7 @@ function getFaviconUrl_() {
     fileId = file.getId();
     props.setProperty(FAVICON_FILE_ID_KEY, fileId);
   }
-  return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&.png';
+  return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&export=download&format=png';
 }
 
 function setupSpreadsheet() {
