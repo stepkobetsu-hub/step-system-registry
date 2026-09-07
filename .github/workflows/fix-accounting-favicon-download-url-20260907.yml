@@ -1,0 +1,39 @@
+name: Fix accounting favicon download URL 20260907
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-accounting-favicon-download-url-20260907.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Use Drive download URL with format=png
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('accounting-login-app/Code.gs')
+          s = p.read_text(encoding='utf-8')
+          old = "return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&.png';"
+          new = "return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&export=download&format=png';"
+          if old not in s:
+              raise SystemExit('target favicon URL line not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Commit change
+        shell: bash
+        run: |
+          rm -f .github/workflows/fix-accounting-favicon-download-url-20260907.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add accounting-login-app/Code.gs .github/workflows/fix-accounting-favicon-download-url-20260907.yml
+          git commit -m 'Fix Apps Script favicon Drive download URL'
+          git push
