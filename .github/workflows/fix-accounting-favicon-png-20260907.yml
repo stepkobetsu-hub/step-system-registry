@@ -1,0 +1,37 @@
+name: Fix accounting favicon PNG 20260907
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-accounting-favicon-png-20260907.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Use PNG favicon URL
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ['accounting-login-app/Code.gs','index.html']:
+              p=Path(name)
+              s=p.read_text(encoding='utf-8')
+              s=s.replace('images/accounting-login-favicon.svg','images/accounting-login-favicon.png')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        shell: bash
+        run: |
+          rm -f .github/workflows/fix-accounting-favicon-png-20260907.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Use PNG favicon for accounting login"
+          git push
