@@ -2189,6 +2189,27 @@ applyAssetInfo=function(item){
 };
 </script>
 
+<script id="step-message-delivery-log-modal-registration-20260908">
+const applyStepMessageDeliveryLogModal20260908Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepMessageDeliveryLogModal20260908Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('STEP配信')||name.includes('STEPメッセージ')))return base;
+  const toArray=value=>Array.isArray(value)?value:(value?[String(value)]:[]);
+  const work='2026年9月8日：右上の「送信ログ確認」で、ログ件数が多い端末では一覧が画面外にはみ出し、スクロールも閉じる操作もできなくなる問題を修正。ログ一覧を画面内スクロールにし、常時見える右上の×、下部の閉じる、背景クリック、Escキーで閉じられるようにした。step-message-center main c74ae4d、GitHub Pages公開成功、実画面でスクロール設定と各閉じる操作を確認。Apps Script・送信処理・保存データは変更していない。';
+  return Object.assign({},base,{
+    '最新版の場所':'step-message-center main c74ae4d（送信ログ画面の操作不能修正）',
+    '確認日':'2026年9月8日',
+    '確認根拠':'step-message-center main c74ae4d。GitHub Pages公開成功。送信ログ一覧の画面内スクロール、右上×、下部の閉じる、背景クリック、Escキーによる終了を確認。Apps Scriptは変更なし。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+work,
+    '確認手順':[...new Set([...toArray(base['確認手順']),'送信ログが多い端末で一覧をスクロールでき、右上×・下部の閉じる・背景クリック・Escキーの各操作で閉じられることを確認'])],
+    '障害時の確認':[...new Set([...toArray(base['障害時の確認']),'送信ログ画面を閉じられない：公開app.jsとstyle.cssがmain c74ae4d以降か、ブラウザキャッシュを確認'])],
+    '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'送信ログ一覧の画面内スクロール','送信ログ画面の右上×・下部ボタン・背景クリック・Escキー終了','送信処理・保存データ・Apps Script変更なし','本番main c74ae4d'])],
+    '確認状況':'欠席一覧の低負荷更新、当日内の新着順、送信ログ画面のスクロール・終了操作、本番公開を確認済み。'
+  });
+};
+</script>
+
 <script id="teacher-payroll-app-registration-20260820">
 const organizeTeacherPayrollApp20260820Base=organizeEntryImport;
 organizeEntryImport=function(items){
