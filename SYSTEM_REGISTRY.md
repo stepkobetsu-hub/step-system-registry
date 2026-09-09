@@ -1,16 +1,17 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-08
+最終更新: 2026-09-09
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
 
-## 登録システム（27件）
+## 登録システム（28件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
+| プリント書き込み消去・再印刷 | 本番 | https://stepkobetsu-hub.github.io/print-handwriting-cleaner/ | [print-handwriting-cleaner](https://github.com/stepkobetsu-hub/print-handwriting-cleaner) | `main` | `public/index.html`、`public/app.js`、`public/styles.css`、`src/index.ts` | GitHub Pages＋ブラウザ内画像処理。画像は端末外へ送信・保存しない | `main`へ反映後、Pagesの公開とスマホ撮影・処理前後比較・A4印刷を確認 | 2026-09-09 | Issue #36。印刷内容の再生成を行わず、色・輝度・局所構造から手書き候補だけを復元。3段階強度、手動仕上げ、縦横自動判定を備える |
 | 経理ログイン管理 | 本番使用中 | https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec | [step-system-registry/accounting-login-app](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app) | `main` | `accounting-login-app/Code.gs`、`accounting-login-app/Index.html`、Google Sheet「経理ログイン管理マスター」 | GitHub＋Google Apps Script＋Google Sheet＋UserProperties | GitHub正本を既存Apps Scriptプロジェクトへ同期し、既存デプロイID／URLを維持して新バージョンへ更新 | 2026-09-07 | Apps Script v7。PW本体はSheet／GitHubへ保存せずGoogleアカウント別UserPropertiesへ保存。L列「表示順」を全PC共通の正本とする |
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
 | ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）** | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `codex/homework-status-root-cause`（現行本番）／`agent/step-progress-v3-implementation`（V3基礎） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/scripts/apply-v3-autosave.mjs`、`cloudflare/scripts/apply-v3-homework-display-fix.mjs`、D1 V3テーブル | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。通常保存はD1直保存。旧Supabaseは復元元として保全 | 1320で最小確認。代表5名を旧スクショと本番APIで照合。田中1100のグラフAPIを3回実測（0.756秒／1.026秒／0.862秒）し、グラフ取得開始を前倒し。利用者実画面で高速化を確認 | 2026-08-23 | 現行Version `b6ed5627-f360-4ba2-8e09-92e9d5d71340`。直前Version `fb49bfc7-73e9-4361-84ef-ef07768d1c27`。V3直前旧版 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。詳細 `docs/learning-progress-v3-stabilized-20260822.md` |

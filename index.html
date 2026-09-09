@@ -3396,5 +3396,24 @@ appendDailyLinks=function(item,article){
 })();
 </script>
 
+<script id="print-handwriting-cleaner-20260909">
+const organizePrintHandwritingCleaner20260909Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizePrintHandwritingCleaner20260909Base(items);
+  if(!out.some(item=>item['ID']==='print-handwriting-cleaner'))out.unshift({
+    'ID':'print-handwriting-cleaner','システム名':'プリント書き込み消去・再印刷','正式名称':'プリント書き込み消去・再印刷',
+    '分類':'教材・印刷','状態':'本番','利用者':'講師・スタッフ','運用担当':'管理者',
+    '概要':'解答済み教材をスマホで撮影または画像選択し、印刷文字・罫線・図・写真を保ちながら鉛筆・赤ペン等の書き込みを除去してA4再印刷する。',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/print-handwriting-cleaner/','GitHub Pages URL':'https://stepkobetsu-hub.github.io/print-handwriting-cleaner/','GitHub URL':'https://github.com/stepkobetsu-hub/print-handwriting-cleaner',
+    'GitHub正本':'stepkobetsu-hub/print-handwriting-cleaner（main）','正本ファイル':['public/index.html','public/app.js','public/styles.css','src/index.ts'],
+    '保存基盤':'GitHub Pages＋ブラウザ内画像処理。教材画像は外部送信・保存しない。',
+    '主要機能':['スマホ撮影・画像選択','3段階の手書き除去','処理前後比較','手動消しゴム','A4縦横自動判定','PNG保存・ブラウザ印刷'],
+    '更新方法':'mainへ反映し、GitHub Pagesの公開完了後にスマホ撮影、縦横画像、処理前後比較、A4印刷プレビューを確認する。',
+    '変更時の注意':['APIキーや秘密情報をフロントエンドへ埋め込まない','縦書き教材を含む印刷文字を生成し直さない','教材画像をサーバーへ保存しない'],
+    '確認日':'2026年9月9日','確認状況':'Issue #36に基づき新規作成。自動テスト、型検査、実ブラウザ処理フローを確認済み。'
+  });
+  return out;
+};
+</script>
 </body>
 </html>

@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "プリント書き込み消去・再印刷",
+      "状態": "本番",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/print-handwriting-cleaner/"
+    },
+    {
       "正式名称": "経理ログイン管理",
       "状態": "本番使用中",
       "利用者向けURL": "https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec"
