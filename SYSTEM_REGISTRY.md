@@ -1032,3 +1032,13 @@
 - Cloudflare本番: `step-checkin-edge-staging` のGitHub Workers Builds成功。GitHub main commit `9a428de3a650f65350ce9e9d93561633f2d0728c`、Worker Version ID `21ecdbbd-37cf-42e3-b555-c2d6375cfa0d`。
 - 検証: Cloudflare対象テスト36/36、TypeScript検査、GAS構文検査、未到着除外・判定引継ぎの追加テストに合格。GitHub check `Workers Builds: step-checkin-edge-staging` の成功を確認。
 - 当日ログ: 2026-09-10の未到着通知2行は、同一生徒について2つの通知先へ送った記録であり、2回の入退室ではない。既存ログは履歴保全のため書き換えず、修正後の判定から除外する。
+
+### 出退くんQR：大吉・塾長レア画面（2026-09-10）
+
+- 対象: 通常の生徒退室。講師の退勤、20秒以内の重複受付、入室では表示しない。
+- 新規演出: 塾長の顔を使った「大吉」のおみくじ風画面。紅白・金・富士山・日の出の背景へ、生徒名・「退室しました」・「今日もよく頑張りました！ 大吉です！」・現在ポイントを重ねて表示する。
+- 抽選確率: 大吉・塾長2%。既存の塾長写真10%、女性レア5%、みかん様5%は維持し、通常の退室キャラクターを80%から78%へ変更。合計100%。
+- 対応画面: Fire／Cloudflare Worker版 `cloudflare/checkin-edge/src/legacy-tablet.html` と通常タブレット版 `tablet_checkin.html`。
+- 画像正本: `assets/checkin/goodbye-director-daikichi.webp`（1536×1024、約212KB）。
+- 本番反映: student-QR main commit `5c15360039778eec9cd98ed8d1dda7cb8b0be77b`。Cloudflare Workers Builds成功、Worker Version ID `b90a269e-0ebc-4201-8840-a68dfce3a446`。GitHub Pages公開成功。
+- 検証: 2%定数、退室限定、講師・重複除外、両画面の画像・クラス・メッセージを対象テスト3件で確認し全件合格。

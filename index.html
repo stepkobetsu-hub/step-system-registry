@@ -3435,5 +3435,21 @@ applyAssetInfo=function(item){
   });
 };
 </script>
+<script id="student-qr-daikichi-rare-20260910">
+const applyStudentQrDaikichiRare20260910Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrDaikichiRare20260910Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(base['ID']!=='qr-register'&&!name.includes('出退くんQR')&&!name.includes('生徒QR'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '最新版の場所':'student-QR main commit 5c15360039778eec9cd98ed8d1dda7cb8b0be77b／Cloudflare Worker Version ID b90a269e-0ebc-4201-8840-a68dfce3a446／Apps Script「生徒QR」v87。',
+    '確認日':'2026年9月10日',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年9月10日：通常の生徒退室時に2%で表示する「大吉・塾長」レア画面を追加。塾長の顔を使った紅白・金・富士山・日の出のおみくじ風デザインで、生徒名・退室表示・メッセージ・ポイントを重ねて表示する。既存の塾長写真10%、女性レア5%、みかん様5%は維持し、通常表示を80%から78%へ調整。講師退勤と20秒以内の重複受付では抽選しない。Fire用Worker画面と通常タブレット画面へ反映。',
+    '確認済み事項':[...new Set([...confirmed,'大吉・塾長レア画面2%','既存レア確率を維持','通常退室表示78%','講師退勤は抽選対象外','重複受付は抽選対象外','Fire用・通常タブレット用の両画面へ反映','GitHub Pages公開成功','Cloudflare Worker Version ID b90a269e-0ebc-4201-8840-a68dfce3a446'])],
+    '確認状況':'大吉・塾長レア画面を2%で本番公開。GitHub PagesとCloudflare Workers Buildsの成功を確認済み。'
+  });
+};
+</script>
 </body>
 </html>
