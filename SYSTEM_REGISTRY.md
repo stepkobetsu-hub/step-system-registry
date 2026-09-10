@@ -1021,3 +1021,14 @@
 - 印刷上余白: Chromeでは `@page` の上余白指定が印刷プレビューへ反映されなかったため、印刷領域の先頭に10mmの空白を直接追加。用紙設定だけに依存しない。
 - 変更時の注意: 展開時約200.2mm×68.2mm、左右4mm相当、印刷領域先頭10mmの空白を維持する。
 - 確認結果: 2026年8月31日、利用者が実際に印刷し、上余白を含め正常に印刷できることを確認。
+
+### 出退くんQR：未到着通知の誤カウント・画面／メール判定不一致修正（2026-09-10）
+
+- 障害: STEP配信システムの「まだお見えになっておりません」は通知先メールアドレスごとに入退室ログ2へ1行ずつ記録される。通知先が2件の場合の2行を入退室2回として誤集計し、その後のQR読取で入室・退室の偶奇が反転することがあった。
+- 構造上の原因: QR画面はCloudflare Durable Object、正式ログ・保護者メールはApps Scriptがそれぞれ独立に入室／退室を判定していたため、画面とメールが食い違う余地があった。
+- 修正: Apps Scriptの当日回数は `送信元システム=QR_ATTENDANCE` の正式なQR入退室行だけを対象とし、未到着通知などSTEP配信の行を除外する。日次状態キャッシュは `CHECKIN_DAY_V3` へ更新し、旧誤集計キャッシュを再利用しない。
+- 判定一本化: Cloudflare受付で確定した `attendanceType`（生徒は入室／退室、講師は出勤／退勤）をApps Script書き戻しへ渡し、既存のEdge連携トークンを検証できた場合だけ正式ログ・メール種別として採用する。直接GAS経路では従来の正式QRログによる判定を維持する。
+- Apps Script本番: 現行プロジェクト `1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22`、バージョン87（2026-09-10 19:23 JST）。既存デプロイID `AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w` とURLを維持。
+- Cloudflare本番: `step-checkin-edge-staging` のGitHub Workers Builds成功。GitHub main commit `9a428de3a650f65350ce9e9d93561633f2d0728c`、Worker Version ID `21ecdbbd-37cf-42e3-b555-c2d6375cfa0d`。
+- 検証: Cloudflare対象テスト36/36、TypeScript検査、GAS構文検査、未到着除外・判定引継ぎの追加テストに合格。GitHub check `Workers Builds: step-checkin-edge-staging` の成功を確認。
+- 当日ログ: 2026-09-10の未到着通知2行は、同一生徒について2つの通知先へ送った記録であり、2回の入退室ではない。既存ログは履歴保全のため書き換えず、修正後の判定から除外する。

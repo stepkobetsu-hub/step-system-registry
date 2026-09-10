@@ -3415,5 +3415,25 @@ organizeEntryImport=function(items){
   return out;
 };
 </script>
+<script id="student-qr-attendance-source-20260910">
+const applyStudentQrAttendanceSource20260910Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentQrAttendanceSource20260910Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(base['ID']!=='qr-register'&&!name.includes('出退くんQR')&&!name.includes('生徒QR'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '状態':'本番使用中（入退室判定一本化・未到着通知除外）',
+    'Apps ScriptプロジェクトID':'1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22',
+    'Apps Scriptバージョン':'87（2026年9月10日 19:23 JST）',
+    'デプロイID':'AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w',
+    '最新版の場所':'student-QR main（Cloudflare Workers build 9a428de3、Version ID 21ecdbbd-37cf-42e3-b555-c2d6375cfa0d）／Apps Script「生徒QR」v87。既存URLを維持。',
+    '確認日':'2026年9月10日',
+    '確認状況':'Apps Script v87とCloudflare Workersの自動公開成功を確認。QR画面で確定した入室・退室種別をメール側へ引き継ぎ、STEP配信の未到着通知行は入退室回数へ含めない。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年9月10日緊急修正：STEP配信の未到着通知が通知先メールアドレスごとにログ行を作るため、同一通知が2行ある場合に入退室回数として誤集計され、入室・退室の偶奇が反転する障害を修正。QR画面はCloudflare Durable Object、メールはApps Scriptで別々に種別を判定していた二重判定も廃止し、Cloudflareで確定した種別を署名済み連携経路でApps Scriptへ渡す。Apps Scriptの日次状態キャッシュをCHECKIN_DAY_V3へ更新して旧誤集計キャッシュを破棄。現行本番Apps Script「生徒QR」v87、Cloudflare Worker Version ID 21ecdbbd-37cf-42e3-b555-c2d6375cfa0dへ反映。',
+    '確認済み事項':[...new Set([...confirmed,'STEP配信の未到着通知を入退室回数から除外','通知先2件のログ2行を入退室2回として数えない','QR画面の確定種別をメールへ引継ぎ','未署名のattendanceTypeは採用しない','日次状態キャッシュCHECKIN_DAY_V3','Apps Script v87・既存デプロイID維持','Cloudflare Workers build成功','Cloudflare Worker Version ID 21ecdbbd-37cf-42e3-b555-c2d6375cfa0d'])]
+  });
+};
+</script>
 </body>
 </html>
