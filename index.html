@@ -3559,5 +3559,45 @@ applyAssetInfo=function(item){
  };
 })();
 </script>
+
+<script id="teacher-registration-qr-update-registry-20260913">
+(function(){
+ const previousOrganize=organizeEntryImport;
+ organizeEntryImport=function(items){
+   const list=previousOrganize(items);
+   const registration=list.find(item=>item['ID']==='teacher-initial-registration');
+   if(registration){
+     registration['システム名']='講師登録・変更';
+     registration['正式名称']='講師登録・変更アプリ';
+     registration['状態']='本番公開済（登録API v34）';
+     registration['概要']='講師本人の初期登録・追加入力・登録情報変更・パスワード変更を行う。初期パスワードは生年月日の月日4桁を自動設定し、保存後は完了表示から閉じる／編集するを選べる。';
+     registration['確認日']='2026年9月13日';
+     registration['確認状況']='登録API v34を既存URLのまま本番公開。画面名・説明・保存完了表示・パスワード表示切替、講師マスターE/O列の表示統一を確認済み。';
+     registration['入力画面']='初期登録ではパスワード入力不要。生年月日の月日4桁をAJ列へ自動設定。現在・新しいパスワードは伏字で、右端の目ボタンから表示を切り替えられる。';
+     registration['登録・変更仕様']='初期登録・追加入力・変更・パスワード変更に対応。新規講師のQ列へSTEP-講師番号を自動作成。登録済みマイナンバーは本人変更不可、未登録者の後日追加入力は可能。';
+     registration['保存後の動作']='保存完了後に「保存しました」と「閉じる」「編集する」を表示する。';
+     registration['管理者通知']='登録・変更内容は変更前／変更後が分かる形で指定管理者2アドレスへ通知。Brevo優先、失敗時はMailAppへフォールバックし、通知失敗を黙って成功扱いにしない。';
+     registration['講師マスター表示']='E列の郵便番号は000-0000、O列のマイナンバーは0000-0000-0000。文字列として先頭0を保持。';
+     const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
+     ['保存完了表示と閉じる／編集する','初期パスワードの生年月日月日4桁による自動設定','パスワード欄の目ボタン','登録済みマイナンバーの本人変更禁止','Q列QRコードの自動作成','郵便番号・マイナンバーのハイフン表示','登録API v34・既存URL維持'].forEach(value=>{if(!checked.includes(value))checked.push(value)});
+     registration['確認済み事項']=checked;
+   }
+   const qr=list.find(item=>item['ID']==='qr-register'||item['システム名']==='出退くんQR作成・読取');
+   if(qr){
+     qr['講師通知確認（2026年9月13日）']='7001は従来どおり送信成功。7093はBrevo送信成功・Gmail受信済みで、同じ件名のためGmailの同一スレッドにまとめられていた。7095はメール誤記訂正後の到着を利用者が確認。';
+     qr['講師QR注意事項']='7093は講師番号とQ列QR値が不一致（Q列がSTEP-7094）のため、将来の重複防止としてSTEP-7093への修正が必要。講師検索結果は最大6時間キャッシュされ、メール訂正直後は旧宛先を参照する可能性がある。';
+     qr['確認日']='2026年9月13日';
+   }
+   return list;
+ };
+ const previousDailyLinks=appendDailyLinks;
+ appendDailyLinks=function(item,article){
+   previousDailyLinks(item,article);
+   if(!String(item['システム名']||item['正式名称']||'').includes('講師ポータル'))return;
+   article.querySelectorAll('.link-name').forEach(label=>{if(label.textContent.trim()==='講師初期登録アプリ')label.textContent='講師登録・変更'});
+ };
+})();
+</script>
+
 </body>
 </html>
