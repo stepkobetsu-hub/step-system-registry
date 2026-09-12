@@ -11,9 +11,10 @@
 
 - 既存の「コマ数報告してない連絡」は、QR出勤済みで当日の授業コマ数報告がない講師へ22:10ごろLINEを1通送る。
 - 管理シートは「講師LINE通知管理」。使用タブは「講師LINE連携」「講師LINE通知履歴」。LINE利用者IDは画面・GitHub・本台帳へ記載しない。
-- 台帳記載のApps Script編集URLは現在接続中のGoogleアカウントでは開けず、「マイトリガー」に `runTeacherReportReminders` も表示されない。実際の所有アカウントまたは正しいプロジェクトIDは要確認。
-- 公開WebアプリURLだけでは、コード更新やトリガー保守はできない。変更前に所有アカウント、編集URL、トリガーを必ず照合する。
-- 講師を検索・選択してLINEを一斉／個別送信する管理画面とサーバー処理は [step-form PR #1](https://github.com/stepkobetsu-hub/step-form/pull/1) に保存済み。既存Apps Scriptの接続先が未確定のため、誤接続を避けて本番反映は保留中。
+- Apps Script正本は「講師授業報告LINE通知」。所有者は個別指導ステップGoogleアカウントで、編集URLは `/u/1/` を使用する。`/u/0/` のmintcocoajasmine側は管理シートの編集者だが、Apps Script所有者ではない。
+- `runTeacherReportReminders` の時間ベーストリガーは有効で、2026年9月12日の確認時点でエラー率0%。
+- 講師を検索・選択してLINEを一斉／個別送信する管理画面とサーバー処理を [step-form PR #1](https://github.com/stepkobetsu-hub/step-form/pull/1) からmainへ反映。Apps Script v3、公開画面HTTP 200、登録済み講師25名の読込を確認済み。実送信テストは未実施。
+- 管理画面: https://stepkobetsu-hub.github.io/step-form/teacher_line_contact.html
 
 ## 登録システム（28件）
 
