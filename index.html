@@ -31,7 +31,7 @@
   <main class="shell">
     <header>
       <div class="brand"><img class="brand-icon" src="https://stepkobetsu-hub.github.io/seiseki-kanri/images/system-portal/app-icon-192.png?v=20260722-fix" alt="STEPシステム資産管理台帳"><div><h1>STEPシステム資産管理台帳</h1><p class="lead">本番システム・旧システム・GitHub・Apps Script・Google Sheet・Supabaseの統合管理</p><span class="former-name">旧称：STEP総合管理ポータル</span></div></div>
-      <div class="top-actions"><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="https://stepkobetsu-hub.github.io/step-workspace/" style="display:inline-flex;align-items:center;gap:7px"><img src="https://stepkobetsu-hub.github.io/step-workspace/favicon-32x32.png" alt="" width="18" height="18" style="border-radius:3px">STEP業務ホームへ</a><button class="btn" id="logoutBtn" type="button">ログアウト</button></div>
+      <div class="top-actions"><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="https://stepkobetsu-hub.github.io/step-workspace/" style="display:inline-flex;align-items:center;gap:7px"><img src="https://stepkobetsu-hub.github.io/step-workspace/favicon-32x32.png" alt="" width="18" height="18" style="border-radius:3px">STEP業務ホームへ</a><button class="btn hidden" id="logoutBtn" type="button">ログアウト</button></div>
     </header>
     <section id="denied" class="notice hidden" role="alert"></section>
     <section id="loginPanel" class="login-card hidden" aria-labelledby="loginTitle">
@@ -162,23 +162,39 @@ async function api(action,extra){
   }
 }
 async function init(){
-  const a=auth();
-  const hasSession=!!(a&&['2','3','4'].includes(String(a.permissionLevel))&&a.systemPortalSessionToken);
-  const hasStoredLogin=hasStoredCredentials();
-  if((hasSession||hasStoredLogin)&&loadPortalCache()){
-    if(!hasSession||Date.now()-portalCacheSavedAt>=SYSTEMS_CACHE_REFRESH_MS)refreshPortalInBackground();
-    return;
+  try{
+    const response=await fetch(`SYSTEM_REGISTRY.md?v=${Date.now()}`,{cache:'no-store'});
+    if(!response.ok)throw new Error(`台帳を取得できませんでした（${response.status}）`);
+    const items=parsePublicRegistryMarkdown(await response.text());
+    if(!items.length)throw new Error('公開台帳にシステムが見つかりませんでした。');
+    savePortalCache(items);
+    showPortal(items);
+  }catch(error){
+    if(!loadPortalCache())deny(`${error.message||'台帳を取得できませんでした。'} 再読み込みしてください。`);
   }
-  if(hasSession){
-    try{await loadPortal();return}catch(firstError){
-      try{if(await restoreStoredLogin())return}catch(e){}
-      showLogin();
-      if(hasStoredLogin)await performLogin(true);else scheduleAutoLogin();
-      return;
-    }
+}
+function parsePublicRegistryMarkdown(markdown){
+  const heading='| 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |';
+  const start=markdown.indexOf(heading);
+  if(start<0)return [];
+  const lines=markdown.slice(start).split(/\r?\n/).slice(2);
+  const keys=['正式名称','状態','利用者向けURL','GitHub URL','本番ブランチ','ソース・主要ファイル','管理','更新方法','確認日','概要'];
+  const rows=[];
+  for(const line of lines){
+    if(!line.startsWith('|'))break;
+    const cells=line.slice(1,-1).split('|').map(cell=>cell.trim());
+    if(cells.length!==keys.length)continue;
+    const item={ID:`public-${rows.length+1}`,'システム名':cleanPublicCell(cells[0]),'分類':'システム資産台帳'};
+    keys.forEach((key,index)=>{item[key]=cleanPublicCell(cells[index],key)});
+    rows.push(item);
   }
-  showLogin();
-  if(hasStoredLogin)await performLogin(true);else scheduleAutoLogin();
+  return rows;
+}
+function cleanPublicCell(value,key){
+  const cell=String(value||'').replace(/\*\*/g,'').replace(/<br\s*\/?>/gi,'\n').trim();
+  const link=cell.match(/^\[[^\]]+\]\((https?:\/\/[^)]+)\)$/);
+  if(link&&(key==='利用者向けURL'||key==='GitHub URL'))return link[1];
+  return cell.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'$1：$2').replace(/`([^`]+)`/g,'$1');
 }
 function hasStoredCredentials(){return !!((localStorage.getItem(STAFF_CODE_KEY)||'').trim()&&localStorage.getItem(STAFF_PASSWORD_KEY))}
 function savePortalCache(items){try{portalCacheSavedAt=Date.now();localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date(portalCacheSavedAt).toISOString()}))}catch(e){}}
