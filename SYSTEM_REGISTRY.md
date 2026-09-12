@@ -1,11 +1,19 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-09
+最終更新: 2026-09-12
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
-この文書にはAPIキー、パスワード、秘密鍵、セッショントークンを記載しない。ポータル認証は権限2・3・4を対象とし、ログイン時とAPI呼び出しごとの権限再確認を維持する。
+この文書にはAPIキー、パスワード、秘密鍵、セッショントークン、LINE利用者IDを記載しない。台帳は公開GitHub Pagesと同じ公開情報を表示するためログイン不要。送信・編集などの管理操作は台帳から分離し、各システム側で権限確認を維持する。
+
+## 講師LINE通知・連絡（2026-09-12確認）
+
+- 既存の「コマ数報告してない連絡」は、QR出勤済みで当日の授業コマ数報告がない講師へ22:10ごろLINEを1通送る。
+- 管理シートは「講師LINE通知管理」。使用タブは「講師LINE連携」「講師LINE通知履歴」。LINE利用者IDは画面・GitHub・本台帳へ記載しない。
+- 台帳記載のApps Script編集URLは現在接続中のGoogleアカウントでは開けず、「マイトリガー」に `runTeacherReportReminders` も表示されない。実際の所有アカウントまたは正しいプロジェクトIDは要確認。
+- 公開WebアプリURLだけでは、コード更新やトリガー保守はできない。変更前に所有アカウント、編集URL、トリガーを必ず照合する。
+- 講師を検索・選択してLINEを一斉／個別送信する管理画面とサーバー処理は [step-form PR #1](https://github.com/stepkobetsu-hub/step-form/pull/1) に保存済み。既存Apps Scriptの接続先が未確定のため、誤接続を避けて本番反映は保留中。
 
 ## 登録システム（28件）
 
