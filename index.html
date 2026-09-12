@@ -3599,5 +3599,28 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="teacher-self-audit-email-registry-20260913">
+(function(){
+ const previousOrganize=organizeEntryImport;
+ organizeEntryImport=function(items){
+   const list=previousOrganize(items);
+   const registration=list.find(item=>item['ID']==='teacher-initial-registration');
+   if(registration){
+     registration['状態']='本番公開済（登録API v35）';
+     registration['本人向け確認メール']='初期登録・追加入力・登録情報変更・パスワード変更後、講師マスターP列の本人へ個別送信。操作種別・受付日時・変更前／変更後を記載し、心当たりがない場合は管理者へ連絡するよう案内する。';
+     registration['本人向けメールの安全対策']='パスワードとマイナンバーの実値は記載しない。管理者通知とは別メールにし、管理者のメールアドレスを本人向けメールの宛先欄へ表示しない。同一アドレスの重複送信を防止する。';
+     registration['登録APIバージョン']='35（2026年9月13日）';
+     registration['確認日']='2026年9月13日';
+     registration['確認状況']='登録API v35を既存デプロイID／URLのまま本番公開。本人向け確認メールは次回の登録・変更から適用。実在講師へのテストメールは送信していない。';
+     const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
+     ['講師本人への個別確認メール','本人向けメールでパスワード・マイナンバー実値を非表示','管理者宛先を本人メールに表示しない','同一アドレスの二重送信防止','登録API v35・既存URL維持'].forEach(value=>{if(!checked.includes(value))checked.push(value)});
+     registration['確認済み事項']=checked;
+   }
+   return list;
+ };
+})();
+</script>
+
 </body>
 </html>
