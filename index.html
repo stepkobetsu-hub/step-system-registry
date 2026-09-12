@@ -2854,7 +2854,7 @@ organizeEntryImport=function(items){
 <script id="teacher-report-reminder-registry-20260901">
 const organizeTeacherReportReminder20260901Base=organizeEntryImport;
 organizeEntryImport=function(items){
-  const out=organizeTeacherReportReminder20260901Base(items).filter(item=>String(item['システム名']||item['正式名称']||'')!=='コマ数報告してない連絡');
+  const out=organizeTeacherReportReminder20260901Base(items).filter(item=>!['コマ数報告してない連絡','LINE講師連絡システム'].includes(String(item['システム名']||item['正式名称']||'')));
   const entry={
     'ID':'teacher-report-line-reminder',
     'システム名':'コマ数報告してない連絡',
@@ -2921,6 +2921,37 @@ organizeEntryImport=function(items){
     '確認済み事項':['LINE登録画面を講師ポータル最上部へ掲載','採用時登録メールへの6桁確認番号','LINE利用者IDと講師コードの連携','当日出勤と授業報告の照合','毎日22:10ごろの自動確認','同日同一講師の重複送信防止','LINE未連携者への誤送信防止','日付・曜日付き通知文面','講師LINE通知管理シートへの履歴保存','既存LINE公式アカウントの共用','既存アプリと分離した通知処理','登録済み再訪時の完了表示','ページを閉じる／再登録するボタン','講師ポータル詳細から管理Googleシートを開く導線','講師ポータル詳細から授業コマ数報告データを開く導線','講師LINE連絡システムの登録済み講師25名読込','ひらがな・カタカナ・ローマ字検索','検索用よみの講師マスター連携','Apps Script v4','step-form PR #2のmain統合'],
     '確認状況':'本番公開済み。Apps Script正本・所有者・runTeacherReportReminders（エラー率0%）を確認。Apps Script v4、step-form main a96833a、公開画面HTTP 200、登録済み講師25名の読込、ひらがな・カタカナ・ローマ字検索を確認。今回の検索確認ではLINE送信を行っていない。'
   };
+  const contactEntry={
+    'ID':'teacher-line-contact-system',
+    'システム名':'LINE講師連絡システム',
+    '正式名称':'LINE講師連絡システム',
+    '分類':'講師・給与',
+    '状態':'本番',
+    '概要':'LINE登録済み講師を検索・選択し、個別指導STEP公式LINEから業務連絡を一斉または個別に送信する管理アプリ。選択中の講師を名前付きで表示し、送信履歴から送信内容を開いて確認できる。',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/step-form/teacher_line_contact.html',
+    'STEP配信システムURL':'https://stepkobetsu-hub.github.io/step-message-center/',
+    '公式LINE URL':'https://chat.line.biz/U4ec286ef731d320a710bfa6cc796b713',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/step-form',
+    'GitHub正本':'teacher_line_contact.html、teacher_line_contact.js、gas/TeacherLineContact.gs',
+    'Apps Scriptプロジェクト名':'講師授業報告LINE通知',
+    'Apps ScriptプロジェクトID':'17u-ZS8sGfq68L6vTOxCQkKL4l0RXn36Z_OkT0UmyXOYnxR_rC1eGvhKa',
+    'Apps Script編集URL':'https://script.google.com/u/1/home/projects/17u-ZS8sGfq68L6vTOxCQkKL4l0RXn36Z_OkT0UmyXOYnxR_rC1eGvhKa/edit',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbz6_kf6oXCUycashVMMQ9-hrA73CtopL7xwPsm0DYkE5MxXJyxJrhkdnghIS70_KC641w/exec',
+    'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1Cv3JgP7kXuFvch5PuHKVkdmjcFQ957qmaWuY9R-6lBA/edit',
+    'Google Sheet名':'講師LINE通知管理',
+    '使用シート名':'講師LINE連携、講師LINE連絡履歴',
+    '講師マスター':'給与明細2026-6-／講師マスター。A列＝講師コード、B列＝氏名、C列＝よみ、R列＝主な教室（「大手」「神領」「神領・大手」）。',
+    '校舎検索仕様':'講師マスターR列を参照。「神領・大手」は神領校・大手町校の両方の検索結果へ表示する。',
+    '認証・セッション':'スタッフ共通認証の権限2・3・4。保存済み認証が有効な端末は自動で開く。LINE利用者IDはブラウザへ返さない。',
+    '主要機能':['講師番号・漢字氏名・ひらがな・カタカナ・ローマ字検索','講師マスターR列による校舎絞り込み','選択中講師の名前付き一覧・個別解除','選択済み行の色付け','文面プレビュー・最終確認','一斉／個別LINE送信','送信履歴・送信内容のクリック表示','STEP配信システム・公式LINEへの上部ボタン'],
+    '送信内容履歴':'講師LINE連絡履歴の本文列を管理画面へ返し、「送信内容を見る」を押すと全文を展開表示する。',
+    '画像添付':'現行は文章送信のみ。画像送信には、LINEが取得できるHTTPS上へ画像を安全に保管する仕組みが別途必要。',
+    '保守上の重要事項':'Apps Scriptは所有者アカウントの /u/1/ で開き、既存デプロイIDを維持して新版を公開する。アクセストークンとLINE利用者IDはGitHub・画面・台帳へ記載しない。',
+    '関連カード':['STEP配信システム','コマ数報告してない連絡','講師ポータル'],
+    '確認日':'2026年9月13日',
+    '確認済み事項':['登録済み講師25名の取得','かな・カナ・ローマ字検索','選択講師の名前表示','R列校舎絞り込み','送信内容の履歴表示','STEP配信システムとの相互リンク','公式LINEボタン','LINEを送信しない画面確認'],
+    '確認状況':'独立カード化し、本番画面・Apps Script・Google Sheet・GitHubの対応関係を記録。'
+  };
   const portalIndex=out.findIndex(item=>String(item['システム名']||item['正式名称']||'').includes('講師ポータル'));
   if(portalIndex>=0){
     const portalItem=out[portalIndex];
@@ -2929,8 +2960,8 @@ organizeEntryImport=function(items){
     const memos=Array.isArray(current)?current.slice():(current?[current]:[]);
     if(!memos.includes(memo))memos.push(memo);
     portalItem['仕様メモ']=memos;
-    out.splice(portalIndex+1,0,entry);
-  }else out.push(entry);
+    out.splice(portalIndex+1,0,entry,contactEntry);
+  }else out.push(entry,contactEntry);
   return out;
 };
 
