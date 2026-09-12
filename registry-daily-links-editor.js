@@ -54,7 +54,18 @@
     }).filter(link=>link.title||link.openUrl);
   }
   function linksForKey(key,article){
-    if(hasOverride(key))return clone(config.cards[key]);
+    if(hasOverride(key)){
+      const links=clone(config.cards[key]);
+      const item=systems.find(entry=>itemKey(entry)===key);
+      if(String(item?.['システム名']||'').includes('講師ポータル')){
+        const url='https://stepkobetsu-hub.github.io/teacher-portal/registration.html';
+        if(!links.some(link=>link.openUrl===url)){
+          const index=links.findIndex(link=>link.title==='講師ポータルアプリ');
+          links.splice(index<0?links.length:index+1,0,{title:'講師初期登録アプリ',openUrl:url,copyUrl:url});
+        }
+      }
+      return links;
+    }
     return captureRenderedLinks(article||findArticleForKey(key));
   }
 
@@ -91,7 +102,7 @@
       if(!section)section=ensureDailySection(article);
       if(hasOverride(key)){
         section.querySelectorAll('.link-row,.registry-daily-empty').forEach(node=>node.remove());
-        const links=config.cards[key];
+        const links=linksForKey(key,article);
         links.forEach(link=>section.append(createCustomLinkRow(link)));
         if(!links.length){const empty=document.createElement('p');empty.className='meta registry-daily-empty';empty.textContent='日常利用リンクはありません。';section.append(empty);}
       }else if(!section.querySelector('.link-row')&&!section.querySelector('.registry-daily-empty')){

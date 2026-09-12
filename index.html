@@ -469,7 +469,7 @@ function isStudentMaster(item){return String(item['システム名']||'').includ
 function dailyFieldOrder(item){if(isGradeSystem(item))return ['利用者向けURL','管理者向けURL','Google Sheet URL'];if(isJukuCard(item))return ['利用者向けURL','読み取りURL','入力フォームURL','Google Sheet URL'];if(isStudentMaster(item))return ['Google Sheet URL','利用者向けURL','管理者向けURL','入力フォームURL'];return GROUPS.flatMap(g=>g.fields.map(([field,label])=>[field,label])).filter(([field])=>DAILY_FIELDS.has(field))}
 function appendDailyLinks(item,article){const section=el('section','daily-links');section.append(el('h3','','日常利用'));const used=new Set();const adjustmentUrl=String(item['料金特別調整専用URL']||'').trim();if(adjustmentUrl){const adjustmentRow=linkRow('料金特別調整専用URL',adjustmentUrl);adjustmentRow.classList.add('billing-adjustment-link');const adjustmentLabel=adjustmentRow.querySelector('.link-name');const adjustmentUrlLink=el('a','billing-adjustment-url',adjustmentUrl);adjustmentUrlLink.href=normalizePortalUrl(adjustmentUrl);adjustmentUrlLink.target='_blank';adjustmentUrlLink.rel='noopener noreferrer';adjustmentLabel.append(adjustmentUrlLink);section.append(adjustmentRow);used.add(adjustmentUrl)}if(isGradeSystem(item)){const studentUrl='https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html';const adminUrl='https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html';section.append(linkRow('生徒用 成績管理を開く',studentUrl),linkRow('管理者・講師用 成績管理',adminUrl));used.add(studentUrl);used.add(adminUrl);}const qrRegisterUrl='https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html';const qrReaderUrl=String(item['読み取りURL']||'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet').trim();if(String(item['システム名']||'').includes('出退くん')){section.append(linkRow('管理者QR登録を開く',qrRegisterUrl),linkRow('QR読み取りアプリを開く',qrReaderUrl));used.add(qrRegisterUrl);used.add(qrReaderUrl)}if(String(item['システム名']||'').includes('講師ポータル')){const staffAppUrl='https://stepkobetsu-hub.github.io/seiseki-kanri/';section.append(linkRow('スタッフ用アプリ',staffAppUrl));used.add(staffAppUrl);}if(isTeacherSchedule(item)){[['利用者向けURL','講師用画面を開く'],['管理者向けURL','管理者用画面を開く']].forEach(([field,label])=>{const url=String(item[field]||'').trim();if(url&&!used.has(url)){section.append(linkRow(label,url));used.add(url)}});TEACHER_TIMETABLE_LINKS.forEach(({label,url})=>{if(!used.has(url)){section.append(linkRow(label,url));used.add(url)}})}else{const definitions=dailyFieldOrder(item);definitions.forEach(def=>{const [field,fallback]=Array.isArray(def)?def:[def,fieldLabel(def)];let value=String(item[field]||'').trim();if(isQrRegister(item)&&field==='読み取りURL'&&!value)value='https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet';if(isGradeSystem(item)&&field==='GitHub Pages URL')value=GRADE_ADMIN_URL;if(!value||(used.has(value)&&!(String(item['システム名']||'').includes('出退くん')&&field==='管理者向けURL')))return;const displayLabel=(String(item['システム名']||'').includes('講師ポータル')&&field==='利用者向けURL')?'講師ポータルアプリ':linkLabel(item,field,fallback||fieldLabel(field));section.append(linkRow(displayLabel,linkUrl(item,field,value)));used.add(value);if(isStudentMaster(item)&&field==='Google Sheet URL')section.append(linkRow('生徒名簿出力','https://script.google.com/macros/s/AKfycbyMqCoqTW9gTUAjJPeV27mCAwx6euMDnyK_TAcZyn7PQfEO6smvy6aWd4Vc5GxgBH2A/exec?page=roster'))})}if(section.querySelector?.('.link-row')||section.children.length>1)article.append(section)}
 const appendDailyLinksBase=appendDailyLinks;
-appendDailyLinks=function(item,article){appendDailyLinksBase(item,article);if(!String(item['システム名']||'').includes('講師ポータル'))return;const section=article.querySelector('.daily-links');if(!section)return;const portalRow=Array.from(section.querySelectorAll('.link-row')).find(row=>row.querySelector('.link-name')?.textContent.trim()==='講師ポータルアプリ');if(!portalRow)return;portalRow.after(linkRow('授業報告','https://stepkobetsu-hub.github.io/teacher-portal/?view=attendance'));}
+appendDailyLinks=function(item,article){appendDailyLinksBase(item,article);if(!String(item['システム名']||'').includes('講師ポータル'))return;const section=article.querySelector('.daily-links');if(!section)return;const portalRow=Array.from(section.querySelectorAll('.link-row')).find(row=>row.querySelector('.link-name')?.textContent.trim()==='講師ポータルアプリ');if(!portalRow)return;portalRow.after(linkRow('講師初期登録アプリ','https://stepkobetsu-hub.github.io/teacher-portal/registration.html'),linkRow('授業報告','https://stepkobetsu-hub.github.io/teacher-portal/?view=attendance'));}
 function fieldLabel(field){const hit=GROUPS.flatMap(g=>g.fields).find(([name])=>name===field);return hit?hit[1]:field}
 function isDailyField(item,field){if(isGradeSystem(item)&&field==='GitHub Pages URL')return true;return DAILY_FIELDS.has(field)}
 function classifyInvestigation(text){const value=String(text||'');if(/現行(?:システム)?から(?:は)?未?参照|現行GitHub Pagesから旧GAS.*呼び出しなし/.test(value)&&/最近の実行(?:履歴)?(?:は)?なし|実行履歴0件/.test(value))return {level:'deferred',label:'現行未参照・調査保留',priority:'低'};if(/削除|保存先|本番|公開URL.*有効|現在も.*利用|実行履歴|参照元/.test(value))return {level:'important',label:'要調査・重要',priority:'高'};if(/アーカイブ|作成理由|過去版|細かな変更/.test(value))return {level:'reference',label:'参考・未確認',priority:'低'};return {level:'required',label:'要調査',priority:'中'}}
@@ -3364,7 +3364,7 @@ appendDailyLinks=function(item,article){
 })();
 </script>
 <script src="registry-editor.js?v=20260907-accounting"></script>
-<script src="registry-daily-links-editor.js?v=20260903-1"></script>
+<script src="registry-daily-links-editor.js?v=20260912-teacher-registration"></script>
 <script src="registry-detail-editor.js?v=20260903-1"></script>
 
 <script id="accounting-login-favicon-20260907">
@@ -3488,10 +3488,10 @@ applyAssetInfo=function(item){
 (() => {
  const record={
   "ID": "teacher-initial-registration",
-  "システム名": "講師初期登録・登録情報変更",
-  "正式名称": "講師初期登録・登録情報変更",
+  "システム名": "講師初期登録アプリ",
+  "正式名称": "講師初期登録アプリ",
   "分類": "講師マスター／給与明細",
-  "状態": "本番公開済（実講師の初回登録待ち）",
+  "状態": "本番公開済（既存講師ログイン確認済）",
   "利用者": "講師・教室スタッフ",
   "運用担当": "管理者",
   "概要": "講師が自分で初期登録し、講師番号とパスワードで後日ログインして住所・銀行口座などを追加入力・修正する。銀行口座やマイナンバーは初回空欄でも登録できる。",
@@ -3504,17 +3504,17 @@ applyAssetInfo=function(item){
     "registration.css",
     "gas/TeacherRegistration.gs"
   ],
-  "最新版の場所": "teacher-portal main 60b50a4e8b0e4174d0e3e14500438aea55cafaac／Apps Script「BREVO_API_KEY」v27（2026年9月12日20:33 JST）。student-QR gas/コード.jsも16ea6b6f497077bee3fb31654cfe745f7412714aへ同期。",
+  "最新版の場所": "teacher-portal main 98aa9479989bed921bcf1f24e5ccdc3299e51790／Apps Script「BREVO_API_KEY」v28（2026年9月12日21:21 JST）。student-QR gas/コード.js：58c1712f87a743f540d37589d8a30ee703e5f166。",
   "元データ": "Google Sheet「給与明細2026-6-」／講師マスター（見出し4行目・データ5行目以降）",
-  "認証仕様": "初回登録・既存講師のパスワード設定・再設定には教室スタッフが発行する本人用登録コード（7日・1回限り）を使用。通常編集は講師番号＋本人のパスワード。権限2・3・4のスタッフのみコード発行可能。",
+  "認証仕様": "既存講師は講師番号＋講師マスターAJ列のパスワードでログイン（AJ列を優先、先頭0対応）。AJ列は変更しない。AJ列が空欄の新規登録者は本アプリで設定した専用パスワードを使用。新規登録・専用パスワード設定には本人用登録コード（7日・1回限り）を使用し、4文字以上で設定可能。",
   "自動入力": "A：最大講師番号＋1（確認時7092、次回7093）、D：1、G：登録日時、M：Lの生年月日をM3のTODAYで年齢計算。同時登録はロックで直列化。",
   "氏名入力": "姓・名とフリガナをそれぞれ分けて入力し、B・C列では空白区切りで保存する。",
   "銀行口座": "H/I/J/Kへコード・支店・種別・口座番号を保存。ゆうちょは9900／5桁の記号／種別空欄／最大8桁の番号。先頭0を保持。",
   "更新仕様": "本人の同じ行だけ更新。変更していない項目とA・D・G・N・Q以降を保持。マイナンバーは登録済み表示のみで番号を再表示しない。編集の競合・二重登録を防止。",
-  "個人情報保護": "平文パスワードやプロフィールをScript Properties・ログ・公開GitHub・ブラウザの永続領域に保存しない。パスワードはPBKDF2＋サーバー側HMAC、セッションと登録コードはハッシュ化。プロフィールは認証済み本人だけ取得。",
+  "個人情報保護": "AJ列はサーバー側で照合し、画面・APIレスポンス・ログへ返さない。認証用パスワードはHTTPSでAPIへ送信し、本アプリからAJ列へ書き込まない。新規専用パスワードはPBKDF2＋HMAC。個人情報は認証済み本人だけ取得。QR生成はブラウザ内で行い、外部QRサービスへ登録コードを送らない。",
   "更新方法": "teacher-portalの画面・APIモジュールを更新。APIは既存登録用Apps Scriptへ同期して既存デプロイを新バージョンへ更新し、student-QRのgas/コード.jsも同期する。入退室通知側「生徒QR」v87とは別。",
-  "操作手順": "画面下部の教室スタッフ欄でコード発行。新しい講師は番号空欄、既存講師のパスワード設定・再設定は対象番号を指定。本人が設定後、「登録情報を変更」からログインして編集。",
-  "詳細記録": "https://github.com/stepkobetsu-hub/teacher-portal/blob/main/docs/teacher-registration.md",
+  "操作手順": "既存講師は「登録情報を変更」から他の講師アプリと同じ認証情報でログイン。新規講師は教室スタッフが発行したQRをスマホで読み取り、登録コードが自動入力されたページで登録。発行済みコードのQR化、QR画像保存、登録リンクコピーにも対応。",
+  "詳細記録": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/teacher-initial-registration-20260912.md",
   "関連カード": [
     "講師ポータル",
     "講師名札印刷",
@@ -3522,17 +3522,18 @@ applyAssetInfo=function(item){
   ],
   "確認日": "2026年9月12日",
   "確認済み事項": [
-    "新規採番・後日口座追加・同一行更新の自動テスト",
-    "本人以外の更新拒否・競合検出・式注入拒否",
-    "再設定時の旧セッション無効化・処理中断復旧",
-    "Apps Script v27・既存URL維持",
-    "講師ポータルの新規入口と本番フォーム表示",
-    "本番シートは7092まで・テスト行追加なし"
+    "新規採番・後日更新・本人認証・競合など既存9群の自動テスト",
+    "AJ列認証・先頭0・誤パスワード拒否・既存専用パスワードへの優先・AJ列非更新の追加テスト",
+    "既存講師2名の本番ログイン成功・検証後ログアウト",
+    "QR生成・登録コード自動入力・新規/既存用切替",
+    "銀行検索ボタン位置・生年月日の入力順・4文字以上のパスワード設定",
+    "Apps Script v28・既存API URL維持"
   ],
   "未確認項目": [
     "教室スタッフによる本人用コード発行から実講師の初期登録・追加入力までの実データ確認"
   ],
-  "確認状況": "本番公開・保存処理の自動テスト済み。実在講師のパスワード設定・登録操作は本人が実施する。"
+  "確認状況": "公開画面とAPI v28を確認。既存講師2名でAJ列パスワードによる本番ログインに成功し、検証後ログアウト。講師情報の保存・変更は行っていない。",
+  "入力画面": "氏名→フリガナ→生年月日→メールアドレスの順。住所欄の「あとから入力できます」は削除。銀行の選択・入力より上に銀行コード・支店コード検索ボタンを配置し、銀行DB.jpを別タブで開く。"
 };
  const organize=organizeEntryImport;
  organizeEntryImport=function(items){
@@ -3545,9 +3546,9 @@ applyAssetInfo=function(item){
    const base=apply(item);
    if(base['ID']!=='qr-register')return base;
    return Object.assign({},base,{
-    'QR登録APIバージョン':'27（2026年9月12日20:33 JST）',
-    '現在のApps Script版':'入退室通知：生徒QR v87／QR登録・講師名簿・初期登録：BREVO_API_KEY v27（別プロジェクト）',
-    '最新版の場所':'student-QR main 16ea6b6f497077bee3fb31654cfe745f7412714a（登録APIコード同期）／登録API v27／入退室通知側は生徒QR v87を維持。',
+    'QR登録APIバージョン':'28（2026年9月12日21:21 JST）',
+    '現在のApps Script版':'入退室通知：生徒QR v87／QR登録・講師名簿・初期登録：BREVO_API_KEY v28（別プロジェクト）',
+    '最新版の場所':'student-QR main 58c1712f87a743f540d37589d8a30ee703e5f166（登録APIコード同期）／登録API v28／入退室通知側は生徒QR v87を維持。',
     '作業メモ':(base['作業メモ']||'')+'\n\n2026年9月12日20:33 JST：講師初期登録・本人による登録情報変更APIをv27へ追加。名札用名簿・既存QR処理を維持。詳細は「講師初期登録・登録情報変更」カードを参照。'
    });
  };

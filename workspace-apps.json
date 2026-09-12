@@ -97,6 +97,11 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher-portal/"
     },
     {
+      "正式名称": "講師初期登録アプリ",
+      "状態": "本番公開済（既存講師ログイン確認済）",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher-portal/registration.html"
+    },
+    {
       "正式名称": "講師マスター／給与明細",
       "状態": "本番使用中",
       "利用者向けURL": "要確認"
