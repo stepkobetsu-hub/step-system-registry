@@ -3483,5 +3483,75 @@ applyAssetInfo=function(item){
   };
 })();
 </script>
+
+<script id="teacher-initial-registration-20260912">
+(() => {
+ const record={
+  "ID": "teacher-initial-registration",
+  "システム名": "講師初期登録・登録情報変更",
+  "正式名称": "講師初期登録・登録情報変更",
+  "分類": "講師マスター／給与明細",
+  "状態": "本番公開済（実講師の初回登録待ち）",
+  "利用者": "講師・教室スタッフ",
+  "運用担当": "管理者",
+  "概要": "講師が自分で初期登録し、講師番号とパスワードで後日ログインして住所・銀行口座などを追加入力・修正する。銀行口座やマイナンバーは初回空欄でも登録できる。",
+  "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher-portal/registration.html",
+  "GitHub URL": "https://github.com/stepkobetsu-hub/teacher-portal",
+  "保存基盤": "GitHub Pages＋既存Apps Script登録API＋Google Sheet講師マスター",
+  "正本ファイル": [
+    "registration.html",
+    "registration.js",
+    "registration.css",
+    "gas/TeacherRegistration.gs"
+  ],
+  "最新版の場所": "teacher-portal main 60b50a4e8b0e4174d0e3e14500438aea55cafaac／Apps Script「BREVO_API_KEY」v27（2026年9月12日20:33 JST）。student-QR gas/コード.jsも16ea6b6f497077bee3fb31654cfe745f7412714aへ同期。",
+  "元データ": "Google Sheet「給与明細2026-6-」／講師マスター（見出し4行目・データ5行目以降）",
+  "認証仕様": "初回登録・既存講師のパスワード設定・再設定には教室スタッフが発行する本人用登録コード（7日・1回限り）を使用。通常編集は講師番号＋本人のパスワード。権限2・3・4のスタッフのみコード発行可能。",
+  "自動入力": "A：最大講師番号＋1（確認時7092、次回7093）、D：1、G：登録日時、M：Lの生年月日をM3のTODAYで年齢計算。同時登録はロックで直列化。",
+  "氏名入力": "姓・名とフリガナをそれぞれ分けて入力し、B・C列では空白区切りで保存する。",
+  "銀行口座": "H/I/J/Kへコード・支店・種別・口座番号を保存。ゆうちょは9900／5桁の記号／種別空欄／最大8桁の番号。先頭0を保持。",
+  "更新仕様": "本人の同じ行だけ更新。変更していない項目とA・D・G・N・Q以降を保持。マイナンバーは登録済み表示のみで番号を再表示しない。編集の競合・二重登録を防止。",
+  "個人情報保護": "平文パスワードやプロフィールをScript Properties・ログ・公開GitHub・ブラウザの永続領域に保存しない。パスワードはPBKDF2＋サーバー側HMAC、セッションと登録コードはハッシュ化。プロフィールは認証済み本人だけ取得。",
+  "更新方法": "teacher-portalの画面・APIモジュールを更新。APIは既存登録用Apps Scriptへ同期して既存デプロイを新バージョンへ更新し、student-QRのgas/コード.jsも同期する。入退室通知側「生徒QR」v87とは別。",
+  "操作手順": "画面下部の教室スタッフ欄でコード発行。新しい講師は番号空欄、既存講師のパスワード設定・再設定は対象番号を指定。本人が設定後、「登録情報を変更」からログインして編集。",
+  "詳細記録": "https://github.com/stepkobetsu-hub/teacher-portal/blob/main/docs/teacher-registration.md",
+  "関連カード": [
+    "講師ポータル",
+    "講師名札印刷",
+    "出退くんQR作成・読取"
+  ],
+  "確認日": "2026年9月12日",
+  "確認済み事項": [
+    "新規採番・後日口座追加・同一行更新の自動テスト",
+    "本人以外の更新拒否・競合検出・式注入拒否",
+    "再設定時の旧セッション無効化・処理中断復旧",
+    "Apps Script v27・既存URL維持",
+    "講師ポータルの新規入口と本番フォーム表示",
+    "本番シートは7092まで・テスト行追加なし"
+  ],
+  "未確認項目": [
+    "教室スタッフによる本人用コード発行から実講師の初期登録・追加入力までの実データ確認"
+  ],
+  "確認状況": "本番公開・保存処理の自動テスト済み。実在講師のパスワード設定・登録操作は本人が実施する。"
+};
+ const organize=organizeEntryImport;
+ organizeEntryImport=function(items){
+   const list=organize(items),i=list.findIndex(item=>item['ID']===record['ID']);
+   if(i>=0)list[i]=Object.assign({},list[i],record);else list.unshift(Object.assign({},record));
+   return list;
+ };
+ const apply=applyAssetInfo;
+ applyAssetInfo=function(item){
+   const base=apply(item);
+   if(base['ID']!=='qr-register')return base;
+   return Object.assign({},base,{
+    'QR登録APIバージョン':'27（2026年9月12日20:33 JST）',
+    '現在のApps Script版':'入退室通知：生徒QR v87／QR登録・講師名簿・初期登録：BREVO_API_KEY v27（別プロジェクト）',
+    '最新版の場所':'student-QR main 16ea6b6f497077bee3fb31654cfe745f7412714a（登録APIコード同期）／登録API v27／入退室通知側は生徒QR v87を維持。',
+    '作業メモ':(base['作業メモ']||'')+'\n\n2026年9月12日20:33 JST：講師初期登録・本人による登録情報変更APIをv27へ追加。名札用名簿・既存QR処理を維持。詳細は「講師初期登録・登録情報変更」カードを参照。'
+   });
+ };
+})();
+</script>
 </body>
 </html>
