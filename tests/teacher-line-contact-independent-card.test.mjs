@@ -11,4 +11,8 @@ test('LINE講師連絡システムを独立カードとして登録する',()=>{
   assert.match(registry,/送信内容のクリック表示/);
   assert.match(registry,/STEP配信システムとの相互リンク/);
   assert.match(registry,/公式LINEボタン/);
+  assert.match(registry,/'Apps Scriptバージョン':'6'/);
+  assert.match(registry,/画像のみ送信/);
+  assert.match(registry,/teacherLineContactCleanupImages/);
+  assert.match(registry,/送信ログ確認の左へ横並び/);
 });
