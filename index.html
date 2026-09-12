@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 134271)
-Total output lines: 3652
-
 <!doctype html>
 <html lang="ja">
 <head>
@@ -1276,7 +1273,418 @@ applyAssetInfo=function(item){
       '確認日':'2026年8月6日',
       '認証仕様':'同一端末・同一ブラウザーでは、明示的にログアウトするまでスタッフ用ログインを維持。ランダムなセッショントークンをサーバー側へ保持し、パスワードは端末へ保存しない。各API呼出時に講師マスタの最新権限を再確認する。',
       '正本ファイル':'stepkobetsu-hub/seiseki-kanri の gas_code.js（認証API）／stepkobetsu-hub/step-system-registry の index.html（公開台帳）',
-      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月6日：従来はCacheServiceの6時間上限により「セッションが切れました」と再ログインを求めていた。認証正本をScript Propertiesの失効可能なランダムトークンへ変更し、ログアウトするまで維持する。高速化用CacheServiceは6時間ごとに自動再生成。旧6時間セッションがまだ有効な端末は最初の照会時に継続ログインへ自動移行する。明示的ロ…14271 tokens truncated…')))return base;
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月6日：従来はCacheServiceの6時間上限により「セッションが切れました」と再ログインを求めていた。認証正本をScript Propertiesの失効可能なランダムトークンへ変更し、ログアウトするまで維持する。高速化用CacheServiceは6時間ごとに自動再生成。旧6時間セッションがまだ有効な端末は最初の照会時に継続ログインへ自動移行する。明示的ログアウトではサーバー側トークンと端末側情報を削除する。権限2・3・4の判定は講師マスタの最新状態で毎回確認し、権限を外した場合は利用不可。',
+      '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'パスワード・セッショントークンの実値は台帳やGitHubへ記録しない。端末紛失時は講師マスタの権限を外すことで次回照会から拒否できる。',
+      '確認済み事項':[...new Set([...confirmed,'明示的ログアウトまでログイン維持','パスワードは端末へ保存しない','ランダムトークンをサーバー側で失効可能に保持','旧6時間セッションを有効中なら自動移行','各照会で講師マスタの最新権限を確認','明示的ログアウトでサーバー・端末の認証を削除'])],
+      '確認状況':'ログアウトまでの継続ログイン仕様を認証正本へ反映'
+    });
+  }
+  return base;
+};
+</script>
+
+<script id="student-persistent-qr-cache-20260807">
+const applyStudentPersistentQrCache20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentPersistentQrCache20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-student-app'||name.includes('STEP塾生アプリ（step-hub）')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '正本ファイル':['step-hub/index.html','step-hub/sw.js','step-hub/tests/common-login.test.mjs','student-QR/my_qr.html','student-QR/my_qr_sw.js','student-QR/tests/my-qr-cache-behavior.test.mjs','student-QR/tests/my-qr-security.test.mjs','student-QR/gas/MyQrApi.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 自分のQR即時表示：初回に本人確認して取得したQR表示データを同一端末・同一ブラウザーのlocalStorage（stepMyQrDisplayCacheV5）へ保存する。2回目以降は保存済みQRを最初に描画して処理を終了し、本人確認API・QR取得APIへアクセスしない。従来の15分制限を廃止し、本人が明示的にログアウトするまで保存する。保存範囲は生徒ID・表示氏名・校舎名・QR登録有無・QRデータだけで、パスワードとセッショントークンはQR表示キャッシュへ保存しない。別生徒でログインした場合は生徒ID不一致を検出して旧QRを削除する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：自分のQR即時表示】①初回QR表示が完了済みか、②stepMyQrDisplayCacheV5が端末にあるか、③student-QR/my_qr.htmlのloadMyQrが保存済み描画後にreturnしているか、④Service Workerがmy_qr_sw.js?v=9（step-my-qr-v9-persistent-local-qr）かを確認する。保存済みがあればAPI通信は発生しない。GitHub：student-QR my_qr.html 42b1c18634026ddfd2e9f43604580283a1bc189f、my_qr_sw.js 19812fc59ef3790d9d4d65f9d7fff9132e051b93、対象試験最終 d20dafdded54368d65f6f579605e0a72812defd4。step-hub index b5bb43ffa6286c22fc4585f8ac259fc9eb4fa3b9、tests c0399462d17eae4540ba018e67cab03c5d44f398。自分のQR対象試験15件、共通ログイン試験9件合格。',
+    '確認済み事項':[...new Set([...confirmed,'自分のQRを端末へ期限なし保存','2回目以降はAPI通信なしで即時表示','QRキャッシュの15分制限を廃止','明示的ログアウトでQR表示キャッシュを削除','別生徒ログイン時に旧QRを削除','旧V4キャッシュをV5へ自動移行','QR表示キャッシュへパスワード・トークンを保存しない','student-QR Service Worker v9','自分のQR対象試験15件合格','step-hub共通ログイン試験9件合格'])],
+    '確認状況':'自分のQRの端末保存・通信なし即時表示・ログアウトと生徒変更時の削除を本番反映済み'
+  });
+};
+</script>
+<script id="student-home-navigation-labels-20260807">
+const applyStudentHomeNavigationLabels20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStudentHomeNavigationLabels20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-student-app'||name.includes('STEP塾生アプリ（step-hub）')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '正本ファイル':['step-hub/index.html','step-hub/sw.js','step-hub/tests/common-login.test.mjs','student-QR/my_qr.html','student-QR/my_qr_sw.js','student-QR/tests/my-qr-cache-behavior.test.mjs','student-QR/tests/my-qr-security.test.mjs','student-QR/gas/MyQrApi.js'],
+    '最新版の場所':'塾生ホーム：stepkobetsu-hub/step-hub（main）／公開URL：https://stepkobetsu-hub.github.io/step-hub/／本人QR：stepkobetsu-hub/student-QR（main）',
+    '確認根拠':'step-hubのGitHub mainにあるindex.html・sw.jsと、GitHub Pages公開構成を照合。画面変更の最終コミットはindex.html 537218c84dc6dda948b31588ac54547a2767ffa6、sw.js 9acb468bb5b42ac1d2051437968d3d0000a6d46d。',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 ホーム画面整理：愛知県入試制度・愛知全県模試は上段の正方形ショートカットだけを削除し、下段の展開式詳細パネルは維持する。残る正方形ショートカットは「愛知県公立高校 入試問題 過去問」「年間予定」の2件。お知らせ・今日の宿題・次回の授業には「工事中」ラベルを表示し、文字・余白・背景色・影を大きく目立つ仕様にした。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：ホーム画面の工事中表示】step-hub/index.html の resource-grid、notice construction-label、今日の宿題と次回の授業の section-title badge を確認する。愛知県入試制度と愛知全県模試は下段の examPanel・admissionPanel を削除しない。PWA更新は index.html の sw.js?v=23 と、sw.js の step-student-v23-large-construction-labels を対で確認する。変更履歴：重複ボタン削除・お知らせ工事中 fe20cc17c2e1ed81ed39d1ad2e883ebf1225d913、宿題・次回授業工事中 53b68deccdbc2efae605444c331837572412bdb5、ラベル拡大 537218c84dc6dda948b31588ac54547a2767ffa6、キャッシュ最終 9acb468bb5b42ac1d2051437968d3d0000a6d46d。',
+    '確認済み事項':[...new Set([...confirmed,'愛知県入試制度の上段正方形ボタンを削除','愛知全県模試の上段正方形ボタンを削除','愛知県入試制度の下段詳細パネルを維持','愛知全県模試の下段詳細パネルを維持','お知らせに大きな工事中ラベルを表示','今日の宿題に大きな工事中ラベルを表示','次回の授業に大きな工事中ラベルを表示','残る正方形リンクを2列表示','step-hub Service Worker v23へ更新'])],
+    '確認状況':'ホーム画面の重複リンク整理・3か所の工事中強調表示・PWAキャッシュv23を本番反映済み'
+  });
+};
+</script>
+<script id="learning-progress-cloudflare-device-warning-20260807">
+const applyLearningProgressCloudflareDeviceWarning20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressCloudflareDeviceWarning20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='learning-progress'||name.includes('学習進捗管理')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '状態':'Cloudflare Worker本番使用中',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
+    'Cloudflare Worker':'step-progress-api',
+    'D1':'step-progress-db（binding DB）',
+    '本番ブランチ':'agent/cloudflare-progress-migration',
+    '正本ファイル':['cloudflare/public/index.html','cloudflare/src/index.ts','cloudflare/wrangler.jsonc','cloudflare/tests/save-status.test.mjs'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 端末選択注意表示：生徒ログインで端末が未選択の場合、「⚠️『自分・家族の端末』か『塾のタブレット』を選んでください。」を端末選択ボタン直下へ、赤枠・淡い赤背景・太字17pxの大きい表示で出す。従来の画面最下部の小さい警告には表示しない。端末選択後とログイン種別切替時は自動的に消す。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月7日 Cloudflare本番反映：source commit 07fd87d39e6330027ad47e97b00efea4e8593156。Worker Version 72c8dafa-53e9-46c4-9048-77e8fa1b8645をtraffic 100%で公開。直前Versionはf3ac9e47-496c-4350-b3e8-1a3276e5ae05。保存設定PRODUCTION_WRITE_APPROVED=true、BROWSER_D1_WRITE_ENABLED=true、TEST_WRITE_APPROVED=false、TEST_STUDENT_ID=1320を維持。Cloudflare側テスト18件、TypeScript検査、git diff --check合格。プレビューと本番実画面で警告位置を確認し、本番/healthはHTTP 200・ok=true。D1データ変更・マイグレーションなし。復旧時は直前Versionを100%へ戻す。完全履歴bundle SHA-256は064efcc4c58a17d958ab3fc4aeb338f73c5e91e6d742388c3b266f4397b10810。',
+    '確認済み事項':[...new Set([...confirmed,'端末未選択の注意書きを選択ボタン直下へ移動','端末未選択の注意書きを赤枠・太字17pxで大型化','端末選択時に注意書きを自動消去','画面最下部の小さい端末警告を廃止','Cloudflare Worker Version 72c8dafaを100%公開','本番保存設定を維持','Cloudflare側テスト18件合格','TypeScript検査合格','本番health HTTP 200','D1データ変更なし'])],
+    '確認状況':'端末未選択の大きい注意表示をCloudflare本番へ反映し、実画面とhealthを確認済み'
+  });
+};
+</script>
+
+<script id="grade-management-device-login-20260807">
+const applyGradeManagementDeviceLogin20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyGradeManagementDeviceLogin20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(name.includes('成績管理')&&!name.includes('塾生アプリ')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月7日',
+    '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
+    '生徒向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html',
+    '最新版の場所':'stepkobetsu-hub/seiseki-kanri（main）／管理者 admin.html／生徒 juku_app.html',
+    '正本ファイル':['admin.html','juku_app.html','admin-device-session.test.mjs','student-device-session.test.mjs','gas_code.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 管理者・生徒の端末別ログイン：各ログイン欄の直前で「自分・家族の端末」「塾のタブレット」を選択する。未選択時は2択直下に赤枠・淡い赤背景・太字の大きな注意を表示する。自分・家族の端末は管理者の講師コードまたは生徒IDとパスワードを同一ブラウザーへ保存し、次回は自動ログインして、明示的ログアウトまでログイン状態を維持する。塾のタブレットは認証情報を永続保存せず、30分間操作がない場合に自動ログアウトする。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'【次回ここから確認：成績管理の端末別ログイン】管理者は admin.html の ADMIN_DEVICE_KEY・scheduleAdminIdleLogout、 生徒は juku_app.html の STUDENT_DEVICE_KEY・selectStudentDevice・resumeStudentSession・recordStudentActivity・logout を確認する。本番コミットは管理者7f53ce97f5a2363ccee808ff3e19481554c8ab4b、生徒4f24aa86622bad821234c80650af9c0d033b4de7。成績データ・GAS・Supabaseスキーマは変更していない。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'自分・家族の端末を共有端末で選ばない。塾のタブレットでは講師コード・パスワードを永続保存しない。明示的ログアウトでは保存済み認証情報を削除する。',
+    '確認済み事項':[...new Set([...confirmed,'管理者用・生徒用に端末選択2択を追加','端末未選択の大きな注意を選択ボタン直下へ表示','自分・家族の端末でID・パスワードを保存','自分・家族の端末で明示的ログアウトまでログイン維持','塾のタブレットでは認証情報を永続保存しない','塾のタブレットは30分無操作で自動ログアウト','明示的ログアウトで保存済み認証情報を削除','成績データ・GAS・Supabaseスキーマ変更なし','管理者用3件・生徒用4件・既存3件の試験合格','管理者用・生徒用のGitHub Pages公開確認'])],
+    '確認状況':'管理者・生徒の端末選択、個人端末の自動ログイン、塾端末の30分無操作ログアウトを本番反映済み'
+  });
+};
+</script>
+
+<script id="auth-resume-screen-status-20260807">
+const applyAuthResumeScreenStatus20260807Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyAuthResumeScreenStatus20260807Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  if(name.includes('成績管理')&&!name.includes('塾生アプリ'))return Object.assign({},base,{
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 自動ログイン画面：個人端末の有効なセッションまたは保存済み認証情報を確認している間はログイン画面を描画せず、成功時は生徒画面へ直接移動する。認証できない場合だけログイン画面を表示する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'本番コミット ce7143a012776ad2e76a5720a64cc713211ffdd7。端末別試験を含む11件とJavaScript構文検査合格。データ・GAS・スキーマ変更なし。',
+    '確認済み事項':[...new Set([...confirmed,'個人端末の自動認証中はログイン画面を非表示','認証失敗時だけログイン画面を表示','成績管理11件の試験合格'])],
+    '確認状況':'個人端末の自動ログイン画面ちらつき防止を本番反映済み'
+  });
+  if(base['ID']==='learning-progress'||name.includes('学習進捗管理'))return Object.assign({},base,{
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月7日 自動ログイン画面：保存済みセッションの認証確認中はログイン画面を描画せず、成功時は進捗画面へ直接移動する。認証できない場合だけログイン画面を表示する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'ソースコミット 7c17acc7053b6b802d89ed3dfe656960b178b20d。Cloudflare側試験6件、TypeScript検査、JavaScript構文検査、dry-run合格。Cloudflare管理画面の人間確認によりWorkerアップロード待ち。既存本番Version 72c8dafa-53e9-46c4-9048-77e8fa1b8645は未変更。',
+    '確認済み事項':[...new Set([...confirmed,'自動認証中のログイン画面非表示をソースへ反映','認証失敗時だけログイン画面を表示','Cloudflare側試験6件合格','TypeScript検査合格'])],
+    '確認状況':'自動ログイン画面ちらつき防止はソース反映済み／Cloudflare Worker公開待ち'
+  });
+  return base;
+};
+</script>
+
+<script id="checkin-edge-interim-production-20260808">
+const applyCheckinEdgeInterimProduction20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyCheckinEdgeInterimProduction20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('出退くん'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '状態':'Cloudflare暫定本番（実記録・メール送信有効）',
+    '読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    'Cloudflare Worker':'step-checkin-edge-staging（production-interimとして暫定本番運用）',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev',
+    'Cloudflare health':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/health',
+    '現在のApps Script版':'バージョン78（既存デプロイID維持）',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main）／tablet_checkin.html／cloudflare/checkin-edge',
+    '正本ファイル':['tablet_checkin.html','cloudflare/checkin-edge/src/index.ts','cloudflare/checkin-edge/wrangler.jsonc','gas/EdgeRosterSync.gs','gas/コード.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月8日 Cloudflare高速受付を暫定本番化。タブレットはCloudflare Workerへ先に受付し、校舎単位のDurable Objectで入退室状態を共有する。神領・大手町のどちらのタブレットで読んでも同じ状態を参照する。60秒以内の同一QRは重複として追加記録・追加メールを行わない。次回の有効読取で入室／退室を切り替える。受付後はApps ScriptのcheckInへ書き戻し、既存の入退室ログ・通知メール・ポイント処理を継続する。同期名簿は神領92名・大手町66名、重複0件を確認し、毎朝7時（UTC 0 22 * * *）に更新する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日：実機2台で高速読取、校舎認証、60秒重複抑止、次回退室、2台間状態共有を確認。試験ページ tablet_checkin_edge_pilot.html は停止表示へ変更。PR #17をsquash merge（a72c58df53f90c4712226889e24e82bd94ef376d）し、CHECKIN_WRITE_ACTION=checkInを有効化。PR #18をsquash merge（2e7b20a326c50423172c99f563f289c605cf5dac）し、healthの環境表示をproduction-interimへ変更。/healthはHTTP 200・ok=true・production-interim。大手町・神領のreceipt-status認証とDurable Object接続を、存在しない受付IDの照会で確認（記録・メール0件）。専用step-checkin-edge-production Workerは未作成で、現在は検証済みstaging Workerを暫定本番利用している。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'端末トークン、同期トークン、名簿取得トークンの実値はGitHub・台帳へ記録しない。校舎別タブレット設定QRは非公開Libraryで管理する。従来のApps Script直接受付はフォールバックとして削除しない。正式production Workerへ移行する際はSecretsを再設定し、端末トークンをローテーションして設定QRを作り直す。',
+    '確認済み事項':[...new Set([...confirmed,'Cloudflare Worker暫定本番化','実記録・通知メールへのcheckIn書戻し有効','神領92名・大手町66名・重複0件','毎朝7時の名簿同期','Durable Objectによる校舎単位の状態共有','60秒以内の重複読取を追加記録・追加メールなしで抑止','異なる2台間で入退室状態を共有','試験ページを停止','既存Apps Script直接受付フォールバックを維持','Apps Scriptバージョン78・既存デプロイID維持','PR #17・#18をsquash merge','health HTTP 200・production-interim','神領・大手町の認証とDurable Object接続確認','設定用QRを非公開Libraryへ保存'])],
+    '確認状況':'Cloudflare高速受付を暫定本番反映し、2校舎の認証・状態共有・healthを確認済み'
+  });
+};
+</script>
+
+<script id="checkin-edge-shared-legacy-20260808">
+const applyCheckinEdgeSharedLegacy20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyCheckinEdgeSharedLegacy20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('出退くん'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '状態':'Cloudflare暫定本番（校舎共通・古いタブレット対応）',
+    '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+    '従来読み取りURL':'https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+    'Cloudflare Worker':'step-checkin-edge-staging（production-interimとして暫定本番運用）',
+    'Cloudflare Worker URL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev',
+    'Cloudflare health':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/health',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main、8db0ce9）／cloudflare/checkin-edge',
+    '正本ファイル':['cloudflare/checkin-edge/src/index.ts','cloudflare/checkin-edge/src/legacy-tablet.html','cloudflare/checkin-edge/wrangler.jsonc','cloudflare/checkin-edge/tests/','tablet_checkin.html','tablet_checkin_compat.html','gas/EdgeRosterSync.gs','gas/コード.js'],
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月8日 校舎共通・旧端末対応を確定。通常受付では端末側の神領／大手町設定を判定に使わず、古い値・空欄・大手町を含めて共通の受付状態へ正規化する。神領名簿を主、 大手町名簿を代替として同じ受付で照合し、どちらの校舎の生徒・講師も同じURL・同じ読取動作で受け付ける。integration-testだけは別名前空間と別認証のまま維持する。Worker配信の軽量画面は保存済み校舎・端末トークンを要求せず、Workerが発行する署名済みHttpOnly・Secure・SameSite=Strict Cookieで認証する。通常のGitHub Pages画面のBearer認証と管理API認証は維持する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日 続報：PR #19で未登録QR読取時の名簿自動更新、#20で初回同期待機、#21で古いAndroid向け軽量画面、#22でWorker直結入口、#23で入室・退室・重複の表示改善、#24〜#26で校舎設定と校舎別端末認証への依存を撤廃、#27で古いタブレットの保存トークン依存を署名済みCookie認証へ変更、#28で以前の緑色カメラのホーム画面アイコンを復元した。最終mainは8db0ce9。Worker試験33件、TypeScript／Wrangler型検査、古いAndroid互換試験4件に合格。本番HTML、ホーム画面マニフェスト、Cookie発行、保存トークンなし・古い校舎値でreceipt-statusが401ではなくAPIへ到達すること、/healthのHTTP 200・ok=true・production-interimを確認した。',
+    '注意事項':'端末トークン、同期トークン、名簿取得トークン、Cookie署名値の実値はGitHub・台帳へ記録しない。校舎別設定QRは過去方式であり、現在のWorker配信軽量画面では使用しない。神領・大手町でURLを分けない。従来のApps Script直接受付はフォールバックとして削除しない。専用production Workerは未作成で、検証済みstaging Workerをproduction-interimとして暫定本番利用している。',
+    '確認済み事項':[...new Set([...confirmed,'運用読取URLをWorker /legacy-tabletへ統一','神領・大手町でURLを分けない','端末の校舎設定を通常受付の判定に使用しない','神領・大手町の両名簿を同一受付で照合','古いAndroid向けWorker直結軽量画面','保存トークンなしで署名済みCookie認証','通常画面と管理APIの認証は維持','integration-testを別名前空間・別認証で維持','受付中の全画面表示を廃止','入室・退室・重複の表示改善','以前の緑色カメラのホーム画面アイコンを復元','Worker試験33件合格','古いAndroid互換試験4件合格','最終main 8db0ce9','PR #19〜#28をmainへ反映','health HTTP 200・production-interim'])],
+    '確認状況':'校舎設定なし・保存トークンなしの古いタブレットを含め、共通URLで受付できる本番状態を確認済み'
+  });
+};
+</script>
+
+<script id="checkin-edge-rare-exit-photo-20260808">
+const applyCheckinEdgeRareExitPhoto20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyCheckinEdgeRareExitPhoto20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('出退くん'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '最新版の場所':'stepkobetsu-hub/student-QR（main、d5a64ca）／cloudflare/checkin-edge',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'生徒の通常退室時だけ約20%で人物写真を表示する。入室、60秒以内の重複受付、講師の出勤・退勤は従来画像を維持する。人物写真は640px・18,338 bytesの軽量WebPを起動時に先読みし、古いタブレットで読み込めない場合は通常の退室イラストへ戻す。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月8日：PR #29をsquash merge（d5a64ca6ae77d47aaf14c9c74784cfd81cc7f48e）。Worker試験33件、退室写真試験2件、TypeScript／Wrangler型検査に合格。本番/legacy-tabletで20%設定と軽量画像参照、/healthのHTTP 200・ok=true・production-interimを確認。変更前の正常版8db0ce9aab24333cfa43083bb085fdf4c3817c96はcheckpoint/checkin-stable-20260808-before-rare-exitへ固定した。',
+    '注意事項':(base['注意事項']?base['注意事項']+' ':'')+'退室レア写真の変更で問題が出た場合はcheckpoint/checkin-stable-20260808-before-rare-exitを基準に復旧する。',
+    '確認済み事項':[...new Set([...confirmed,'生徒の通常退室時だけ約20%で人物写真を表示','入室・重複受付・講師表示は従来どおり','18KB軽量WebPを起動時に先読み','画像失敗時は通常退室イラストへ復帰','PR #29をmainへ反映','最終main d5a64ca','変更前チェックポイント8db0ce9を固定','退室写真試験2件合格','Worker試験33件合格','本番/legacy-tablet反映確認','health HTTP 200・production-interim'])]
+  });
+};
+</script>
+
+<script id="teacher-portal-timetable-input-20260808">
+const applyTeacherPortalTimetableInput20260808Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyTeacherPortalTimetableInput20260808Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('講師ポータル'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月8日',
+    '最新版の場所':'stepkobetsu-hub/teacher-portal（main）／index.html commit 2c1f7f862d117beba21eb96d161471b2e01d6e10',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月8日：講師ポータルのホーム画面へ「時間割入力」カードを追加。カードから生徒マスタの「時間割マスタ」シートを開き、上部の「🗓️ 時間割入力」メニューから専用入力画面を利用する。シート上の E～AB、AH～AJ のプルダウンには「（空欄に戻す）」を追加し、選択すると編集時トリガー clearTimetableBlankChoice がセル内容を実際の空欄へ戻す。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'Apps Script project 16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45 に clearTimetableBlankChoice を追加し、スプレッドシート編集時トリガーを作成。講師ポータル公開コミット 2c1f7f862d117beba21eb96d161471b2e01d6e10。',
+    '確認済み事項':[...new Set([...confirmed,'講師ポータルに時間割入力カードを追加','時間割マスタへのリンクを公開確認','シートの時間割・兄弟コード・標準コース・標準オプションで空欄へ戻せる','空欄選択時に文字を残さずセルをクリア','編集時トリガー clearTimetableBlankChoice を設定','teacher-portal commit 2c1f7f862d117beba21eb96d161471b2e01d6e10'])],
+    '確認状況':'講師ポータルの時間割入力カードと、シート上の空欄復帰機能を本番反映済み'
+  });
+};
+</script>
+
+
+<script>
+const organizeTimetableMasterInput20260809Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeTimetableMasterInput20260809Base(items);
+  if(!out.some(x=>String(x['システム名']||'').includes('時間割マスタ入力'))){
+    out.push({
+      'システム名':'時間割マスタ入力',
+      '正式名称':'時間割マスタ入力',
+      '分類':'生徒管理・時間割',
+      '状態':'本番',
+      '概要':'生徒マスタの「時間割マスタ」シートを、スタッフが専用画面から編集するWebアプリ。生徒番号・氏名・学年・教室を表示し、時間割、兄弟コード、標準コース、標準オプションを選択式で入力・保存する。',
+      '公開URL':'https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec',
+      '利用者向けURL':'https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec',
+      'Apps Scriptプロジェクト名':'生徒名簿',
+      'Apps ScriptプロジェクトID':'16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45',
+      'Apps Script編集URL':'https://script.google.com/u/0/home/projects/16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45/edit',
+      'デプロイID':'AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA',
+      '本番バージョン':'v42（2026年8月9日）',
+      '正本スプレッドシート':'★生徒マスタ202606-（1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk）',
+      'Google Sheet URL':'https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit?gid=829117795#gid=829117795',
+      '使用シート名':'時間割マスタ',
+      'GASファイル一覧':['時間割入力.gs','時間割一覧表示.gs','時間割Web.gs','時間割入力Web4.html'],
+      '現在の入口':'時間割Web.gs の doGet → 時間割入力Web4.html',
+      'スタッフ用アプリ':'https://stepkobetsu-hub.github.io/seiseki-kanri/ の「時間割マスタ入力」カード。AK=2・3・4のみ表示。',
+      'スタッフ用アプリ正本':'stepkobetsu-hub/seiseki-kanri（main）／index.html commit f8da684185fc2be7dc79bc5165e29e8ffb4e61ee',
+      '認証・権限':'Webアプリはアクセス中のGoogleユーザーとして実行し、Googleアカウントを持つユーザーが入口へアクセスできる。実データはスプレッドシートの共有権限で制御。スタッフ用アプリ側ではAK=2以上（2・3・4）だけカードを表示し、追加のID・パスワード確認は行わない。',
+      '一覧表示仕様':'左側の生徒一覧は従来順の逆順で、新しく追加された生徒を上に表示する。I～X列がすべて空欄なら小さな赤字「未設定」、AI列の標準コースが空欄なら小さな赤字「コース未設定」を氏名付近に表示し、両方なら2つを並べる。',
+      '入力仕様':'時間割、AH列の兄弟コード、AI列の標準コース、AJ列の標準オプションを選択式で保存する。シート側のプルダウンは「（空欄に戻す）」を選ぶと実際の空欄へ戻す。',
+      '画面仕様':'上部に「時間割マスタを開く」ボタンと「更新」ボタンを配置。シートボタンはデスクトップで右半分の別ウィンドウ、狭い画面では新しいタブを開く。更新ボタンはページ全体を再読込せず、生徒一覧・未設定判定・コース設定をスプレッドシートから再取得する。',
+      '注意表示':'コース設定の横に「※コース設定をしないと学費請求がされません。正確に設定してください。」を大きな赤字・太字・赤枠で表示する。',
+      '名前カード関連':'「④名前カード」ではコード番号に連動してコード・氏名・QRをB4付近から表示する仕組みを追加。学年色の適用範囲・色を付けない範囲・罫線削除を調整した。',
+      '要再確認':'「④名前カード」のB16付近（氏名を囲む罫線）が残るとの報告あり。次回、条件付き書式・結合セル・画像／描画・通常罫線のどれが表示元かを実画面で再確認する。',
+      '変更履歴':'v37を正常版の基準として復旧。v39で上部のシート表示ボタンとコース設定の重要注意文を追加。v40で生徒一覧を新しい順へ変更し、未設定・コース未設定マークを追加。v41の単純なページ再読込方式はGoogle Apps Script内で画面が空になるため廃止。v42で更新ボタンを安全なデータ再取得方式へ修正。',
+      '作業メモ':'本番デプロイIDは変更せず、既存デプロイを新バージョンへ更新する。現在の正本はv42／時間割入力Web4.html。v41のlocation.reload方式へ戻さない。更新時は上部ボタン、生徒一覧96件の再取得、未設定表示、コース警告、エラーなしを実画面確認する。',
+      '確認日':'2026年8月9日',
+      '確認状況':'本番v42、上部更新ボタンの再取得完了、生徒一覧表示、未設定・コース未設定表示、スタッフ用アプリの「時間割マスタ入力」表記を公開画面で確認済み',
+      '関連カード':['生徒マスタ','スタッフ用アプリ','講師ポータル']
+    });
+  }
+  return out;
+};
+</script>
+<script id="learning-progress-display-release-20260809">
+const applyLearningProgressDisplayRelease20260809Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyLearningProgressDisplayRelease20260809Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='learning-progress'||name.includes('学習進捗管理')))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '確認日':'2026年8月9日',
+    '状態':'Cloudflare Worker本番使用中',
+    '利用者向けURL':'https://step-progress-api.stepkobetsu.workers.dev/',
+    'Cloudflare Worker':'step-progress-api',
+    'D1':'step-progress-db（binding DB）',
+    '本番Version':'bf08686b-79d0-4187-9139-458e73c0d3d3（traffic 100%）',
+    '復旧Version':'eb7d6bae-efec-4deb-88aa-33544494049c',
+    '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年8月9日 学習進捗グラフ表示：教科ごとの1本のバーで、1周目100%を全体の70%、2周目を15%、3周目を15%として表示する。70%位置には破線と「1周目ゴール」を表示する。2周目・3周目の宿題は「TRYの赤×なおし」「エクササイズの赤×なおし」と表示する。1周目と教材固有の宿題生成規則は維持する。',
+    '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年8月9日 Cloudflare本番反映：Version bf08686b-79d0-4187-9139-458e73c0d3d3をtraffic 100%で公開。変更前の安定Version eb7d6bae-efec-4deb-88aa-33544494049cは復旧用に維持。変更はStatic Assetのcloudflare/public/index.htmlだけで、Worker保存API・D1・認証・同期処理・Cron・環境変数を変更していない。プレビューと本番配信HTMLで70%線・3文言・70/15/15加重計算を確認。本番/healthはHTTP 200、ok=true、productionWriteApproved=true、browserD1WriteEnabled=true、dualWriteEnabled=true。反映用package SHA-256は109454faa1c0ce091740faa27488955e8f1427dcc4798bbc95355a852a188d34。',
+    '注意事項':(base['注意事項']?base['注意事項']+'\n\n':'')+'Cloudflare接続の標準手順：Node.js未導入時はwingetでOpenJS.NodeJS.LTSを導入し、wrangler@4.120.0 loginでブラウザー認証する。通常ブラウザーでCloudflareへログインしただけではWrangler認証にならない。whoamiで接続先を確認後、versions upload --no-bundle --strict --keep-varsでプレビューを作り、表示とhealthを確認してからversions deploy <Version ID>@100%で本番化する。Cloudflareのクイック編集ではStatic Assetsを確認できない。今回のWindows環境ではwrangler init --from-dashを使わない。OAuthコードやAPIトークンをチャット・GitHub・台帳へ記録しない。問題時はeb7d6bae-efec-4deb-88aa-33544494049cを100%へ戻し、D1データは操作しない。Windows PowerShell 5.1向けスクリプトはASCIIのみで作成する。',
+    '確認済み事項':[...new Set([...confirmed,'1周目100%をバーの70%位置として表示','70%位置に破線と1周目ゴールを表示','2周目を15%・3周目を15%として表示','2周目・3周目のTRYをTRYの赤×なおしと表示','2周目・3周目のExerciseをエクササイズの赤×なおしと表示','Cloudflare Worker Version bf08686bを100%公開','本番health HTTP 200・ok=true','productionWriteApproved=trueを維持','browserD1WriteEnabled=trueを維持','dualWriteEnabled=trueを維持','保存API・D1・認証・同期処理・Cron変更なし','復旧用Version eb7d6baeを維持','Node.js導入からWrangler OAuth認証までを記録','Versions upload・preview・deploy・rollbackの標準手順を記録','Static Assetsはクイック編集で探さない','OAuthコード・APIトークンを台帳へ記録しない'])],
+    '確認状況':'70%基準グラフと2・3周目の宿題文言をCloudflare本番へ反映し、表示・health・保存許可設定を確認済み'
+  });
+};
+</script>
+<script id="invoice-systems-separation-20260810">
+const applyInvoiceSystemsSeparation20260810Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyInvoiceSystemsSeparation20260810Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(name.includes('請求管理システムV3.1'))return Object.assign({},base,{
+    '正式名称':'請求管理システムV3.1（学費計算・請求データ作成）',
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    '用途':'生徒マスタ・時間割マスタ・料金表を参照する学費計算と請求データ作成。PDF配信基盤ではない。',
+    '識別注意':'STEP請求書PDF作成・配信システムとは別物。Cloudflare版コードやPDF配信用Script Propertiesを設定しない。',
+    '確認日':'2026年8月10日',
+    '確認状況':'Apps Script編集画面でプロジェクト名とコードファイル3件を確認済み'
+  });
+  if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム'))return Object.assign({},base,{
+    '状態':'Cloudflare本番接続完了（本番メール送信無効）',
+    'Apps Scriptプロジェクト名':'STEP請求書PDF作成・配信システム',
+    'Apps ScriptプロジェクトID':'1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit',
+    'Apps Scriptファイル':'コード_v022.gs / Download.html / appsscript.json',
+    'Apps Script現行デプロイ':'既存デプロイID維持・v0.1.23 Cloudflare R2接続・Google Drive配信廃止（本番メール送信無効）、2026/08/10反映',
+    'Apps ScriptデプロイID':'AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw/exec',
+    '接続Spreadsheet':'STEP請求書PDF作成・配信システム（1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y）',
+    'Cloudflare Worker':'step-invoice-api',
+    'Cloudflare Worker URL':'https://step-invoice-api.stepkobetsu.workers.dev',
+    'Cloudflare health':'https://step-invoice-api.stepkobetsu.workers.dev/health',
+    'Worker Version':'2cbfc116-20cb-4f76-9283-0528b0df37eb',
+    'D1':'step-invoice-db（binding DB）',
+    '非公開R2':'step-invoice-pdfs（binding PDFS）',
+    '最新版の場所':'stepkobetsu-hub/invoice-pdf branch agent/cloudflare-production-switch、PR #12、commit deb5e57',
+    'Apps Script正本':'専用プロジェクトを確認済み。請求システム2026NEWは対象外。',
+    '安全設定':'PRODUCTION_SEND_APPROVED=false、TEST_SEND_APPROVED=false。Cloudflare URLの実PDF・テストメール確認まで本番送信を有効にしない。',
+    '確認日':'2026年8月10日',
+    '接続試験':'Apps ScriptのCLOUDFLARE_ADMIN_API_KEYとWorkerのADMIN_API_KEYを同期し、testCloudflareIntegrationの実行完了を2026年8月10日に確認。秘密値は台帳へ記録しない。',
+    '確認状況':'専用Apps Script正本へv0.1.23を既存デプロイIDのまま反映済み。D1マイグレーション3件、R2、Worker health、Apps ScriptからWorkerへの認証接続を確認済み。本番メール送信は無効を維持。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'Apps Script専用正本・プロジェクトID確認','Apps Script v0.1.23を既存デプロイIDへ反映','Apps ScriptデプロイIDとWebアプリURLのコード一致','Spreadsheet ID確認','Worker step-invoice-api本番配置','D1 step-invoice-db接続','R2 step-invoice-pdfs接続','health ok=true・storage=cloudflare-r2','Worker管理APIを認証済みローカル環境から確認','Apps Script testCloudflareIntegration実行完了','請求システム2026NEWを対象外として識別'])]
+  });
+  return base;
+};
+</script>
+
+<script id="billing-v31-canonical-permissions-20260811">
+const applyBillingV31CanonicalPermissions20260811Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31CanonicalPermissions20260811Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('請求管理システムV3.1'))return base;
+  return Object.assign({},base,{
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    'Apps ScriptデプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン40（2026年8月11日）',
+    '模試権限仕様':'模試マスタ・模試申込の追加、編集、削除、一括登録はAK権限2以上（2・3・4）が可能。権限1以下は拒否。',
+    '確認日':'2026年8月11日',
+    '確認状況':'正本プロジェクト、主要3ファイル、現行WebアプリURL、請求V3.1画面構成を確認。模試権限をAK 2以上へ統一し、既存デプロイIDのままバージョン40へ更新済み。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'正本Project ID訂正','主要3ファイル確認','本番デプロイID一致','請求V3.1画面構成一致','模試関連の追加・編集・削除・一括登録はAK 2以上','既存デプロイID維持・バージョン40'])]
+  });
+};
+</script>
+
+<script id="billing-v31-mock-targets-20260811">
+const applyBillingV31MockTargets20260811Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31MockTargets20260811Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('請求管理システムV3.1'))return base;
+  return Object.assign({},base,{
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン43（2026年8月11日）',
+    '模試仕様':'対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。チェック済み申込データの一括削除後も生徒は一覧に残りOFFとなる。',
+    '模試データ保存':'模試申込6列目の請求対象をBoolean TRUE/FALSEで明示保存。行の存在ではなくTRUEだけを請求計算・請求確認・MF等の元データへ含める。',
+    '模試権限仕様':'模試マスタ・模試申込の追加、編集、削除、一括登録、請求対象ON/OFF、全員チェック、全解除、チェック済み申込の一括削除はAK権限2以上（2・3・4）が可能。権限1以下は拒否。',
+    '確認日':'2026年8月11日',
+    '確認状況':'2026/09 第３回愛知全県模試の対象在籍者62名で、全解除・全選択・個別OFF・再読込保持・OFFの請求抽出除外・別月／別模試非干渉・権限設定・状態復元を確認。既存デプロイIDのままバージョン43へ更新済み。',
+    '確認済み事項':[...new Set([...(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[]),'対象学年の在籍生徒を全員表示','請求対象Boolean保存','全員チェック・全解除・個別調整','チェックONのみ模試代請求','チェック済み申込の一括削除','AK 2以上','既存デプロイID維持・バージョン43'])]
+  });
+};
+</script>
+<script id="billing-v31-complete-release-history-20260811">
+const applyBillingV31CompleteReleaseHistory20260811Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyBillingV31CompleteReleaseHistory20260811Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!name.includes('請求管理システムV3.1'))return base;
+  const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
+  return Object.assign({},base,{
+    '正式名称':'請求管理システムV3.1（請求システム2026NEW）',
+    '状態':'本番稼働中',
+    'Apps Scriptプロジェクト名':'請求システム2026NEW',
+    'Apps ScriptプロジェクトID':'1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp',
+    'Apps Script編集URL':'https://script.google.com/home/projects/1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp/edit',
+    'Apps ScriptデプロイID':'AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb',
+    'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
+    'Apps Script現行デプロイ':'既存デプロイID維持・バージョン54（2026年8月11日）',
+    '現行バージョン':'v54',
+    '変更ファイル':'コード.gs（ローカル正本名 Code.gs）／BillingV31_Index.html／BillingV31_Auth.gs。請求書メール処理 BillingV31_InvoiceMail.gs は既存保護。',
+    '主要変更関数':'doGet、BILLING_FUNCTION_PERMISSIONS_、billingApplyPermissionUi、billingStartApp、setupNav、showPage、模試マスタ・申込一覧取得／請求対象個別保存／一括保存／チェック済み申込一括削除、模試料金読込・請求生成、特別調整一覧取得／単月保存／継続保存／アーカイブ／復元。',
+    '権限仕様':'請求V3.1の全操作はAK権限2・3・4が可能。AK権限1以下は変更不可。認証・セッション方式は維持。模試、特別調整、料金設定、請求生成、請求確認、CSV、PDF・メール送信を含む。',
+    '模試運用手順':'最初に模試マスタで模試名・対象区分／対象学年・実施回・金額・有効状態を設定する。模試申込では同じ模試・請求月を選び、対象学年の在籍生徒全員を一覧表示して、請求対象チェックで受験／非受験を決める。',
+    '模試仕様':'対象学年の在籍生徒を全員一覧表示し、右端の請求対象チェックで受験／非受験を管理する。全員チェック・全解除・個別調整・一括保存・チェック済み申込の一括削除に対応。チェックONの生徒のみ模試代を請求する。非受験者を削除して管理する旧方式は廃止。保存後は模試単位の1行表示へ折りたたみ、クリックで生徒一覧を再表示する。1行表示には対象請求月（例：2026年9月分（8/27振替））も表示する。',
+    '模試データ保存':'模試申込の請求対象列へBoolean TRUE/FALSEを明示保存する。既存申込は安全にONとして引き継ぐ。行の存在では判定せず、TRUEの生徒だけを模試料金集計・請求生成・請求確認・MF等の請求元データへ含める。月・模試をキーに分離し、別月／別模試の状態を変更しない。',
+    '模試一括処理':'全員チェック・全解除は1人ずつ通信せず、一括更新サーバー関数を1回呼ぶ。個人変更は1名単位で保存可能。保存中／保存完了を表示する。同じ模試・同じ請求月の重複レコード大量作成を防ぐ。',
+    '模試削除仕様':'通常の受験者選択は削除ではなく請求対象OFFを使う。チェック済み申込の一括削除は誤登録レコードの管理操作として提供する。削除後も対象学年の在籍生徒一覧は残り、請求対象OFFとして表示する。模試マスタは申込生徒の削除とは別管理で、名称変更・無効化・削除操作を区別する。',
+    '特別調整仕様':'今月だけの調整、継続調整、旧データ確認、アーカイブ／復元を管理する。生徒は最新の在籍生徒から選択する。加算・減額、税抜金額、対象請求月を明示し、請求計算へ反映する。',
+    '料金特別調整専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html',
+    '料金特別調整直接URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
+    '専用画面仕様':'請求システムと同じデータ・認証・権限を使う特別調整専用入口。他機能の左ナビを非表示にし、スマホでは料金特別調整だけを全画面表示する。青い上部バー右端に小型ログアウトボタンを配置し、画面内の大きなログアウト欄は専用画面のみ非表示。',
+    'スタッフ用アプリ連携':'stepkobetsu-hub/seiseki-kanri のスタッフ用アプリに「料金特別調整／イレギュラーな割引・加算を、気づいた時点で入力」カードを追加。AK=2・3・4だけ表示し、スマホ用入口を開く。',
+    'スマホホーム画面':'専用の金色¥アイコンを180px・512pxで配置。iPhone Safari／Android Chromeのホーム画面追加に対応。ホーム画面名は「料金特別調整」。入口ページがApps Script専用画面を全画面表示する。',
+    'スタッフ用アプリ正本':'GitHub stepkobetsu-hub/seiseki-kanri（main）。関連コミット：dd7d309（カード追加）、44ef497（アイコン画像追加）、1a85f8f（カードへアイコン設定）、4974d72（スマホ用入口追加）、aa90df4（カードを専用入口へ接続）、b7d7dd6（右上小型ログアウト）。',
+    '本番更新履歴':'v40 模試権限をAK2以上へ統一。v43 対象学年の在籍生徒全員表示・請求対象Boolean方式・一括操作・請求除外を本番化。その後、模試設定変更／削除、一覧復旧、1行折りたたみ、請求月表示を追加。v51 請求V3.1全操作をAK2以上へ統一。v52 料金特別調整の専用画面とスタッフ用入口。v53 スマホホーム画面用アイコン。v54 右上小型ログアウトへ整理。すべて既存デプロイIDを維持。',
+    '請求計算への反映':'模試申込の請求対象BooleanがTRUEの行だけを readMockTestEntries_ 相当の読込対象とし、請求作成・今月の請求・請求確認・MF等の出力元へ加算する。FALSEは模試代を一切加算しない。特別調整は単月／継続の有効データだけを請求明細へ反映し、アーカイブ中は適用しない。',
+    '既存機能保護':'料金設定、コースマスタ、割引設定、兄弟割引、教材、請求確認、請求生成、認証、セッション、月切替、既存デプロイIDを維持。STEP請求書PDF作成・配信システムは別システムとして変更対象外。',
+    'テスト結果':'対象学年の在籍生徒全員表示、全員チェック、全解除、個別ON/OFF、再読込保持、ONのみ模試代請求、OFFの請求確認／請求抽出除外、別月・別模試非干渉、権限2操作可、権限1変更不可を確認。特別調整は権限2で一覧・追加・編集・アーカイブ操作が有効。専用URL表示、スタッフ用カード、180/512pxアイコン、スマホ入口、右上ログアウト表示を本番確認。',
+    '確認日':'2026年8月11日',
+    '確認状況':'請求システム2026NEW v54を既存デプロイIDのまま本番反映済み。模試の請求対象方式、全操作AK2以上、料金特別調整専用画面、スタッフ用アプリカード、スマホホーム画面アイコン、右上ログアウトまで確認済み。',
+    '確認済み事項':[...new Set([...confirmed,
+      '対象学年の在籍生徒を全員表示',
+      '請求対象Boolean TRUE/FALSE保存',
+      '全員チェック・全解除・個別調整・一括保存',
+      'チェック済み申込の一括削除',
+      '請求対象ONだけ模試代請求',
+      '請求対象OFFは請求確認・請求抽出から除外',
+      '別月・別模試の状態を維持',
+      '模試単位の保存して1行折りたたみ表示',
+      '模試1行表示に請求月・振替日',
+      '請求V3.1の全操作はAK2・3・4',
+      '料金特別調整専用画面',
+      'スタッフ用アプリに料金特別調整カード',
+      'スマホホーム画面用180px・512pxアイコン',
+      '右上小型ログアウト',
+      '既存デプロイID維持・バージョン54',
+      'STEP請求書PDF作成・配信システムは変更対象外'
+    ])]
+  });
+};
+</script>
+<script id="step-invoice-pdf-release-20260812">
+const applyStepInvoicePdfRelease20260812Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyStepInvoicePdfRelease20260812Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(!(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム')))return base;
   const confirmed=(Array.isArray(base['確認済み事項'])?base['確認済み事項']:[])
     .filter(entry=>entry!=='本番メール送信無効');
   return Object.assign({},base,{
