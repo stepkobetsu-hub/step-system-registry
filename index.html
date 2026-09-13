@@ -475,7 +475,29 @@ applyAssetInfo=function(item){
     '確認状況':'J・K列のハイフン整形を本番公開済み'
   });
 };
-const CARD_ANCHORS=[['証憑自動回収','receipt-collector'],['生徒マスタ','student-master'],['お問い合わせ管理','contact-management'],['成績管理','grade-management'],['面談メモ','meeting-memo'],['受付カード','juku-card'],['出退くん','qr-register'],['不達メール','delivery-failures'],['欠席・遅刻連絡','absence-contact'],['過去問','past-exams'],['STEPメッセージ','step-message'],['STEP配信','step-message'],['講師スケジュール','teacher-schedule'],['講師予定','teacher-schedule'],['夏休み出勤','teacher-schedule'],['請求管理','billing'],['ホームページニュース','homepage-news']];function anchorFromName(name){const hit=CARD_ANCHORS.find(([key])=>String(name||'').includes(key));return hit?hit[1]:String(name||'system').toLowerCase().replace(/[^a-z0-9_-]+/g,'-')}function cardAnchor(item){return 'system-'+(anchorFromName(item['システム名'])||item['ID']||'card')}
+const applyAssetInfoBeforeChildTimeManager=applyAssetInfo;
+applyAssetInfo=function(item){
+  const result=applyAssetInfoBeforeChildTimeManager(item);
+  if(String(result['システム名']||'')!=='子供用の時間制限アプリ')return result;
+  return Object.assign({},result,{
+    '分類':'管理・運営',
+    '利用者':'保護者',
+    '運用担当':'加瀬俊介',
+    '概要':'Unihertz Jelly 2（Android 11）の利用時間とお休み時間を、パソコンまたはPixel 9aから遠隔管理する保護者用アプリ。',
+    '利用者向けURL':'https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/',
+    'APKダウンロードURL':'https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/smartphone-time-manager-v0.5.apk',
+    'GitHub URL':'https://github.com/stepkobetsu-hub/smartphone-time-manager',
+    '保存基盤':'ChatGPT Sites Worker＋D1',
+    '対象端末':'子供：Unihertz Jelly 2（Android 11）／保護者：Windowsパソコン・Pixel 9a',
+    '主な機能':'1日の利用上限、お休み開始・終了、対象アプリ制限、今すぐロック、ロック解除、15分だけ許可、最終接続時刻確認',
+    '接続方法':'Jelly 2の通信とユーザー補助「スマホ時間管理」を有効にすると約30秒間隔で自動接続',
+    '障害時の確認':'Jelly 2の通信確認→ユーザー補助をオフ・オン→30～60秒待機→管理画面再読み込み→必要時は端末再起動',
+    '変更時の注意':'暗証番号、端末接続トークン、セッション秘密値を台帳・公開GitHub・画面説明へ記載しない。Androidアプリを削除せず接続版APKを上書きする。',
+    '確認済み事項':['Jelly 2と保護者用管理画面の接続','パソコンとPixel 9aの共通管理画面','PIN認証前の設定非表示','画面離脱時の再ロック','暗証番号2回確認','約30秒間隔の遠隔設定取得'],
+    '確認状況':'2026年9月14日、Jelly 2と保護者用管理画面の接続成功を利用者が確認済み'
+  });
+};
+const CARD_ANCHORS=[['子供用の時間制限アプリ','child-time-manager'],['証憑自動回収','receipt-collector'],['生徒マスタ','student-master'],['お問い合わせ管理','contact-management'],['成績管理','grade-management'],['面談メモ','meeting-memo'],['受付カード','juku-card'],['出退くん','qr-register'],['不達メール','delivery-failures'],['欠席・遅刻連絡','absence-contact'],['過去問','past-exams'],['STEPメッセージ','step-message'],['STEP配信','step-message'],['講師スケジュール','teacher-schedule'],['講師予定','teacher-schedule'],['夏休み出勤','teacher-schedule'],['請求管理','billing'],['ホームページニュース','homepage-news']];function anchorFromName(name){const hit=CARD_ANCHORS.find(([key])=>String(name||'').includes(key));return hit?hit[1]:String(name||'system').toLowerCase().replace(/[^a-z0-9_-]+/g,'-')}function cardAnchor(item){return 'system-'+(anchorFromName(item['システム名'])||item['ID']||'card')}
 function appendAssetSections(item,article){ASSET_SECTIONS.forEach(def=>{const section=el('section','group');section.append(el('h3','',`【${def.title}】`));let count=0;if(def.title==='関連システム'&&Array.isArray(item['関連カード']))item['関連カード'].forEach(name=>{const row=el('div','meta');row.append(document.createTextNode('関連カード：'));const a=el('a','',name);a.href=`#system-${anchorFromName(name)}`;row.append(a);section.append(row);count++});def.fields.forEach(([field,label])=>{const value=item[field];if(value===undefined||value===null||value===''||(Array.isArray(value)&&!value.length))return;(Array.isArray(value)?value:[value]).forEach(v=>{const text=`${label}：${v}`;section.append(el('div',/(?:Spreadsheet ID|プロジェクトID|AKfy|\b1[A-Za-z0-9_-]{20,})/.test(text)?'meta asset-id':'meta',text));count++})});if(count)article.append(section)})}
 function isTeacherSchedule(item){const name=String(item['システム名']||'');return name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')}
 function statusClass(status){const s=String(status||'');if(s.includes('本番運用中'))return 'status-production';if(s.includes('開発中')||s.includes('移行中'))return 'status-progress';if(s.includes('一部使用中'))return 'status-partial';if(s.includes('旧システム')||s.includes('使用終了'))return 'status-old';if(s.includes('要確認')||s.includes('確認中'))return 'status-warning';return ''}
