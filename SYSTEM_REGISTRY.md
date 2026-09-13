@@ -1,20 +1,32 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-12
+最終更新: 2026-09-13
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークン、LINE利用者IDを記載しない。台帳は公開GitHub Pagesと同じ公開情報を表示するためログイン不要。送信・編集などの管理操作は台帳から分離し、各システム側で権限確認を維持する。
 
-## 講師LINE通知・連絡（2026-09-12確認）
+## 講師LINE通知・連絡（2026-09-13最終構成）
 
-- 既存の「コマ数報告してない連絡」は、QR出勤済みで当日の授業コマ数報告がない講師へ22:10ごろLINEを1通送る。
-- 管理シートは「講師LINE通知管理」。使用タブは「講師LINE連携」「講師LINE通知履歴」。LINE利用者IDは画面・GitHub・本台帳へ記載しない。
-- Apps Script正本は「講師授業報告LINE通知」。所有者は個別指導ステップGoogleアカウントで、編集URLは `/u/1/` を使用する。`/u/0/` のmintcocoajasmine側は管理シートの編集者だが、Apps Script所有者ではない。
-- `runTeacherReportReminders` の時間ベーストリガーは有効で、2026年9月12日の確認時点でエラー率0%。
-- 講師を検索・選択してLINEを一斉／個別送信する管理画面とサーバー処理を [step-form PR #1](https://github.com/stepkobetsu-hub/step-form/pull/1) からmainへ反映。Apps Script v3、公開画面HTTP 200、登録済み講師25名の読込を確認済み。実送信テストは未実施。
-- 管理画面: https://stepkobetsu-hub.github.io/step-form/teacher_line_contact.html
+- **「コマ数報告してない連絡」**は、QR出勤済みで当日の授業コマ数報告がない講師へ22:10ごろ自動通知する既存システムとして継続する。講師自身のLINE登録ページ `teacher_line_register.html`、既存Apps Script「講師授業報告LINE通知」、Google Sheet「講師LINE通知管理」はこの自動通知で引き続き使用する。
+- **「LINE講師連絡システム」**は2026年9月13日に再構築。管理者・スタッフがLINE登録済み講師を検索・選択し、文章または画像を個別／複数送信する手動連絡システム。
+- 本番画面: https://stepkobetsu-hub.github.io/step-form/teacher_line_contact.html
+- GitHub正本: `stepkobetsu-hub/step-form` の `teacher_line_contact.html` と `teacher_line_contact_v3.js`。
+- 送信基盤: GitHub Pages＋Supabase Edge Function `line-teacher-api`＋Postgres＋Supabase Storage＋LINE Messaging API。旧Apps Script手動送信経路は使用しない。
+- 講師一覧: 通常起動は端末キャッシュを即表示し、Supabaseの同期済み一覧で更新する。講師マスター全体を毎回読まないため高速。
+- **「講師情報を強制更新」**を押した場合だけ講師マスターの最新情報を即時取得する。C列=よみ、D列=在籍（`1`のみ表示）、R列=教室として反映する。D列の`1`を付ける／消す変更はボタン1回でその場で反映する。
+- LINE登録情報はGoogle Sheet「講師LINE通知管理」からSupabase `line_teacher_recipients` へバックグラウンド同期する。画面操作速度には影響させない。
+- 検索: 講師番号、漢字氏名、ひらがな、カタカナ、ローマ字、教室絞り込み。
+- 送信: LINE Messaging APIの実成功応答を確認できた場合だけ「送信しました」と表示する。結果は `line_teacher_send_logs` に保存する。
+- 送信履歴: 一覧では「送信内容を見る」を表示し、押すと送信本文を展開する。画像付き送信では送信画像も同時に表示する。画像のみの場合は「文章なし（画像のみ送信）」と画像を表示する。
+- 画像: JPEG/PNG 1枚。ブラウザ側でLINE送信用に縮小・圧縮し、Supabase Storage経由で送信する。旧Google Drive画像一時保存方式は廃止。
+- スタッフ認証: 初回に既存の講師番号・パスワードで権限確認し、その後は新システム専用セッションを保持する。**利用者が上部の「ログアウト」を自分で押さない限り、日数経過だけを理由にスタッフ確認画面へ戻さない。**
+- LINEチャネルアクセストークンは初回だけ設定し、サーバー側の非公開設定に保存する。アクセストークン・LINE利用者ID・セッショントークンはGitHub・公開画面・本台帳へ記載しない。
+- 現行Supabaseテーブル: `line_teacher_recipients`、`line_teacher_send_logs`、`line_teacher_private_config`、`line_teacher_staff_sessions`。
+- 旧実装は整理済み。step-formから旧Apps Script連絡コード、V1/V2、固定講師スナップショット、応急送信JS、旧テストを削除。途中で作ったSupabase `line-teacher-send`、`line-teacher-auth`、`probe-line-gas` はHTTP 410を返す廃止エンドポイントへ変更し、現行は `line-teacher-api` のみを使用する。
+- 2026年9月13日、利用者による新構成でのLINE送信成功を確認済み。
+- 詳細: `docs/line-teacher-contact-rebuild-20260913.md`
 
 ## 登録システム（28件）
 
