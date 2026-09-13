@@ -18,6 +18,7 @@ section = '''## 講師LINE通知・連絡（2026-09-13最終構成）
 - LINE登録情報はGoogle Sheet「講師LINE通知管理」からSupabase `line_teacher_recipients` へバックグラウンド同期する。画面操作速度には影響させない。
 - 検索: 講師番号、漢字氏名、ひらがな、カタカナ、ローマ字、教室絞り込み。
 - 送信: LINE Messaging APIの実成功応答を確認できた場合だけ「送信しました」と表示する。結果は `line_teacher_send_logs` に保存する。
+- 送信履歴: 一覧では「送信内容を見る」を表示し、押すと送信本文を展開する。画像付き送信では送信画像も同時に表示する。画像のみの場合は「文章なし（画像のみ送信）」と画像を表示する。
 - 画像: JPEG/PNG 1枚。ブラウザ側でLINE送信用に縮小・圧縮し、Supabase Storage経由で送信する。旧Google Drive画像一時保存方式は廃止。
 - スタッフ認証: 初回に既存の講師番号・パスワードで権限確認し、その後は新システム専用セッションを保持する。**利用者が上部の「ログアウト」を自分で押さない限り、日数経過だけを理由にスタッフ確認画面へ戻さない。**
 - LINEチャネルアクセストークンは初回だけ設定し、サーバー側の非公開設定に保存する。アクセストークン・LINE利用者ID・セッショントークンはGitHub・公開画面・本台帳へ記載しない。
@@ -27,10 +28,11 @@ section = '''## 講師LINE通知・連絡（2026-09-13最終構成）
 - 詳細: `docs/line-teacher-contact-rebuild-20260913.md`
 
 '''
-pat = r'## 講師LINE通知・連絡（[^\n]*）\n.*?(?=## 登録システム)'
-md, count = re.subn(pat, section, md, count=1, flags=re.S)
-if count != 1:
-    raise SystemExit('SYSTEM_REGISTRY.md: 講師LINE通知・連絡 section not found')
+start = md.find('## 講師LINE通知・連絡')
+end = md.find('## 登録システム', start)
+if start < 0 or end < 0 or end <= start:
+    raise SystemExit('SYSTEM_REGISTRY.md: section boundaries not found')
+md = md[:start] + section + md[end:]
 md_path.write_text(md, encoding='utf-8')
 
 # -------- index.html --------
@@ -56,7 +58,7 @@ new_contact = r'''  const contactEntry={
     'LINE登録同期':'Google Sheet「講師LINE通知管理」のLINE登録情報をSupabase `line_teacher_recipients` へバックグラウンド同期する。通常操作速度には影響させない。',
     '検索':'講師番号・漢字氏名・ひらがな・カタカナ・ローマ字・教室で検索／絞り込み。',
     '画像添付':'JPEG・PNGを1枚選択可能。端末側でLINE送信用に縮小・圧縮し、プレビュー後にSupabase Storage経由で送信する。画像のみ送信にも対応。旧Google Drive一時保存方式は廃止。',
-    '送信履歴':'Supabase `line_teacher_send_logs` に保存。旧履歴2件も新DBへ移行済み。',
+    '送信履歴':'Supabase `line_teacher_send_logs` に保存。「送信内容を見る」を押すと送信本文を展開し、画像付き送信では送信画像も同時に表示する。画像のみの場合は「文章なし（画像のみ送信）」と画像を表示する。',
     '認証・セッション':'初回だけ既存の講師番号・パスワードで権限確認。以後は新システム専用セッションを保持し、利用者が上部の「ログアウト」を押さない限り日数経過だけではスタッフ確認画面へ戻さない。ログアウト時だけサーバー・端末のセッションを破棄する。',
     'LINE送信設定':'チャネルアクセストークンは初回だけ設定し、サーバー側の非公開設定へ保存する。アクセストークン・LINE利用者ID・スタッフセッションはGitHub・画面・台帳へ記載しない。',
     'Supabase主データ':['line_teacher_recipients','line_teacher_send_logs','line_teacher_private_config','line_teacher_staff_sessions'],
@@ -65,14 +67,14 @@ new_contact = r'''  const contactEntry={
     '保守上の重要事項':'手動LINE送信は旧Apps Scriptへ戻さず、line-teacher-apiを正本とする。「コマ数報告してない連絡」の22:10自動通知は別システムとして既存Apps Scriptを維持する。LINEアクセストークンやLINE利用者IDを公開ソースへ記載しない。',
     '関連カード':['コマ数報告してない連絡','講師ポータル','STEP配信システム'],
     '確認日':'2026年9月13日',
-    '確認済み事項':['新Supabase基盤へ講師25名移行','端末キャッシュによる高速初期表示','D列在籍1の即時強制更新','C列よみ・R列教室の反映','かな・カナ・ローマ字検索','文章送信','画像添付・プレビュー','LINE Messaging API実成功時のみ成功表示','送信履歴DB保存','上部ログアウトボタン','明示ログアウトまでセッション維持','利用者による実送信成功','旧GitHub実装削除','旧Supabase中継をHTTP 410で無効化'],
+    '確認済み事項':['新Supabase基盤へ講師25名移行','端末キャッシュによる高速初期表示','D列在籍1の即時強制更新','C列よみ・R列教室の反映','かな・カナ・ローマ字検索','文章送信','画像添付・プレビュー','LINE Messaging API実成功時のみ成功表示','送信履歴DB保存','送信履歴から本文・画像を展開表示','上部ログアウトボタン','明示ログアウトまでセッション維持','利用者による実送信成功','旧GitHub実装削除','旧Supabase中継をHTTP 410で無効化'],
     '確認状況':'2026年9月13日、本番再構築完了。利用者によるLINE実送信成功を確認し、旧送信経路・旧応急ファイルを整理して正本をline-teacher-apiへ一本化。',
     '詳細記録':'docs/line-teacher-contact-rebuild-20260913.md'
   };'''
 
-pattern = r'  const contactEntry=\{.*?\n  \};(?=\r?\n  const portalIndex=)'
-html, count = re.subn(pattern, new_contact, html, count=1, flags=re.S)
-if count != 1:
-    raise SystemExit('index.html: contactEntry block not found')
-
+start = html.find('  const contactEntry={')
+end = html.find('\n  const portalIndex=', start)
+if start < 0 or end < 0 or end <= start:
+    raise SystemExit('index.html: contactEntry boundaries not found')
+html = html[:start] + new_contact + html[end:]
 index_path.write_text(html, encoding='utf-8')
