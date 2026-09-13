@@ -1,0 +1,36 @@
+name: Record rebuilt LINE teacher contact system
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/record_line_teacher_rebuild_20260913.py'
+      - '.github/workflows/record-line-teacher-rebuild-20260913.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update registry
+        run: python3 scripts/record_line_teacher_rebuild_20260913.py
+      - name: Basic checks
+        run: |
+          grep -q '最終更新: 2026-09-13' SYSTEM_REGISTRY.md
+          grep -q '本番稼働中（Supabase再構築版）' index.html
+          grep -q 'line-teacher-api' SYSTEM_REGISTRY.md
+          grep -q 'line-teacher-api' index.html
+          grep -q 'ログアウト.*押さない限り' SYSTEM_REGISTRY.md
+          test -f docs/line-teacher-contact-rebuild-20260913.md
+      - name: Commit registry changes
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SYSTEM_REGISTRY.md index.html
+          git commit -m 'Record rebuilt LINE teacher contact system'
+          git push
