@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-13
+最終更新: 2026-09-14
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -28,10 +28,11 @@
 - 2026年9月13日、利用者による新構成でのLINE送信成功を確認済み。
 - 詳細: `docs/line-teacher-contact-rebuild-20260913.md`
 
-## 登録システム（28件）
+## 登録システム（29件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
+| 子供用の時間制限アプリ | 本番使用中 | https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/ | [smartphone-time-manager](https://github.com/stepkobetsu-hub/smartphone-time-manager) | `main` | Androidアプリ `project/app/src/main/`、保護者用Web管理画面、ChatGPT Sites Worker、D1設定DB | Jelly 2（Android 11）＋パソコン／Pixel 9aのブラウザ＋ChatGPT Sites＋D1 | Android変更はGitHub `main`へ反映してAPKを自動ビルド。保護者用管理画面と接続版APKを同じSites URLへ公開し、Jelly 2へ上書き更新 | 2026-09-14 | Family Link／Kidsloxが利用できなかったため作成した専用アプリ。設定画面は保護者PINで保護し、アプリを離れるたび再認証。秘密値・暗証番号・端末接続トークンは台帳へ記載しない |
 | プリント書き込み消去・再印刷 | 本番 | https://stepkobetsu-hub.github.io/print-handwriting-cleaner/ | [print-handwriting-cleaner](https://github.com/stepkobetsu-hub/print-handwriting-cleaner) | `main` | `public/index.html`、`public/app.js`、`public/styles.css`、`src/index.ts` | GitHub Pages＋ブラウザ内画像処理。画像は端末外へ送信・保存しない | `main`へ反映後、Pagesの公開とスマホ撮影・処理前後比較・A4印刷を確認 | 2026-09-09 | Issue #36。印刷内容の再生成を行わず、色・輝度・局所構造から手書き候補だけを復元。3段階強度、手動仕上げ、縦横自動判定を備える |
 | 経理ログイン管理 | 本番使用中 | https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec | [step-system-registry/accounting-login-app](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app) | `main` | `accounting-login-app/Code.gs`、`accounting-login-app/Index.html`、Google Sheet「経理ログイン管理マスター」 | GitHub＋Google Apps Script＋Google Sheet＋UserProperties | GitHub正本を既存Apps Scriptプロジェクトへ同期し、既存デプロイID／URLを維持して新バージョンへ更新 | 2026-09-07 | Apps Script v7。PW本体はSheet／GitHubへ保存せずGoogleアカウント別UserPropertiesへ保存。L列「表示順」を全PC共通の正本とする |
 | 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
@@ -59,6 +60,24 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・43カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-23 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、証憑自動回収を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## 子供用の時間制限アプリ：本番仕様
+
+- **用途:** 子供用スマートフォンの利用時間とお休み時間を、保護者が遠隔管理する。
+- **子供端末:** Unihertz Jelly 2（Android 11）。
+- **保護者端末:** WindowsパソコンおよびPixel 9a。どちらも同じブラウザ管理画面を使用する。
+- **保護者用管理画面:** https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/
+- **接続版APK:** https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/smartphone-time-manager-v0.5.apk
+- **GitHub正本:** https://github.com/stepkobetsu-hub/smartphone-time-manager
+- **主な機能:** 1日の利用上限、お休み開始・終了、対象アプリ制限、今すぐロック、ロック解除、15分だけ許可、Jelly 2の最終接続時刻確認。
+- **設定保護:** Jelly 2でアプリを開くと保護者暗証番号を要求する。認証前は利用時間・制限対象・暗証番号変更欄を表示しない。アプリを離れると設定画面を再ロックする。
+- **暗証番号変更:** 新しい4桁と確認用4桁の2か所が一致した場合だけ変更する。暗証番号の実値は本台帳へ記載しない。
+- **接続:** Jelly 2のユーザー補助サービスが有効でインターネット接続中なら、約30秒間隔で管理設定を自動取得する。
+- **初回設定:** 接続版APKを既存アプリへ上書きし、使用状況へのアクセスとユーザー補助「スマホ時間管理」を許可する。更新直後はユーザー補助を一度オフにして再度オンにする。
+- **接続できない場合:** Jelly 2の通信を確認し、ユーザー補助「スマホ時間管理」をオフ→オン、30～60秒待って管理画面を再読み込みする。改善しなければJelly 2を再起動する。
+- **保存基盤:** ChatGPT SitesのWorkerとD1。端末接続用トークン、セッション秘密値、暗証番号などの秘密情報を公開GitHub・台帳・画面説明へ記載しない。
+- **注意:** 通常のAndroidアプリであるため、端末設定からのアンインストールやユーザー補助の無効化を完全には防止できない。完全な防止には端末所有者モード等の追加管理が必要。
+- **確認日:** 2026-09-14。Jelly 2と保護者用管理画面の接続成功を利用者が確認済み。
 
 ## お問い合わせ管理：反応リストの電話番号・郵便番号整形（2026-09-07）
 
