@@ -2957,22 +2957,25 @@ organizeEntryImport=function(items){
     '正本ファイル':['teacher_line_contact.html','teacher_line_contact_v3.js'],
     '保存基盤':'GitHub Pages＋Supabase Edge Function `line-teacher-api`＋Postgres＋Supabase Storage＋LINE Messaging API',
     '送信API':'Supabase Edge Function `line-teacher-api`。LINE APIの実成功応答を確認できた場合だけ送信成功表示を出す。',
-    '講師一覧':'通常起動は端末キャッシュを即表示し、Supabaseの同期済み一覧で更新する。講師マスターを毎回読まず高速表示する。',
+    '講師一覧':'通常起動は端末キャッシュを即表示し、Supabaseの同期済み一覧でバックグラウンド更新する。講師マスターを毎回読まず、画面本体と保存済み講師一覧を先に表示する。',
+    '起動高速化':'画面本体を通信完了前に表示し、端末キャッシュの講師一覧を先に描画する。Supabaseの一覧・送信履歴・LINE設定状態は後から並行取得し、起動中の長い待機表示を避ける。',
     '強制更新':'「講師情報を強制更新」を押した場合だけ講師マスターの最新C列=よみ、D列=在籍、R列=教室を即時取得する。D列が1の講師だけ表示し、1の追加・削除はボタン1回でその場で反映する。',
     'LINE登録同期':'Google Sheet「講師LINE通知管理」のLINE登録情報をSupabase `line_teacher_recipients` へバックグラウンド同期する。通常操作速度には影響させない。',
     '検索':'講師番号・漢字氏名・ひらがな・カタカナ・ローマ字・教室で検索／絞り込み。',
     '画像添付':'JPEG・PNGを1枚選択可能。端末側でLINE送信用に縮小・圧縮し、プレビュー後にSupabase Storage経由で送信する。画像のみ送信にも対応。旧Google Drive一時保存方式は廃止。',
     '送信履歴':'Supabase `line_teacher_send_logs` に保存。「送信内容を見る」を押すと送信本文を展開し、画像付き送信では送信画像も同時に表示する。画像のみの場合は「文章なし（画像のみ送信）」と画像を表示する。',
     '認証・セッション':'初回だけ既存の講師番号・パスワードで権限確認。以後は新システム専用セッションを保持し、利用者が上部の「ログアウト」を押さない限り日数経過だけではスタッフ確認画面へ戻さない。ログアウト時だけサーバー・端末のセッションを破棄する。',
-    'LINE送信設定':'チャネルアクセストークンは初回だけ設定し、サーバー側の非公開設定へ保存する。アクセストークン・LINE利用者ID・スタッフセッションはGitHub・画面・台帳へ記載しない。',
+    'LINE送信設定':'チャネルアクセストークンは初回だけ設定し、サーバー側の非公開設定へ保存する。通常画面には設定案内やコード入力欄を表示せず、上部の小さな「設定」ボタンを押した場合だけ設定画面を開く。設定画面はHTMLの初期状態から非表示にし、起動時の一瞬の表示も防ぐ。アクセストークン・LINE利用者ID・スタッフセッションはGitHub・画面・台帳へ記載しない。',
+    '上部ナビゲーション':'左から小さな「設定」、「STEP配信システムへ」、「公式LINEへ」、「業務ホームへ」、「ログアウト」の順。設定ボタンはSTEP配信システムへのボタンの左側に配置する。',
     'Supabase主データ':['line_teacher_recipients','line_teacher_send_logs','line_teacher_private_config','line_teacher_staff_sessions'],
     '廃止した旧実装':['gas/TeacherLineContact.gs','teacher_line_contact.js','teacher_line_contact_v2.js','teacher_line_registered.json','teacher_roster_direct.js','teacher_roster_snapshot.json','teacher_send_fix.js','旧teacher_line_contactテスト'],
     '廃止エンドポイント':['line-teacher-send（HTTP 410）','line-teacher-auth（HTTP 410）','probe-line-gas（HTTP 410）'],
     '保守上の重要事項':'手動LINE送信は旧Apps Scriptへ戻さず、line-teacher-apiを正本とする。「コマ数報告してない連絡」の22:10自動通知は別システムとして既存Apps Scriptを維持する。LINEアクセストークンやLINE利用者IDを公開ソースへ記載しない。',
     '関連カード':['コマ数報告してない連絡','講師ポータル','STEP配信システム'],
-    '確認日':'2026年9月13日',
-    '確認済み事項':['新Supabase基盤へ講師25名移行','端末キャッシュによる高速初期表示','D列在籍1の即時強制更新','C列よみ・R列教室の反映','かな・カナ・ローマ字検索','文章送信','画像添付・プレビュー','LINE Messaging API実成功時のみ成功表示','送信履歴DB保存','送信履歴から本文・画像を展開表示','上部ログアウトボタン','明示ログアウトまでセッション維持','利用者による実送信成功','旧GitHub実装削除','旧Supabase中継をHTTP 410で無効化'],
-    '確認状況':'2026年9月13日、本番再構築完了。利用者によるLINE実送信成功を確認し、旧送信経路・旧応急ファイルを整理して正本をline-teacher-apiへ一本化。',
+    '確認日':'2026年9月14日',
+    '確認済み事項':['新Supabase基盤へ講師25名移行','画面本体と端末キャッシュによる高速初期表示','D列在籍1の即時強制更新','C列よみ・R列教室の反映','かな・カナ・ローマ字検索','選択中講師の氏名チップ表示','文章送信','JPEG・PNG画像添付・自動縮小・プレビュー','画像のみ送信','LINE Messaging API実成功時のみ成功表示','送信履歴DB保存','送信履歴から本文・画像を展開表示','設定ボタンをSTEP配信システムへの左側に配置','LINE送信設定を通常画面から非表示','設定ボタン操作時だけLINE送信設定を表示','起動時の設定案内ちらつき防止','上部ログアウトボタン','明示ログアウトまでセッション維持','利用者による実送信成功','旧GitHub実装削除','旧Supabase中継をHTTP 410で無効化'],
+    '確認状況':'2026年9月13日に本番再構築を完了し、利用者によるLINE実送信成功を確認。2026年9月14日に起動表示を高速化し、LINE送信設定を通常画面から外して上部の設定ボタン内へ移動。公開画面で設定ボタンの位置、設定画面の初期非表示、更新版JavaScriptの配信を確認。',
+    '最新変更PR':'https://github.com/stepkobetsu-hub/step-form/pull/9',
     '詳細記録':'docs/line-teacher-contact-rebuild-20260913.md'
   };
   const portalIndex=out.findIndex(item=>String(item['システム名']||item['正式名称']||'').includes('講師ポータル'));
@@ -3695,31 +3698,6 @@ applyAssetInfo=function(item){
      registration['確認状況']='登録API v35を既存デプロイID／URLのまま本番公開。本人向け確認メールは次回の登録・変更から適用。実在講師へのテストメールは送信していない。';
      const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
      ['講師本人への個別確認メール','本人向けメールでパスワード・マイナンバー実値を非表示','管理者宛先を本人メールに表示しない','同一アドレスの二重送信防止','登録API v35・既存URL維持'].forEach(value=>{if(!checked.includes(value))checked.push(value)});
-     registration['確認済み事項']=checked;
-   }
-   return list;
- };
-})();
-</script>
-
-<script id="teacher-confirmation-recipient-settings-registry-20260914">
-(function(){
- const previousOrganize=organizeEntryImport;
- organizeEntryImport=function(items){
-   const list=previousOrganize(items);
-   const registration=list.find(item=>item['ID']==='teacher-initial-registration');
-   if(registration){
-     registration['状態']='本番公開済（登録API v36）';
-     registration['確認メール送信先設定']='「教室スタッフ：登録コードの発行」の枠外・直下に、小さな「確認メール送信先の設定」ボタンを設置。スタッフID・パスワードで認証後、講師本人以外の送信先を1～3件で確認・変更できる。';
-     registration['現在の追加送信先']='初期設定は mintcocoajasmine@gmail.com、admin@educrest.jp の2件。設定画面から1件以上3件以下へ変更可能。';
-     registration['確認メールの宛先']='初期登録・追加入力・登録情報変更・パスワード変更の確認メールを、講師本人と設定済みの追加送信先1～3件へ送信する。同一アドレスは重複送信しない。';
-     registration['送信先設定の安全対策']='送信先の表示・保存には権限2・3・4のスタッフ認証が必要。未認証の画面へ登録済みアドレスを表示しない。';
-     registration['登録APIバージョン']='36（2026年9月14日）';
-     registration['画面最新版']='teacher-portal main 6adf822422b81850b04a7ccfae00dee0ee373f11';
-     registration['確認日']='2026年9月14日';
-     registration['確認状況']='登録API v36を既存デプロイID／URLのまま本番公開。設定ボタンが登録コード発行枠の外・直下に表示されること、幅165px・高さ34pxの控えめな表示、設定画面の開閉、全自動試験合格、公開画面のエラーなしを確認済み。';
-     const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
-     ['確認メール追加送信先を1～3件で設定','講師本人と設定済み追加送信先への同時送信','追加送信先の重複排除','送信先設定のスタッフ認証','登録コード発行枠の外・直下に小型設定ボタン','登録API v36・既存URL維持','公開画面で設定パネル開閉・エラーなし'].forEach(value=>{if(!checked.includes(value))checked.push(value)});
      registration['確認済み事項']=checked;
    }
    return list;
