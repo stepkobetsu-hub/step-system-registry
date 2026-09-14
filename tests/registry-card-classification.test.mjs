@@ -39,3 +39,10 @@ test('classification occupies the full card width and wraps only when needed',()
   assert.match(editor,/\.registry-classification-group\{[^}]*flex-wrap:nowrap/);
   assert.match(editor,/head\.after\(holder\)/);
 });
+
+test('search and filters call the latest decorated renderer',()=>{
+  assert.match(index,/getElementById\('search'\)\.addEventListener\('input',\(\)=>render\(\)\)/);
+  assert.match(index,/getElementById\('category'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
+  assert.match(index,/getElementById\('status'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
+  assert.match(index,/getElementById\('investigationFilter'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
+});
