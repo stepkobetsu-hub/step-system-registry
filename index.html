@@ -3705,5 +3705,30 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="teacher-confirmation-recipient-settings-registry-20260914">
+(function(){
+ const previousOrganize=organizeEntryImport;
+ organizeEntryImport=function(items){
+   const list=previousOrganize(items);
+   const registration=list.find(item=>item['ID']==='teacher-initial-registration');
+   if(registration){
+     registration['状態']='本番公開済（登録API v36）';
+     registration['確認メール送信先設定']='「教室スタッフ：登録コードの発行」の枠外・直下に、小さな「確認メール送信先の設定」ボタンを設置。スタッフID・パスワードで認証後、講師本人以外の送信先を1～3件で確認・変更できる。';
+     registration['現在の追加送信先']='初期設定は mintcocoajasmine@gmail.com、admin@educrest.jp の2件。設定画面から1件以上3件以下へ変更可能。';
+     registration['確認メールの宛先']='初期登録・追加入力・登録情報変更・パスワード変更の確認メールを、講師本人と設定済みの追加送信先1～3件へ送信する。同一アドレスは重複送信しない。';
+     registration['送信先設定の安全対策']='送信先の表示・保存には権限2・3・4のスタッフ認証が必要。未認証の画面へ登録済みアドレスを表示しない。';
+     registration['登録APIバージョン']='36（2026年9月14日）';
+     registration['画面最新版']='teacher-portal main 6adf822422b81850b04a7ccfae00dee0ee373f11';
+     registration['確認日']='2026年9月14日';
+     registration['確認状況']='登録API v36を既存デプロイID／URLのまま本番公開。設定ボタンが登録コード発行枠の外・直下に表示されること、幅165px・高さ34pxの控えめな表示、設定画面の開閉、全自動試験合格、公開画面のエラーなしを確認済み。';
+     const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
+     ['確認メール追加送信先を1～3件で設定','講師本人と設定済み追加送信先への同時送信','追加送信先の重複排除','送信先設定のスタッフ認証','登録コード発行枠の外・直下に小型設定ボタン','登録API v36・既存URL維持','公開画面で設定パネル開閉・エラーなし'].forEach(value=>{if(!checked.includes(value))checked.push(value)});
+     registration['確認済み事項']=checked;
+   }
+   return list;
+ };
+})();
+</script>
+
 </body>
 </html>
