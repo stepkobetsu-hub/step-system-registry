@@ -9,7 +9,7 @@ const workflow=fs.readFileSync(new URL('../.github/workflows/sync-workspace-apps
 test('資産管理は左側のアプリ種類一覧から選択できる',()=>{
   for(const value of ['registrySidebar','registryPurposeNav','registryCurrentPurpose','registryMobileMenu'])assert.match(html,new RegExp(value));
   assert.match(editor,/renderPurposeSidebar/);
-  assert.match(editor,/classificationForItem\(item\)\.purpose/);
+  assert.match(editor,/classificationForItem\(item\)/);
   assert.match(editor,/data-registry-purpose/);
 });
 
@@ -17,6 +17,14 @@ test('種類の追加・色・アイコン設定が左側一覧にも反映さ�
   assert.match(editor,/config\.purposeTypes\.map/);
   assert.match(editor,/--purpose-color/);
   assert.match(editor,/type\.icon/);
+});
+
+test('用途の下と業務ホームボタンの上に利用者分類を表示する',()=>{
+  const purposeIndex=html.indexOf('id="registryPurposeNav"'),audienceIndex=html.indexOf('id="registryAudienceNav"'),workspaceIndex=html.indexOf('STEP業務ホームへ',audienceIndex);
+  assert.ok(purposeIndex<audienceIndex);
+  assert.ok(audienceIndex<workspaceIndex);
+  assert.match(editor,/classification\?\.audiences\.includes\(activeAudience\)/);
+  assert.match(editor,/activePurpose,activeAudience/);
 });
 
 test('パソコンでは台帳を画面幅いっぱいに広げる',()=>{

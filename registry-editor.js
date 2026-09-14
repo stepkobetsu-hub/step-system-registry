@@ -33,6 +33,7 @@
   ];
   let config=loadConfig();
   let activePurpose='';
+  let activeAudience='';
 
   function clone(value){return JSON.parse(JSON.stringify(value));}
   function normalizeTypeList(value,defaults){
@@ -323,9 +324,12 @@
     panel.addEventListener('click',event=>{if(event.target===panel)closeManagement();});
     formPanel.addEventListener('click',event=>{if(event.target===formPanel)closeCardForm();});
     typePanel.addEventListener('click',event=>{if(event.target===typePanel)closeTypeSettings();});
-    const choosePurpose=purpose=>{activePurpose=purpose;render();closeSidebar();};
-    document.querySelector('[data-registry-purpose=""]')?.addEventListener('click',()=>choosePurpose(''));
+    const choosePurpose=purpose=>{activePurpose=activePurpose===purpose?'':purpose;render();closeSidebar();};
+    const chooseAudience=audience=>{activeAudience=activeAudience===audience?'':audience;render();closeSidebar();};
+    document.querySelector('[data-registry-purpose=""]')?.addEventListener('click',()=>{activePurpose='';activeAudience='';render();closeSidebar();});
     document.getElementById('registryPurposeNav')?.addEventListener('click',event=>{const button=event.target.closest('[data-registry-purpose]');if(button)choosePurpose(button.dataset.registryPurpose||'');});
+    document.getElementById('registryAudienceNav')?.addEventListener('click',event=>{const button=event.target.closest('[data-registry-audience]');if(button)chooseAudience(button.dataset.registryAudience||'');});
+    document.getElementById('clearBtn')?.addEventListener('click',()=>{activePurpose='';activeAudience='';render();});
     const sidebar=document.getElementById('registrySidebar'),backdrop=document.getElementById('registrySidebarBackdrop');
     const closeSidebar=()=>{sidebar?.classList.remove('is-open');backdrop?.classList.remove('is-open');};
     document.getElementById('registryMobileMenu')?.addEventListener('click',()=>{sidebar?.classList.add('is-open');backdrop?.classList.add('is-open');});
@@ -338,17 +342,23 @@
   function originalItemForKey(key){return rawBaseSystems?.find(item=>item.__cardKey===key)||null;}
   function currentItemForKey(key){return systems.find(item=>item.__cardKey===key)||originalItemForKey(key)||null;}
   function renderPurposeSidebar(){
-    const nav=document.getElementById('registryPurposeNav');if(!nav)return;
+    const nav=document.getElementById('registryPurposeNav'),audienceNav=document.getElementById('registryAudienceNav');if(!nav||!audienceNav)return;
     const valid=new Set(config.purposeTypes.map(type=>type.name));if(activePurpose&&!valid.has(activePurpose))activePurpose='';
+    const validAudiences=new Set(config.audienceTypes.map(type=>type.name));if(activeAudience&&!validAudiences.has(activeAudience))activeAudience='';
     const counts=new Map(config.purposeTypes.map(type=>[type.name,0]));
-    systems.forEach(item=>{const purpose=classificationForItem(item).purpose;counts.set(purpose,(counts.get(purpose)||0)+1);});
+    const audienceCounts=new Map(config.audienceTypes.map(type=>[type.name,0]));
+    systems.forEach(item=>{const classification=classificationForItem(item);counts.set(classification.purpose,(counts.get(classification.purpose)||0)+1);classification.audiences.forEach(audience=>audienceCounts.set(audience,(audienceCounts.get(audience)||0)+1));});
     nav.replaceChildren(...config.purposeTypes.map(type=>{
       const button=document.createElement('button');button.type='button';button.className='registry-purpose-item';button.dataset.registryPurpose=type.name;button.classList.toggle('is-active',activePurpose===type.name);button.style.setProperty('--purpose-color',type.color);
       const icon=document.createElement('span');icon.className='registry-sidebar-icon';icon.textContent=type.icon;const label=document.createElement('span');label.textContent=type.name;const count=document.createElement('small');count.textContent=counts.get(type.name)||0;button.append(icon,label,count);return button;
     }));
-    const all=document.querySelector('[data-registry-purpose=""]');all?.classList.toggle('is-active',!activePurpose);const allCount=document.getElementById('registryAllCount');if(allCount)allCount.textContent=systems.length;
-    let visible=0;document.querySelectorAll('#cards .card').forEach(article=>{const item=systems.find(system=>cardAnchor(system)===article.id);const show=!activePurpose||(item&&classificationForItem(item).purpose===activePurpose);article.hidden=!show;if(show)visible+=1;});
-    const title=activePurpose||'すべてのカード';const current=document.getElementById('registryCurrentPurpose');if(current)current.textContent=title;const summary=document.getElementById('registryVisibleSummary');if(summary)summary.textContent=`${visible}件表示`;
+    audienceNav.replaceChildren(...config.audienceTypes.map(type=>{
+      const button=document.createElement('button');button.type='button';button.className='registry-purpose-item registry-audience-item';button.dataset.registryAudience=type.name;button.classList.toggle('is-active',activeAudience===type.name);button.style.setProperty('--purpose-color',type.color);
+      const icon=document.createElement('span');icon.className='registry-sidebar-icon';icon.textContent=type.icon;const label=document.createElement('span');label.textContent=type.name;const count=document.createElement('small');count.textContent=audienceCounts.get(type.name)||0;button.append(icon,label,count);return button;
+    }));
+    const all=document.querySelector('[data-registry-purpose=""]');all?.classList.toggle('is-active',!activePurpose&&!activeAudience);const allCount=document.getElementById('registryAllCount');if(allCount)allCount.textContent=systems.length;
+    let visible=0;document.querySelectorAll('#cards .card').forEach(article=>{const item=systems.find(system=>cardAnchor(system)===article.id),classification=item?classificationForItem(item):null;const purposeMatch=!activePurpose||classification?.purpose===activePurpose;const audienceMatch=!activeAudience||classification?.audiences.includes(activeAudience);const show=purposeMatch&&audienceMatch;article.hidden=!show;if(show)visible+=1;});
+    const title=[activePurpose,activeAudience].filter(Boolean).join(' × ')||'すべてのカード';const current=document.getElementById('registryCurrentPurpose');if(current)current.textContent=title;const summary=document.getElementById('registryVisibleSummary');if(summary)summary.textContent=`${visible}件表示`;
   }
   function decorateCards(){
     document.querySelectorAll('#cards .card').forEach(article=>{
