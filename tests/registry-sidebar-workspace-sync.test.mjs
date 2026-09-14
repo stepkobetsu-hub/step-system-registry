@@ -37,3 +37,11 @@ test('台帳の正式一覧を業務ホーム用JSONへ自動出力する',()=>{
   assert.match(workflow,/node scripts\/generate-workspace-apps\.mjs/);
   assert.match(workflow,/git add workspace-apps\.json/);
 });
+
+test('編集ボタンは重複し得る表示IDではなくカード固有キーへ結び付く',()=>{
+  assert.match(html,/article\.dataset\.registryKey=registryKey/);
+  assert.match(editor,/function itemForArticle\(article\)/);
+  assert.match(editor,/systems\.find\(item=>item\.__cardKey===key\)/);
+  assert.match(editor,/const item=itemForArticle\(article\)/);
+  assert.match(html,/registry-editor\.js\?v=20260914-card-key-fix/);
+});

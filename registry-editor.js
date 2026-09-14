@@ -341,6 +341,10 @@
   }
   function originalItemForKey(key){return rawBaseSystems?.find(item=>item.__cardKey===key)||null;}
   function currentItemForKey(key){return systems.find(item=>item.__cardKey===key)||originalItemForKey(key)||null;}
+  function itemForArticle(article){
+    const key=article?.dataset?.registryKey;
+    return (key&&systems.find(item=>item.__cardKey===key))||systems.find(item=>cardAnchor(item)===article?.id)||null;
+  }
   function renderPurposeSidebar(){
     const nav=document.getElementById('registryPurposeNav'),audienceNav=document.getElementById('registryAudienceNav');if(!nav||!audienceNav)return;
     const valid=new Set(config.purposeTypes.map(type=>type.name));if(activePurpose&&!valid.has(activePurpose))activePurpose='';
@@ -357,12 +361,12 @@
       const icon=document.createElement('span');icon.className='registry-sidebar-icon';icon.textContent=type.icon;const label=document.createElement('span');label.textContent=type.name;const count=document.createElement('small');count.textContent=audienceCounts.get(type.name)||0;button.append(icon,label,count);return button;
     }));
     const all=document.querySelector('[data-registry-purpose=""]');all?.classList.toggle('is-active',!activePurpose&&!activeAudience);const allCount=document.getElementById('registryAllCount');if(allCount)allCount.textContent=systems.length;
-    let visible=0;document.querySelectorAll('#cards .card').forEach(article=>{const item=systems.find(system=>cardAnchor(system)===article.id),classification=item?classificationForItem(item):null;const purposeMatch=!activePurpose||classification?.purpose===activePurpose;const audienceMatch=!activeAudience||classification?.audiences.includes(activeAudience);const show=purposeMatch&&audienceMatch;article.hidden=!show;if(show)visible+=1;});
+    let visible=0;document.querySelectorAll('#cards .card').forEach(article=>{const item=itemForArticle(article),classification=item?classificationForItem(item):null;const purposeMatch=!activePurpose||classification?.purpose===activePurpose;const audienceMatch=!activeAudience||classification?.audiences.includes(activeAudience);const show=purposeMatch&&audienceMatch;article.hidden=!show;if(show)visible+=1;});
     const title=[activePurpose,activeAudience].filter(Boolean).join(' × ')||'すべてのカード';const current=document.getElementById('registryCurrentPurpose');if(current)current.textContent=title;const summary=document.getElementById('registryVisibleSummary');if(summary)summary.textContent=`${visible}件表示`;
   }
   function decorateCards(){
     document.querySelectorAll('#cards .card').forEach(article=>{
-      const item=systems.find(system=>cardAnchor(system)===article.id);
+      const item=itemForArticle(article);
       if(!item)return;
       const head=article.querySelector('.card-head');
       if(head&&!article.querySelector(':scope > .registry-classification')){

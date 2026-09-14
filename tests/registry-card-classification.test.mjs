@@ -31,7 +31,7 @@ test('classification types can be added and their icon and color edited',()=>{
 });
 
 test('published page uses the classification editor cache key',()=>{
-  assert.match(index,/registry-editor\.js\?v=20260914-stable-load/);
+  assert.match(index,/registry-editor\.js\?v=20260914-card-key-fix/);
 });
 
 test('classification occupies the full card width and wraps only when needed',()=>{
