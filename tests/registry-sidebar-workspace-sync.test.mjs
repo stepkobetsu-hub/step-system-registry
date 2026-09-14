@@ -45,3 +45,9 @@ test('編集ボタンは重複し得る表示IDではなくカード固有キー
   assert.match(editor,/const item=itemForArticle\(article\)/);
   assert.match(html,/registry-editor\.js\?v=20260914-card-key-fix/);
 });
+
+test('画面上部の使い方から台帳と業務ホームの役割を確認できる',()=>{
+  for(const id of ['usageButton','usageDialog','usageCloseButton'])assert.match(html,new RegExp(id));
+  assert.match(html,/カードの基本情報は「STEPシステム資産管理台帳」を正本/);
+  assert.match(html,/並び順・お気に入り・PC／スマホ設定/);
+});
