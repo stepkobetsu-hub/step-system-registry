@@ -3107,8 +3107,7 @@ organizeEntryImport=function(items){
     '状態':'本番',
     '利用者':'STEPスタッフ',
     '運用担当':'管理者',
-    '概要':'高速ホーム（閲覧専用）、料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。高速ホームはCloudflare D1を読み取り、保存・更新・送信は行わない。',
-    '高速ホームURL':'https://stepkobetsu-hub.github.io/invoice-pdf/billing-home.html',
+    '概要':'料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。',
     '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
     '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
     '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
@@ -3138,7 +3137,6 @@ appendDailyLinks=function(item,article){
     if(row.querySelector('.link-name')?.textContent.trim()==='利用者向けアプリを開く')row.remove();
   });
   const entries=[
-    ['高速表示・閲覧専用（保存・更新・送信なし）','請求状況をすぐ確認',item['高速ホームURL']],
     ['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く',item['料金特別調整URL']],
     ['学費計算・請求データ作成','請求システムを開く',item['請求管理システムURL']],
     ['請求書配信・PDF作成','請求書：作成・配信システムを開く',item['請求書配信PDF作成URL']]
