@@ -3710,12 +3710,12 @@ applyAssetInfo=function(item){
    const registration=list.find(item=>item['ID']==='teacher-initial-registration');
    if(registration){
      registration['状態']='本番公開済（登録API v36）';
-     registration['確認メール送信先設定']='「教室スタッフ：登録コードの発行」の枠外・直下に、小さな「確認メール送信先の設定」ボタンを設置。スタッフID・パスワードで認証後、講師本人以外の送信先を1～3件で確認・変更できる。';
-     registration['現在の追加送信先']='初期設定は mintcocoajasmine@gmail.com、admin@educrest.jp の2件。設定画面から1件以上3件以下へ変更可能。';
-     registration['確認メールの宛先']='初期登録・追加入力・登録情報変更・パスワード変更の確認メールを、講師本人と設定済みの追加送信先1～3件へ送信する。同一アドレスは重複送信しない。';
-     registration['送信先設定の安全対策']='送信先の表示・保存には権限2・3・4のスタッフ認証が必要。未認証の画面へ登録済みアドレスを表示しない。';
+     registration['主要機能']='講師本人の初期登録・追加入力・登録情報変更・パスワード変更に加え、「教室スタッフ：登録コードの発行」の枠外・直下にある小さな「確認メール送信先の設定」ボタンから、講師本人以外の送信先を1～3件で確認・変更できる。';
+     registration['連絡先運用']='確認メールは講師本人と設定済みの追加送信先1～3件へ送信する。初期設定は mintcocoajasmine@gmail.com、admin@educrest.jp の2件で、設定画面から1件以上3件以下へ変更可能。同一アドレスは重複送信しない。';
+     registration['認証・セッション']='講師本人の登録・変更は本人用認証を使用。確認メール追加送信先の表示・保存には権限2・3・4のスタッフID・パスワード認証が必要で、未認証の画面へ登録済みアドレスを表示しない。';
+     registration['変更時の注意']='確認メールの追加送信先は最低1件、最大3件を維持する。送信先設定の認証を外さず、登録済みアドレスを未認証画面や公開コードへ埋め込まない。';
      registration['登録APIバージョン']='36（2026年9月14日）';
-     registration['画面最新版']='teacher-portal main 6adf822422b81850b04a7ccfae00dee0ee373f11';
+     registration['最新版の場所']='teacher-portal main 6adf822422b81850b04a7ccfae00dee0ee373f11／Apps Script「BREVO_API_KEY」登録API v36（2026年9月14日、既存デプロイID・URLを維持）';
      registration['確認日']='2026年9月14日';
      registration['確認状況']='登録API v36を既存デプロイID／URLのまま本番公開。設定ボタンが登録コード発行枠の外・直下に表示されること、幅165px・高さ34pxの控えめな表示、設定画面の開閉、全自動試験合格、公開画面のエラーなしを確認済み。';
      const checked=Array.isArray(registration['確認済み事項'])?registration['確認済み事項']:[];
