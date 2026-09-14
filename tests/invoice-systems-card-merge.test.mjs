@@ -9,7 +9,7 @@ const registry=fs.readFileSync(new URL('../SYSTEM_REGISTRY.md',import.meta.url),
 test('請求関連の2システムを1枚の請求システムカードへまとめる',()=>{
   for(const text of [
     "'システム名':'請求システム'",
-    '請求管理システムを開く',
+    '請求システムを開く',
     '料金特別調整を開く',
     '請求書：作成・配信システムを開く',
     'billing-system-details',
@@ -48,14 +48,14 @@ test('実画面のカード名でも2枚を1枚へ統合する',()=>{
 test('入口上部は小さい説明だけを残す',()=>{
   const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
   assert.ok(script.includes("heading.append(el('span','',description))"));
-  assert.ok(script.indexOf("['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く'")<script.indexOf("['学費計算・請求データ作成','請求管理システムを開く'"));
+  assert.ok(script.indexOf("['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く'")<script.indexOf("['学費計算・請求データ作成','請求システムを開く'"));
   assert.equal(script.includes("heading.append(el('strong','',title)"),false);
-  assert.ok(script.includes("['学費計算・請求データ作成','請求管理システムを開く'"));
+  assert.ok(script.includes("['学費計算・請求データ作成','請求システムを開く'"));
   assert.ok(script.includes("['請求書配信・PDF作成','請求書：作成・配信システムを開く'"));
 });
 
-test('小さい説明と入口タイトルの隙間をなくし枠を低くする',()=>{
-  assert.match(page,/\.billing-system-entry\{margin-top:7px;padding:6px 10px/);
+test('小さい説明と入口タイトルの隙間をなくし青い囲みを表示しない',()=>{
+  assert.match(page,/\.billing-system-entry\{margin-top:7px;padding:0;border:0;border-radius:0;background:transparent/);
   assert.match(page,/\.billing-system-entry-heading\{[^}]*margin-bottom:0;line-height:1\.2/);
   assert.match(page,/\.billing-system-entry \.link-row\{margin:0\}/);
   assert.match(page,/\.billing-system-entry \.open,\.billing-system-entry \.copy\{padding:6px 9px\}/);
@@ -80,7 +80,15 @@ test('PDFライブラリをPDF作成時だけ読み込む本番仕様を記録�
 
 test('共有設定にかかわらず請求作成アプリへの入口を表示する',()=>{
   const dailyEditor=fs.readFileSync(new URL('../registry-daily-links-editor.js',import.meta.url),'utf8');
-  assert.match(dailyEditor,/請求管理システムを開く/);
+  assert.match(dailyEditor,/請求システムを開く/);
   assert.match(dailyEditor,/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/);
-  assert.match(dailyEditor,/normalized\.unshift\(billing\)/);
+  assert.match(dailyEditor,/料金特別調整を開く/);
+  assert.match(dailyEditor,/請求書：作成・配信システムを開く/);
+  assert.doesNotMatch(dailyEditor,/請求管理システムを開く/);
+});
+
+test('請求カードから汎用の利用者向け入口を取り除く',()=>{
+  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
+  assert.match(script,/利用者向けアプリを開く/);
+  assert.match(script,/row\.remove\(\)/);
 });

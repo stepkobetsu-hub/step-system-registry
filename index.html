@@ -287,7 +287,7 @@ function unique(a){return [...new Set(a.filter(Boolean))].sort((x,y)=>x.localeCo
 function loadCardCustomization(){try{const value=JSON.parse(localStorage.getItem(CARD_CUSTOMIZATION_KEY)||'null');return value&&typeof value==='object'&&Array.isArray(value.order)&&value.cards&&typeof value.cards==='object'?value:{order:[],cards:{}}}catch(e){return {order:[],cards:{}}}}
 function cardCustomizationKey(item,index){const id=String(item?.['ID']||'').trim();if(id)return `id:${id}`;const name=String(item?.['システム名']||item?.['正式名称']||'').trim();const category=String(item?.['分類']||'').trim();return name?`name:${name}|${category}`:`index:${index}`}
 function defaultCardTitle(item){return item['ID']==='learning-progress'?'ステップ＆ゴール進捗管理':(item['システム名']||'名称未設定')}
-function cardDisplayValues(item){const key=item.__cardKey||cardCustomizationKey(item,item.__sourceIndex||0),saved=cardCustomization.cards[key]||{};return {key,title:Object.prototype.hasOwnProperty.call(saved,'title')?saved.title:defaultCardTitle(item),summary:Object.prototype.hasOwnProperty.call(saved,'summary')?saved.summary:(item['概要']||'')};}
+function cardDisplayValues(item){const key=item.__cardKey||cardCustomizationKey(item,item.__sourceIndex||0),saved=cardCustomization.cards[key]||{};let title=Object.prototype.hasOwnProperty.call(saved,'title')?saved.title:defaultCardTitle(item);if(item['ID']==='accounting-login-app'&&title==='経理ログイン管理')title='仕訳・経理：URL管理';return {key,title,summary:Object.prototype.hasOwnProperty.call(saved,'summary')?saved.summary:(item['概要']||'')};}
 function sortCustomizedCards(items){const positions=new Map(cardCustomization.order.map((key,index)=>[key,index]));return items.slice().sort((a,b)=>{const ai=positions.has(a.__cardKey)?positions.get(a.__cardKey):Number.MAX_SAFE_INTEGER,bi=positions.has(b.__cardKey)?positions.get(b.__cardKey):Number.MAX_SAFE_INTEGER;return ai-bi||a.__sourceIndex-b.__sourceIndex})}
 function canCustomizeCards(){return ['2','3','4'].includes(String(auth()?.permissionLevel||''))}
 function openCardSettings(){if(!canCustomizeCards())return;cardSettingsDraft=systems.map(item=>{const display=cardDisplayValues(item);return {key:item.__cardKey,item,title:display.title,summary:display.summary,defaultTitle:defaultCardTitle(item),defaultSummary:item['概要']||''}});renderCardSettings();document.getElementById('cardSettingsPanel').classList.remove('hidden');document.body.style.overflow='hidden';document.getElementById('closeCardSettings').focus()}
@@ -3108,9 +3108,12 @@ appendDailyLinks=function(item,article){
     const toggle=article.querySelector('.toggle');
     article.insertBefore(section,toggle||null);
   }
+  section.querySelectorAll('.link-row').forEach(row=>{
+    if(row.querySelector('.link-name')?.textContent.trim()==='利用者向けアプリを開く')row.remove();
+  });
   const entries=[
     ['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く',item['料金特別調整URL']],
-    ['学費計算・請求データ作成','請求管理システムを開く',item['請求管理システムURL']],
+    ['学費計算・請求データ作成','請求システムを開く',item['請求管理システムURL']],
     ['請求書配信・PDF作成','請求書：作成・配信システムを開く',item['請求書配信PDF作成URL']]
   ];
   entries.forEach(([description,label,url])=>{
@@ -3141,7 +3144,7 @@ addStandardContent=function(item,body){
 
 const billingSystemsCardStyle=document.createElement('style');
 billingSystemsCardStyle.textContent=`
-  .billing-system-entry{margin-top:7px;padding:6px 10px;border:1px solid #bdd2ee;border-radius:10px;background:#f7fbff}
+  .billing-system-entry{margin-top:7px;padding:0;border:0;border-radius:0;background:transparent}
   .billing-system-entry-heading{display:flex;align-items:baseline;flex-wrap:wrap;margin-bottom:0;line-height:1.2;color:#102a43}
   .billing-system-entry-heading span{font-size:12px;color:#627d98}
   .billing-system-entry .link-row{margin:0}
@@ -3447,7 +3450,7 @@ appendDailyLinks=function(item,article){
 (() => {
   const record={
     'ID':'accounting-login-app',
-    'システム名':'経理ログイン管理',
+    'システム名':'仕訳・経理：URL管理',
     '分類':'請求・会計',
     '状態':'本番使用中',
     '利用者':'スタッフ',
@@ -3462,7 +3465,7 @@ appendDailyLinks=function(item,article){
   };
   const base=organizeEntryImport;
   organizeEntryImport=function(items){
-    const list=base(items),index=list.findIndex(item=>item['ID']===record['ID']||String(item['システム名']||'')===record['システム名']);
+    const list=base(items),index=list.findIndex(item=>item['ID']===record['ID']||['経理ログイン管理',record['システム名']].includes(String(item['システム名']||'')));
     if(index>=0)list[index]=Object.assign({},list[index],record);else list.unshift(Object.assign({},record));
     return list;
   };
@@ -3474,7 +3477,7 @@ appendDailyLinks=function(item,article){
 
 <script id="accounting-login-favicon-20260907">
 (() => {
-  const targetName = '経理ログイン管理';
+  const targetName = '仕訳・経理：URL管理';
   const iconUrl = 'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon.png';
   function attachAccountingFavicon() {
     document.querySelectorAll('#cards .card, .card').forEach(card => {
@@ -3755,7 +3758,7 @@ applyAssetInfo=function(item){
 <script id="registry-canonical-32-card-view-20260914">
 (() => {
   const pinCanonicalCards=cards=>{
-    const priority=new Map([['請求システム',0],['経理ログイン管理',1]]);
+    const priority=new Map([['請求システム',0],['仕訳・経理：URL管理',1]]);
     return cards.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??2)-(priority.get(String(b.item['システム名']||''))??2)||a.index-b.index).map(entry=>entry.item);
   };
   const previousOrganize=organizeEntryImport;

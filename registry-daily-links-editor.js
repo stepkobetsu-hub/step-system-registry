@@ -59,10 +59,14 @@
     const ensureRequiredLinks=links=>{
       const normalized=clone(links);
       if(String(item?.['システム名']||'').trim()==='請求システム'){
-        const url='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
-        let billing=normalized.find(link=>link.openUrl===url||/請求管理システム|学費計算・請求データ作成/.test(link.title||''));
-        if(!billing){billing={title:'',openUrl:'',copyUrl:''};normalized.unshift(billing);}
-        billing.title='請求管理システムを開く';billing.openUrl=url;billing.copyUrl=url;
+        const adjustment='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments';
+        const billing='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
+        const delivery='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
+        return [
+          {title:'料金特別調整を開く',openUrl:adjustment,copyUrl:adjustment},
+          {title:'請求システムを開く',openUrl:billing,copyUrl:billing},
+          {title:'請求書：作成・配信システムを開く',openUrl:delivery,copyUrl:delivery}
+        ];
       }
       return normalized;
     };
