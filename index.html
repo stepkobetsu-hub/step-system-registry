@@ -3754,6 +3754,10 @@ applyAssetInfo=function(item){
 
 <script id="registry-canonical-32-card-view-20260914">
 (() => {
+  const pinCanonicalCards=cards=>{
+    const priority=new Map([['請求システム',0],['経理ログイン管理',1]]);
+    return cards.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??2)-(priority.get(String(b.item['システム名']||''))??2)||a.index-b.index).map(entry=>entry.item);
+  };
   const previousOrganize=organizeEntryImport;
   organizeEntryImport=function(items){
     const list=previousOrganize(items);
@@ -3771,9 +3775,10 @@ applyAssetInfo=function(item){
     if(reception)reception['読み取りURL']='https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html';
     const workspace=kept.find(item=>String(item['システム名']||'')==='STEP業務ホーム');
     if(workspace)workspace['旧版URL']='https://stepkobetsu-hub.github.io/step-hub/system/';
-    const priority=new Map([['請求システム',0],['経理ログイン管理',1]]);
-    return kept.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??2)-(priority.get(String(b.item['システム名']||''))??2)||a.index-b.index).map(entry=>entry.item);
+    return pinCanonicalCards(kept);
   };
+  const previousSort=sortCustomizedCards;
+  sortCustomizedCards=function(items){return pinCanonicalCards(previousSort(items));};
 })();
 </script>
 
