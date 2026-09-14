@@ -2,12 +2,17 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "子供用の時間制限アプリ",
+      "状態": "本番使用中",
+      "利用者向けURL": "https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/"
+    },
+    {
       "正式名称": "プリント書き込み消去・再印刷",
       "状態": "本番",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/print-handwriting-cleaner/"
     },
     {
-      "正式名称": "経理ログイン管理",
+      "正式名称": "仕訳・経理：URL管理",
       "状態": "本番使用中",
       "利用者向けURL": "https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec"
     },
@@ -97,11 +102,6 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher-portal/"
     },
     {
-      "正式名称": "講師初期登録アプリ",
-      "状態": "本番公開済（既存講師ログイン確認済）",
-      "利用者向けURL": "https://stepkobetsu-hub.github.io/teacher-portal/registration.html"
-    },
-    {
       "正式名称": "講師マスター／給与明細",
       "状態": "本番使用中",
       "利用者向けURL": "要確認"
@@ -119,11 +119,11 @@
     {
       "正式名称": "請求システム",
       "状態": "**Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）**",
-      "利用者向けURL": "**請求管理:** https://stepkobetsu-hub.github.io/invoice-pdf/#adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html"
+      "利用者向けURL": "**請求作成（学費計算・請求データ作成）:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec<br>**料金特別調整:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html"
     },
     {
       "正式名称": "お問い合わせ管理",
-      "状態": "本番使用中",
+      "状態": "本番使用中（反応リストJ・K列ハイフン対応済み）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-form/contact_form.html"
     },
     {

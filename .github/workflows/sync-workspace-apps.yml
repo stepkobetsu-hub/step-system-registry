@@ -1,0 +1,46 @@
+name: Sync STEP workspace app list
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - SYSTEM_REGISTRY.md
+      - scripts/generate-workspace-apps.mjs
+      - .github/workflows/sync-workspace-apps.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-step-workspace-apps
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate workspace app list from the registry
+        run: node scripts/generate-workspace-apps.mjs
+      - name: Verify generated JSON
+        run: node -e "const data=require('./workspace-apps.json'); if(!Array.isArray(data.apps)||!data.apps.length) process.exit(1)"
+      - name: Publish updated app list
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- workspace-apps.json; then
+            echo 'Workspace app list is already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add workspace-apps.json
+          git commit -m 'Sync STEP workspace app list from registry'
+          git push origin HEAD:main
