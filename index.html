@@ -3099,7 +3099,8 @@ organizeEntryImport=function(items){
 const appendBillingSystemsLinks20260901Base=appendDailyLinks;
 appendDailyLinks=function(item,article){
   appendBillingSystemsLinks20260901Base(item,article);
-  if(item['ID']!=='billing'||!Array.isArray(item['__billingSystems']))return;
+  const billingName=String(item['システム名']||item['正式名称']||'');
+  if(item['ID']!=='billing'&&billingName!=='請求システム')return;
   let section=article.querySelector('.daily-links');
   if(!section){
     section=el('section','daily-links');

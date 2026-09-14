@@ -16,6 +16,7 @@ test('請求関連の2システムを1枚の請求システムカードへまと
     'STEP請求書PDF作成・配信システム'
   ])assert.match(page,new RegExp(text));
   assert.ok(page.includes("name.includes('請求管理システム')"));
+  assert.match(page,/item\['ID'\]!==\s*'billing'&&billingName!==\s*'請求システム'/);
   assert.match(page,/filter\(\(item,index\)=>index!==managementIndex&&index!==deliveryIndex\)/);
   assert.match(page,/filtered\.splice\(insertAt,0,merged\)/);
 });
