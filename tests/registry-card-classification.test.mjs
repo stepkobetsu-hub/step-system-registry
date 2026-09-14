@@ -31,7 +31,7 @@ test('classification types can be added and their icon and color edited',()=>{
 });
 
 test('published page uses the classification editor cache key',()=>{
-  assert.match(index,/registry-editor\.js\?v=20260914-classification-row/);
+  assert.match(index,/registry-editor\.js\?v=20260914-stable-load/);
 });
 
 test('classification occupies the full card width and wraps only when needed',()=>{
@@ -45,4 +45,12 @@ test('search and filters call the latest decorated renderer',()=>{
   assert.match(index,/getElementById\('category'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
   assert.match(index,/getElementById\('status'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
   assert.match(index,/getElementById\('investigationFilter'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
+});
+
+test('initial shared settings are loaded once without replacing visible cards',()=>{
+  assert.match(editor,/__stepRegistryInitialSharedConfigPromise/);
+  assert.match(editor,/waitingForInitialSharedConfig=!hadCachedConfig/);
+  assert.match(editor,/最新の台帳を読み込んでいます/);
+  assert.match(editor,/次回表示から反映します/);
+  assert.doesNotMatch(editor,/config=nextConfig;\s*persistLocal\(\);\s*applyConfigToPortal\(\)/);
 });

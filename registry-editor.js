@@ -11,6 +11,11 @@
   let saving=false;
   let editingKey='';
   let typeDraft=null;
+  const hadCachedConfig=!!localStorage.getItem(LOCAL_KEY);
+  const initialSharedConfigPromise=window.__stepRegistryInitialSharedConfigPromise||(window.__stepRegistryInitialSharedConfigPromise=api('getWorkspaceConfig').catch(error=>({success:false,__networkError:error})));
+  let initialSharedRequestUsed=false;
+  let waitingForInitialSharedConfig=!hadCachedConfig;
+  let pendingPortalItems=null;
   const DEFAULT_AUDIENCE_TYPES=[
     {name:'講師',icon:'👨‍🏫',color:'#2563eb'},
     {name:'生徒',icon:'🎒',color:'#16a34a'},
@@ -169,13 +174,28 @@
     render();
   }
 
-  const baseShowPortal=showPortal;
-  showPortal=function(items){
+  function showRegistryLoading(){
+    document.getElementById('portal')?.classList.add('hidden');
+    let loading=document.getElementById('registryInitialLoading');
+    if(!loading){loading=document.createElement('section');loading.id='registryInitialLoading';loading.className='registry-initial-loading';loading.innerHTML='<span class="registry-loading-spinner" aria-hidden="true"></span><strong>最新の台帳を読み込んでいます…</strong><small>カードの内容を確定してから表示します</small>';document.querySelector('.shell>header')?.after(loading);}
+    loading.classList.remove('hidden');
+  }
+  function hideRegistryLoading(){document.getElementById('registryInitialLoading')?.classList.add('hidden');}
+  function renderPortalNow(items){
     syncLegacyCustomization();
     baseShowPortal(items);
     rawBaseSystems=baseSystems.map(item=>Object.assign({},item));
     applyConfigToPortal();
-    queueMicrotask(loadSharedConfig);
+    hideRegistryLoading();
+  }
+
+  const baseShowPortal=showPortal;
+  showPortal=function(items){
+    if(waitingForInitialSharedConfig){
+      pendingPortalItems=items;showRegistryLoading();queueMicrotask(()=>loadSharedConfig(true));return;
+    }
+    renderPortalNow(items);
+    queueMicrotask(()=>loadSharedConfig(true));
   };
 
   const baseRender=render;
@@ -199,23 +219,29 @@
     const target=document.getElementById('registryEditorSync');
     if(target){target.textContent=message;target.dataset.state=state||'';}
   }
-  async function loadSharedConfig(){
+  async function loadSharedConfig(useBootstrap=false){
     try{
-      const result=await api('getWorkspaceConfig');
-      if(!result?.success)return;
+      const result=useBootstrap&&!initialSharedRequestUsed?(initialSharedRequestUsed=true,await initialSharedConfigPromise):await api('getWorkspaceConfig');
+      if(!result?.success)throw result?.__networkError||new Error(result?.error||'共有設定を取得できませんでした。');
       sharedEnvelope=result.sharedState&&typeof result.sharedState==='object'?clone(result.sharedState):{};
       sharedVersion=Number(result.version||0);
       if(sharedEnvelope.registryConfig&&!dirtySinceSharedLoad){
-        config=normalizeConfig(sharedEnvelope.registryConfig);
+        const nextConfig=normalizeConfig(sharedEnvelope.registryConfig);
+        const changed=JSON.stringify(nextConfig)!==JSON.stringify(config);
+        config=nextConfig;
         persistLocal();
-        applyConfigToPortal();
-        setSync(`全パソコンで共有中（版 ${sharedVersion}）`,'ready');
+        if(waitingForInitialSharedConfig&&pendingPortalItems){waitingForInitialSharedConfig=false;const items=pendingPortalItems;pendingPortalItems=null;renderPortalNow(items);}
+        setSync(changed&&rawBaseSystems?'最新設定を保存しました。次回表示から反映します':`全パソコンで共有中（版 ${sharedVersion}）`,'ready');
       }else if(sharedEnvelope.registryConfig){
         setSync('この端末の変更を保存待ちです','saving');
       }else{
+        if(waitingForInitialSharedConfig&&pendingPortalItems){waitingForInitialSharedConfig=false;const items=pendingPortalItems;pendingPortalItems=null;renderPortalNow(items);}
         setSync('編集すると全パソコンへ共有されます','local');
       }
-    }catch(_){setSync('現在はこの端末の設定を表示しています','error');}
+    }catch(_){
+      if(waitingForInitialSharedConfig&&pendingPortalItems){waitingForInitialSharedConfig=false;const items=pendingPortalItems;pendingPortalItems=null;renderPortalNow(items);}
+      setSync('現在はこの端末に保存された設定を表示しています','error');
+    }
   }
   function scheduleSharedSave(){
     clearTimeout(saveTimer);
@@ -252,7 +278,7 @@
     const style=document.createElement('style');
     style.id='registry-editor-style';
     style.textContent=`
-      .registry-card-edit{border:1px solid #bfd4f6;background:#edf4ff;color:#1d4ed8;border-radius:8px;padding:5px 9px;font-weight:800;cursor:pointer;white-space:nowrap}.registry-classification{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;margin:9px 0 2px}.registry-classification-group{display:inline-flex;flex-wrap:nowrap;gap:5px;align-items:center;white-space:nowrap}.registry-classification-label{font-size:11px;font-weight:900;color:#627d98;margin-right:1px}.registry-classification-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid color-mix(in srgb,var(--badge-color) 38%,white);border-radius:999px;background:color-mix(in srgb,var(--badge-color) 10%,white);color:var(--badge-color);font-size:12px;font-weight:900;line-height:1.25;white-space:nowrap}
+      .registry-card-edit{border:1px solid #bfd4f6;background:#edf4ff;color:#1d4ed8;border-radius:8px;padding:5px 9px;font-weight:800;cursor:pointer;white-space:nowrap}.registry-classification{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;margin:9px 0 2px}.registry-classification-group{display:inline-flex;flex-wrap:nowrap;gap:5px;align-items:center;white-space:nowrap}.registry-classification-label{font-size:11px;font-weight:900;color:#627d98;margin-right:1px}.registry-classification-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid color-mix(in srgb,var(--badge-color) 38%,white);border-radius:999px;background:color-mix(in srgb,var(--badge-color) 10%,white);color:var(--badge-color);font-size:12px;font-weight:900;line-height:1.25;white-space:nowrap}.registry-initial-loading{display:flex;min-height:220px;flex-direction:column;align-items:center;justify-content:center;gap:9px;margin-top:24px;border:1px solid #d8e2ec;border-radius:16px;background:#fff;color:#102a43;box-shadow:0 6px 20px rgba(16,42,67,.06)}.registry-initial-loading small{color:#627d98}.registry-loading-spinner{width:34px;height:34px;border:4px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:registry-spin .8s linear infinite}@keyframes registry-spin{to{transform:rotate(360deg)}}
       .registry-editor-panel,.registry-card-form-panel,.registry-type-panel{position:fixed;inset:0;background:rgba(15,35,55,.6);z-index:80;padding:18px;overflow:auto}
       .registry-editor-dialog{width:min(1120px,100%);margin:0 auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.28)}
       .registry-editor-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.registry-editor-head h2{margin:0;color:#102a43}.registry-editor-head p{margin:5px 0 0;color:#627d98}
@@ -326,7 +352,7 @@
     renderManagementList();
     document.getElementById('registryEditorPanel').classList.remove('hidden');
     document.body.style.overflow='hidden';
-    loadSharedConfig();
+    loadSharedConfig(false);
   }
   function closeManagement(){document.getElementById('registryEditorPanel').classList.add('hidden');document.body.style.overflow='';}
   function renderManagementList(){

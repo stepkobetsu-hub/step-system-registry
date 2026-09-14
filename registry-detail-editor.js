@@ -3,6 +3,7 @@
 
   const LOCAL_KEY='stepSystemRegistryDetailLinksV1';
   const SHARED_KEY='registryDetailLinksConfig';
+  const hadCachedConfig=!!localStorage.getItem(LOCAL_KEY);
   let config=loadLocal();
   let editingKey='';
   let draft=[];
@@ -103,7 +104,7 @@
 
   function setSync(text,state){const el=document.getElementById('registryDetailSync');if(el){el.textContent=text;el.dataset.state=state||'';}}
   async function loadShared(){
-    try{const result=await api('getWorkspaceConfig');if(!result?.success)return;const remote=result.sharedState?.[SHARED_KEY];if(remote&&!dirtySinceSharedLoad){config=normalizeConfig(remote);persistLocal();render();setSync('全パソコンで共有中','ready');}else if(remote)setSync('この端末の変更を保存待ちです','saving');else setSync('編集内容は保存時に全パソコンへ共有されます','local');}
+    try{const result=await (window.__stepRegistryInitialSharedConfigPromise||api('getWorkspaceConfig'));if(!result?.success)return;const remote=result.sharedState?.[SHARED_KEY];if(remote&&!dirtySinceSharedLoad){config=normalizeConfig(remote);persistLocal();if(!hadCachedConfig)render();setSync(hadCachedConfig?'最新設定を保存しました。次回表示から反映します':'全パソコンで共有中','ready');}else if(remote)setSync('この端末の変更を保存待ちです','saving');else setSync('編集内容は保存時に全パソコンへ共有されます','local');}
     catch(_){setSync('現在はこの端末の設定を表示しています','error');}
   }
   function scheduleSharedSave(){clearTimeout(saveTimer);setSync('全パソコンへ保存待ち…','saving');saveTimer=setTimeout(saveShared,650);}

@@ -3,6 +3,7 @@
 
   const LOCAL_KEY='stepSystemRegistryDailyLinksV1';
   const SHARED_KEY='registryDailyLinksConfig';
+  const hadCachedConfig=!!localStorage.getItem(LOCAL_KEY);
   let config=loadLocal();
   let editingKey='';
   let draft=[];
@@ -126,9 +127,9 @@
   }
   async function loadShared(){
     try{
-      const result=await api('getWorkspaceConfig');if(!result?.success)return;
+      const result=await (window.__stepRegistryInitialSharedConfigPromise||api('getWorkspaceConfig'));if(!result?.success)return;
       const remote=result.sharedState?.[SHARED_KEY];
-      if(remote&&!dirtySinceSharedLoad){config=normalizeConfig(remote);persistLocal();render();setSync('全パソコンで共有中','ready');}
+      if(remote&&!dirtySinceSharedLoad){config=normalizeConfig(remote);persistLocal();if(!hadCachedConfig)render();setSync(hadCachedConfig?'最新設定を保存しました。次回表示から反映します':'全パソコンで共有中','ready');}
       else if(remote){setSync('この端末の変更を保存待ちです','saving');}
       else setSync('編集内容は保存時に全パソコンへ共有されます','local');
     }catch(_){setSync('現在はこの端末の設定を表示しています','error');}
