@@ -55,9 +55,19 @@
     }).filter(link=>link.title||link.openUrl);
   }
   function linksForKey(key,article){
+    const item=systems.find(entry=>itemKey(entry)===key);
+    const ensureRequiredLinks=links=>{
+      const normalized=clone(links);
+      if(String(item?.['システム名']||'').trim()==='請求システム'){
+        const url='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
+        let billing=normalized.find(link=>link.openUrl===url||/請求管理システム|学費計算・請求データ作成/.test(link.title||''));
+        if(!billing){billing={title:'',openUrl:'',copyUrl:''};normalized.unshift(billing);}
+        billing.title='請求作成（学費計算・請求データ作成）を開く';billing.openUrl=url;billing.copyUrl=url;
+      }
+      return normalized;
+    };
     if(hasOverride(key)){
       const links=clone(config.cards[key]);
-      const item=systems.find(entry=>itemKey(entry)===key);
       if(String(item?.['システム名']||'').includes('講師ポータル')){
         const url='https://stepkobetsu-hub.github.io/teacher-portal/registration.html';
         if(!links.some(link=>link.openUrl===url)){
@@ -65,9 +75,9 @@
           links.splice(index<0?links.length:index+1,0,{title:'講師初期登録アプリ',openUrl:url,copyUrl:url});
         }
       }
-      return links;
+      return ensureRequiredLinks(links);
     }
-    return captureRenderedLinks(article||findArticleForKey(key));
+    return ensureRequiredLinks(captureRenderedLinks(article||findArticleForKey(key)));
   }
 
   function ensureDailySection(article){

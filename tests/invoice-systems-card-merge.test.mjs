@@ -61,7 +61,7 @@ test('小さい説明と入口タイトルの隙間をなくし枠を低くす�
 });
 
 test('台帳本文も請求システム1行として記録する',()=>{
-  assert.match(registry,/\| 請求システム \| \*\*Cloudflare完全統合・本番稼働中（本番送信は無効）\*\* \|/);
+  assert.match(registry,/\| 請求システム \| \*\*Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）\*\* \|/);
   assert.doesNotMatch(registry,/^\| 請求管理システムV3\.1/m);
   assert.doesNotMatch(registry,/^\| STEP請求書PDF作成・配信システム/m);
   assert.match(registry,/請求・会計（3件）/);
@@ -75,4 +75,11 @@ test('PDFライブラリをPDF作成時だけ読み込む本番仕様を記録�
   assert.match(page,/c167d71715d70fe917d40a665edba4c1c40bdf64/);
   assert.match(registry,/請求書作成・配信：PDFライブラリ遅延読込（2026-09-03）/);
   assert.match(registry,/最初のPDF作成時だけライブラリ取得時間が加わる/);
+});
+
+test('共有設定にかかわらず請求作成アプリへの入口を表示する',()=>{
+  const dailyEditor=fs.readFileSync(new URL('../registry-daily-links-editor.js',import.meta.url),'utf8');
+  assert.match(dailyEditor,/請求作成（学費計算・請求データ作成）を開く/);
+  assert.match(dailyEditor,/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/);
+  assert.match(dailyEditor,/normalized\.unshift\(billing\)/);
 });
