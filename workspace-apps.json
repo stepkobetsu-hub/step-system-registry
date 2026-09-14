@@ -119,7 +119,7 @@
     {
       "正式名称": "請求システム",
       "状態": "**Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）**",
-      "利用者向けURL": "**請求作成（学費計算・請求データ作成）:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec<br>**料金特別調整:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html"
+      "利用者向けURL": "**高速ホーム（閲覧専用・保存/送信なし）:** https://stepkobetsu-hub.github.io/invoice-pdf/billing-home.html<br>**請求作成（学費計算・請求データ作成）:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec<br>**料金特別調整:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html"
     },
     {
       "正式名称": "お問い合わせ管理",
