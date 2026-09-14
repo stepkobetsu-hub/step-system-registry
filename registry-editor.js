@@ -252,7 +252,7 @@
     const style=document.createElement('style');
     style.id='registry-editor-style';
     style.textContent=`
-      .registry-card-edit{border:1px solid #bfd4f6;background:#edf4ff;color:#1d4ed8;border-radius:8px;padding:5px 9px;font-weight:800;cursor:pointer;white-space:nowrap}.registry-classification{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.registry-classification-group{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.registry-classification-label{font-size:11px;font-weight:900;color:#627d98;margin-right:1px}.registry-classification-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid color-mix(in srgb,var(--badge-color) 38%,white);border-radius:999px;background:color-mix(in srgb,var(--badge-color) 10%,white);color:var(--badge-color);font-size:12px;font-weight:900;line-height:1.25;white-space:nowrap}
+      .registry-card-edit{border:1px solid #bfd4f6;background:#edf4ff;color:#1d4ed8;border-radius:8px;padding:5px 9px;font-weight:800;cursor:pointer;white-space:nowrap}.registry-classification{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;width:100%;margin:9px 0 2px}.registry-classification-group{display:inline-flex;flex-wrap:nowrap;gap:5px;align-items:center;white-space:nowrap}.registry-classification-label{font-size:11px;font-weight:900;color:#627d98;margin-right:1px}.registry-classification-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid color-mix(in srgb,var(--badge-color) 38%,white);border-radius:999px;background:color-mix(in srgb,var(--badge-color) 10%,white);color:var(--badge-color);font-size:12px;font-weight:900;line-height:1.25;white-space:nowrap}
       .registry-editor-panel,.registry-card-form-panel,.registry-type-panel{position:fixed;inset:0;background:rgba(15,35,55,.6);z-index:80;padding:18px;overflow:auto}
       .registry-editor-dialog{width:min(1120px,100%);margin:0 auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.28)}
       .registry-editor-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.registry-editor-head h2{margin:0;color:#102a43}.registry-editor-head p{margin:5px 0 0;color:#627d98}
@@ -306,15 +306,15 @@
     document.querySelectorAll('#cards .card').forEach(article=>{
       const item=systems.find(system=>cardAnchor(system)===article.id);
       if(!item)return;
-      const titleWrap=article.querySelector('.card-title-wrap');
-      if(titleWrap&&!titleWrap.querySelector('.registry-classification')){
+      const head=article.querySelector('.card-head');
+      if(head&&!article.querySelector(':scope > .registry-classification')){
         const classification=classificationForItem(item);
         const holder=document.createElement('div');holder.className='registry-classification';
         const audienceGroup=document.createElement('span');audienceGroup.className='registry-classification-group';
         const audienceLabel=document.createElement('span');audienceLabel.className='registry-classification-label';audienceLabel.textContent='使う人';audienceGroup.append(audienceLabel,...classification.audiences.map(name=>badge('audience',name)));
         const purposeGroup=document.createElement('span');purposeGroup.className='registry-classification-group';
         const purposeLabel=document.createElement('span');purposeLabel.className='registry-classification-label';purposeLabel.textContent='種類';purposeGroup.append(purposeLabel,badge('purpose',classification.purpose));
-        holder.append(audienceGroup,purposeGroup);titleWrap.append(holder);
+        holder.append(audienceGroup,purposeGroup);head.after(holder);
       }
       if(!article.querySelector('.registry-card-edit')){
         const button=document.createElement('button');button.type='button';button.className='registry-card-edit';button.textContent='✎ 編集';button.addEventListener('click',()=>openCardForm(item.__cardKey));

@@ -31,5 +31,11 @@ test('classification types can be added and their icon and color edited',()=>{
 });
 
 test('published page uses the classification editor cache key',()=>{
-  assert.match(index,/registry-editor\.js\?v=20260914-classification/);
+  assert.match(index,/registry-editor\.js\?v=20260914-classification-row/);
+});
+
+test('classification occupies the full card width and wraps only when needed',()=>{
+  assert.match(editor,/\.registry-classification\{[^}]*flex-wrap:wrap[^}]*width:100%/);
+  assert.match(editor,/\.registry-classification-group\{[^}]*flex-wrap:nowrap/);
+  assert.match(editor,/head\.after\(holder\)/);
 });
