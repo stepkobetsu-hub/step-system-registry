@@ -28,6 +28,12 @@
     @media(max-width:900px){#portal:not(.hidden){grid-template-columns:210px minmax(0,1fr);gap:14px}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{grid-column:1/-1}.card-settings-fields{grid-template-columns:1fr}}
     @media(max-width:780px){header{display:block}.top-actions{margin-top:12px}#portal:not(.hidden){display:block}.registry-mobile-menu{display:inline-flex;align-items:center;gap:7px;margin:0 0 10px}.registry-sidebar{position:fixed;inset:0 auto 0 0;z-index:60;width:246px;max-height:none;border:0;border-radius:0;transform:translateX(-102%);transition:transform .2s}.registry-sidebar.is-open{transform:translateX(0)}.registry-sidebar-backdrop.is-open{position:fixed;inset:0;z-index:55;display:block;border:0;background:rgba(15,35,55,.42)}.grid{grid-template-columns:1fr}.link-row{grid-template-columns:1fr auto}.link-row .copy{grid-column:2}.shell{width:min(100% - 20px,1180px)}.flow{flex-direction:column}.flow-arrow{transform:rotate(90deg)}.card{padding:15px}.card-head{flex-direction:column}.status{align-self:flex-start}.investigation-item dl{grid-template-columns:1fr}.investigation-item dd{margin-bottom:4px}.investigation-panel,.card-settings-panel{padding:8px}.investigation-dialog,.card-settings-dialog{padding:15px}.card-settings-actions{margin:16px -15px -15px;padding:12px 15px}.investigation-filters,.investigation-form-grid{grid-template-columns:1fr}.investigation-field.full{grid-column:auto}}
   </style>
+  <style>
+    @media(min-width:781px){
+      .shell{width:min(1800px,calc(100% - 40px))}
+      #portal:not(.hidden){grid-template-columns:250px minmax(0,1fr);gap:20px}
+    }
+  </style>
 </head>
 <body>
   <main class="shell">

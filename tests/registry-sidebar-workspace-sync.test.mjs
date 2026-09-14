@@ -19,6 +19,11 @@ test('種類の追加・色・アイコン設定が左側一覧にも反映さ�
   assert.match(editor,/type\.icon/);
 });
 
+test('パソコンでは台帳を画面幅いっぱいに広げる',()=>{
+  assert.match(html,/\.shell\{width:min\(1800px,calc\(100% - 40px\)\)\}/);
+  assert.match(html,/grid-template-columns:250px minmax\(0,1fr\);gap:20px/);
+});
+
 test('台帳の正式一覧を業務ホーム用JSONへ自動出力する',()=>{
   assert.match(workflow,/SYSTEM_REGISTRY\.md/);
   assert.match(workflow,/node scripts\/generate-workspace-apps\.mjs/);
