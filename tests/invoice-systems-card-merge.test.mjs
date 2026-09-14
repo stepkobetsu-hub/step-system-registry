@@ -79,7 +79,7 @@ test('PDFライブラリをPDF作成時だけ読み込む本番仕様を記録�
 
 test('共有設定にかかわらず請求作成アプリへの入口を表示する',()=>{
   const dailyEditor=fs.readFileSync(new URL('../registry-daily-links-editor.js',import.meta.url),'utf8');
-  assert.match(dailyEditor,/請求作成（学費計算・請求データ作成）を開く/);
+  assert.match(dailyEditor,/請求管理システムを開く/);
   assert.match(dailyEditor,/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/);
   assert.match(dailyEditor,/normalized\.unshift\(billing\)/);
 });

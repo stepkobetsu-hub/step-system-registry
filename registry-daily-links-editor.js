@@ -62,7 +62,7 @@
         const url='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
         let billing=normalized.find(link=>link.openUrl===url||/請求管理システム|学費計算・請求データ作成/.test(link.title||''));
         if(!billing){billing={title:'',openUrl:'',copyUrl:''};normalized.unshift(billing);}
-        billing.title='請求作成（学費計算・請求データ作成）を開く';billing.openUrl=url;billing.copyUrl=url;
+        billing.title='請求管理システムを開く';billing.openUrl=url;billing.copyUrl=url;
       }
       return normalized;
     };

@@ -592,9 +592,9 @@ async function copyUrl(url){try{await navigator.clipboard.writeText(url)}catch(e
 function el(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node}
 </script>
 <script>
-const applyAssetInfoBase=applyAssetInfo;
+const applyAssetInfoEnrichedBase=applyAssetInfo;
 applyAssetInfo=function(item){
-  const base=applyAssetInfoBase(item);const name=String(base['システム名']||'');const patch={};
+  const base=applyAssetInfoEnrichedBase(item);const name=String(base['システム名']||'');const patch={};
   if(name.includes('成績管理'))Object.assign(patch,{
     '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html',
     '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
@@ -3748,6 +3748,31 @@ applyAssetInfo=function(item){
    }
    return list;
  };
+})();
+</script>
+
+<script id="registry-canonical-32-card-view-20260914">
+(() => {
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=previousOrganize(items);
+    const excludedIds=new Set(['step-invoice-pdf','teacher-timetable-master-input']);
+    const excludedNames=new Set(['エントリーシート読み取り','STEP請求書PDF作成・配信システム','STEP統合管理ポータル','時間割マスタ入力']);
+    const seenNames=new Set();
+    const kept=list.filter(item=>{
+      const id=String(item['ID']||'').trim();
+      const name=String(item['システム名']||item['正式名称']||'').trim();
+      if(excludedIds.has(id)||excludedNames.has(name)||seenNames.has(name))return false;
+      seenNames.add(name);
+      return true;
+    });
+    const reception=kept.find(item=>String(item['システム名']||'').includes('受付カード・エントリーシート読み取り'));
+    if(reception)reception['読み取りURL']='https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html';
+    const workspace=kept.find(item=>String(item['システム名']||'')==='STEP業務ホーム');
+    if(workspace)workspace['旧版URL']='https://stepkobetsu-hub.github.io/step-hub/system/';
+    const priority=new Map([['請求システム',0],['経理ログイン管理',1]]);
+    return kept.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??2)-(priority.get(String(b.item['システム名']||''))??2)||a.index-b.index).map(entry=>entry.item);
+  };
 })();
 </script>
 
