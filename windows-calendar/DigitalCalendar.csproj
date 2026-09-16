@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>DigitalCalendar</AssemblyName>
+    <RootNamespace>DigitalCalendar</RootNamespace>
+    <ApplicationIcon>calendar.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Company>個別指導STEP</Company>
+    <Product>デジタルカレンダー</Product>
+    <Description>個別指導STEP デジタルカレンダー Windows版</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+</Project>
