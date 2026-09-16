@@ -5,6 +5,10 @@ on:
     paths:
       - "windows-calendar/**"
       - ".github/workflows/build-digital-calendar-windows.yml"
+  pull_request:
+    paths:
+      - "windows-calendar/**"
+      - ".github/workflows/build-digital-calendar-windows.yml"
   workflow_dispatch:
 
 permissions:
@@ -28,6 +32,7 @@ jobs:
           name: DigitalCalendarSetup
           path: downloads/DigitalCalendarSetup.exe
       - name: Publish direct download file
+        if: github.event_name == 'push'
         shell: powershell
         run: |
           git config user.name "github-actions[bot]"
