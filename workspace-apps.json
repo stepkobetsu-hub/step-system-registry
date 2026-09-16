@@ -3,8 +3,8 @@
   "apps": [
     {
       "正式名称": "デジタルカレンダー",
-      "状態": "本番公開中（Fire 7 第12世代向け）",
-      "利用者向けURL": "https://fire-digital-calendar.mintcocoajasmine.chatgpt.site"
+      "状態": "本番公開中（Fire 7／Windows 10・11）",
+      "利用者向けURL": "Web版: https://fire-digital-calendar.mintcocoajasmine.chatgpt.site<br>Windows版: https://stepkobetsu-hub.github.io/step-system-registry/downloads/DigitalCalendarSetup.exe"
     },
     {
       "正式名称": "子供用の時間制限アプリ",
