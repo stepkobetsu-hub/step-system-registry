@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-14
+最終更新: 2026-09-16
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -32,6 +32,7 @@
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
+| デジタルカレンダー | 本番公開中（Fire 7 第12世代向け） | https://fire-digital-calendar.mintcocoajasmine.chatgpt.site | GitHub公開正本なし（ChatGPT Sites管理） | 該当なし | ChatGPT Sites管理ソース、`dist/index.html`、`dist/app.js`、`dist/style.css`、`dist/sw.js` | ChatGPT Sites＋Googleカレンダー閲覧専用連携＋予定日取得用Apps Script | ChatGPT Sitesのソースを更新して新版を公開。Fire 7のSilk／Chromeで再読み込みし、表示・予定・点灯維持を確認 | 2026-09-16 | Googleカレンダーを書き換えない閲覧専用アプリ。既定は「日付のみ」と画面点灯6時間。設定で予定表示、白黒テーマ、秒表示、時計幅、点灯時間／常時点灯を変更可能 |
 | 子供用の時間制限アプリ | 本番使用中 | https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/ | [smartphone-time-manager](https://github.com/stepkobetsu-hub/smartphone-time-manager) | `main` | Androidアプリ `project/app/src/main/`、保護者用Web管理画面、ChatGPT Sites Worker、D1設定DB | Jelly 2（Android 11）＋パソコン／Pixel 9aのブラウザ＋ChatGPT Sites＋D1 | Android変更はGitHub `main`へ反映してAPKを自動ビルド。保護者用管理画面と接続版APKを同じSites URLへ公開し、Jelly 2へ上書き更新 | 2026-09-14 | Family Link／Kidsloxが利用できなかったため作成した専用アプリ。設定画面は保護者PINで保護し、アプリを離れるたび再認証。秘密値・暗証番号・端末接続トークンは台帳へ記載しない |
 | プリント書き込み消去・再印刷 | 本番 | https://stepkobetsu-hub.github.io/print-handwriting-cleaner/ | [print-handwriting-cleaner](https://github.com/stepkobetsu-hub/print-handwriting-cleaner) | `main` | `public/index.html`、`public/app.js`、`public/styles.css`、`src/index.ts` | GitHub Pages＋ブラウザ内画像処理。画像は端末外へ送信・保存しない | `main`へ反映後、Pagesの公開とスマホ撮影・処理前後比較・A4印刷を確認 | 2026-09-09 | Issue #36。印刷内容の再生成を行わず、色・輝度・局所構造から手書き候補だけを復元。3段階強度、手動仕上げ、縦横自動判定を備える |
 | 仕訳・経理：URL管理 | 本番使用中 | https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec | [step-system-registry/accounting-login-app](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app) | `main` | `accounting-login-app/Code.gs`、`accounting-login-app/Index.html`、Google Sheet「経理ログイン管理マスター」 | GitHub＋Google Apps Script＋Google Sheet＋UserProperties | GitHub正本を既存Apps Scriptプロジェクトへ同期し、既存デプロイID／URLを維持して新バージョンへ更新 | 2026-09-14 | Apps Script v7。PW本体はSheet／GitHubへ保存せずGoogleアカウント別UserPropertiesへ保存。L列「表示順」を全PC共通の正本とする |
@@ -60,6 +61,22 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・43カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-23 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、証憑自動回収を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+
+## デジタルカレンダー：本番仕様
+
+- **用途:** 余っているAmazon Fire 7（第12世代）を、Googleカレンダーと連携する卓上デジタル時計・月間カレンダーとして利用する。
+- **本番URL:** https://fire-digital-calendar.mintcocoajasmine.chatgpt.site
+- **公開・更新基盤:** ChatGPT Sites。GitHub Pagesではない。変更時はSites管理ソースを更新し、保存した新版を本番公開する。
+- **Google連携:** 運用Googleカレンダーを閲覧専用で表示する。予定の追加・変更・削除は行わない。日付セルを押すと、その日1日分の予定を画面のほぼ全体に大きく一覧表示し、予定が多い場合は画面内をスクロールできる。
+- **初期表示:** 「日付のみ」。右上の「スケジュール」「日付のみ」で表示を切り替える。ボタンは7インチ画面でも識別できる表示とする。
+- **予定表示:** 右下は「予定」と表示し、Googleカレンダーから本日の予定を表示する。予定がなければ「-」。日付のみ表示では、予定がある日だけ日付の下に点を表示する。予定日一覧は閲覧専用Apps Scriptから取得し、端末へ短時間キャッシュする。
+- **カレンダー操作:** 左右スワイプで前月・次月へ移動。5分間操作がなければ当月へ自動復帰する。年月、令和年（年月の右側）、曜日、日付、時計、予定はFire 7で読める大きさを優先する。
+- **時計表示:** 時・分を大きく表示し、秒は分の右下付近へ小さく表示する。時計とカレンダーの境界をスライドして幅を変更できる。
+- **外観設定:** 黒ベース／白ベース、秒表示、明るさ、時計幅、初期表示を設定できる。
+- **画面点灯設定:** 既定は6時間。オフ、1時間、3時間、6時間、8時間、12時間、24時間、常につけておく、から選択して保存できる。「常につけておく」はページが前面表示されている間、ブラウザーのScreen Wake Lockを再取得して点灯維持する。Fire OSの省電力設定が優先される場合がある。
+- **導入方法:** 本番URLをQRコードにし、Fire 7のSilkまたはChromeで開く。更新後は一度再読み込みし、必要に応じてホーム画面へ追加する。
+- **注意事項:** Googleアカウントの認証情報、アクセストークン、カレンダーの非公開予定内容は台帳へ記載しない。画面点灯維持は対応ブラウザーとFire OSの制御範囲内で動作する。
+- **確認日:** 2026年9月16日。Sites版16を本番公開済み。
 
 ## 子供用の時間制限アプリ：本番仕様
 

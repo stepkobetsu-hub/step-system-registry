@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "デジタルカレンダー",
+      "状態": "本番公開中（Fire 7 第12世代向け）",
+      "利用者向けURL": "https://fire-digital-calendar.mintcocoajasmine.chatgpt.site"
+    },
+    {
       "正式名称": "子供用の時間制限アプリ",
       "状態": "本番使用中",
       "利用者向けURL": "https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/"
