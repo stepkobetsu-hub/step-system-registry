@@ -3869,5 +3869,47 @@ applyAssetInfo=function(item){
   };
 })();
 </script>
+
+<script id="teacher-qr-rendering-sync-20260917">
+(() => {
+  const previousOrganize = organizeEntryImport;
+  const addUnique = (item, key, values) => {
+    const current = Array.isArray(item[key]) ? item[key].slice() : (item[key] ? [String(item[key])] : []);
+    values.forEach(value => { if(!current.includes(value)) current.push(value); });
+    item[key] = current;
+  };
+  organizeEntryImport = function(items) {
+    const list = previousOrganize(items);
+    const qr = list.find(item => item['ID'] === 'qr-register' || String(item['システム名'] || item['正式名称'] || '').includes('出退くんQR作成・読取'));
+    if(qr) {
+      qr['講師QR表示仕様'] = '講師マスターQ列の登録値をQR化する。管理画面の登録済みQR表示・新規発行後表示・PDFメール送信、および講師ポータルの出退くんQRは誤り訂正レベルMに統一。マスクパターンは生成側が自動選択するため、同じ登録値でも名札と模様が異なる場合がある。模様ではなく復号結果と実機受付で確認する。';
+      qr['確認日'] = '2026年9月17日';
+      qr['確認状況'] = '名札QRと講師ポータルQRの両方について、入口のAndroidタブレットで出勤・退勤が正常に受け付けられることを利用者が実機確認済み。';
+      qr['詳細記録'] = 'docs/teacher-qr-rendering-sync-20260917.md';
+      addUnique(qr, '確認済み事項', ['講師QR表示の誤り訂正レベルMへの統一','名札QRのAndroidタブレット出勤・退勤受付','講師ポータルQRのAndroidタブレット出勤・退勤受付','QRの模様が異なっても復号結果が同一であることの確認']);
+      addUnique(qr, '更新履歴', ['2026年9月17日：講師QRの表示方式を確認し、管理画面と講師ポータルを誤り訂正レベルMへ統一。名札版・講師ポータル版とも出勤・退勤の実機受付に成功。']);
+    }
+    const badge = list.find(item => item['ID'] === 'teacher-name-badge-print' || String(item['システム名'] || item['正式名称'] || '') === '講師名札印刷');
+    if(badge) {
+      badge['QR実機確認'] = '2026年9月17日、名札QRを入口のAndroidタブレットへかざし、出勤・退勤の両方が正常受付されることを利用者が確認。';
+      badge['確認日'] = '2026年9月17日';
+      badge['確認状況'] = '本番反映・表示・名札QRの出勤／退勤実機受付を確認済み。ログイン保持設定と7091印刷確認は別途継続。';
+      badge['詳細記録'] = 'docs/teacher-qr-rendering-sync-20260917.md';
+      addUnique(badge, '確認済み事項', ['名札QRのAndroidタブレット出勤受付','名札QRのAndroidタブレット退勤受付']);
+      addUnique(badge, '更新履歴', ['2026年9月17日：名札QRと講師ポータルQRの復号結果を照合し、名札QRの出勤・退勤実機受付を確認。']);
+    }
+    const portal = list.find(item => item['ID'] === 'teacher-portal' || String(item['システム名'] || item['正式名称'] || '') === '講師ポータル');
+    if(portal) {
+      portal['出退くんQR表示'] = '講師マスターQ列の登録値を誤り訂正レベルMでQR化。名札と模様が異なる場合があるが、復号結果は同一。';
+      portal['出退くんQR実機確認'] = '2026年9月17日、入口のAndroidタブレットで出勤・退勤の両方が正常受付されることを利用者が確認。';
+      portal['確認日'] = '2026年9月17日';
+      portal['詳細記録'] = 'docs/teacher-qr-rendering-sync-20260917.md';
+      addUnique(portal, '確認済み事項', ['講師ポータルQRの誤り訂正レベルM表示','講師ポータルQRのAndroidタブレット出勤受付','講師ポータルQRのAndroidタブレット退勤受付']);
+      addUnique(portal, '更新履歴', ['2026年9月17日：出退くんQRを誤り訂正レベルMへ変更し、JavaScriptのキャッシュ版を更新。出勤・退勤の実機受付を確認。']);
+    }
+    return list;
+  };
+})();
+</script>
 </body>
 </html>
