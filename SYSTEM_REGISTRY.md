@@ -434,6 +434,9 @@
 
 ## 登録詳細：講師ポータル
 
+- 2026-09-17 講師ポータル専用アイコンへ変更。緑系・先生＋黒板モチーフ。生徒用との識別性改善
+- アイコン正本: `teacher-portal/images/teacher-portal-icon.svg`。PNGは512px／192px／32pxで統一。カードは `https://stepkobetsu-hub.github.io/teacher-portal/images/app-icon-192.png?v=20260917-teacher-green` を使用。
+
 - ID: `teacher-portal`
 - 状態: 本番使用中
 - 利用者向けURL: https://stepkobetsu-hub.github.io/teacher-portal/
