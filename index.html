@@ -3481,18 +3481,30 @@ appendDailyLinks=function(item,article){
     '状態':'本番使用中',
     '利用者':'スタッフ',
     '運用担当':'管理者',
-    '概要':'Google Sheets「経理ログイン管理マスター」と連携し、経理サービスのログインID・メモ・表示順をカードで管理するアプリ。パスワードはGoogle SheetやGitHubに保存せず、Googleアカウント専用の非公開領域に保存。',
+    '概要':'Google Sheets「経理ログイン管理マスター」と連携し、経理サービスのログインID・メモ・表示順をカードで管理するアプリ。並べ替え時は検索できる1行一覧で「先頭へ」・移動先番号・↑↓・ドラッグを利用可能。パスワードはGoogle SheetやGitHubに保存せず、Googleアカウント専用の非公開領域に保存。',
     '利用者向けURL':'https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec',
     'GitHub URL':'https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app',
     'Google Sheet名':'経理ログイン管理マスター',
-    'Apps Scriptバージョン':'7',
-    '確認日':'2026年9月7日',
-    '確認状況':'Apps Script v7を既存URLへ公開し、PW操作・12列表示順・PC/スマホ並べ替えを確認済み'
+    'Apps Scriptバージョン':'新バージョン（番号未確認）',
+    '確認日':'2026年9月24日',
+    '確認状況':'既存URLへのアクセス復旧と、並べ替え改善後の利用を利用者が確認。デプロイ版の番号は未確認。'
   };
+  const usage='2026年9月24日：並べ替えモードを検索できる1行一覧へ変更。カード名で検索して「先頭へ」または移動先番号を指定でき、↑↓とドラッグも利用可能。表示順はGoogle SheetのL列へ保存する。';
+  const history='2026年9月24日：既存WebアプリURLでGoogleドライブの「現在、ファイルを開くことができません」が発生。URLはデプロイ画面と一致。キャッシュ削除と別ブラウザーでは解消せず、既存デプロイを新バージョンへ更新して同じURLで利用者が復旧を確認。原因の詳細は未確定。その後、並べ替え画面を1行一覧・名前検索・移動先番号指定に改善し、利用者が動作成功を報告。アクセス設定は「自分のみ」を維持。';
+  const checked=['既存WebアプリURLでアクセス復旧（利用者確認）','1行一覧でカード名検索と移動先番号による並べ替えが利用できる（利用者確認）','「先頭へ」・↑↓・ドラッグでの移動と表示順の保存'];
+  const append=(value,note)=>String(value||'').includes(note)?value:[value,note].filter(Boolean).join('\n');
+  const mergeItems=(value,added)=>[...new Set([...(Array.isArray(value)?value:(value?[String(value)]:[])),...added])];
   const base=organizeEntryImport;
   organizeEntryImport=function(items){
     const list=base(items),index=list.findIndex(item=>item['ID']===record['ID']||['経理ログイン管理',record['システム名']].includes(String(item['システム名']||'')));
-    if(index>=0)list[index]=Object.assign({},list[index],record);else list.unshift(Object.assign({},record));
+    const previous=index>=0?list[index]:{};
+    const updated=Object.assign({},previous,record,{
+      '仕様メモ':append(previous['仕様メモ'],usage),
+      '作業メモ':append(previous['作業メモ'],history),
+      '更新履歴':mergeItems(previous['更新履歴'],[history]),
+      '確認済み事項':mergeItems(previous['確認済み事項'],checked)
+    });
+    if(index>=0)list[index]=updated;else list.unshift(updated);
     return list;
   };
 })();
