@@ -3945,5 +3945,93 @@ applyAssetInfo=function(item){
   organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
 })();
 </script>
+<script id="seiseki-supabase-meeting-update-20260923">
+(() => {
+  const asArray=value=>Array.isArray(value)?value.slice():(value?[String(value)]:[]);
+  const addUnique=(current,values)=>[...new Set([...asArray(current),...values])];
+  const appendMemo=(current,note)=>{
+    const text=String(current||'').trim();
+    return text.includes(note)?text:[text,note].filter(Boolean).join('\n\n');
+  };
+  const enrich=item=>{
+    const name=String(item['システム名']||item['正式名称']||'');
+    if(name.includes('成績管理')){
+      const history='2026年9月23日：管理画面・面談メモをSupabase中心の本番運用へ更新。管理者Runtime v11を反映し、生徒フリガナ332件を補充。成績×通知表、生徒一覧、面談・メモ、テスト成績、通知表、志望校の検索を、漢字・ひらがな・カタカナ・ローマ字・生徒番号の部分一致へ統一。退塾済みは赤い「退塾生」、退塾予定は黄色い「退塾予定」で区別する。';
+      return Object.assign({},item,{
+        '状態':'本番使用中（Supabase運用・検索統一）',
+        '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html',
+        '面談メモ専用URL':'https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html',
+        '保存基盤':'Supabase Edge Functions＋Postgres/RLS（Google Sheetは既存連携・復旧経路として維持）',
+        'Supabaseプロジェクト':'wisedgcgwaebtkprdhth',
+        'Supabase Edge Function':'生徒：seiseki-runtime-v1／管理者・面談：seiseki-admin-runtime-v1 v11',
+        '正本ファイル':'admin.html / meeting_memo.html / juku_app.html / supabase/functions/seiseki-admin-runtime-v1 / supabase/migrations',
+        '最新版の場所':'stepkobetsu-hub/seiseki-kanri main（admin.html df95769／管理者Runtimeソース 1795792／Edge Function v11）',
+        'ログイン方式':'管理画面・スタッフ用と同じ既存ID・パスワードを使用。管理画面と面談メモ専用アプリでログイン状態を共有し、未ログイン時は生徒情報・面談内容を表示しない。',
+        'ログイン保持':'自分・家族の端末はログアウト操作まで保持。塾の共用端末は30分間操作がなければ自動ログアウト。ログアウトボタンを設置。',
+        '生徒在籍区分':'active＝在籍、withdrawal_scheduled＝退塾予定、withdrawn＝退塾済み。退塾予定と退塾済みを別状態として表示する。',
+        '生徒検索仕様':'成績×通知表、生徒一覧、面談・メモ、テスト成績、通知表、志望校で、漢字・ひらがな・カタカナ・ローマ字・生徒番号の途中入力検索に統一。例：山本／やま／ヤマモト／yama／yamamoto。',
+        '検索データ整備':'生徒マスタのフリガナをSupabaseへ332件補充。旧GASの生徒一覧にフリガナがない場合も、Supabase上の既存フリガナを同期処理でnullへ戻さない。',
+        '退塾生表示':'検索結果には退塾生も必要に応じて表示し、退塾済みは赤い「退塾生」、退塾予定は黄色い「退塾予定」マークで在籍生と区別する。',
+        '表示性能対策':'一覧表示はSupabaseから取得。面談検索は取得済み一覧を端末内で絞り込み、入力のたびの不要な再通信を避ける。',
+        '注意事項':'Supabaseの既存RLS警告2件は今回の変更とは別件であり、今回の作業では変更していない。service_role・秘密鍵・利用者パスワード・生徒個人情報の実値は台帳へ記録しない。',
+        '詳細記録':'docs/seiseki-supabase-meeting-update-20260923.md',
+        '確認日':'2026年9月23日',
+        '確認状況':'管理画面・面談メモ専用アプリのSupabase運用、Runtime v11、共通ログイン、面談一覧表示、フリガナ補充、全対象画面の検索統一、退塾区分表示を本番反映済み。',
+        '作業メモ':appendMemo(item['作業メモ'],history),
+        '確認済み事項':addUnique(item['確認済み事項'],[
+          '管理者Edge Function v11本番反映','管理画面と面談メモの共通ログイン',
+          '自分・家族端末のログアウトまでのセッション保持','共用端末の30分無操作自動ログアウト',
+          '未ログイン時の生徒情報・面談内容非表示','面談一覧の日付降順表示',
+          '生徒フリガナ332件のSupabase補充','同期時の既存フリガナ保持',
+          '漢字・ひらがな・カタカナ・ローマ字・生徒番号検索',
+          '成績×通知表・生徒一覧・面談・メモ・テスト成績・通知表・志望校の検索統一',
+          '退塾生と退塾予定の別マーク表示','全期間・入塾時情報の維持'
+        ]),
+        '更新履歴':addUnique(item['更新履歴'],[history]),
+        '未確認項目':[]
+      });
+    }
+    if(name.includes('面談メモ')){
+      const history='2026年9月23日：面談メモ専用アプリと管理画面の面談・メモをSupabaseの同一データ・同一ログインへ統一。一覧を面談日の新しい順で表示し、専用アプリの生徒選択は検索入力後だけ候補を出す方式へ変更。';
+      return Object.assign({},item,{
+        '状態':'本番使用中（Supabase・共通ログイン）',
+        '利用者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html',
+        '管理者向けURL':'https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html#meetings',
+        '保存基盤':'Supabase Edge Function seiseki-admin-runtime-v1 v11＋Postgres/RLS',
+        '認証方式':'成績管理システム・スタッフ用と同じ既存ID・パスワード。管理画面と専用アプリでログイン状態を共有。',
+        'ログイン保持':'自分・家族の端末はログアウトまで保持。塾の共用端末は30分無操作で自動ログアウト。端末種類は未選択を初期値とし、未選択時は大きな注意表示を出す。',
+        '公開範囲':'未ログインの利用者には面談内容・生徒情報を表示しない。',
+        '一覧表示':'面談日を基準に新しい記録から順に表示。管理画面と専用アプリの双方で同じ面談データを操作できる。',
+        '検索仕様':'氏名・フリガナ・カタカナ・ローマ字・生徒番号・面談内容の部分一致。取得済み一覧を端末内で絞り込み、検索入力ごとの再通信を抑える。',
+        '生徒選択UI':'生徒全員を最初から縦に並べず、検索欄へ文字を入力したときだけ候補を表示。候補を選択して決定する方式。',
+        '在籍区分':'通常の生徒名簿は在籍生を基本表示。退塾生を表示する場面では赤い「退塾生」、退塾予定は黄色い「退塾予定」で区別する。',
+        '正本ファイル':'meeting_memo.html / admin.html / supabase/functions/seiseki-admin-runtime-v1',
+        '最新版の場所':'stepkobetsu-hub/seiseki-kanri main（2026年9月23日）／Edge Function v11',
+        '関連カード':['成績管理','生徒マスタ','STEP配信システム'],
+        '注意事項':'認証情報、秘密鍵、利用者パスワード、生徒・保護者の面談内容は台帳に記録しない。',
+        '詳細記録':'docs/seiseki-supabase-meeting-update-20260923.md',
+        '確認日':'2026年9月23日',
+        '確認状況':'専用アプリ・管理画面の一覧表示、保存、共通ログイン、日付降順、検索選択UI、かな・ローマ字検索を本番反映済み。',
+        '作業メモ':appendMemo(item['作業メモ'],history),
+        '確認済み事項':addUnique(item['確認済み事項'],[
+          'Supabase同一データの利用','管理画面と専用アプリのログイン共有',
+          '自分・家族端末のログアウトまでの保持','共用端末の30分無操作自動ログアウト',
+          '端末種類の未選択初期値と大きな注意表示','未ログイン時の情報非表示',
+          '面談日の新しい順表示','検索後だけ候補表示する生徒選択',
+          '漢字・かな・ローマ字・生徒番号検索','面談内容検索の維持',
+          '退塾生・退塾予定の区別表示'
+        ]),
+        '更新履歴':addUnique(item['更新履歴'],[history]),
+        '未確認項目':[]
+      });
+    }
+    return item;
+  };
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return enrich(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
+})();
+</script>
 </body>
 </html>
