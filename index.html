@@ -4081,5 +4081,38 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="teacher-registration-approval-registry-20260924">
+(function(){
+  function record(item){
+    if(item['ID']!=='teacher-initial-registration')return item;
+    const history='2026年9月24日：初回登録を氏名・フリガナ・生年月日・メールアドレスだけの申請へ簡素化。設定済みの確認メール送信先へ承認リンクを送り、管理者権限のスタッフ認証後に承認すると講師マスターへ登録する。承認時にA列を採番し、B/C/L/P・D=1・QのSTEP番号・AJの誕生日月日4桁を設定。住所・口座・マイナンバーは登録情報の追加・変更へ移動。日付型による承認エラーを修正し、表示はyyyy/MM/ddへ統一。ダミー7094・7095は講師マスター・申請履歴・登録用内部情報から削除し採番値を7093へ戻した。';
+    const unique=(values,extra)=>[...new Set([...(Array.isArray(values)?values:[]),...extra])];
+    return Object.assign({},item,{
+      'システム名':'講師登録・変更',
+      '正式名称':'講師登録・変更アプリ',
+      '状態':'本番公開済（管理者承認方式）',
+      '概要':'講師の初回申請は氏名・フリガナ・生年月日・メールアドレスのみ。管理者がメール内リンクからスタッフ認証して承認後、講師マスターへ登録する。住所・口座・マイナンバーは本人が後から追加・変更する。',
+      '入力画面':'初回登録に登録コード発行・登録コード入力・同意チェックは不要。確認画面は「この内容で送信する」。初期パスワードの説明は「登録情報を変更」のログイン用パスワード欄の下に表示。',
+      '承認と通知':'申請は非表示の「講師登録申請」シートへ一時保存し、確認メール送信先の設定に登録されたアドレスへ承認リンクを通知。管理者権限（権限2）のスタッフIDで内容を確認し、承認した時だけ講師マスターへ反映。申請メールの生年月日はyyyy/MM/dd。未承認中の再申請では既存メールの承認リンクを案内する。',
+      '講師マスター反映':'承認時にA列を自動採番し、B列氏名・C列フリガナ・D列在籍1・L列生年月日・P列メールアドレス・Q列STEP-講師番号・AJ列生年月日の月日4桁を設定。Q列・AJ列は後日の上書き変更を妨げない。',
+      'ダミー登録整理':'2026年9月24日：7094は講師マスターに存在せず、7095行を削除。両番号の承認済み申請履歴と登録APIの該当内部情報を削除し、採番値を7093に戻した。次回の新規登録は7094を予定。帳票出力の連番表示は将来の番号枠なので維持。',
+      '正本ファイル':'teacher-portal/registration.html・registration.js／gas/TeacherApprovalExtension.gs／既存Apps Script「BREVO_API_KEY」のコード.gs（API振分・既存登録処理）',
+      '最新版の場所':'stepkobetsu-hub/teacher-portal main（画面 a0262849827c4a11824e00ec6d6dc96fc4bfac4d）／登録API「BREVO_API_KEY」既存デプロイ v39',
+      '操作手順':'初回は4項目を送信。管理者は設定済みの送信先に届くメールのリンクを開き、スタッフIDで認証して申請内容を確認・承認。講師番号発行後、本人は「登録情報を変更」からログインして住所・口座・マイナンバーを追加入力する。',
+      '確認日':'2026年9月24日',
+      '確認状況':'公開画面の初回入力・送信文言・パスワード説明の移動を確認。ダミー申請では承認後のD/Q/AJを確認し、生年月日エラーを修正。ダミー削除後は講師マスター末尾7093、申請履歴は見出しのみ。次回の実登録7094は未実施。',
+      '更新履歴':unique(item['更新履歴'],[history]),
+      '確認済み事項':unique(item['確認済み事項'],['管理者承認後にD列へ1を自動入力','生年月日の日時文字列化を修正','ダミー7094・7095を削除し採番値を7093へ復帰','初回登録の送信表示とログイン欄の初期パスワード説明を公開確認']),
+      '未確認項目':unique((item['未確認項目']||[]).filter(x=>!String(x).includes('コード発行')),['次の実講師の初回申請・承認で7094が発行されることを確認'])
+    });
+  }
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return record(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(record);};
+})();
+</script>
+
 </body>
 </html>
