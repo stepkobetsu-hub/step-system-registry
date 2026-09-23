@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-16
+最終更新: 2026-09-23
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -32,7 +32,7 @@
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
-| デジタルカレンダー | 本番公開中（Fire 7／Windows 10・11） | https://fire-digital-calendar.mintcocoajasmine.chatgpt.site | ChatGPT Sites管理ソース＋[step-system-registry/windows-calendar](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/windows-calendar) | `main` | ChatGPT Sites管理ソース、`dist/`一式、Windows版の検証用ソース | ChatGPT Sites＋Googleカレンダー閲覧専用Apps Script連携 | Web版はChatGPT Sitesで新版を公開。WindowsではMicrosoft Edgeで本番URLを開き、「アプリ」→「このサイトをアプリとしてインストール」を使用 | 2026-09-18 | Sites版34。日付別予定と「今日から〇日分」の大画面表示は、端末内の保存済み予定を先に表示した後、毎回Googleカレンダーの最新予定を再取得して同じ画面を自動更新する。2026年9月21日14:30の中山予定が取得元と新規状態の画面に存在することを確認。Windows用の署名なしEXEは正式配布に使用せず、Edgeのサイトアプリを正式方式とする |
+| デジタルカレンダー | 本番公開中（Sites版54・Fire 7／Windows 10・11） | https://fire-digital-calendar.mintcocoajasmine.chatgpt.site | ChatGPT Sites管理ソース＋[step-system-registry/windows-calendar](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/windows-calendar) | `main` | ChatGPT Sites管理ソース、`dist/`一式、`dist/server/index.js`、`scripts/build-worker.mjs`、Windows版の検証用ソース | ChatGPT Sites Worker＋Googleカレンダー閲覧専用Apps Script連携 | Web版はSites管理ソースを更新し、Workerを再生成して新版を公開。更新番号を上げ、Fire 7実機で予定・点・ヘッドラインを確認。WindowsはEdgeのサイトアプリを使用 | 2026-09-23 | 更新54。FireからGoogleへ直接接続せず、同一サイト内APIを経由。応答を45秒まで待ち、更新失敗時は既存予定を保持する。Fire 7実機で復旧確認済み |
 | 子供用の時間制限アプリ | 本番使用中 | https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/ | [smartphone-time-manager](https://github.com/stepkobetsu-hub/smartphone-time-manager) | `main` | Androidアプリ `project/app/src/main/`、保護者用Web管理画面、ChatGPT Sites Worker、D1設定DB | Jelly 2（Android 11）＋パソコン／Pixel 9aのブラウザ＋ChatGPT Sites＋D1 | Android変更はGitHub `main`へ反映してAPKを自動ビルド。保護者用管理画面と接続版APKを同じSites URLへ公開し、Jelly 2へ上書き更新 | 2026-09-14 | Family Link／Kidsloxが利用できなかったため作成した専用アプリ。設定画面は保護者PINで保護し、アプリを離れるたび再認証。秘密値・暗証番号・端末接続トークンは台帳へ記載しない |
 | プリント書き込み消去・再印刷 | 本番 | https://stepkobetsu-hub.github.io/print-handwriting-cleaner/ | [print-handwriting-cleaner](https://github.com/stepkobetsu-hub/print-handwriting-cleaner) | `main` | `public/index.html`、`public/app.js`、`public/styles.css`、`src/index.ts` | GitHub Pages＋ブラウザ内画像処理。画像は端末外へ送信・保存しない | `main`へ反映後、Pagesの公開とスマホ撮影・処理前後比較・A4印刷を確認 | 2026-09-09 | Issue #36。印刷内容の再生成を行わず、色・輝度・局所構造から手書き候補だけを復元。3段階強度、手動仕上げ、縦横自動判定を備える |
 | 仕訳・経理：URL管理 | 本番使用中 | https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec | [step-system-registry/accounting-login-app](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app) | `main` | `accounting-login-app/Code.gs`、`accounting-login-app/Index.html`、Google Sheet「経理ログイン管理マスター」 | GitHub＋Google Apps Script＋Google Sheet＋UserProperties | GitHub正本を既存Apps Scriptプロジェクトへ同期し、既存デプロイID／URLを維持して新バージョンへ更新 | 2026-09-14 | Apps Script v7。PW本体はSheet／GitHubへ保存せずGoogleアカウント別UserPropertiesへ保存。L列「表示順」を全PC共通の正本とする |
@@ -64,20 +64,22 @@
 
 ## デジタルカレンダー：本番仕様
 
-- **用途:** 余っているAmazon Fire 7（第12世代）を、Googleカレンダーと連携する卓上デジタル時計・月間カレンダーとして利用する。
+- **用途:** 余っているAmazon Fire 7（第12世代）を、Googleカレンダーと連携する卓上デジタル時計・月間カレンダーとして利用する。Windows 10・11ではEdgeのサイトアプリとして利用する。
 - **本番URL:** https://fire-digital-calendar.mintcocoajasmine.chatgpt.site
-- **公開・更新基盤:** ChatGPT Sites。GitHub Pagesではない。変更時はSites管理ソースを更新し、保存した新版を本番公開する。
-- **Google連携:** 運用Googleカレンダーを閲覧専用で表示する。予定の追加・変更・削除は行わない。日付セルを押すと、取得済みまたは新たに取得した1か月分の予定から選択日だけを抜き出し、画面のほぼ全体に大きく一覧表示する。予定が多い場合は画面内をスクロールできる。ヘッドラインを押した場合も同じ月単位データを使い、月をまたぐときだけ次月分も取得する。
-- **初期表示:** アプリを開くたびに必ず「日付のみ」から開始する。右上の「スケジュール」「日付のみ」で、その場で表示を切り替える。ボタンは7インチ画面でも識別できる表示とする。
-- **予定表示:** 時計下部には「今日から〇日分の予定」という小さな見出しを置き、本日を含む3日分（設定で1～7日）のGoogleカレンダー予定を「月日（曜日）開始時刻-　タイトル」の順に1行の大きな文字で、ヘッドラインニュースのように右から左へゆっくり流して表示する。表示部分を押すと、選択した日数分の予定一覧を大画面で開く。予定がなければ「-」。日付のみ表示では、予定がある日だけ日付の下に点を表示し、日本の祝日は日付の数字を赤色にする。予定日一覧・予定タイトル・祝日は閲覧専用Apps Scriptから取得し、端末へ短時間キャッシュする。日付タップ、流れる予定のタップ、「スケジュール」表示はいずれもGoogleログイン不要のアプリ内一覧を使用し、Android 7など古い端末のGoogleログインループを回避する。「スケジュール」表示は予定一覧自体を上下スライドして月末まで閲覧できる。予定取得は最大3回まで自動再試行し、正常取得済みの予定キャッシュがあれば先に表示する。ヘッドライン取得に一時失敗した場合も直前の予定を残して自動再取得する。
-- **カレンダー操作:** 日付カレンダーは上下・左右スワイプで前月・次月へ移動する（上・左で次月、下・右で前月）。令和年の右にある「今日」ボタンで当月へ戻り、5分間操作がなければ自動でも当月へ復帰する。年月、令和年（年月の右側）、曜日、日付、時計、予定はFire 7で読める大きさを優先する。 左下の「前月カレンダー」「来月カレンダー」を押すと、予定ヘッドラインの領域を各月の小型カレンダーへ切り替え、選択中の同じボタンを再度押すと予定ヘッドラインへ戻る。小型カレンダーは表示領域の高さを広げ、日付数字を約2倍にしながら行間を詰めて表示する。
-- **時計表示:** 時・分を大きく表示し、秒は分の右下付近へ小さく表示する。秒の上には、秒と同程度の大きさでAM／PMを表示する。時計とカレンダーの境界は、時計が完全に隠れる0％までスライドでき、残る境界線から時計を再表示できる。
-- **外観設定:** 黒ベース／白ベース、秒表示、明るさ、時計幅、初期表示を設定できる。白ベースでは「前月カレンダー」「来月カレンダー」「スケジュール」「日付のみ」を濃い青系の背景と白文字にし、選択中は濃い青緑で区別する。
-- **画面点灯設定:** 既定は6時間。オフ、1時間、3時間、6時間、8時間、12時間、24時間、常につけておく、から選択して保存できる。「常につけておく」はページが前面表示されている間、ブラウザーのScreen Wake Lockを再取得して点灯維持する。Fire OSの省電力設定が優先される場合がある。
-- **導入方法:** 本番URLをQRコードにし、Fire 7のSilkまたはChromeで開く。更新後は一度再読み込みし、必要に応じてホーム画面へ追加する。
-- **注意事項:** Googleアカウントの認証情報、アクセストークン、カレンダーの非公開予定内容は台帳へ記載しない。画面点灯維持は対応ブラウザーとFire OSの制御範囲内で動作する。
-- **確認日:** 2026年9月16日。Sites版33を本番公開済み。
-
+- **公開・更新基盤:** ChatGPT Sites Worker。GitHub Pagesではない。変更時はSites管理ソースを更新し、Workerを再生成して保存した新版を本番公開する。
+- **Google連携:** 運用Googleカレンダーを閲覧専用で表示し、予定の追加・変更・削除は行わない。日付セルを押すと、取得済みの1か月分から選択日を先に表示し、必ず最新情報を再取得して同じ画面を自動更新する。ヘッドラインを押した場合も同じ月単位データを使う。Googleログイン不要のアプリ内一覧のため、Android 7などのログインループを回避する。
+- **初期表示:** アプリを開くたびに「日付のみ」から開始する。右上の「スケジュール」「日付のみ」で表示を切り替える。
+- **予定表示:** 時計下部に「今日から〇日分の予定」を表示し、本日を含む3日分（設定で1～7日）の予定を「9/18（金）15：00-内容」形式の1行で右から左へ流す。同じ日の2件目以降は時刻だけを表示する。押すと対象日数分を大画面で開く。予定がなければ「-」。日付のみ表示では予定がある日だけ点を付け、日本の祝日は日付を赤色にする。月間スケジュールは上下スクロールで月末まで閲覧できる。
+- **カレンダー操作:** 日付カレンダーは上下・左右スワイプで前月・次月へ移動する（上・左で次月、下・右で前月）。令和年の右の「今日」で当月へ戻り、5分間無操作でも当月へ自動復帰する。左下の「前月カレンダー」「来月カレンダー」で、予定欄を大きな文字の小型月間カレンダーへ切り替えられる。時計とカレンダーの境界は時計が完全に隠れる0％まで変更できる。
+- **時計表示:** 時・分を大きく、秒を分の右下付近、AM／PMを秒と同程度の大きさで表示する。年月、令和年（年月の右側）、曜日、日付、予定は7インチ画面で読める大きさを優先する。
+- **外観設定:** 黒、白、青、深緑、やさしいベージュ、グレー系スケルトン、モダン、ブルー・スカイ、ゴールドの9テーマ。秒表示、明るさ、時計幅、表示モードを変更できる。白系テーマでも主要ボタンを濃色＋白文字で見やすくする。
+- **画面保護:** 画面焼け対策として表示位置を5分ごとに数ピクセル動かす。指定時間帯の夜間減光と明るさ調整を併用できる。
+- **画面点灯設定:** 既定は6時間。オフ、1、3、6、8、12、24時間、常につけておく、から選択して保存できる。次回起動時も設定を保持する。「常につけておく」は前面表示中にScreen Wake Lockを再取得する。
+- **手動更新・障害対策:** 曜日横の「更新」で予定日、月間予定、ヘッドラインをまとめて再取得する。取得途中、空応答、通信失敗時は既存の予定と点を消さず、正常な最新データを取得した場合だけ差し替える。FireからGoogle Apps Scriptへ直接接続せず、Sites Workerの同一サイト内 `/api/calendar` を経由する。Apps Script応答が約18秒かかる場合に備え、端末側は45秒まで待つ。
+- **導入方法:** 本番URLをQRコードにしてFireのChromeまたはSilkで開き、「この端末にアプリとして追加」を利用できる。更新後は更新番号付きURLで開き、画面の更新番号を確認する。
+- **Windows版:** 正式方式はMicrosoft Edgeで本番URLを開き、「アプリ」→「このサイトをアプリとしてインストール」。署名なしEXEはSmart App Controlでブロックされたため正式配布に使用しない。
+- **注意事項:** Googleアカウントの認証情報、アクセストークン、非公開予定内容は台帳へ記載しない。Fire OSの省電力設定が点灯維持より優先される場合がある。
+- **確認日:** 2026年9月23日。Sites版54を本番公開し、Fire 7実機で予定、日付下の点、月間スケジュール、ヘッドラインの復旧を確認済み。
 ## 子供用の時間制限アプリ：本番仕様
 
 - **用途:** 子供用スマートフォンの利用時間とお休み時間を、保護者が遠隔管理する。
