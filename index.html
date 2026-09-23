@@ -4035,5 +4035,39 @@ applyAssetInfo=function(item){
   organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
 })();
 </script>
+<script id="teacher-line-badge-7093-registry-20260924">
+(function(){
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=previousOrganize(items);
+    const badge=list.find(item=>item['ID']==='teacher-name-badge-print');
+    if(badge){
+      badge['状態']='本番公開済（Sites v14）';
+      badge['最新版の場所']='ChatGPT Sites管理Git／公開v14（2026年9月23日）。専用GitHub正本なし。';
+      badge['7093対応']='講師マスターD列の在籍を1に設定し、Q列の名札用QRが7093と対応することを確認。甲斐ゆりな先生を名札検索の対象とした。';
+      badge['長い氏名の表示']='氏名の文字数に応じて名札の大きい文字を少し小さくし、3文字以上でも印刷枠からはみ出しにくいようSites v14へ公開。';
+      badge['確認日']='2026年9月23日';
+      badge['更新履歴']=[...new Set(['2026年9月23日：7093の在籍・QRを確認し、長い氏名の文字サイズを調整してSites v14へ公開。',...(badge['更新履歴']||[])])];
+    }
+    const contact=list.find(item=>item['ID']==='teacher-line-contact-system');
+    if(contact){
+      contact['LINE登録同期']='2026年9月23日以降、非公開のGoogle Sheet「講師LINE通知管理」の講師LINE連携タブを最終行まで約1時間ごとに照合し、在籍・有効な登録の未反映分やLINE連携先の変更をSupabaseへ追加・更新する。本人によるLINE登録完了と講師マスターD列=1が前提。即時反映ではない。';
+      contact['強制更新']='「講師情報を強制更新」はSupabaseの既存講師について、講師マスターのよみ・在籍・教室を更新する。新規LINE登録者の追加は行わない。';
+      contact['7093対応']='甲斐ゆりな先生（7093）のLINE登録は講師LINE連携タブの1001行目に存在したが、Supabase一覧に未登録だった。登録シートと講師マスターを照合してSupabaseへ追加し、利用者が表示・利用を確認した。';
+      contact['確認日']='2026年9月24日';
+      contact['確認済み事項']=[...new Set([...(contact['確認済み事項']||[]),'7093のLINE登録シート1001行目を確認','7093をSupabaseの連絡先へ追加し利用者が動作確認','定期照合で有効登録26人とSupabase26人に差分なし'])];
+      contact['未確認項目']=[...new Set([...(contact['未確認項目']||[]),'次の新規LINE登録者が定期照合で自動追加される実運用確認'])];
+      contact['確認状況']='7093のLINE登録・連絡先反映と利用者の動作確認済み。2026年9月23～24日の定期照合では有効登録26人とSupabase26人が一致。次の新規登録の自動追加は未検証。';
+    }
+    const reminder=list.find(item=>item['ID']==='teacher-report-line-reminder');
+    if(reminder){
+      reminder['7093登録確認']='甲斐ゆりな先生（7093）の本人LINE登録は講師LINE連携タブの1001行目に保存されていた。1000行で読み取りを打ち切らず最終行まで確認する。';
+      reminder['確認日']='2026年9月23日';
+    }
+    return list;
+  };
+})();
+</script>
+
 </body>
 </html>
