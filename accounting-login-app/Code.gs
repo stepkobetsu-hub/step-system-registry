@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-07-pw-order-2-favicon';
+const APP_VERSION = '2026-09-23-order-drag-top';
 function setupSpreadsheet() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
   return SpreadsheetApp.openById(DEFAULT_SPREADSHEET_ID).getUrl();
@@ -146,7 +146,9 @@ function saveCardOrder(ids, expectedIds) {
       throw new Error('別の画面で並び順が更新されています。再読み込みしてください。');
     }
 
-    ids.forEach((id, index) => sheet.getRange(idToRow.get(id), 12).setValue(index + 1));
+    const nextOrders = rows.map(r => [parseOrder_(r[11]) || '']);
+    ids.forEach((id, index) => { nextOrders[idToRow.get(id) - 2][0] = index + 1; });
+    sheet.getRange(2, 12, nextOrders.length, 1).setValues(nextOrders);
     SpreadsheetApp.flush();
     return { ok: true };
   } finally {
