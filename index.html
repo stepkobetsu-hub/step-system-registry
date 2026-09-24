@@ -4138,5 +4138,26 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="teacher-line-sync-review-20260924">
+(function(){
+  function record(item){
+    if(item['ID']!=='teacher-line-contact-system')return item;
+    const unique=(current,extra)=>[...new Set([...(Array.isArray(current)?current:[]),...extra])];
+    item['最終照合']='2026年9月24日13:18 JST：講師LINE連携タブの実際の最終行1001行まで確認。講師マスターの在籍・氏名・よみ・教室を照合し、有効なLINE登録26人とSupabaseの連絡先26人に差分なし。追加・更新0件。';
+    item['確認状況']='7093のLINE登録・送信先反映と利用者の動作確認済み。2026年9月24日13:18 JSTの最終行までの照合では、有効登録26人と送信先26人が一致。次の新規登録の自動追加は未検証。';
+    item['確認日']='2026年9月24日';
+    item['確認済み事項']=unique(item['確認済み事項'],['2026年9月24日13:18 JST、登録表1001行目まで・講師マスター・送信先26人を照合し差分0件']);
+    item['未確認項目']=unique(item['未確認項目'],['次の新規LINE登録者が定期照合で自動追加される実運用確認']);
+    item['更新履歴']=unique(item['更新履歴'],['2026年9月24日13:18 JST：登録表最終行まで照合し、有効登録26人・送信先26人の一致を確認。書き込み0件。']);
+    return item;
+  }
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return record(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(record);};
+})();
+</script>
+
 </body>
 </html>
