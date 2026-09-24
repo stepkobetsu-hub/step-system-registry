@@ -4114,5 +4114,29 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="teacher-badge-7093-login-20260924">
+(function(){
+  function enrich(item){
+    if(item['ID']!=='teacher-name-badge-print')return item;
+    const unique=(current,extra)=>[...new Set([...(Array.isArray(current)?current:[]),...extra])];
+    item['状態']='本番公開済（Sites v16）';
+    item['最新版の場所']='ChatGPT Sites管理Git main 02ad70332081b30fbb249d147cb8ecdc6358807b／公開v16（2026年9月24日）。専用GitHub正本なし。';
+    item['7093対応']='講師マスターの7093（甲斐 ゆりな）の氏名B列に姓名の空白を追加。名札中央は「甲斐」、ふりがなは「かい」、下部は「甲斐 ゆりな」。公開画面の左右両面で確認済み。';
+    item['姓名の表示仕様']='講師マスターB列の姓名区切りで苗字を表示。7093は2026年9月24日にB列を「甲斐 ゆりな」に修正し、アプリ側にも「甲斐／かい」の補助情報を追加。中央は苗字だけ、下部はフルネーム。苗字が長い場合は文字数に応じてサイズを調整する。';
+    item['ログイン保持']='Sites v16：一度スタッフIDでログインした端末のセッションを保存。起動時にセッションが見つからない場合も端末に保存済みの再認証情報から自動復帰し、セッション期限切れ時も自動更新する。ログアウト時に保存情報を削除する。ChatGPT Sites側のサインイン期限は別管理。';
+    item['確認済み事項']=unique(item['確認済み事項'],['7093の名札中央「甲斐」・ふりがな「かい」・下部「甲斐 ゆりな」を公開画面で確認','Sites v16公開後、画面再読み込みでスタッフIDの再入力なしに講師一覧33名を表示']);
+    item['未確認項目']=(Array.isArray(item['未確認項目'])?item['未確認項目']:[]).filter(x=>!String(x).includes('ログイン保持用パスワードを一度設定すること'));
+    item['確認状況']='7093の名札表示とSites v16での再読み込み後のログイン保持を確認済み。セッション期限切れ後の自動再認証は未確認。';
+    item['確認日']='2026年9月24日';
+    item['更新履歴']=unique(item['更新履歴'],['2026年9月24日：7093の氏名に姓名の空白を追加し、中央の苗字・下部のフルネームを公開画面で確認。Sites v15。','2026年9月24日：ログイン時の保存処理と起動時の自動復帰を改善し、再読み込み後もログインが保持されることを確認。Sites v16。']);
+    return item;
+  }
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return enrich(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
+})();
+</script>
+
 </body>
 </html>
