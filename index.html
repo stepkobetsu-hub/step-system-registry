@@ -4188,5 +4188,38 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script>
+const organizePointGrant20260927Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizePointGrant20260927Base(items);
+  const exists=out.some(item=>{
+    const name=String(item['システム名']||item['正式名称']||'');
+    return name.includes('ポイント管理')||name==='ポイント付与';
+  });
+  if(!exists){
+    out.push({
+      'ID':'point-grant',
+      'システム名':'ポイント付与',
+      '正式名称':'ポイント付与',
+      '分類':'生徒・受付',
+      '状態':'本番',
+      '利用者':'スタッフ',
+      '運用担当':'管理者',
+      '概要':'生徒への特別ポイント付与・ポイント使用・履歴確認を行う独立アプリ。',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      '保存基盤':'GitHub Pages＋既存生徒QR Apps Script＋Google Sheet「入退室ログ２」',
+      '正本ファイル':'points_manager.html / gas/PointManager.js / gas/コード.js',
+      '最新版の場所':'stepkobetsu-hub/student-QR main',
+      '関連カード':['出退くんQR作成・読取'],
+      '確認日':'2026年9月27日',
+      '確認状況':'QR管理Ver.2から分離した独立アプリとして登録'
+    });
+  }
+  return out;
+};
+</script>
+
 </body>
 </html>
