@@ -397,6 +397,17 @@
 - 安全設定: メール送信は宛先・件数を確認してキューへ登録し、バックグラウンドで処理する。送信許可フラグやAPIキーなどの秘密値は台帳へ記録しない。
 - 秘密情報: `ADMIN_API_KEY`、`TOKEN_PEPPER`、Apps ScriptのScript Properties実値は台帳・GitHubへ記録しない。
 
+#### 2026年9月26日 新規取引先の請求書送信障害対応
+
+- 症状: 新規生徒1331およびダミー1332の請求書送信で、当初は生徒マスタ確認20秒タイムアウト、その後 `INTERNAL_ERROR` / `INVOICE_API_INVALID_RESPONSE` / `INVOICE_API_RETURNED_HTML` が発生。
+- 生徒マスタ確認: 1331・1332ともメールアドレス登録を確認。新規生徒のメール未登録が原因ではなかった。
+- Apps Script正本: プロジェクトID `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1` を正本として再確認。2026-09-26 14:25に既存デプロイID維持でv61へ更新。
+- Cloudflare→Apps Script通信: ContentServiceのリダイレクトを通常の `redirect: follow` で処理するよう修正。GitHub Actionsの本番ヘルスチェックで最終URL `script.googleusercontent.com`、HTTP 200、`application/json` 応答を確認。
+- PDFアップロード障害: D1取引先はUUIDの `partner_id` を使う一方、PDFアップロード側が既存顧客にも `partner:<顧客コード>` を作っていたため、既存顧客コードとの競合／外部キー不整合を起こし得る構造を修正。既存 `customer_code` の `partner_id` を再利用する。
+- Cloudflare本番: 修正コミット `581acf7` のDeploy Cloudflare Workerが2026-09-26に成功。
+- Gmail確認: `mintcocoajasmine@gmail.com` の受信箱を接続済みGmailで確認可能。請求システムの実送信確認時は、Brevo/請求システムからの到着を受信箱で照合する。
+- 注意: Gmailから直接送ったメールは請求システムの送信経路検証にはならないため、最終確認は請求アプリの「この内容で送信」→受信箱到着までを1セットで確認する。
+
 #### 2026年9月2日 列幅調整
 
 - 請求書一覧画面は、左メニューと請求書一覧の境界をドラッグして幅を調整でき、設定幅をブラウザへ保存する。
