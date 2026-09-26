@@ -1275,3 +1275,18 @@
 - 申請履歴の生年月日がGoogle SheetsでDate型になると承認時に「生年月日を確認してください」となる不具合を修正。既存申請も承認できるよう日付を正規化し、承認画面・新規通知メールの表示を`yyyy/MM/dd`にした。申請中の再送時は既存メールの承認リンクを案内する。
 - ダミー7094・7095を整理。7094は講師マスターに存在せず、7095の行を削除。両番号の承認済み申請履歴と登録API内の関連プロパティ8件を削除し、`TR_V1_SEQUENCE`を7093へ戻した。実データ末尾は7093。次回の新規採番は7094になる設計だが、削除後の実登録は未実施。
 - テスト: 承認申請の自動テストで日付型の再読込・権限確認・D/Q/AJ入力・再実行を確認。公開ページで初回画面と変更ログイン画面の文言を確認。ダミー削除後、講師マスターと申請履歴を再読込して確認。送信済みメールはこのデータ削除の対象外。
+
+
+## 2026年9月27日：生徒・講師QRコード管理 Ver.2
+
+- 新しい管理入口: https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html
+- 生徒用QR: https://stepkobetsu-hub.github.io/student-QR/student_qr_create.html
+  - 表示名を「生徒用QR発行・変更」へ変更。
+  - 「通知先メールの変更・追加」ボタンから既存の通知先メール管理へ直接移動。
+- 講師用QR: https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html
+  - 表示名を「講師用QR発行・変更」へ変更。
+  - 既存の名札発行機能は維持。
+- Ver.2入口から「入退くんQR取込」「勤怠CSV出力」を除外。
+- ポイント機能は独立アプリ「ポイント付与」として運用: https://stepkobetsu-hub.github.io/student-QR/points_manager.html
+- GitHub正本: stepkobetsu-hub/student-QR main
+- GitHub Pagesのデプロイ成功を確認。
