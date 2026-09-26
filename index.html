@@ -4159,5 +4159,34 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script>
+const applyQrManagerV2_20260927Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyQrManagerV2_20260927Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(name.includes('出退くん')){
+    return Object.assign({},base,{
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html',
+      '管理者向けURL':'https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html',
+      '正本ファイル':'student_qr_manager_v2.html / student_qr_create.html / teacher_qr_create.html / tablet_checkin.html',
+      '仕様メモ':(base['仕様メモ']?base['仕様メモ']+'\n\n':'')+'2026年9月27日：QR管理Ver.2を追加。入口は生徒用QR／講師用QRの2カード。生徒側は「生徒用QR発行・変更」、講師側は「講師用QR発行・変更」。通知先メールの変更・追加は生徒用QR画面内から開く。入退くんQR取込・勤怠CSV出力はVer.2入口から外し、ポイント付与は別アプリとして独立。',
+      '確認日':'2026年9月27日'
+    });
+  }
+  if(name.includes('ポイント管理')||name==='ポイント付与'){
+    return Object.assign({},base,{
+      'システム名':'ポイント付与',
+      '正式名称':'ポイント付与',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+      '公開URL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+      '概要':'生徒への特別ポイント付与・ポイント使用・履歴確認を行う独立アプリ。',
+      '確認日':'2026年9月27日'
+    });
+  }
+  return base;
+};
+</script>
+
 </body>
 </html>
