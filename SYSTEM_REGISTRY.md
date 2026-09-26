@@ -378,11 +378,13 @@
 - Apps Scriptプロジェクト名: `STEP請求書PDF作成・配信システム`
 - Apps Script編集URL: https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit
 - Apps ScriptプロジェクトID: `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1`
-- 現行デプロイ: 既存デプロイIDを維持してApps Scriptバージョン39を2026-08-12に反映済み。
+- 現行デプロイ: 既存デプロイIDを維持。2026-09-26の管理画面確認ではアクティブ版はApps Scriptバージョン60（2026-08-12 06:36表示）。従来記録のv39は過去履歴として扱う。
 - デプロイID: `AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw`
 - WebアプリURL: https://script.google.com/macros/s/AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw/exec
 - 接続Spreadsheet: `STEP請求書PDF作成・配信システム`（ID `1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y`）
-- Apps Scriptファイル: `コード_v023.gs`、`Download.html`、`appsscript.json`
+- 接続Spreadsheet直接URL: https://docs.google.com/spreadsheets/d/1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y/edit
+- Apps Scriptファイル: `Code.gs`、`Download.html`、`appsscript.json`
+- 誤選択防止（2026-09-26確認）: 類似名の別Apps Script `STEP請求書PDF・配信システム（Cloudflare連携）` が存在する。管理画面で「Cloudflare連携 v0.1...」等が表示される別プロジェクトは正本ではないため、編集・デプロイ・Script Properties変更を行わない。正本判定は必ずプロジェクトID `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1` と上記デプロイIDの両方で照合する。
 - Cloudflare切替ブランチ: `agent/cloudflare-production-switch`、PR #12、接続設定コミット `deb5e57`
 - Cloudflare Worker: `step-invoice-api`
 - Worker URL: https://step-invoice-api.stepkobetsu.workers.dev
