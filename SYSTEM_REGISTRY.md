@@ -44,7 +44,7 @@
 | 子供用の時間制限アプリ | 本番使用中 | https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/ | [smartphone-time-manager](https://github.com/stepkobetsu-hub/smartphone-time-manager) | `main` | Androidアプリ `project/app/src/main/`、保護者用Web管理画面、ChatGPT Sites Worker、D1設定DB | Jelly 2（Android 11）＋パソコン／Pixel 9aのブラウザ＋ChatGPT Sites＋D1 | Android変更はGitHub `main`へ反映してAPKを自動ビルド。保護者用管理画面と接続版APKを同じSites URLへ公開し、Jelly 2へ上書き更新 | 2026-09-14 | Family Link／Kidsloxが利用できなかったため作成した専用アプリ。設定画面は保護者PINで保護し、アプリを離れるたび再認証。秘密値・暗証番号・端末接続トークンは台帳へ記載しない |
 | プリント書き込み消去・再印刷 | 本番 | https://stepkobetsu-hub.github.io/print-handwriting-cleaner/ | [print-handwriting-cleaner](https://github.com/stepkobetsu-hub/print-handwriting-cleaner) | `main` | `public/index.html`、`public/app.js`、`public/styles.css`、`src/index.ts` | GitHub Pages＋ブラウザ内画像処理。画像は端末外へ送信・保存しない | `main`へ反映後、Pagesの公開とスマホ撮影・処理前後比較・A4印刷を確認 | 2026-09-09 | Issue #36。印刷内容の再生成を行わず、色・輝度・局所構造から手書き候補だけを復元。3段階強度、手動仕上げ、縦横自動判定を備える |
 | 仕訳・経理：URL管理 | 本番使用中 | https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec | [step-system-registry/accounting-login-app](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/accounting-login-app) | `main` | `accounting-login-app/Code.gs`、`accounting-login-app/Index.html`、Google Sheet「経理ログイン管理マスター」 | GitHub＋Google Apps Script＋Google Sheet＋UserProperties | GitHub正本を既存Apps Scriptプロジェクトへ同期し、既存デプロイID／URLを維持して新バージョンへ更新 | 2026-09-14 | Apps Script v7。PW本体はSheet／GitHubへ保存せずGoogleアカウント別UserPropertiesへ保存。L列「表示順」を全PC共通の正本とする |
-| 生徒マスタ | 本番使用中 | 要確認 | 要確認 | 該当なし | Google Sheet `☆マスタ`、関連Apps Scriptは要確認 | Apps Script管理（要確認） | 正本確認後にSheet／Apps Scriptで更新 | 2026-07-20 | 正本未確定のため候補を変更しない |
+| 生徒マスタ | 本番使用中 | https://stepkobetsu-hub.github.io/touroku/touroku.html | [touroku](https://github.com/stepkobetsu-hub/touroku) | `main` | `touroku.html`、Google Sheet `☆マスタ`、関連Apps Script | GitHub Pages＋Apps Script＋Google Sheet | `touroku/main` と既存Apps Script・Sheetの整合を確認して更新 | 2026-09-27 | 公式LINEリッチメニューから現行利用している「生徒・保護者登録」を利用者向け本番入口として確定 |
 | ステップ＆ゴール進捗管理 | **V3本番稼働中（D1直保存・旧進捗復元済み・グラフ高速化）** | https://step-progress-api.stepkobetsu.workers.dev/ | [foresta-step-progress](https://github.com/stepkobetsu-hub/foresta-step-progress) | `codex/homework-status-root-cause`（現行本番）／`agent/step-progress-v3-implementation`（V3基礎） | `cloudflare/src/v3.ts`、`cloudflare/src/dashboard.ts`、`cloudflare/src/summary.ts`、`cloudflare/scripts/apply-v3-autosave.mjs`、`cloudflare/scripts/apply-v3-homework-display-fix.mjs`、D1 V3テーブル | GitHub＋Cloudflare Worker＋D1 `step-progress-db`。通常保存はD1直保存。旧Supabaseは復元元として保全 | 1320で最小確認。代表5名を旧スクショと本番APIで照合。田中1100のグラフAPIを3回実測（0.756秒／1.026秒／0.862秒）し、グラフ取得開始を前倒し。利用者実画面で高速化を確認 | 2026-08-23 | 現行Version `b6ed5627-f360-4ba2-8e09-92e9d5d71340`。直前Version `fb49bfc7-73e9-4361-84ef-ef07768d1c27`。V3直前旧版 `7b84a8f6-3b25-4052-ab32-f02d6af55a51`。詳細 `docs/learning-progress-v3-stabilized-20260822.md` |
 | フォレスタ進捗管理 | **V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）** | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main`（本番 `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`） | `app.js`、`config.js`、`apps-script/Code.gs`、Supabase Edge Functions `foresta-runtime-v3` / `foresta-timetable-sync`、`foresta_v3_*` テーブル | GitHub Pages＋Supabase V3 Runtime v8＋Apps Script v20＋旧Google Sheet（ロールバック・ミラー用） | 通常読込はSupabaseスナップショット、通常保存はmutation queue。ただし管理者の `saveRange` は信頼性優先でGAS同期保存とし、実保存完了後だけ画面を閉じる。queuedを完了扱いせず、直列latest-wins、selector/testId整合性、旧キュー再適用拒否を実装。`?legacy=1` は旧GAS経路 | 2026-09-01 | 緊急時のみ `https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1` を使用。 PR #12をmainへマージ。Apps Script v20→Runtime v8→stale cleanup migration→Pages run 33500353501（#475）の順で本番反映。旧saveRangeはcancelled_stale 66件、mirrored 253件、再試行対象0件。`npm test` 全件成功、GAS health・公開app.jsを確認。詳細 `docs/foresta-progress-v3-production-20260831.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
@@ -1112,6 +1112,17 @@
   - 左側メニュー名は「QR確認・印刷」。
 - データ保護: 講師番号、パスワード、セッショントークン、通知先メール、生徒個人情報の実値は台帳・GitHub・公開説明へ記録しない。
 - 詳細引継ぎ: `docs/student-qr-admin-pc-20260820.md`
+
+## 登録詳細：生徒マスタ
+
+- 利用者向け本番URL: https://stepkobetsu-hub.github.io/touroku/touroku.html
+- GitHub正本: https://github.com/stepkobetsu-hub/touroku
+- 正本ファイル: `touroku.html`
+- 用途: 新入塾生の生徒・保護者情報登録。公式LINEのリッチメニューから現行利用中。
+- 入力内容: 生徒氏名・フリガナ・性別・生年月日・学年・学校・保護者情報・住所・メール・電話番号など。
+- 保存先: 生徒マスタ（使用シート `☆マスタ`）。Apps Scriptの詳細構成は別途確認対象。
+- 確認日: 2026-09-27
+- 経緯: 旧STEP統合管理ポータルおよび初期の資産台帳では利用者向けURLが「要確認」のままだったが、GitHubの `touroku` リポジトリと現行運用を照合し、本番入口を確定した。
 
 ## 資産管理ポータル自体の更新
 
