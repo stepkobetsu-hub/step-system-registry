@@ -58,11 +58,11 @@
 | 受付カード読み取り | 本番使用中 | https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit | なし | 該当なし | 受付カードGoogle SheetのバインドApps Script | Apps Script管理 | Sheetの「拡張機能→Apps Script」から既存デプロイを更新 | 2026-07-21 | GitHubの試作候補を正本扱いしない |
 | 過去問保管DB | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `past_exam_db.html`、`past_exam_upload.html`、バインドApps Script | GitHub＋Apps Script＋Drive | Pagesと既存Webアプリを更新し、2つのDrive用途を確認 | 2026-07-22 | 現行Webアプリ v129。内蔵学生提出画面とPages登録画面を区別 |
 | 遅刻・欠席・早退連絡 | 本番使用中（フォーム更新済み／Apps Script再デプロイ確認待ち） | https://stepkobetsu-hub.github.io/step-form/ | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main`（件名対応 `c7a0918`） | `index.html`、Apps Script project `1d5p77ukBLgeWBJ0cKwCB0ZUui4iVkI-IMIeJqp_15GH3QtzByv3O6xGC`、[Apps Script編集画面](https://script.google.com/u/0/home/projects/1d5p77ukBLgeWBJ0cKwCB0ZUui4iVkI-IMIeJqp_15GH3QtzByv3O6xGC/edit)、[回答Google Sheet](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、`★欠席遅刻` | GitHub Pages＋Google Apps Script Webアプリ＋Google Sheet | 画面変更はGitHub `main`、メール・保存処理はApps Script編集画面から既存デプロイIDを維持して更新 | 2026-08-25 | 管理者メール一覧：件名は`氏名:連絡内容 【神領／大手】`、本文1行目（一覧プレビュー）にも同じ連絡内容を表示する。連絡内容は`欠席`、`遅刻:5～15分`、`遅刻:15～30分`、`遅刻:30分以上`、`早退希望`。`新しい連絡が届きました`は表示しない。実行URLは既存Webアプリを維持 |
-| STEP配信システム | 本番使用中（Ver.31.6・起動／欠席更新高速化） | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（Ver.31.6：`app.js` fa9533c1／`index.html` 28c190b6） | `index.html`、`app.js`、`api.js`、`style.css`、`Code.gs`。欠席回答正本：[遅刻・欠席・早退連絡（回答）](https://docs.google.com/spreadsheets/d/1c2He5p_FMXGq0Gor74wIrJKtdBvTdjmO992ZkNSVuLQ/edit)、参照シート `★欠席遅刻`、表示用 `欠席キャッシュ` | GitHub Pages＋Google Apps Script Ver.31.5＋Brevo＋Google Sheet | 画面変更はGitHub `main`へ反映。Apps Script変更時だけ既存デプロイIDを維持して新版へ更新 | 2026-09-23 | 起動時のテンプレート・生徒・欠席取得を並列化し、端末保存データを即表示。手動更新は約1.2秒で操作を戻し、元シート全件確認をバックグラウンド化。確認完了後に一覧・更新時刻を自動差替え。「※送信前に必ず更新！」を緑のボタン内へ配置し、ボタン名を「手動更新」へ変更。メール送信処理、回答正本、既存WebアプリURLは変更なし。 |
-| 不達メール管理 | **本番使用中（請求書不達も集約・一時エラー自動再試行・宛先別Webhook追跡）** | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（複数宛先ログ `499db6e4ca56e04840b24ec0a2a12584de207bfb`） | `delivery_failures.html`、`gas/DeliveryFailures.js`、`gas/コード.js`、入退室ログ2「不達メール管理」 | GitHub Pages＋Apps Script「生徒QR」v86＋Brevo＋Google Sheet | GitHub正本をApps Scriptの同名ファイルへ同期し、既存WebアプリのデプロイID／URLを維持して新バージョンへ更新。Brevo Webhookは宛先単位で更新し、請求書不達はinvoice-pdfのD1配信イベントから同画面へ集約 | 2026-09-04 | 一時エラー `soft_bounce` / `deferred` / `error` は24時間「一時停止（自動）」後、次の新しい通知だけを1回自動再試行。複数宛先では該当アドレスだけ状態更新し、他宛先の成功状態を維持。Issue [#46](https://github.com/stepkobetsu-hub/student-QR/issues/46) でApps Script v86へ本番反映。詳細 `docs/student-qr-multi-recipient-log-20260904.md` |
+| STEP配信システム | **本番使用中（Ver.31.6・不達メール管理への相互導線追加）** | https://stepkobetsu-hub.github.io/step-message-center/ | [step-message-center](https://github.com/stepkobetsu-hub/step-message-center) | `main`（2026-09-27 `fd8d7de7`） | `index.html`、`style.css`、`app.js`、`api.js`、`Code.gs` | GitHub Pages＋Google Apps Script＋Brevo＋Google Sheet | 画面変更はGitHub `main`へ反映。Apps Script変更時だけ既存デプロイIDを維持して新版へ更新 | 2026-09-27 | ヘッダーの「LINE講師連絡システムへ」の左側へ「不達メール管理」ボタンを追加。白背景・青枠・青文字・丸角で「送信ログ確認」と同系統の見た目に統一。CSSキャッシュ更新値も変更し、公開版で新デザインを確実に読込。リンク先は `student-QR/delivery_failures.html`。既存のメール送信・欠席更新ロジックは変更なし。 |
+| 不達メール管理 | **本番使用中（Apps Script v90・公式LINE即時通知・復旧済み自動判定）** | https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（2026-09-27 `75610554`） | `delivery_failures.html`、`gas/DeliveryFailures.js`、`gas/DeliveryHistory.js`、`gas/コード.js`、入退室ログ2「ログ」「不達メール管理」 | GitHub Pages＋Apps Script「生徒QR」v90＋Brevo＋Google Sheet＋既存LINE講師連絡システム（Supabase Edge Function） | GitHub正本を本番GASへ同期し、既存WebアプリのデプロイID／URLを維持して新版へ更新。Webhookで不達を記録し、管理者メール＋7001への公式LINE通知。復旧済みは通常警告から除外 | 2026-09-27 | `deferred / soft_bounce / error / hard_bounce / blocked / invalid_email / spam` 等を管理。2916行目のYahoo `421 temporarily deferred` を契機に、送信受付と配信完了を分離。LINE通知先は7001 加瀬俊介。ダミー `deferred` 試験で不達記録・管理者メール・LINE `成功 1件` を確認。横地康太郎・伊藤天音・山本瑛介は後続の同一生徒・同一送信元の配信完了を検出し「その後配信成功」へ自動復旧、未確認件数0件。兄弟同一メール誤判定防止テスト合格。検証用 `.invalid` はアーカイブ保持。LINE設定ダイアログの閉じる処理はイベントリスナー方式へ修正。 |
 | 講師ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/teacher-portal/ | [teacher-portal](https://github.com/stepkobetsu-hub/teacher-portal) | `main` | `index.html`、`script.js`、`Code.gs` | GitHub Pages＋Apps Script | `main`へ反映してPages確認。API変更時は既存Apps Scriptとの対応も確認 | 2026-08-06 | 空の `eacher-portal` は正本ではない。出退くんQRの画面遷移は `script.js` を確認 |
 | 講師マスター／給与明細 | 本番使用中 | 要確認 | なし（要確認） | 該当なし | 給与明細Webアプリ関連Apps Script | Apps Script管理 | 正本Sheet／プロジェクト確定後、既存デプロイを更新 | 2026-07-20 | 正本未確定の候補は変更しない |
-| 出退くんQR作成・読取 | **本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）** | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（Issue #46 `499db6e4ca56e04840b24ec0a2a12584de207bfb`） | `teacher_qr_create.html`、`student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`cloudflare/checkin-edge/`、`gas/コード.js`、`gas/DeliveryFailures.js`、`tests/checkin-multi-recipient-log.test.mjs`、Apps Script「生徒QR」 | GitHub Pages＋Cloudflare Workers/Durable Objects＋Apps Script v86＋Google Sheet＋Brevo | 画面は `student-QR/main`、GASはGitHub正本と同期し、既存デプロイIDを維持して新バージョンへ更新。入退室ログはキューの宛先配列を正本として件数・宛先別状態を集計 | 2026-09-04 | `メール送信結果` を `送信成功 2/2件` 等の件数付き表示にし、`送信先メール` を実際にキューへ入った宛先で保存、末尾へ `送信先別結果` 列を追加。最大4件まで `メール1：配信完了 / メール2：一時エラー` のように表示。Webhookは対象宛先だけ更新。過去ログは推測で書き換えない。Issue #46追加テスト6/6合格、Apps Script v86、既存URL維持・HTTP 200確認。全体テスト17件の旧期待値不一致は今回差分外。詳細 `docs/student-qr-multi-recipient-log-20260904.md` |
+| 出退くんQR作成・読取 | **本番使用中（Apps Script v90・不達監視／LINE通知連携）** | **管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**不達メール管理:** https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec | [student-QR](https://github.com/stepkobetsu-hub/student-QR) | `main`（2026-09-27 `75610554`） | `teacher_qr_create.html`、`student_qr_register.html`、`my_qr.html`、`tablet_checkin.html`、`delivery_failures.html`、`cloudflare/checkin-edge/`、`gas/コード.js`、`gas/DeliveryFailures.js`、`gas/DeliveryHistory.js`、Apps Script「生徒QR」 | GitHub Pages＋Cloudflare Workers/Durable Objects＋Apps Script v90＋Google Sheet＋Brevo＋公式LINE通知 | QRの入室・退室判定ロジックは変更せず、不達監視のみ強化。GASはGitHub正本と同期し、既存デプロイIDを維持して新版へ更新 | 2026-09-27 | 2916行目の一時エラーを調査し、Brevo受付成功と受信側配信完了を区別。Webhook後の不達管理登録・管理者通知・公式LINE通知を本番で検証。ダミー `deferred` 試験成功。QR判定、LINE通知、管理者メール通知、Brevo webhook、デプロイIDは維持し、関連テスト15件すべて成功。 |
 | 講師予定・夏休み出勤登録 | 本番使用中 | https://stepkobetsu-hub.github.io/teacher_schedule/teacher_app.html | [teacher_schedule](https://github.com/stepkobetsu-hub/teacher_schedule) | `main` | `teacher_app.html`、Supabase関連コード | GitHub＋Supabase＋Apps Script出力 | PagesとSupabaseを更新し、校舎別Sheet転記を確認 | 2026-07-22 | 現行はSupabase経路。旧GAS入力Webアプリ群は旧版 |
 | 請求システム | **Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）** | **請求作成（学費計算・請求データ作成）:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec<br>**料金特別調整:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments<br>**請求書配信・PDF作成:** https://stepkobetsu-hub.github.io/invoice-pdf/#invoices<br>**旧料金調整互換URL:** https://stepkobetsu-hub.github.io/seiseki-kanri/billing_adjustment.html | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（2026-09-04反映済み） | `index.html`、`assets/app.js`、`assets/receipt-pdf.js`、`apps-script/Code.gs`、`cloudflare/src/index.js`、D1 `step-invoice-db`、R2 `step-invoice-pdfs` | GitHub Pages＋Worker `step-invoice-api`＋D1＋非公開R2＋Apps Script＋Brevo。請求業務データはD1、PDFはR2を正本とし、メール送信は認証済みApps Script／Brevo経路 | 生徒選択時に生徒マスタを正本として氏名・フリガナ・郵便番号・住所・保護者メール・学年を取引先マスタへ同期。取引先独自項目は維持。手動「生徒マスタ更新」も可能。PDF閲覧URLの過剰レート制限を緩和し、請求書不達を中央の不達メール管理へ連携 | 2026-09-04 | 「1個ずつ作成」へ名称変更。取引先メール欠落時は生徒マスタから補完して保存。実運用送信元は `admin@educrest.jp`、返信先は `stepkobetsu@gmail.com`。請求書側の送信済み・開封・URL閲覧・PDF閲覧／ダウンロード表示は維持し、不達管理には対応が必要な失敗だけを集約。「未開封」は不達扱いにしない。Cloudflareの単独 `/api/send` 保護は維持し、実送信はApps Script／Brevo経路。詳細 `docs/invoice-delivery-bounce-management-20260904.md` |
 | お問い合わせ管理 | 本番使用中（反応リストJ・K列ハイフン対応済み） | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main`（現行 `19da862`） | `contact_form.html`、`問い合わせ.gs` | GitHub Pages＋Google SheetバインドApps Script | 画面変更はGitHub `main`へ反映。保存処理を変える場合は既存GASデプロイと整合させる | 2026-09-07 | 顧客は電話番号・郵便番号をハイフンなしで入力。送信直前に電話番号（反応リストJ列）と郵便番号（K列）をハイフン付きへ整形して保存する。全角数字にも対応。生徒管理側の連絡先を優先する現行設計は維持 |
@@ -1364,3 +1364,53 @@
   - 以前の試験結果: `入室のみ0 / 9分0 / 11分+1 / 同日再来+0`。
 - 成績管理管理者画面 `https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html` の左メニュー下部に「⭐ ポイント付与」を追加し、このアプリへリンク。
 - 成績管理管理者画面の左メニューは、縦間隔を少し縮め、文字を少し大きく調整。
+
+
+## 2026年9月27日：出退くんQR・不達メール管理・LINE通知・STEP配信導線の最終整備
+
+### 発端と調査結果
+- 入退室ログ2の2916行目で、入室メールがBrevoには受け付けられたものの、Yahoo側で `421 temporarily deferred` となる一時エラーを確認した。
+- 従来の画面表示「送信成功」はBrevoの受付成功を意味し、保護者側サーバーへの配信完了とは別であることを確認。以後は「送信受付」と「配信完了」を区別して扱う。
+- 旧状態では「ログ」シートは一時エラーへ更新されても、「不達メール管理」シートへの記録・管理者通知まで連動しないケースがあり、未達管理が実運用上十分に機能していなかった。
+
+### 本番修正
+- Apps Script「生徒QR」を **v90** へ更新。既存デプロイID／既存WebアプリURLは維持。
+- GitHub正本は `stepkobetsu-hub/student-QR` main。2026-09-27時点の最終コミットは `7561055488b2d6f2f078505326257eb5f358ec4b`。
+- Webhookで `deferred / soft_bounce / error / hard_bounce / blocked / invalid_email / spam` 等を不達管理へ記録し、管理者メール通知を行う。
+- QRの入室・退室判定ロジックは変更していない。
+
+### 公式LINE未達通知
+- 既存の「LINE講師連絡システム」送信経路を再利用し、公式LINEから管理者へ即時通知する仕組みを追加。
+- 既定通知先は **7001 加瀬俊介**。
+- LINEアクセストークンを二重管理せず、既存Supabase Edge Function `line-teacher-api` と既存スタッフセッションを利用。
+- 同一不達イベントの重複LINE通知を防止し、「LINE通知済み」「LINE通知日時」「LINE通知結果」を不達管理データに記録。
+- 本番ダミー `deferred` 試験で、不達メール管理への記録・管理者メール送信・7001へのLINE送信結果「成功 1件」を確認。
+- LINE受信端末の画面そのものは自動環境から確認できないため、API成功応答までをシステム側の確認範囲とする。
+
+### 復旧済みの自動判定
+- 一時エラー後に、同一生徒・同一送信元で後続の `delivered / 配信完了` が確認できた場合、「その後配信成功」と緑色で表示する。
+- 復旧済みは上部の未確認件数・赤い警告件数から除外し、エラー履歴自体は削除せず保持する。
+- 判定はメールアドレスだけでなく、生徒番号または生徒名＋送信元システムを照合し、兄弟で同じ保護者メールを使う場合の誤復旧を防止。
+- 本番確認：横地康太郎、伊藤天音、山本瑛介はいずれも後続QR読取・配信完了を確認し「その後配信成功」扱い。未確認件数は0件。
+- 検証用 `delivery-line-verification@example.invalid` は完全削除せずアーカイブし、通常一覧から除外。
+- 関連テスト15件すべて成功。
+
+### 不達メール管理UI
+- 「報告メール設定」は色なしの通常ボタン。
+- 「LINE通知設定」も色なしの通常ボタン。
+- 「全送信ログを見る」の左側へ、少し小さめの色付き「STEP送信システム」ボタンを追加。
+- LINE通知設定ダイアログの「閉じる」が効かなかった原因は、壊れたインライン `onclick` 記述。インライン処理を廃止し、専用ID＋イベントリスナーで `dialog.close()` を実行する方式へ変更（commit `75610554`）。
+
+### STEP配信システムとの相互導線
+- STEP配信システム `https://stepkobetsu-hub.github.io/step-message-center/` のヘッダーに「不達メール管理」ボタンを追加。
+- 配置は「LINE講師連絡システムへ」の左側。
+- 白背景・青枠・青文字・丸角で、「送信ログ確認」と同系統のボタンデザイン。
+- CSSキャッシュ更新値を変更し、旧CSSが残ってリンク文字のまま表示される問題を解消。
+- step-message-center最終反映コミット：`fd8d7de7cc2e24010fab2fc1856ce71ccda4d7cc`。
+- 不達メール管理側からは「全送信ログを見る」の左側に色付き「STEP送信システム」ボタンを配置し、相互移動を容易にした。
+
+### 運用上の基準
+- 「送信受付」はBrevoが受け付けた状態であり、保護者側受信サーバーへの到達を保証しない。
+- 「配信完了」は受信サーバーまで届いた状態を示すが、迷惑メール振り分けや実際の閲覧までは保証しない。
+- 新規未達はメール＋公式LINEで管理者へ通知し、後続正常配信が確認できた一時エラーは自動的に警告対象から外す。
+- 秘密値（Brevo APIキー、LINEチャネルアクセストークン、セッショントークン、パスワード）は台帳・GitHubへ記録しない。
