@@ -4305,7 +4305,7 @@ applyAssetInfo=function(item){
         'Amazon Fireインストール旧導線：https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html',
         'Amazon Fire APK旧導線：https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk',
         'ポイント付与は別カード・独立アプリ：https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
-        '2026年9月27日：生徒マスタ新規登録時、L列PASSはフリガナをローマ字化した先頭4文字（例：ヤマダタロウ→yama、ハットリトウマ→hatt）を自動設定。AZ列はSTEP-生徒番号（例：STEP-1331）を自動設定。L列・AZ列とも後から手動変更可能。',
+        '2026年9月27日：生徒・保護者登録を本番GAS v45へ反映。A列=最大番号+1（LockServiceで排他）、B列=1、C列=登録日、H列=通塾教室、J列=I列生年月日参照の4月1日基準・年度連動学年数式、K列=フォーム選択学年、L列=フリガナのローマ字先頭4文字、AZ列=STEP-生徒番号。L/AZは後から手動変更可能。通塾教室はフォーム必須で神領/大手/その他。テスト後ダミー行338・339を完全削除し、次回採番は既存最大1332から1333。',
         '2026年9月27日：QR管理Ver.2の左メニューは「QR管理トップ→生徒用QR発行・変更→生徒用QRまとめて印刷→通知先メール変更・追加」の順。通知先メール変更ボタンは生徒用QR発行・変更画面の下部へ小さく配置。',
         '成績管理admin.htmlの左メニュー下部に「ポイント付与」リンクを追加。'
       ].join('\n'),
@@ -4317,8 +4317,9 @@ applyAssetInfo=function(item){
         '講師用QR発行・変更',
         '入退室QR読取',
         'ポイント付与の独立',
-        '生徒登録時のL列PASS自動作成',
-        '生徒登録時のAZ列STEP-生徒番号自動作成',
+        '生徒登録時のA/B/C/H/J/K/L/AZ自動設定（GAS v45）',
+        'J列は4月1日基準の年度連動学年数式',
+        '通塾教室の必須選択（神領・大手・その他）',
         '旧管理導線を詳細へ退避'
       ],
       '確認状況':'QR管理Ver.2へ整理・現行リンク確認済み'
