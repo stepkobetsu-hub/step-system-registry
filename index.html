@@ -4221,5 +4221,130 @@ organizeEntryImport=function(items){
 };
 </script>
 
+
+<script id="qr-assets-final-20260927">
+const organizeQrAssetsFinal20260927Base=organizeEntryImport;
+organizeEntryImport=function(items){
+  const out=organizeQrAssetsFinal20260927Base(items);
+  let pointFound=false;
+  for(const item of out){
+    const name=String(item['システム名']||item['正式名称']||'');
+    if(name.includes('ポイント管理')||name==='ポイント付与'){
+      item['システム名']='ポイント付与';
+      item['正式名称']='ポイント付与';
+      item['利用者']='スタッフ';
+      item['用途分類']='受付・事務';
+      item['分類']='生徒・受付';
+      item['状態']='本番';
+      item['概要']='生徒への特別ポイント付与・ポイント使用・履歴確認、来塾ポイントの基本設定を行う独立アプリ。';
+      item['利用者向けURL']='https://stepkobetsu-hub.github.io/student-QR/points_manager.html';
+      item['GitHub URL']='https://github.com/stepkobetsu-hub/student-QR';
+      item['正本ファイル']='points_manager.html / gas/PointManager.js / gas/コード.js';
+      item['最新版の場所']='stepkobetsu-hub/student-QR main';
+      item['Google Sheet名']='入退室ログ２';
+      item['使用シート名']='ポイント履歴／ポイント操作ログ';
+      item['仕様メモ']='来塾ポイントの設定画面では、有効/無効、付与タイミング、1日あたりの付与制限、必要滞在時間、付与ポイント数を設定する。2026年8月の確認では「入室のみ0、9分0、11分+1、同日再来+0」を検証済み。2026年9月27日にQR管理Ver.2から独立アプリとして整理。';
+      item['関連カード']=['出退くんQR作成・読取'];
+      item['確認日']='2026年9月27日';
+      item['確認状況']='独立アプリとして本番利用';
+      pointFound=true;
+    }
+  }
+  if(!pointFound){
+    out.push({
+      'ID':'point-grant',
+      'システム名':'ポイント付与',
+      '正式名称':'ポイント付与',
+      '分類':'生徒・受付',
+      '状態':'本番',
+      '利用者':'スタッフ',
+      '用途分類':'受付・事務',
+      '概要':'生徒への特別ポイント付与・ポイント使用・履歴確認、来塾ポイントの基本設定を行う独立アプリ。',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      '正本ファイル':'points_manager.html / gas/PointManager.js / gas/コード.js',
+      '最新版の場所':'stepkobetsu-hub/student-QR main',
+      'Google Sheet名':'入退室ログ２',
+      '使用シート名':'ポイント履歴／ポイント操作ログ',
+      '仕様メモ':'来塾ポイントの設定画面では、有効/無効、付与タイミング、1日あたりの付与制限、必要滞在時間、付与ポイント数を設定する。2026年8月の確認では「入室のみ0、9分0、11分+1、同日再来+0」を検証済み。2026年9月27日にQR管理Ver.2から独立アプリとして整理。',
+      '関連カード':['出退くんQR作成・読取'],
+      '確認日':'2026年9月27日',
+      '確認状況':'独立アプリとして本番利用'
+    });
+  }
+  return out;
+};
+
+const applyQrAssetsFinal20260927Base=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applyQrAssetsFinal20260927Base(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  if(name.includes('出退くん')){
+    return Object.assign({},base,{
+      '状態':'本番',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html',
+      '読み取りURL':'https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+      '管理者向けURL':'',
+      'Amazon FireインストールURL':'',
+      'Amazon Fire APK URL':'',
+      '旧版URL':'',
+      '正本ファイル':'student_qr_manager_v2.html / student_qr_create.html / student_qr_register.html / teacher_qr_create.html / tablet_checkin.html / points_manager.html / gas/コード.js',
+      '最新版の場所':'stepkobetsu-hub/student-QR main',
+      '確認日':'2026年9月27日',
+      '概要':'生徒・講師QRの発行・変更、複数生徒QRのまとめて印刷、通知先メール管理、入退室QR読取を行うシステム。管理入口はVer.2へ整理済み。',
+      '仕様メモ':[
+        '【現行の管理入口】https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html',
+        '生徒用QR発行・変更：https://stepkobetsu-hub.github.io/student-QR/student_qr_create.html',
+        '生徒用QRまとめて印刷：https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html#check',
+        '通知先メール変更・追加：https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html#email',
+        '講師用QR発行・変更：https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html',
+        '現行QR読取：https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet',
+        '【旧画面・互換用】旧「入退くんQR取込」画面はstudent_qr_register.html内部に互換処理として残すが、通常画面・メニューには表示しない。旧管理入口 student_qr_register.html の単独起動は、現在は「生徒用QRまとめて印刷」を既定表示する。',
+        '旧タブレット予備：https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html',
+        '旧端末互換：https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html',
+        'Amazon Fireインストール旧導線：https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html',
+        'Amazon Fire APK旧導線：https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk',
+        'ポイント付与は別カード・独立アプリ：https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+        '2026年9月27日：生徒マスタ新規登録時、L列PASSはフリガナをローマ字化した先頭4文字（例：ヤマダタロウ→yama、ハットリトウマ→hatt）を自動設定。AZ列はSTEP-生徒番号（例：STEP-1331）を自動設定。L列・AZ列とも後から手動変更可能。',
+        '2026年9月27日：QR管理Ver.2の左メニューは「QR管理トップ→生徒用QR発行・変更→生徒用QRまとめて印刷→通知先メール変更・追加」の順。通知先メール変更ボタンは生徒用QR発行・変更画面の下部へ小さく配置。',
+        '成績管理admin.htmlの左メニュー下部に「ポイント付与」リンクを追加。'
+      ].join('\n'),
+      '確認済み事項':[
+        'QR管理Ver.2入口',
+        '生徒用QR発行・変更',
+        '生徒用QRまとめて印刷（複数選択・一括印刷）',
+        '通知先メール変更・追加',
+        '講師用QR発行・変更',
+        '入退室QR読取',
+        'ポイント付与の独立',
+        '生徒登録時のL列PASS自動作成',
+        '生徒登録時のAZ列STEP-生徒番号自動作成',
+        '旧管理導線を詳細へ退避'
+      ],
+      '確認状況':'QR管理Ver.2へ整理・現行リンク確認済み'
+    });
+  }
+  if(name==='ポイント付与'||name.includes('ポイント管理')){
+    return Object.assign({},base,{
+      'システム名':'ポイント付与',
+      '正式名称':'ポイント付与',
+      '状態':'本番',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/points_manager.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      '正本ファイル':'points_manager.html / gas/PointManager.js / gas/コード.js',
+      '最新版の場所':'stepkobetsu-hub/student-QR main',
+      'Google Sheet名':'入退室ログ２',
+      '使用シート名':'ポイント履歴／ポイント操作ログ',
+      '確認日':'2026年9月27日',
+      '概要':'生徒への特別ポイント付与・ポイント使用・履歴確認、来塾ポイントの基本設定を行う独立アプリ。',
+      '仕様メモ':'基本設定はポイント有効/無効、付与タイミング、1日あたりの制限、必要滞在時間、付与ポイント数。現在の退室時・1日1回・10分・1ポイント設定では、入室だけで帰ると0ポイント。翌日は新しい入室として開始する。以前の試験は入室のみ0、9分0、11分+1、同日再来+0。',
+      '関連カード':['出退くんQR作成・読取'],
+      '確認状況':'QR管理から分離した独立本番アプリ'
+    });
+  }
+  return base;
+};
+</script>
+
 </body>
 </html>
