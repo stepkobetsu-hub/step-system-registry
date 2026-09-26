@@ -417,6 +417,30 @@
 - Gmail確認: `mintcocoajasmine@gmail.com` の受信箱を接続済みGmailで確認可能。請求システムの実送信確認時は、Brevo/請求システムからの到着を受信箱で照合する。
 - 注意: Gmailから直接送ったメールは請求システムの送信経路検証にはならないため、最終確認は請求アプリの「この内容で送信」→受信箱到着までを1セットで確認する。
 
+#### 2026年9月26日 請求書メール送信トラブル解消・関連UI整理
+
+- 対象: `STEP請求書PDF作成・配信システム`（GitHub `stepkobetsu-hub/invoice-pdf`）と、連携元のApps Script `請求システム2026NEW`。
+- 新規生徒テスト: 1331 福山七都、1332 山田太郎（ダミー）でメール送信確認。両名とも生徒マスタのメールアドレス登録を確認済み。1332は `mintcocoajasmine@gmail.com`。
+- 初期障害1: 宛先メールアドレス確認が20秒でタイムアウト。生徒マスタ検索待ち時間を60秒へ延長し、公開JSのキャッシュ更新を実施。
+- 初期障害2: `INTERNAL_ERROR`。Cloudflare配信URL作成の一括D1処理で失敗した場合に逐次処理へフォールバックする修正を追加。
+- デプロイ障害: GitHub ActionsのUIテストが古いJSバージョン文字列を期待して失敗し、Workerの本番デプロイが中断していた。テストを更新し、以降のDeploy Cloudflare Worker成功を確認。
+- Apps Script通信障害: `INVOICE_API_INVALID_RESPONSE` → `INVOICE_API_RETURNED_HTML`。Cloudflare→Apps ScriptのContentServiceリダイレクト処理を通常の `redirect: follow` へ修正。GitHub Actionsの本番ヘルスチェックで最終URL `script.googleusercontent.com`、HTTP 200、`application/json` 応答を確認。
+- Apps Script正本再確認: 正しいプロジェクトIDは `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1`。類似名の別Apps Script `STEP請求書PDF・配信システム（Cloudflare連携）` は正本ではなく、編集・デプロイ対象外。正本を2026-09-26 14:25にv61へ更新し、既存デプロイIDを維持。
+- PDFアップロード障害: D1の既存取引先がUUID `partner_id` を持つ一方、PDFアップロード側が `partner:<顧客コード>` を生成していたため、既存取引先で競合／外部キー不整合が起こり得る構造を修正。既存 `customer_code` の `partner_id` を再利用するよう変更し、Worker本番デプロイ成功を確認。
+- Gmail確認: 接続済みGmailで `mintcocoajasmine@gmail.com` の受信確認が可能。請求システムの実送信確認は、請求アプリ側の送信操作→Gmail受信確認までを1セットとする。Gmailからの直接送信は請求システム経路の検証には使わない。
+- 請求管理ホームv101（2026-09-26 15:42）: `BillingV31_Index.html` のみ変更。本番URL・デプロイID維持。
+  - `CSVデータで請求書を作成`: 304×69px。既存のCSV生成・自動受け渡し処理を維持。
+  - `請求書作成・配信アプリへ`: 304×69px。CSV処理なしで `https://stepkobetsu-hub.github.io/invoice-pdf/` を別タブで開く。
+  - `連携用CSVを保存（通常は不要）`: 304×48px、文字12px、低コントラスト。従来のCSV保存処理を維持。
+- 追加UI要望（Codex側で対応依頼済み）:
+  - `連携用CSVを保存（通常は不要）` をさらに小型化し、説明文「請求作成、確認、CSV出力、各種設定をこの管理画面から操作できます。」右側付近へ移動。
+  - `CSVデータで請求書を作成` と `請求書作成・配信アプリへ` を左詰め。
+  - `請求書作成・配信アプリへ` に請求書アプリで使用している￥系ファビコンを表示し、背景色も別色にする。
+- 請求書アプリ側の運用要望:
+  - 一度ログインしたら、利用者が明示的にログアウトしない限りログイン状態を保持する。
+  - 右上の「通常送信」付近へ `請求システムへ` ボタンを設け、`https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec` へ移動できるようにする。
+- 資産管理上の注意: 正本Apps Script、接続Spreadsheet、WebアプリURL、GitHub正本を分けて記録し、類似名の別プロジェクトを誤って編集しない。
+
 #### 2026年9月2日 列幅調整
 
 - 請求書一覧画面は、左メニューと請求書一覧の境界をドラッグして幅を調整でき、設定幅をブラウザへ保存する。
