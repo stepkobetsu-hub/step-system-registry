@@ -1290,3 +1290,65 @@
 - ポイント機能は独立アプリ「ポイント付与」として運用: https://stepkobetsu-hub.github.io/student-QR/points_manager.html
 - GitHub正本: stepkobetsu-hub/student-QR main
 - GitHub Pagesのデプロイ成功を確認。
+
+
+## 2026年9月27日：QR管理Ver.2・生徒登録自動設定・ポイント付与独立化
+
+### 出退くんQR作成・読取
+- 管理入口を `https://stepkobetsu-hub.github.io/student-QR/student_qr_manager_v2.html` に変更。
+- Ver.2の入口は「生徒用QR」「講師用QR」の2カード。
+- 生徒側の正式名称は「生徒用QR発行・変更」。
+  - URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_create.html
+  - 左メニュー順: `QR管理トップ → 生徒用QR発行・変更 → 生徒用QRまとめて印刷 → 通知先メール変更・追加`
+  - 通知先メール変更・追加は使用頻度が低いため、生徒用QR発行・変更画面の下部に小さいボタンとして配置。
+- 複数生徒QRの一括印刷は「生徒用QRまとめて印刷」へ名称変更。
+  - URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html#check
+  - 生徒コード・氏名・フリガナ・ローマ字検索、校舎・学年絞り込み、複数選択、選択QRの一括印刷を維持。
+  - `student_qr_register.html` を単独で開いた場合も、このまとめて印刷画面を既定表示する。
+- 通知先メール画面:
+  - URL: https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html#email
+  - 表示名を「通知先メール変更・追加」に統一。
+- 講師側の正式名称は「講師用QR発行・変更」。
+  - URL: https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html
+  - 名札発行機能は維持。
+- Ver.2の通常メニューから「入退くんQR取込」「ポイント付与」「勤怠CSV出力」を削除。
+- 旧「入退くんQR取込」画面は互換処理のためHTML内に残すが、通常利用画面には表示しない。
+- QR読取の現行本番入口は `https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet`。
+- 旧・予備導線は詳細情報として保管:
+  - 予備タブレット: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin.html
+  - 旧端末互換: https://stepkobetsu-hub.github.io/student-QR/tablet_checkin_compat.html
+  - Amazon Fireインストール旧導線: https://stepkobetsu-hub.github.io/step-system-registry/fire-install.html
+  - Amazon Fire APK旧導線: https://stepkobetsu-hub.github.io/step-system-registry/downloads/Shuttaikun-Fire-v1.0.3.apk
+
+### 生徒登録時の自動設定
+- 生徒・保護者登録フォーム: https://stepkobetsu-hub.github.io/touroku/touroku.html
+- 保存先: `★生徒マスタ202606-` の `☆マスタ`。
+- L列（PASS）:
+  - フリガナをローマ字化して先頭4文字を自動設定。
+  - `ヤマダタロウ → yama`
+  - `ハットリトウマ → hatt`
+  - 自動設定後も手動変更可能。
+- AZ列（QRデータ）:
+  - `STEP-生徒番号` を自動設定。
+  - 例: 生徒番号1331 → `STEP-1331`
+  - 自動設定後も手動変更可能。
+- 既存テスト行1332「山田太郎」は L=`yama`、AZ=`STEP-1332` を確認。
+- 将来の新規登録行にもL列・AZ列の自動式を設定。
+
+### ポイント付与
+- QR管理から切り離し、独立カード・独立アプリとして資産台帳へ登録。
+- 本番URL: https://stepkobetsu-hub.github.io/student-QR/points_manager.html
+- GitHub正本: `stepkobetsu-hub/student-QR`
+- 主要ファイル: `points_manager.html`、`gas/PointManager.js`、`gas/コード.js`
+- 保存先: `入退室ログ２` の `ポイント履歴`、監査は `ポイント操作ログ`。
+- 機能:
+  - 特別ポイント付与
+  - ポイント使用
+  - 生徒別・全体履歴
+  - 基本設定（有効/無効、付与タイミング、1日あたりの制限、必要滞在時間、付与ポイント数）
+- 現在確認した基本設定例: `退室時 / 1日1回まで / 必要滞在10分 / 1ポイント`。
+  - 入室だけで退室QRを読まずに帰宅した日は0ポイント。
+  - 翌日は新しい入室から開始し、前日の未退室状態を翌日に持ち越してポイント付与しない。
+  - 以前の試験結果: `入室のみ0 / 9分0 / 11分+1 / 同日再来+0`。
+- 成績管理管理者画面 `https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html` の左メニュー下部に「⭐ ポイント付与」を追加し、このアプリへリンク。
+- 成績管理管理者画面の左メニューは、縦間隔を少し縮め、文字を少し大きく調整。
