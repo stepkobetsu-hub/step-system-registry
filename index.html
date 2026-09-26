@@ -4347,5 +4347,59 @@ applyAssetInfo=function(item){
 };
 </script>
 
+
+<script id="sep27-delivery-line-recovery-20260927">
+const applySep27DeliveryLineRecoveryBase=applyAssetInfo;
+applyAssetInfo=function(item){
+  const base=applySep27DeliveryLineRecoveryBase(item);
+  const name=String(base['システム名']||base['正式名称']||'');
+  const toArray=v=>Array.isArray(v)?v:(v?[String(v)]:[]);
+  if(name.includes('不達メール')){
+    return Object.assign({},base,{
+      '状態':'本番使用中（Apps Script v90・公式LINE即時通知・復旧済み自動判定）',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html',
+      'GitHub URL':'https://github.com/stepkobetsu-hub/student-QR',
+      'Google Sheet名':'入退室ログ２',
+      '使用シート名':['ログ','不達メール管理'],
+      'Apps Scriptプロジェクト名':'生徒QR',
+      'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec',
+      '現在のApps Script版':'バージョン90（2026年9月27日）',
+      '最新版の場所':'stepkobetsu-hub/student-QR main 7561055488b2d6f2f078505326257eb5f358ec4b／Apps Script「生徒QR」v90',
+      'Apps Script概要':'Brevo Webhookの不達イベントを不達管理へ記録し、管理者メール＋既存LINE講師連絡システム経由で7001へ公式LINE通知。同一不達イベントのLINE重複通知を防止し、後続の同一生徒・同一送信元の配信完了を検出して「その後配信成功」へ自動復旧する。',
+      '主要機能':[...new Set([...toArray(base['主要機能']),'未達・一時エラーのWebhook記録','管理者メール通知','7001への公式LINE即時通知','LINE通知重複防止','復旧済み自動判定','兄弟同一メール誤判定防止','復旧済みを未確認件数から除外','送信履歴保持'])],
+      '連携メモ':[...new Set([...toArray(base['連携メモ']),'既存のLINE講師連絡システム／Supabase Edge Function line-teacher-apiを再利用し、LINEアクセストークンを二重管理しない。','STEP配信システムと相互リンク。STEP配信側ヘッダーから不達メール管理へ、不達管理側からSTEP送信システムへ移動できる。'])],
+      '仕様メモ':'「送信受付」はBrevo受付成功であり配信完了とは別。「配信完了」は受信サーバー到達を示すが閲覧までは保証しない。一時エラー後に同一生徒・同一送信元の後続配信完了があれば「その後配信成功」として警告対象から外す。',
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年9月27日：入退室ログ2916行目のYahoo 421 temporarily deferredを契機に、Webhook後の不達管理登録・管理者通知を修正。GAS v88でLINE通知を本番反映し、v90で復旧済み自動判定を追加。ダミーdeferred試験で不達記録・管理者メール・LINE成功1件を確認。横地康太郎・伊藤天音・山本瑛介は後続QR読取・配信完了を確認し「その後配信成功」、未確認0件。兄弟同一メール誤判定防止テスト合格。検証用.invalidはアーカイブ保持。LINE設定ダイアログの閉じるは専用ID＋イベントリスナー方式へ修正。',
+      '確認日':'2026年9月27日',
+      '確認済み事項':[...new Set([...toArray(base['確認済み事項']),'Apps Script v90','既存デプロイURL維持','不達記録','管理者メール通知','7001へのLINE通知 成功1件','復旧済み自動判定','横地康太郎の後続配信成功','伊藤天音の後続配信成功','山本瑛介の後続配信成功','未確認0件','兄弟同一メール誤判定防止','関連テスト15件成功','検証用.invalidアーカイブ','LINE設定ダイアログ閉じる修正'])],
+      '未確認項目':[],
+      '確認状況':'2026年9月27日、本番GAS v90・LINE通知・復旧済み判定・UI修正まで確認済み'
+    });
+  }
+  if(name.includes('出退くん')){
+    return Object.assign({},base,{
+      '状態':'本番使用中（Apps Script v90・不達監視／LINE通知連携）',
+      'Apps Script WebアプリURL':'https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec',
+      '現在のApps Script版':'バージョン90（2026年9月27日）',
+      '最新版の場所':'stepkobetsu-hub/student-QR main 7561055488b2d6f2f078505326257eb5f358ec4b／Apps Script「生徒QR」v90',
+      '関連カード':[...new Set([...toArray(base['関連カード']),'不達メール管理','STEP配信システム','LINE講師連絡システム'])],
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年9月27日：QRの入室・退室判定ロジックは変更せず、不達監視・管理者メール・7001公式LINE通知・復旧済み判定のみ強化。ダミーdeferred試験と関連テスト15件成功。既存デプロイID／URLを維持。',
+      '確認日':'2026年9月27日'
+    });
+  }
+  if(name.includes('STEP配信')||name.includes('STEPメッセージ')){
+    return Object.assign({},base,{
+      '状態':'本番使用中（Ver.31.6・不達メール管理への相互導線追加）',
+      '利用者向けURL':'https://stepkobetsu-hub.github.io/step-message-center/',
+      '最新版の場所':'stepkobetsu-hub/step-message-center main fd8d7de7cc2e24010fab2fc1856ce71ccda4d7cc',
+      '主要機能':[...new Set([...toArray(base['主要機能']),'ヘッダーから不達メール管理を開く'])],
+      '連携メモ':[...new Set([...toArray(base['連携メモ']),'ヘッダーの「LINE講師連絡システムへ」の左側に、不達メール管理への白背景・青枠・青文字の丸角ボタンを配置。送信ログ確認と同系統の見た目。'])],
+      '作業メモ':(base['作業メモ']?base['作業メモ']+'\n\n':'')+'2026年9月27日：不達メール管理への導線を追加。初回はリンク文字のまま見えたため、style.cssのキャッシュ更新番号を変更して新しいボタンCSSを確実に読込。メール送信・欠席更新ロジックは変更なし。',
+      '確認日':'2026年9月27日'
+    });
+  }
+  return base;
+};
+</script>
 </body>
 </html>
