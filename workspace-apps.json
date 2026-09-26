@@ -93,12 +93,12 @@
     },
     {
       "正式名称": "STEP配信システム",
-      "状態": "本番使用中（Ver.31.6・起動／欠席更新高速化）",
+      "状態": "**本番使用中（Ver.31.6・不達メール管理への相互導線追加）**",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-message-center/"
     },
     {
       "正式名称": "不達メール管理",
-      "状態": "**本番使用中（請求書不達も集約・一時エラー自動再試行・宛先別Webhook追跡）**",
+      "状態": "**本番使用中（Apps Script v90・公式LINE即時通知・復旧済み自動判定）**",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html"
     },
     {
@@ -113,8 +113,8 @@
     },
     {
       "正式名称": "出退くんQR作成・読取",
-      "状態": "**本番使用中（Apps Script v86・複数宛先ログ／宛先別Webhook対応）**",
-      "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbzYpm-16ahuZ3BRFKRT-iSvR9nThsYcTOhxplyBp4bZmVmehfTYZEEl18THzJasypOsTQ/exec"
+      "状態": "**本番使用中（Apps Script v90・不達監視／LINE通知連携）**",
+      "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**不達メール管理:** https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec"
     },
     {
       "正式名称": "講師予定・夏休み出勤登録",
