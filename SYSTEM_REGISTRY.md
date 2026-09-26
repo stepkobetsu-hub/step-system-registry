@@ -378,7 +378,7 @@
 - Apps Scriptプロジェクト名: `STEP請求書PDF作成・配信システム`
 - Apps Script編集URL: https://script.google.com/home/projects/1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1/edit
 - Apps ScriptプロジェクトID: `1SnTqPE8bSQKLkiJI6rPo-7WGQDZoqGpwY7LAAox3FFsj3sGstnHf41X1`
-- 現行デプロイ: 既存デプロイIDを維持。2026-09-26の管理画面確認ではアクティブ版はApps Scriptバージョン60（2026-08-12 06:36表示）。従来記録のv39は過去履歴として扱う。
+- 現行デプロイ: 既存デプロイIDを維持。2026-09-26 14:25にApps Scriptバージョン61へ更新済み。デプロイIDは変更なし。従来記録のv39・v60は過去履歴として扱う。
 - デプロイID: `AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw`
 - WebアプリURL: https://script.google.com/macros/s/AKfycbwo1DdSQ2eUVVU35v1TqermHTgIEsT1u4U-M_67KfA50VelbHsh28W_pec56OlyBkxqaw/exec
 - 接続Spreadsheet: `STEP請求書PDF作成・配信システム`（ID `1NXdr3f_GCQ2CAuyy0i_Ap0dC5w4cKRgNbUAfdolTN0Y`）
