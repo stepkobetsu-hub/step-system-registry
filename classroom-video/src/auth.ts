@@ -3,6 +3,12 @@ const encoder = new TextEncoder();
 export type Device = { id: string; name: string };
 export type Session = Device & { exp: number };
 
+export function campusOfDevice(deviceId: string): "jinryo" | "otemachi" | null {
+  if (deviceId.startsWith("jinryo-")) return "jinryo";
+  if (deviceId.startsWith("otemachi-")) return "otemachi";
+  return null;
+}
+
 function bytesToBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
@@ -47,11 +53,10 @@ export function resolveDeviceIdentity(requestedId: string, devices: Map<string, 
   return { configured, canonical: { ...configured, id: `${campusId}-${slot}` } };
 }
 
-export function displayNameForDevice(device: Device, requestedName?: string): string {
-  const custom = requestedName?.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 24);
-  if (custom) return custom;
+export function displayNameForDevice(device: Device): string {
   const slot = /-([1-4])$/.exec(device.id)?.[1];
-  return slot ? `${device.name} ${slot}` : device.name;
+  const campus = device.id.startsWith("jinryo") ? "神領" : device.id.startsWith("otemachi") ? "大手町" : device.name;
+  return slot ? `${campus}${slot}` : campus;
 }
 
 export async function tokensEqual(left: string, right: string): Promise<boolean> {

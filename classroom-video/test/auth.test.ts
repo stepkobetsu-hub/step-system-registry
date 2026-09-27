@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "../src/auth";
+import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "../src/auth";
 
 describe("device authentication", () => {
   it("parses two provisioned devices", () => {
@@ -41,9 +41,15 @@ describe("device authentication", () => {
     expect(resolveDeviceIdentity("jinryo-5", devices)).toBeNull();
   });
 
-  it("uses a safe custom tablet name without changing the internal id", () => {
-    expect(displayNameForDevice({ id: "jinryo-2", name: "神領校" })).toBe("神領校 2");
-    expect(displayNameForDevice({ id: "jinryo-2", name: "神領校" }, " 神領 正面\n")).toBe("神領 正面");
-    expect(displayNameForDevice({ id: "otemachi-1", name: "大手町校" }, "x".repeat(40))).toHaveLength(24);
+  it("derives a fixed short display name from the internal id", () => {
+    expect(displayNameForDevice({ id: "jinryo-2", name: "神領校" })).toBe("神領2");
+    expect(displayNameForDevice({ id: "otemachi-1", name: "大手町校" })).toBe("大手町1");
+    expect(displayNameForDevice({ id: "jinryo-4", name: "神領校" })).toBe("神領4");
+  });
+
+  it("derives the campus used for call routing from the canonical id", () => {
+    expect(campusOfDevice("jinryo-1")).toBe("jinryo");
+    expect(campusOfDevice("otemachi-3")).toBe("otemachi");
+    expect(campusOfDevice("unknown-1")).toBeNull();
   });
 });
