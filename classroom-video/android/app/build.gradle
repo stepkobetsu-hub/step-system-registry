@@ -12,6 +12,7 @@ android {
         buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.stepkobetsu.workers.dev/"'
     }
     buildFeatures { buildConfig true }
+    lint { disable 'ExpiredTargetSdkVersion' }
     signingConfigs {
         debug {
             v1SigningEnabled true
