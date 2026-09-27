@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-invoice-search';
+const APP_VERSION = '2026-09-27-entry-favicon-fix';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
@@ -109,24 +109,9 @@ function logoutApp(token) {
 }
 
 function getFaviconUrl_() {
-  const props = PropertiesService.getScriptProperties();
-  let fileId = props.getProperty(FAVICON_FILE_ID_KEY);
-
-  if (!fileId) {
-    const response = UrlFetchApp.fetch(FAVICON_SOURCE_URL);
-    const blob = response.getBlob().setName('accounting-login-favicon.png');
-
-    const file = DriveApp.createFile(blob);
-    file.setSharing(
-      DriveApp.Access.ANYONE_WITH_LINK,
-      DriveApp.Permission.VIEW
-    );
-
-    fileId = file.getId();
-    props.setProperty(FAVICON_FILE_ID_KEY, fileId);
-  }
-
-  return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&export=download&format=png';
+  // Opening the web app must not require Drive authorization.
+  // Use the public GitHub Pages favicon directly instead of creating a Drive file.
+  return FAVICON_SOURCE_URL;
 }
 
 function setupSpreadsheet_() {
