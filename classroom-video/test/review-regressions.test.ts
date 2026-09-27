@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 const app = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
 const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const android = readFileSync(new URL("../android/app/src/main/java/jp/stepkobetsu/classroomvideo/MainActivity.java", import.meta.url), "utf8");
+const androidManifest = readFileSync(new URL("../android/app/src/main/AndroidManifest.xml", import.meta.url), "utf8");
 const worker = readFileSync(new URL("../src/index.ts", import.meta.url), "utf8");
 const css = readFileSync(new URL("../public/style.css", import.meta.url), "utf8");
 
@@ -260,7 +261,8 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/message\.type === "media-state"/);
     expect(worker).toMatch(/type: "media-state", from: sender\.id/);
     expect(app).toContain("📹 ビデオ OFF");
-    expect(app).toContain("🎤 マイク OFF");
+    expect(app).toContain('badge.textContent="🎤"');
+    expect(app).toContain('badge.setAttribute("aria-label","マイクオフ")');
     expect(html).toContain('id="featured-mic-off"');
     expect(app).toMatch(/function updateFeaturedMediaState/);
     expect(app).toMatch(/function sendMediaState/);
@@ -268,5 +270,17 @@ describe("PR review regressions", () => {
     expect(css).toMatch(/\.camera-off/);
     expect(css).toMatch(/\.mic-off/);
     expect(css).toMatch(/\.featured-mic-off/);
+    expect(css).toMatch(/\.remote-tile \.mic-off:after/);
+    expect(css).toMatch(/\.remote-tile\.main \.mic-off\{display:none\}/);
+  });
+
+  it("supports Fire tablet portrait and landscape rotation without restarting WebRTC", () => {
+    expect(androidManifest).toContain('android:screenOrientation="fullUser"');
+    expect(androidManifest).toContain('android:configChanges="orientation|screenSize|keyboardHidden"');
+    expect(readFileSync(new URL("../public/manifest.webmanifest", import.meta.url), "utf8")).toContain('"orientation": "any"');
+    expect(app).toMatch(/window\.addEventListener\("resize",refreshLayout\)/);
+    expect(app).toMatch(/window\.addEventListener\("orientationchange"/);
+    expect(app).toMatch(/const portrait=window\.innerHeight>window\.innerWidth/);
+    expect(css).toMatch(/@media\(orientation:portrait\)/);
   });
 });
