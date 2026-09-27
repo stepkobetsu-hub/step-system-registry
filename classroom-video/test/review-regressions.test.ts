@@ -165,21 +165,30 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/signaling=.*ice=.*connection=.*tracks=/);
   });
 
-  it("keeps the selected tablet name aligned with the internal device id", () => {
+  it("keeps a customizable tablet name aligned with the internal device id", () => {
     expect(html).toContain('id="settings-tablet-name"');
-    for (const id of ["jinryo-1", "jinryo-2", "jinryo-3", "otemachi-1", "otemachi-2", "otemachi-3"]) {
-      expect(html).toContain(`option value="${id}"`);
-    }
-    expect(app).toMatch(/tabletName:defaultTabletName\(deviceId\)/);
-    expect(app).toMatch(/body:JSON\.stringify\(\{deviceId:config\.deviceId\}\)/);
+    expect(html).toContain('placeholder="jinryo-phone-1"');
+    expect(html).toContain('id="settings-display-name"');
+    expect(app).toMatch(/tabletName:normalizedTabletName/);
+    expect(app).toMatch(/displayName:config\.tabletName/);
     expect(worker).toMatch(/displayNameForDevice\(identity\.canonical\)/);
   });
 
-  it("routes calls only to the opposite campus and closes acknowledged alerts", () => {
-    expect(worker).toMatch(/campusOfDevice\(sender\.id\)/);
-    expect(worker).toMatch(/broadcastToCampus\(senderCampus === "jinryo" \? "otemachi" : "jinryo"/);
+  it("routes calls only to the selected online device and closes acknowledged alerts", () => {
+    expect(worker).toMatch(/message\.to !== "string"/);
+    expect(worker).toMatch(/this\.hasActiveDevice\(message\.to\)/);
+    expect(worker).toMatch(/this\.sendTo\(message\.to, \{ type: "call"/);
     expect(worker).toMatch(/type: "call-acknowledged"/);
     expect(app).toMatch(/message\.type==="call-acknowledged"/);
+    expect(app).toMatch(/function openCallTargetPicker/);
+    expect(html).toContain('id="call-target-picker"');
+  });
+
+  it("supports custom device ids and display names", () => {
+    expect(app).toMatch(/displayName:config\.tabletName/);
+    expect(app).toMatch(/params\.get\("name"\)/);
+    expect(html).toContain('id="settings-display-name"');
+    expect(worker).toMatch(/body\.displayName/);
   });
 
   it("marks only the local device and fully resets realtime state on stop", () => {

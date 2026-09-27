@@ -28,7 +28,7 @@ describe("device authentication", () => {
     expect(await verifyTicket(ticket, secret, 3000)).toBeNull();
   });
 
-  it("assigns up to four stable device slots per campus with legacy aliases", () => {
+  it("assigns extensible device ids per campus with legacy aliases", () => {
     const devices = parseDevices(JSON.stringify([
       { id: "jinryo", name: "神領校", token: "a".repeat(24) },
       { id: "otemachi", name: "大手町校", token: "b".repeat(24) }
@@ -38,7 +38,9 @@ describe("device authentication", () => {
     expect(resolveDeviceIdentity("jinryo-4", devices)?.canonical.id).toBe("jinryo-4");
     expect(resolveDeviceIdentity("otemachi", devices)?.canonical.id).toBe("otemachi-1");
     expect(resolveDeviceIdentity("otemachi-4", devices)?.canonical.id).toBe("otemachi-4");
-    expect(resolveDeviceIdentity("jinryo-5", devices)).toBeNull();
+    expect(resolveDeviceIdentity("jinryo-5", devices)?.canonical.id).toBe("jinryo-5");
+    expect(resolveDeviceIdentity("jinryo-phone-1", devices)?.canonical.id).toBe("jinryo-phone-1");
+    expect(resolveDeviceIdentity("personal-phone", devices)).toBeNull();
   });
 
   it("derives a fixed short display name from the internal id", () => {

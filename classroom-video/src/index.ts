@@ -3,7 +3,7 @@ import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resol
 
 type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
-type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } |
+type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
   { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 
@@ -94,13 +94,12 @@ export class VideoRoom extends DurableObject<Env> {
       return;
     }
     if (message.type === "call") {
-      if (typeof message.callId !== "string" || !/^[a-f0-9-]{36}$/.test(message.callId)) return;
-      const senderCampus = campusOfDevice(sender.id);
-      if (!senderCampus) return;
+      if (typeof message.callId !== "string" || !/^[a-f0-9-]{36}$/.test(message.callId) ||
+          typeof message.to !== "string" || message.to === sender.id || !this.hasActiveDevice(message.to)) return;
       const recent = this.ctx.storage.sql.exec<{ created_at: number }>("SELECT created_at FROM calls WHERE sender = ? ORDER BY created_at DESC LIMIT 1", sender.id).toArray()[0];
       if (recent && Date.now() - recent.created_at < 10_000) { this.safeSend(socket, { type: "cooldown" }); return; }
       this.ctx.storage.sql.exec("INSERT INTO calls (id, sender, created_at) VALUES (?, ?, ?)", message.callId, sender.id, Date.now());
-      this.broadcastToCampus(senderCampus === "jinryo" ? "otemachi" : "jinryo", { type: "call", callId: message.callId, from: sender });
+      this.sendTo(message.to, { type: "call", callId: message.callId, from: sender });
       return;
     }
     if (message.type === "ack") {
@@ -138,6 +137,9 @@ export class VideoRoom extends DurableObject<Env> {
     try { socket.close(code, reason); } catch { /* already closing */ }
   }
   private sendTo(id: string, value: unknown): void { for (const socket of this.ctx.getWebSockets(`device:${id}`)) this.safeSend(socket, value); }
+  private hasActiveDevice(id: string): boolean {
+    return this.ctx.getWebSockets(`device:${id}`).some((socket) => socket.readyState === WebSocket.OPEN && socketAttachment(socket)?.mode === "active");
+  }
   private broadcastToCampus(campus: "jinryo" | "otemachi", value: unknown): void {
     for (const socket of this.ctx.getWebSockets()) if (campusOfDevice(socketAttachment(socket)?.id ?? "") === campus) this.safeSend(socket, value);
   }
@@ -152,13 +154,15 @@ export class VideoRoom extends DurableObject<Env> {
 async function sessionResponse(request: Request, env: Env): Promise<Response> {
   const authorization = request.headers.get("authorization") ?? "";
   const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  const body: { deviceId?: string } = await request.json<{ deviceId?: string }>().catch(() => ({}));
+  const body: { deviceId?: string; displayName?: string } = await request.json<{ deviceId?: string; displayName?: string }>().catch(() => ({}));
   if (!body.deviceId || !token) return json({ error: "端末設定が必要です" }, 401);
   let devices;
   try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
   const identity = resolveDeviceIdentity(body.deviceId, devices);
   if (!identity || !(await tokensEqual(token, identity.configured.token))) return json({ error: "端末を確認できません" }, 401);
-  const canonicalDevice = { ...identity.canonical, name: displayNameForDevice(identity.canonical) };
+  const requestedName = typeof body.displayName === "string" ? body.displayName.trim() : "";
+  if (requestedName.length > 24) return json({ error: "端末名は24文字以内にしてください" }, 400);
+  const canonicalDevice = { ...identity.canonical, name: requestedName || displayNameForDevice(identity.canonical) };
   const exp = Date.now() + 15 * 60_000;
   const ticket = await createTicket({ id: canonicalDevice.id, name: canonicalDevice.name, exp }, env.SESSION_SECRET);
   let iceServers: IceServer[];
