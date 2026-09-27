@@ -261,7 +261,7 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/message\.type === "media-state"/);
     expect(worker).toMatch(/type: "media-state", from: sender\.id/);
     expect(app).toContain("📹 ビデオ OFF");
-    expect(app).toContain('badge.textContent="🎤"');
+    expect(app).toContain('class="mic-glyph"');
     expect(app).toContain('badge.setAttribute("aria-label","マイクオフ")');
     expect(html).toContain('id="featured-mic-off"');
     expect(app).toMatch(/function updateFeaturedMediaState/);
@@ -271,6 +271,10 @@ describe("PR review regressions", () => {
     expect(css).toMatch(/\.mic-off/);
     expect(css).toMatch(/\.featured-mic-off/);
     expect(css).toMatch(/\.remote-tile \.mic-off:after/);
+    expect(css).toMatch(/\.remote-tile \.mic-glyph\{/);
+    expect(css).toMatch(/\.remote-tile \.mic-glyph:before/);
+    expect(css).toMatch(/\.remote-tile \.mic-glyph:after/);
+    expect(app).not.toContain('badge.textContent="🎤"');
     expect(css).toMatch(/\.remote-tile\.main \.mic-off\{display:none\}/);
   });
 
