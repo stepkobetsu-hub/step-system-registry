@@ -118,7 +118,9 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/StepNative\?\.restartApp/);
     expect(app).toMatch(/StepNative\?\.exitApp/);
     expect(android).toMatch(/@JavascriptInterface public void restartApp/);
-    expect(android).toMatch(/recreate\(\)/);
+    expect(android).toMatch(/getLaunchIntentForPackage\(getPackageName\(\)\)/);
+    expect(android).toMatch(/Intent\.FLAG_ACTIVITY_NEW_TASK \| Intent\.FLAG_ACTIVITY_CLEAR_TASK/);
+    expect(android).toMatch(/startActivity\(launchIntent\)/);
     expect(android).toMatch(/@JavascriptInterface public void exitApp/);
     expect(android).toMatch(/finishAndRemoveTask\(\)/);
   });

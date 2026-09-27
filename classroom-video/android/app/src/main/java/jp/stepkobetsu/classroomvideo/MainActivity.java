@@ -156,7 +156,12 @@ public final class MainActivity extends Activity {
         }
 
         @JavascriptInterface public void restartApp() {
-            runOnUiThread(() -> recreate());
+            runOnUiThread(() -> {
+                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+                if (launchIntent == null) { recreate(); return; }
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(launchIntent);
+            });
         }
 
         @JavascriptInterface public void playChime() {
