@@ -31,16 +31,19 @@
   <section id="loginView" class="loginWrap" aria-labelledby="loginTitle">
     <div class="loginCard">
       <h1 id="loginTitle">経理ログイン管理</h1>
-      <p>許可されたGoogleアカウントでログインしてください。</p>
-      <div id="loginAccount" class="loginAccount">Googleアカウントを確認しています…</div>
-      <button id="loginBtn" class="btn primary" type="button" onclick="login()" disabled>ログイン</button>
+      <p>管理者IDとパスワードを入力してください。</p>
+      <form id="loginForm" onsubmit="event.preventDefault();login()">
+        <div class="field"><label for="adminLoginId">管理者ID</label><input id="adminLoginId" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="200"></div>
+        <div class="field" style="margin-top:14px"><label for="adminLoginPassword">パスワード</label><input id="adminLoginPassword" name="password" type="password" autocomplete="current-password" required maxlength="512"></div>
+        <button id="loginBtn" class="btn primary" type="submit">ログイン</button>
+      </form>
       <p>この端末・ブラウザでは、ログアウトするまでログイン状態を保持します。共有端末では使用後にログアウトしてください。</p>
       <div id="loginMessage" class="loginMessage" role="status" aria-live="polite"></div>
     </div>
   </section>
   <div class="wrap" id="appView" hidden>
     <div class="top">
-      <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。パスワードはこのアプリのユーザー専用非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
+      <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。登録するサービスのパスワードはアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
       <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
     <div class="toolbar">
@@ -90,8 +93,8 @@
   });
 
 
-  const SESSION_STORAGE_KEY='accounting-login-app.session.v1';
-  let sessionToken='', sessionEpoch=0, loginAccountReady=false;
+  const SESSION_STORAGE_KEY='accounting-login-app.admin-session.v2';
+  let sessionToken='', sessionEpoch=0, loginAccountReady=true;
 
   // All data RPCs require the browser token. Ignore callbacks from a session
   // that was logged out in another tab while a request was in flight.
@@ -118,34 +121,37 @@
     sessionEpoch++;sessionToken='';entries=[];loadedOrder=[];sheetUrl='';editingId='';editingRevision='';shownPassword='';
     clearTimeout(secretTimer);clearTimeout(tt);
     [editDialog,memoDialog,secretDialog].forEach(d=>{if(d.open)d.close()});
-    $('editForm').reset();$('fSecret').value='';$('fSecret').type='password';
+    $('adminLoginPassword').value='';$('adminLoginId').value='';$('editForm').reset();$('fSecret').value='';$('fSecret').type='password';
     ['grid','chips','memoBody','secretValue','sessionUser','count','appVersion','toast'].forEach(id=>$(id).textContent='');
     $('toast').classList.remove('show');$('search').value='';activeCategory='すべて';reorderMode=false;draggedId='';
     $('orderModeBtn').classList.remove('active');$('orderModeBtn').textContent='↕ 並べ替え';$('reorderHint').classList.remove('show');
     $('appView').hidden=true;$('loginView').hidden=false;$('loginMessage').textContent=message;busy(false);
   }
   function initializeSession(){
-    google.script.run.withSuccessHandler(data=>{
-      loginAccountReady=true;$('loginAccount').textContent=data.email;$('loginBtn').disabled=pending;
-    }).withFailureHandler(err=>{loginAccountReady=false;$('loginAccount').textContent='利用可能なアカウントを確認できません';$('loginMessage').textContent=err.message||'再読み込みしてください。'}).getLoginAccount();
     sessionToken=storedSession();
     if(sessionToken){$('loginMessage').textContent='ログイン状態を確認しています…';load()}
   }
   function login(){
-    if(pending||!loginAccountReady)return;busy(true);$('loginMessage').textContent='ログインしています…';
+    if(pending)return;
+    const adminId=$('adminLoginId').value.trim(),password=$('adminLoginPassword').value;
+    if(!adminId||!password){$('loginMessage').textContent='管理者IDとパスワードを入力してください。';return}
+    busy(true);$('loginMessage').textContent='ログインしています…';
     google.script.run.withSuccessHandler(data=>{
+      $('adminLoginPassword').value='';
       try{localStorage.setItem(SESSION_STORAGE_KEY,data.token)}
       catch{
         google.script.run.withSuccessHandler(()=>{}).withFailureHandler(()=>{}).logoutApp(data.token);
         showLogin('ログイン状態を保存できません。ブラウザのサイトデータ保存を許可してください。');return;
       }
       sessionEpoch++;sessionToken=data.token;busy(false);load();
-    }).withFailureHandler(fail).loginApp();
+    }).withFailureHandler(err=>{
+      $('adminLoginPassword').value='';busy(false);$('loginMessage').textContent=(err&&err.message)||'ログインできませんでした。';
+    }).loginApp(adminId,password);
   }
   function logout(){
     if(pending||!sessionToken)return;busy(true);const token=sessionToken;
     google.script.run.withSuccessHandler(()=>{
-      clearStoredSession();showLogin('ログアウトしました。GmailなどのGoogleサービスはログインしたままです。');
+      clearStoredSession();showLogin('ログアウトしました。');
     }).withFailureHandler(err=>{
       busy(false);alert('ログアウトを完了できませんでした。通信を確認して再度お試しください。');
     }).logoutApp(token);
@@ -164,7 +170,7 @@
     if(!sessionToken){showLogin();return}
     if(pending)return; busy(true);
     authenticatedRun().withSuccessHandler(data=>{
-      $('appView').hidden=false;$('loginView').hidden=true;$('sessionUser').textContent='ログイン中：'+(data.userEmail||'');
+      $('appView').hidden=false;$('loginView').hidden=true;$('sessionUser').textContent='ログイン中：管理者ID '+(data.adminId||'');
       entries=(data.entries||[]).sort((a,b)=>(Number(a.sortOrder)||999999)-(Number(b.sortOrder)||999999)); loadedOrder=entries.map(e=>e.id);sheetUrl=data.sheetUrl||''; $('appVersion').textContent=data.version||''; busy(false); renderChips(); render();
     }).withFailureHandler(fail).getAppData();
   }
