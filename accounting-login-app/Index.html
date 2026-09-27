@@ -94,11 +94,31 @@
     <div class="field"><label for="invoiceMonth">支払い月</label><input id="invoiceMonth" type="month" required></div>
   </div><p class="help">支払期限・支払予定日の月で照合します。検索範囲は支払い月の前3か月から翌月の受信分です。</p>
   <button id="invoiceSearchBtn" class="btn primary" type="submit">Gmailで請求書を探す</button></form>
+  <button type="button" id="invoiceVendorSettingsBtn" class="btn" style="margin-top:14px" onclick="openInvoiceVendorSettings()">＋ 取引先の追加・設定</button>
   <details style="margin:18px 0"><summary>保存先の設定</summary><p class="help">指定Gmailアカウントが保存できるGoogle Driveフォルダを設定できます。このアプリの共通設定です。</p><div class="field"><label for="invoiceFolder">保存先フォルダのURL</label><input id="invoiceFolder" type="text" placeholder="https://drive.google.com/drive/folders/…"></div><button id="invoiceFolderBtn" class="btn" style="margin-top:8px" onclick="saveInvoiceFolder()">保存先を変更</button></details>
   <p id="invoiceDestination" class="help"></p>
   <div id="invoiceStatus" role="status" aria-live="polite" style="margin:16px 0;white-space:pre-wrap"></div>
   <div id="invoiceResults"></div>
 </div></dialog>
+<dialog id="invoiceVendorDialog" aria-labelledby="invoiceVendorTitle"><div class="modal">
+  <div class="modalHead"><h2 id="invoiceVendorTitle">取引先の追加・設定</h2><button class="x" type="button" aria-label="取引先設定を閉じる" onclick="$('invoiceVendorDialog').close()">×</button></div>
+  <p class="help">登録すると、請求書検索の取引先に追加されます。設定はこのアプリの利用者で共有します。追加取引先はメール添付のPDFに対応します。外部サイトへのリンクだけのメールは個別対応が必要です。</p>
+  <div class="field"><label for="invoiceVendorEdit">設定する取引先</label><select id="invoiceVendorEdit" onchange="selectInvoiceVendorEdit()"><option value="">＋ 新しい取引先を追加</option></select></div>
+  <form id="invoiceVendorForm" onsubmit="event.preventDefault();saveInvoiceVendorSettings()" style="margin-top:16px">
+    <div class="formGrid">
+      <div class="field full"><label for="invoiceVendorName">取引先名 *</label><input id="invoiceVendorName" required maxlength="60" placeholder="例：○○株式会社"></div>
+      <div class="field full"><label for="invoiceVendorSender">送信元メールアドレスまたはドメイン *</label><input id="invoiceVendorSender" required maxlength="254" placeholder="例：billing@example.com または example.com" autocapitalize="none" spellcheck="false"><span class="help">請求書メールの「差出人」を指定してください。</span></div>
+      <div class="field full"><label for="invoiceVendorSubject">件名に含まれる言葉（任意）</label><input id="invoiceVendorSubject" maxlength="100" placeholder="例：請求書"></div>
+    </div>
+    <details style="margin:16px 0"><summary>日付・金額の読み取り設定（任意）</summary><p class="help">通常は空欄で自動判定します。うまく読み取れない場合は、PDF内の日付・金額の見出しを指定できます。確定できない値は、検索後に確認して入力します。</p><div class="formGrid">
+      <div class="field"><label for="invoiceVendorDateLabel">支払日の見出し</label><input id="invoiceVendorDateLabel" maxlength="40" placeholder="例：お支払期限"></div>
+      <div class="field"><label for="invoiceVendorAmountLabel">金額の見出し</label><input id="invoiceVendorAmountLabel" maxlength="40" placeholder="例：ご請求金額"></div>
+    </div></details>
+    <p id="invoiceVendorMessage" role="status" aria-live="polite" style="white-space:pre-wrap"></p>
+    <div class="modalFoot"><button type="button" id="invoiceVendorDeleteBtn" class="btn danger" hidden onclick="deleteInvoiceVendorSettings()">この取引先を削除</button><button type="submit" id="invoiceVendorSaveBtn" class="btn primary" style="margin-left:auto">追加する</button></div>
+  </form>
+</div></dialog>
+
 <dialog id="invoiceConfirm" aria-labelledby="invoiceConfirmTitle"><div class="modal">
   <div class="modalHead"><h2 id="invoiceConfirmTitle">このタイトルで保存しますが、OKですか？</h2></div>
   <p id="invoiceConfirmName" style="font-weight:800;overflow-wrap:anywhere"></p><p id="invoiceConfirmFolder"></p>
@@ -137,7 +157,7 @@
       withSuccessHandler(fn){success=fn;return runner},
       withFailureHandler(fn){failure=fn;return runner}
     };
-    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave'].forEach(name=>{
+    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave','saveInvoiceVendor','deleteInvoiceVendor'].forEach(name=>{
       runner[name]=(...args)=>{
         if(!token){failure(new Error('APP_SESSION_REQUIRED'));return}
         google.script.run
@@ -402,19 +422,20 @@
   function attr(s){return esc(s).replace(/`/g,'&#96;')}
 let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false;
 function invoiceStatus(text){$('invoiceStatus').textContent=text;}
-function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn'].forEach(id=>$(id).disabled=on);}
+function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn'].forEach(id=>$(id).disabled=on);}
 function invoiceError(e){invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
 function openInvoices(){
-  $('invoiceDialog').showModal();
+  $('invoiceDialog').showModal();$('invoiceVendorSettingsBtn').disabled=true;
   if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
   authenticatedRun().withSuccessHandler(s=>{
+    renderInvoiceVendors(s.vendors||[]);$('invoiceVendorSettingsBtn').disabled=invoiceWaiting;
     $('invoiceFolder').value=s.folderUrl||'';$('invoiceDestination').textContent='検索するGmail：'+s.mailbox+'\n保存先：'+(s.folderName||'未設定');
     if(!s.ready)invoiceStatus('Gmail接続の初期設定がまだ完了していません。');
     else if(!s.healthy)invoiceStatus('Gmail接続の応答を待っています。長く続く場合は管理者に連絡してください。');
   }).withFailureHandler(invoiceError).getInvoiceSettings();
 }
 function closeInvoices(){ $('invoiceDialog').close(); }
-function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;invoiceWait(false);['invoiceDialog','invoiceConfirm'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
+function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
 function searchInvoices(){
   if(invoiceWaiting)return;invoiceWait(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('Gmailを検索しています。通常1〜数分かかります。');
   authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value);
@@ -446,7 +467,42 @@ function confirmInvoice(){
   authenticatedRun().withSuccessHandler(r=>{$('invoiceConfirm').close();invoiceConfirmation=null;invoiceStatus('PDFを保存しています。通常1分ほどかかります。');pollInvoice(r.jobId);}).withFailureHandler(invoiceError).confirmInvoiceSave(p.jobId,p.itemId,p.nonce);
 }
 
+let invoiceVendors=[], invoiceVendorSaving=false;
+function renderInvoiceVendors(vendors,selected){
+  invoiceVendors=vendors;const old=selected||$('invoiceVendor').value;
+  $('invoiceVendor').innerHTML=vendors.map(v=>`<option value="${attr(v.id)}">${esc(v.name)}</option>`).join('');
+  if(vendors.some(v=>v.id===old))$('invoiceVendor').value=old;
+  const editing=$('invoiceVendorEdit').value;
+  $('invoiceVendorEdit').innerHTML='<option value="">＋ 新しい取引先を追加</option>'+vendors.map(v=>`<option value="${attr(v.id)}">${esc(v.name)}${v.builtin?'（標準設定）':''}</option>`).join('');
+  if(vendors.some(v=>v.id===editing))$('invoiceVendorEdit').value=editing;
+}
+function openInvoiceVendorSettings(){
+  if(invoiceWaiting)return;$('invoiceVendorEdit').value='';selectInvoiceVendorEdit();$('invoiceVendorDialog').showModal();
+}
+function selectInvoiceVendorEdit(){
+  const v=invoiceVendors.find(v=>v.id===$('invoiceVendorEdit').value)||{};
+  for(const [field,key] of [['Name','name'],['Sender','sender'],['Subject','subject'],['DateLabel','dateLabel'],['AmountLabel','amountLabel']]){const el=$('invoiceVendor'+field);el.value=v[key]||'';el.disabled=!!v.builtin||invoiceVendorSaving;}
+  $('invoiceVendorSaveBtn').hidden=!!v.builtin;$('invoiceVendorDeleteBtn').hidden=!v.id||!!v.builtin;
+  $('invoiceVendorSaveBtn').textContent=v.id?'変更を保存':'追加する';
+  $('invoiceVendorMessage').textContent=v.builtin?'標準の取引先は設定済みです。追加した取引先はここで変更できます。':'';
+}
+function invoiceVendorBusy(on){invoiceVendorSaving=on;['invoiceVendorEdit','invoiceVendorName','invoiceVendorSender','invoiceVendorSubject','invoiceVendorDateLabel','invoiceVendorAmountLabel','invoiceVendorSaveBtn','invoiceVendorDeleteBtn'].forEach(id=>$(id).disabled=on);}
+function invoiceVendorError(e){invoiceVendorBusy(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}$('invoiceVendorMessage').textContent=e.message||'設定を保存できませんでした。';}
+function saveInvoiceVendorSettings(){
+  if(invoiceVendorSaving)return;const p={id:$('invoiceVendorEdit').value,name:$('invoiceVendorName').value,sender:$('invoiceVendorSender').value,subject:$('invoiceVendorSubject').value,dateLabel:$('invoiceVendorDateLabel').value,amountLabel:$('invoiceVendorAmountLabel').value};
+  invoiceVendorBusy(true);$('invoiceVendorMessage').textContent='設定を保存しています…';
+  authenticatedRun().withSuccessHandler(r=>{invoiceVendorBusy(false);renderInvoiceVendors(r.vendors,r.vendor.id);$('invoiceVendorEdit').value=r.vendor.id;selectInvoiceVendorEdit();$('invoiceVendorMessage').textContent='保存しました。検索する取引先に追加されています。';}).withFailureHandler(invoiceVendorError).saveInvoiceVendor(p);
+}
+function deleteInvoiceVendorSettings(){
+  const id=$('invoiceVendorEdit').value,v=invoiceVendors.find(v=>v.id===id);
+  if(invoiceVendorSaving||!v||v.builtin||!confirm('「'+v.name+'」の検索設定を削除しますか？保存済みのPDFやメールは削除されません。'))return;
+  invoiceVendorBusy(true);
+  authenticatedRun().withSuccessHandler(r=>{invoiceVendorBusy(false);renderInvoiceVendors(r.vendors);$('invoiceVendorEdit').value='';selectInvoiceVendorEdit();$('invoiceVendorMessage').textContent='取引先の検索設定を削除しました。';}).withFailureHandler(invoiceVendorError).deleteInvoiceVendor(id);
+}
+
 </script>
 </body>
 </html>
+
+
 
