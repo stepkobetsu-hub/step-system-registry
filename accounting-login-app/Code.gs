@@ -2,12 +2,28 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-23-order-drag-top';
+const APP_VERSION = '2026-09-27-allowed-accounts';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
 
 const FAVICON_FILE_ID_KEY = 'ACCOUNTING_FAVICON_DRIVE_FILE_ID';
+
+
+const ALLOWED_USERS_PROPERTY = 'ACCOUNTING_ALLOWED_EMAILS';
+
+// Deploy as the user accessing the web app. Never fall back to the deployer's
+// effective identity: it would authorize other visitors as the owner.
+function requireAllowedUser_() {
+  const email = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
+  const allowed = String(PropertiesService.getScriptProperties()
+    .getProperty(ALLOWED_USERS_PROPERTY) || '')
+    .split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
+  if (!email || !allowed.includes(email)) {
+    throw new Error('このアカウントには利用権限がありません。許可されたGoogleアカウントでログインしてください。');
+  }
+  return email;
+}
 
 function getFaviconUrl_() {
   const props = PropertiesService.getScriptProperties();
@@ -31,6 +47,7 @@ function getFaviconUrl_() {
 }
 
 function setupSpreadsheet() {
+  requireAllowedUser_();
   PropertiesService.getScriptProperties()
     .setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
 
@@ -40,12 +57,14 @@ function setupSpreadsheet() {
 }
 
 function doGet() {
+  requireAllowedUser_();
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
     .setFaviconUrl(getFaviconUrl_())
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function getAppData() {
+  requireAllowedUser_();
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
@@ -102,6 +121,7 @@ function getAppData() {
 }
 
 function saveEntry(payload) {
+  requireAllowedUser_();
   payload = payload || {};
   const item = normalizeEntry_(payload);
   if (!item.serviceName) throw new Error('サービス名を入力してください。');
@@ -148,6 +168,7 @@ function saveEntry(payload) {
 }
 
 function saveCardOrder(ids, expectedIds) {
+  requireAllowedUser_();
   if (!Array.isArray(ids) || !ids.length) throw new Error('並べ替えデータがありません。');
   ids = ids.map(id => clean_(id, 100)).filter(Boolean);
   if (new Set(ids).size !== ids.length) throw new Error('並べ替えデータが重複しています。');
@@ -188,6 +209,7 @@ function saveCardOrder(ids, expectedIds) {
 }
 
 function getPassword(id) {
+  requireAllowedUser_();
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const sheet = getSheet_(getSpreadsheet_());
@@ -198,6 +220,7 @@ function getPassword(id) {
 }
 
 function clearPassword(id) {
+  requireAllowedUser_();
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
@@ -211,6 +234,7 @@ function clearPassword(id) {
 }
 
 function deleteEntry(id, revision) {
+  requireAllowedUser_();
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
