@@ -35,6 +35,18 @@ export function parseDevices(source: string): Map<string, Device & { token: stri
   return devices;
 }
 
+export function resolveDeviceIdentity(requestedId: string, devices: Map<string, Device & { token: string }>) {
+  const migrated = requestedId === "shinryo" ? "jinryo" : requestedId;
+  const match = /^(jinryo|otemachi)(?:-([1-4]))?$/.exec(migrated);
+  if (!match) return null;
+  const campusId = match[1];
+  const slot = match[2] ?? "1";
+  const lookupCandidates = campusId === "jinryo" ? ["jinryo", "shinryo"] : ["otemachi"];
+  const configured = lookupCandidates.map((id) => devices.get(id)).find(Boolean);
+  if (!configured) return null;
+  return { configured, canonical: { ...configured, id: `${campusId}-${slot}` } };
+}
+
 export async function tokensEqual(left: string, right: string): Promise<boolean> {
   const key = await crypto.subtle.importKey("raw", encoder.encode("step-token-compare"), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const [a, b] = await Promise.all([
