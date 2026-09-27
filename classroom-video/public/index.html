@@ -49,6 +49,11 @@
         <div id="incoming-text">呼び出しです</div>
         <button id="ack">確認</button>
       </div>
+      <section id="call-target-picker" class="target-picker hidden" aria-labelledby="call-target-title">
+        <h2 id="call-target-title">呼び出す端末を選択</h2>
+        <div id="call-target-list" class="target-list"></div>
+        <button id="call-target-cancel">キャンセル</button>
+      </section>
       <nav id="controls" aria-label="通話操作">
         <button id="mic" aria-pressed="true"><span>🎙</span><b>マイク ON</b></button>
         <button id="camera" aria-pressed="true"><span class="video-icon" aria-hidden="true"></span><b>カメラ ON</b></button>
@@ -59,11 +64,11 @@
       <section id="settings" class="settings hidden" aria-labelledby="settings-title">
         <h2 id="settings-title">端末設定</h2>
         <p>端末：<strong id="settings-device"></strong></p>
-        <label>タブレット名
-          <select id="settings-tablet-name">
-            <option value="jinryo-1">神領1</option><option value="jinryo-2">神領2</option><option value="jinryo-3">神領3</option>
-            <option value="otemachi-1">大手町1</option><option value="otemachi-2">大手町2</option><option value="otemachi-3">大手町3</option>
-          </select>
+        <label>端末ID（半角英数字とハイフン）
+          <input id="settings-tablet-name" autocomplete="off" placeholder="jinryo-phone-1">
+        </label>
+        <label>画面に表示する端末名
+          <input id="settings-display-name" autocomplete="off" maxlength="24" placeholder="管理者スマホ">
         </label>
         <label>操作バー表示時間
           <select id="settings-controls-timeout">

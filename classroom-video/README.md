@@ -1,12 +1,14 @@
-# STEP 教室間ビデオ通話 v0.2.10
+# STEP 教室間ビデオ通話 v0.3.0
 
 Fire HD 8の神領校・大手町校端末を、1タップで固定ルームにつなぎます。v0.2はWebRTC meshで3台同時接続を正式対象とし、端末IDは各教室4台まで設定できます。映像・音声はWebRTC P2P、認証・シグナリング・呼び出し通知はCloudflare Worker / Durable Objectを使用します。
 
 - 本番URL: `https://step-classroom-video.stepkobetsu.workers.dev/`
 
-## v0.2.10に含む機能
+## v0.3.0に含む機能
 
 - ログイン・会議コードなしの「教室をつなぐ」ボタン
+- `jinryo-phone-1` のような追加端末IDと「管理者スマホ」など任意の表示名に対応（IDは校舎名から始め、重複させない）
+- 呼び出しボタンから現在オンラインの端末を1台選び、その端末だけを鳴らす個別呼び出し
 - 参加端末ごとに独立したPeerConnectionを持つmesh接続と複数映像の同時表示
 - Fire WebView向けにICE状態を併用し、切断判定へ12秒の猶予を設けた安定化処理
 - 端末ID順でoffer生成側を固定し、再接続時のoffer衝突を防止

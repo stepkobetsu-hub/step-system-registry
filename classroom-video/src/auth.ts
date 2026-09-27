@@ -43,20 +43,20 @@ export function parseDevices(source: string): Map<string, Device & { token: stri
 
 export function resolveDeviceIdentity(requestedId: string, devices: Map<string, Device & { token: string }>) {
   const migrated = requestedId === "shinryo" ? "jinryo" : requestedId;
-  const match = /^(jinryo|otemachi)(?:-([1-4]))?$/.exec(migrated);
+  const match = /^(jinryo|otemachi)(?:-([a-z0-9][a-z0-9-]{0,22}))?$/.exec(migrated);
   if (!match) return null;
   const campusId = match[1];
   const slot = match[2] ?? "1";
-  const lookupCandidates = campusId === "jinryo" ? ["jinryo", "shinryo"] : ["otemachi"];
+  const lookupCandidates = campusId === "jinryo" ? [migrated, "jinryo", "shinryo"] : [migrated, "otemachi"];
   const configured = lookupCandidates.map((id) => devices.get(id)).find(Boolean);
   if (!configured) return null;
   return { configured, canonical: { ...configured, id: `${campusId}-${slot}` } };
 }
 
 export function displayNameForDevice(device: Device): string {
-  const slot = /-([1-4])$/.exec(device.id)?.[1];
+  const slot = /-(\d+)$/.exec(device.id)?.[1];
   const campus = device.id.startsWith("jinryo") ? "神領" : device.id.startsWith("otemachi") ? "大手町" : device.name;
-  return slot ? `${campus}${slot}` : campus;
+  return slot ? `${campus}${slot}` : device.name || campus;
 }
 
 export async function tokensEqual(left: string, right: string): Promise<boolean> {
