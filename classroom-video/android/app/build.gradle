@@ -5,11 +5,11 @@ android {
     compileSdk 35
     defaultConfig {
         applicationId 'jp.stepkobetsu.classroomvideo'
-        minSdk 23
-        targetSdk 35
-        versionCode 1
-        versionName '0.1.0'
-        buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.REPLACE.workers.dev/"'
+        minSdk 22
+        targetSdk 28
+        versionCode 2
+        versionName '0.1.1-fire'
+        buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.stepkobetsu.workers.dev/"'
     }
     buildFeatures { buildConfig true }
 }

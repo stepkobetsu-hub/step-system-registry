@@ -11,7 +11,7 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/function unlockAudio\(\)/);
     expect(app).toMatch(/async function start\([^)]*\)\{unlockAudio\(\)/);
     expect(app).toMatch(/const context=state\.audioContext/);
-    expect(app).toMatch(/StepNative\?\.playChime\(\)/);
+    expect(app).toMatch(/StepNative\.playChime\(\)/);
   });
 
   it("offers only 5 through 12 hours and defaults to 6", () => {
@@ -35,5 +35,21 @@ describe("PR review regressions", () => {
     expect(android).toMatch(/RESOURCE_VIDEO_CAPTURE/);
     expect(android).toMatch(/RESOURCE_AUDIO_CAPTURE/);
     expect(android).not.toContain("request.grant(request.getResources())");
+  });
+
+  it("uses the alarm stream and restores its previous volume", () => {
+    expect(android).toMatch(/AudioManager\.STREAM_ALARM/);
+    expect(android).toMatch(/getStreamMaxVolume\(AudioManager\.STREAM_ALARM\) \* 0\.65/);
+    expect(android).toMatch(/originalAlarmVolume/);
+    expect(android).toMatch(/setStreamVolume\(AudioManager\.STREAM_ALARM, originalAlarmVolume/);
+    expect(android).not.toContain("AudioManager.STREAM_NOTIFICATION");
+  });
+
+  it("generates short-lived TURN credentials without exposing the long-lived key", () => {
+    expect(worker).toMatch(/credentials\/generate-ice-servers/);
+    expect(worker).toMatch(/ttl: 46800/);
+    expect(worker).toMatch(/Bearer \$\{env\.TURN_KEY_API_TOKEN\}/);
+    expect(worker).toMatch(/!\/:53/);
+    expect(worker).not.toMatch(/TURN_KEY_API_TOKEN.*json\(/);
   });
 });

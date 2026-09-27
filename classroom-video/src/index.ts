@@ -6,6 +6,35 @@ type SignalMessage = { type: "signal"; to: string; description?: unknown; candid
 type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 
+function withoutBlockedBrowserPorts(servers: IceServer[]): IceServer[] {
+  return servers.map((server) => ({
+    ...server,
+    urls: (Array.isArray(server.urls) ? server.urls : [server.urls]).filter((url) => !/:53(?:\?|$)/.test(url))
+  })).filter((server) => server.urls.length > 0);
+}
+
+async function createIceServers(env: Env): Promise<IceServer[]> {
+  if (env.TURN_KEY_ID && env.TURN_KEY_API_TOKEN) {
+    const response = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${encodeURIComponent(env.TURN_KEY_ID)}/credentials/generate-ice-servers`, {
+      method: "POST",
+      headers: { "authorization": `Bearer ${env.TURN_KEY_API_TOKEN}`, "content-type": "application/json" },
+      body: JSON.stringify({ ttl: 46800 })
+    });
+    if (!response.ok) {
+      console.error(JSON.stringify({ event: "turn_credential_failure", status: response.status }));
+      throw new Error("TURN credential generation failed");
+    }
+    const body = await response.json<{ iceServers?: IceServer[] }>();
+    if (!Array.isArray(body.iceServers) || body.iceServers.length < 2) throw new Error("TURN credential response was incomplete");
+    return withoutBlockedBrowserPorts(body.iceServers);
+  }
+  if (env.ICE_SERVERS_JSON) {
+    const configured = JSON.parse(env.ICE_SERVERS_JSON) as IceServer[];
+    if (Array.isArray(configured) && configured.length > 0) return withoutBlockedBrowserPorts(configured);
+  }
+  throw new Error("TURN is not configured");
+}
+
 function json(data: unknown, status = 200): Response {
   return Response.json(data, { status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
 }
@@ -93,9 +122,10 @@ async function sessionResponse(request: Request, env: Env): Promise<Response> {
   if (!device || !(await tokensEqual(token, device.token))) return json({ error: "端末を確認できません" }, 401);
   const exp = Date.now() + 15 * 60_000;
   const ticket = await createTicket({ id: device.id, name: device.name, exp }, env.SESSION_SECRET);
-  const iceServers: IceServer[] = [{ urls: "stun:stun.cloudflare.com:3478" }];
-  if (env.ICE_SERVERS_JSON) {
-    try { iceServers.push(...JSON.parse(env.ICE_SERVERS_JSON) as IceServer[]); } catch { return json({ error: "TURN設定エラー" }, 500); }
+  let iceServers: IceServer[];
+  try { iceServers = await createIceServers(env); } catch (error) {
+    console.error(JSON.stringify({ event: "turn_configuration_error", error: String(error) }));
+    return json({ error: "TURN設定エラー" }, 503);
   }
   return json({ ticket, expiresAt: exp, serverNow: Date.now(), device: { id: device.id, name: device.name }, iceServers });
 }
