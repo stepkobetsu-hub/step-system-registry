@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTicket, parseDevices, tokensEqual, verifyTicket } from "../src/auth";
+import { createTicket, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "../src/auth";
 
 describe("device authentication", () => {
   it("parses two provisioned devices", () => {
@@ -26,5 +26,18 @@ describe("device authentication", () => {
     expect((await verifyTicket(ticket, secret, 1000))?.id).toBe("shinryo");
     expect(await verifyTicket(`${ticket}x`, secret, 1000)).toBeNull();
     expect(await verifyTicket(ticket, secret, 3000)).toBeNull();
+  });
+
+  it("assigns up to four stable device slots per campus with legacy aliases", () => {
+    const devices = parseDevices(JSON.stringify([
+      { id: "jinryo", name: "神領校", token: "a".repeat(24) },
+      { id: "otemachi", name: "大手町校", token: "b".repeat(24) }
+    ]));
+    expect(resolveDeviceIdentity("jinryo", devices)?.canonical.id).toBe("jinryo-1");
+    expect(resolveDeviceIdentity("shinryo", devices)?.canonical.id).toBe("jinryo-1");
+    expect(resolveDeviceIdentity("jinryo-4", devices)?.canonical.id).toBe("jinryo-4");
+    expect(resolveDeviceIdentity("otemachi", devices)?.canonical.id).toBe("otemachi-1");
+    expect(resolveDeviceIdentity("otemachi-4", devices)?.canonical.id).toBe("otemachi-4");
+    expect(resolveDeviceIdentity("jinryo-5", devices)).toBeNull();
   });
 });

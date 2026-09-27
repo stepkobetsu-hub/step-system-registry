@@ -27,14 +27,37 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.9' }
-      - run: gradle assembleDebug
+      - name: Prepare stable Fire release signing key
+        env:
+          STEP_VIDEO_KEYSTORE_B64: ${{ secrets.STEP_VIDEO_KEYSTORE_B64 }}
+        run: |
+          test -n "$STEP_VIDEO_KEYSTORE_B64"
+          echo "$STEP_VIDEO_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/step-video-release.p12"
+      - name: Build universal release APK
+        env:
+          STEP_VIDEO_KEYSTORE: ${{ runner.temp }}/step-video-release.p12
+          STEP_VIDEO_STORE_PASSWORD: ${{ secrets.STEP_VIDEO_STORE_PASSWORD }}
+          STEP_VIDEO_KEY_ALIAS: ${{ secrets.STEP_VIDEO_KEY_ALIAS }}
+          STEP_VIDEO_KEY_PASSWORD: ${{ secrets.STEP_VIDEO_KEY_PASSWORD }}
+        run: gradle assembleRelease
+      - name: Verify Fire compatibility and v1/v2 signatures
+        run: |
+          APK=app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" | tee /tmp/apk-signature.txt
+          grep -F 'Verified using v1 scheme (JAR signing): true' /tmp/apk-signature.txt
+          grep -F 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apk-signature.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee /tmp/apk-badging.txt
+          grep -F "package: name='jp.stepkobetsu.classroomvideo' versionCode='3' versionName='0.2.0-fire'" /tmp/apk-badging.txt
+          grep -F "sdkVersion:'22'" /tmp/apk-badging.txt
+          grep -F "targetSdkVersion:'28'" /tmp/apk-badging.txt
+          sha256sum "$APK"
       - uses: actions/upload-artifact@v4
-        with: { name: step-classroom-video-debug-apk, path: classroom-video/android/app/build/outputs/apk/debug/app-debug.apk }
+        with: { name: step-classroom-video-v0.2-release-apk, path: classroom-video/android/app/build/outputs/apk/release/app-release.apk }
       - name: Publish stable Fire APK download
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk STEP-Classroom-Video-Fire.apk
+          cp app/build/outputs/apk/release/app-release.apk STEP-Classroom-Video-Fire.apk
           gh release view classroom-video-fire >/dev/null 2>&1 || gh release create classroom-video-fire --title "STEP Classroom Video Fire" --notes "Fire tablet build"
           gh release upload classroom-video-fire STEP-Classroom-Video-Fire.apk --clobber

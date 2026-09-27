@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { createTicket, parseDevices, tokensEqual, verifyTicket } from "./auth";
+import { createTicket, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
 type Attachment = { id: string; name: string };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown };
@@ -78,7 +78,7 @@ export class VideoRoom extends DurableObject<Env> {
     if (message.type === "ping") { socket.send(JSON.stringify({ type: "pong", at: Date.now() })); return; }
     if (message.type === "signal") {
       if (typeof message.to !== "string" || message.to === sender.id || (!message.description && !message.candidate)) return;
-      this.sendTo(message.to, { ...message, from: sender.id });
+      this.sendTo(message.to, { ...message, from: sender.id, fromName: sender.name });
       return;
     }
     if (message.type === "call") {
@@ -118,13 +118,9 @@ async function sessionResponse(request: Request, env: Env): Promise<Response> {
   if (!body.deviceId || !token) return json({ error: "端末設定が必要です" }, 401);
   let devices;
   try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
-  // Canonical device ID is "jinryo". Keep compatibility with the existing
-  // production secret entry "shinryo" so the already-issued token remains valid.
-  const requestedId = body.deviceId === "shinryo" ? "jinryo" : body.deviceId;
-  const lookupId = requestedId === "jinryo" ? (devices.has("jinryo") ? "jinryo" : "shinryo") : requestedId;
-  const device = devices.get(lookupId);
-  if (!device || !(await tokensEqual(token, device.token))) return json({ error: "端末を確認できません" }, 401);
-  const canonicalDevice = requestedId === "jinryo" ? { ...device, id: "jinryo" } : device;
+  const identity = resolveDeviceIdentity(body.deviceId, devices);
+  if (!identity || !(await tokensEqual(token, identity.configured.token))) return json({ error: "端末を確認できません" }, 401);
+  const canonicalDevice = identity.canonical;
   const exp = Date.now() + 15 * 60_000;
   const ticket = await createTicket({ id: canonicalDevice.id, name: canonicalDevice.name, exp }, env.SESSION_SECRET);
   let iceServers: IceServer[];

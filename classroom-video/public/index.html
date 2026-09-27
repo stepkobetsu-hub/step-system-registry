@@ -13,7 +13,7 @@
     <section id="setup" class="panel hidden" aria-labelledby="setup-title">
       <h1 id="setup-title">端末の初期設定</h1>
       <p>管理者から渡された端末IDと端末トークンを最初の1回だけ入力します。</p>
-      <label>端末ID<input id="device-id" autocomplete="off" placeholder="jinryo"></label>
+      <label>端末ID<input id="device-id" autocomplete="off" placeholder="jinryo-1"></label>
       <label>端末トークン<input id="device-token" type="password" autocomplete="off"></label>
       <label>連続動作時間
         <select id="duration-hours">
@@ -40,20 +40,39 @@
     </section>
 
     <section id="call" class="call hidden">
-      <video id="remote-video" autoplay playsinline></video>
-      <video id="local-video" autoplay playsinline muted></video>
-      <header><span id="status-dot"></span><span id="status">接続中</span><strong id="peer-name">相手教室</strong></header>
+      <div id="remote-grid" class="remote-grid" aria-label="相手映像"></div>
+      <figure id="local-tile" class="local-tile"><video id="local-video" autoplay playsinline muted></video><figcaption>この端末</figcaption></figure>
+      <header><span id="status-dot"></span><span id="status">接続中</span><strong id="peer-summary">相手を待っています</strong></header>
       <div id="notice" class="notice hidden" role="status"></div>
       <div id="incoming" class="incoming hidden">
         <div id="incoming-text">呼び出しです</div>
         <button id="ack">確認</button>
       </div>
-      <nav aria-label="通話操作">
-        <button id="mic" aria-pressed="true"><span>🎙</span>マイク ON</button>
-        <button id="camera" aria-pressed="true"><span>📷</span>カメラ ON</button>
+      <nav id="controls" aria-label="通話操作">
+        <button id="mic" aria-pressed="true"><span>🎙</span><b>マイク ON</b></button>
+        <button id="camera" aria-pressed="true"><span class="video-icon" aria-hidden="true"></span><b>カメラ ON</b></button>
         <button id="alert" class="alert"><span>🔔</span>呼び出す</button>
+        <button id="settings-button"><span>⚙</span>設定</button>
         <button id="hangup" class="danger"><span>✕</span>終了</button>
       </nav>
+      <section id="settings" class="settings hidden" aria-labelledby="settings-title">
+        <h2 id="settings-title">端末設定</h2>
+        <p>端末：<strong id="settings-device"></strong></p>
+        <label>次回からの連続運転時間
+          <select id="settings-duration">
+            <option value="5">5時間</option><option value="6">6時間（標準）</option>
+            <option value="7">7時間</option><option value="8">8時間</option>
+            <option value="9">9時間</option><option value="10">10時間</option>
+            <option value="11">11時間</option><option value="12">12時間</option>
+          </select>
+        </label>
+        <div class="settings-actions">
+          <button id="chime-test">呼び出し音テスト</button>
+          <button id="settings-save" class="primary">保存</button>
+          <button id="settings-close">閉じる</button>
+        </div>
+        <button id="reset-device" class="reset-device">端末設定をリセット</button>
+      </section>
     </section>
   </main>
   <script src="/app.js" defer></script>

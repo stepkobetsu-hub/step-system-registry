@@ -15,7 +15,7 @@ describe("PR review regressions", () => {
   });
 
   it("offers only 5 through 12 hours and defaults to 6", () => {
-    const values = [...html.matchAll(/<option value="(\d+)"/g)].map((match) => Number(match[1]));
+    const values = [...new Set([...html.matchAll(/<option value="(\d+)"/g)].map((match) => Number(match[1])))];
     expect(values).toEqual([5, 6, 7, 8, 9, 10, 11, 12]);
     expect(html).toContain('<option value="6" selected>');
   });
@@ -39,10 +39,32 @@ describe("PR review regressions", () => {
 
   it("uses the alarm stream and restores its previous volume", () => {
     expect(android).toMatch(/AudioManager\.STREAM_ALARM/);
-    expect(android).toMatch(/getStreamMaxVolume\(AudioManager\.STREAM_ALARM\) \* 0\.65/);
+    expect(android).toMatch(/getStreamMaxVolume\(AudioManager\.STREAM_ALARM\) \* 0\.80/);
     expect(android).toMatch(/originalAlarmVolume/);
     expect(android).toMatch(/setStreamVolume\(AudioManager\.STREAM_ALARM, originalAlarmVolume/);
     expect(android).not.toContain("AudioManager.STREAM_NOTIFICATION");
+  });
+
+  it("keeps one peer connection and candidate queue per remote device", () => {
+    expect(app).toMatch(/peers:new Map\(\)/);
+    expect(app).toMatch(/state\.peers\.set\(peerInfo\.id,entry\)/);
+    expect(app).toMatch(/for\(const peer of present\.values\(\)\)/);
+    expect(app).not.toContain("peers[0]");
+  });
+
+  it("persists APK provisioning outside WebView localStorage", () => {
+    expect(android).toMatch(/getSharedPreferences\(PREFS, MODE_PRIVATE\)/);
+    expect(android).toMatch(/@JavascriptInterface public String loadConfig/);
+    expect(android).toMatch(/@JavascriptInterface public void saveConfig/);
+    expect(app).toMatch(/window\.StepNative\?\.loadConfig/);
+    expect(app).toMatch(/window\.StepNative\?\.saveConfig/);
+  });
+
+  it("keeps immersive fullscreen and auto-hides the controls", () => {
+    expect(android).toMatch(/SYSTEM_UI_FLAG_IMMERSIVE_STICKY/);
+    expect(android).toMatch(/onWindowFocusChanged/);
+    expect(app).toMatch(/controls-hidden/);
+    expect(app).toMatch(/7000/);
   });
 
   it("generates short-lived TURN credentials without exposing the long-lived key", () => {
