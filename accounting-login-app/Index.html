@@ -29,6 +29,12 @@
     .invoice-feature-copy{display:flex;align-items:center;gap:16px;min-width:0}.invoice-feature-icon{display:grid;place-items:center;width:52px;height:60px;flex-shrink:0;border:1px solid #a7d9cf;border-radius:12px;background:#fff;color:#0f766e}.invoice-feature-icon svg{width:32px;height:36px}
     .invoice-feature h2{font-size:20px;line-height:1.5;margin:0 0 3px;color:#134e4a}.invoice-feature p{font-size:14px;line-height:1.6;margin:0;color:#42665f}
     .invoice-launch{display:inline-flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;min-height:60px;padding:15px 25px;border:1px solid #0f766e;border-radius:13px;background:#0f766e;color:#fff;font-size:19px;font-weight:800;box-shadow:0 4px 10px rgba(15,118,110,.22)}.invoice-launch:hover{background:#115e59;border-color:#115e59}.invoice-launch:focus-visible{outline:3px solid #0f766e;outline-offset:4px}.invoice-launch svg{width:24px;height:24px}
+    .invoice-searching{display:none;position:relative;margin:18px 0 8px;padding:10px 12px 12px;overflow:hidden;border:1px solid #dbeafe;border-radius:16px;background:linear-gradient(180deg,#f8fbff,#fff);text-align:center}
+    .invoice-searching.show{display:block}.invoice-searching img{display:block;width:min(100%,340px);height:auto;margin:0 auto;animation:invoiceSearchFloat 2.4s ease-in-out infinite;filter:drop-shadow(0 8px 18px rgba(37,99,235,.08))}
+    .invoice-searching::after{content:"";position:absolute;inset:-20% -40%;pointer-events:none;background:linear-gradient(105deg,transparent 36%,rgba(255,255,255,.62) 49%,transparent 62%);transform:translateX(-65%);animation:invoiceSearchSweep 2.8s ease-in-out infinite}
+    @keyframes invoiceSearchFloat{0%,100%{transform:translateY(0) scale(1);opacity:.97}50%{transform:translateY(-5px) scale(1.012);opacity:1}}
+    @keyframes invoiceSearchSweep{0%,20%{transform:translateX(-65%)}70%,100%{transform:translateX(65%)}}
+    @media(prefers-reduced-motion:reduce){.invoice-searching img,.invoice-searching::after{animation:none}}
     @media(max-width:650px){.invoice-feature{align-items:stretch;flex-direction:column;gap:16px;padding:18px 16px}.invoice-feature h2{font-size:18px}.invoice-feature-copy{gap:12px}.invoice-launch{width:100%;min-height:58px}}
   </style>
 </head>
@@ -97,6 +103,7 @@
   <button type="button" id="invoiceVendorSettingsBtn" class="btn" style="margin-top:14px" onclick="openInvoiceVendorSettings()">＋ 取引先の追加・設定</button>
   <details style="margin:18px 0"><summary>保存先の設定</summary><p class="help">指定Gmailアカウントが保存できるGoogle Driveフォルダを設定できます。このアプリの共通設定です。</p><div class="field"><label for="invoiceFolder">保存先フォルダのURL</label><input id="invoiceFolder" type="text" placeholder="https://drive.google.com/drive/folders/…"></div><button id="invoiceFolderBtn" class="btn" style="margin-top:8px" onclick="saveInvoiceFolder()">保存先を変更</button></details>
   <p id="invoiceDestination" class="help"></p>
+  <div id="invoiceSearching" class="invoice-searching" aria-hidden="true"><img src="https://stepkobetsu-hub.github.io/step-system-registry/images/invoice-search-loading.webp" alt=""></div>
   <div id="invoiceStatus" role="status" aria-live="polite" style="margin:16px 0;white-space:pre-wrap"></div>
   <div id="invoiceResults"></div>
 </div></dialog>
@@ -422,8 +429,9 @@
   function attr(s){return esc(s).replace(/`/g,'&#96;')}
 let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false;
 function invoiceStatus(text){$('invoiceStatus').textContent=text;}
+function showInvoiceSearching(on){const box=$('invoiceSearching');if(box)box.classList.toggle('show',!!on);}
 function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn'].forEach(id=>$(id).disabled=on);}
-function invoiceError(e){invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
+function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
 function openInvoices(){
   $('invoiceDialog').showModal();$('invoiceVendorSettingsBtn').disabled=true;
   if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
@@ -435,21 +443,21 @@ function openInvoices(){
   }).withFailureHandler(invoiceError).getInvoiceSettings();
 }
 function closeInvoices(){ $('invoiceDialog').close(); }
-function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
+function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
 function searchInvoices(){
-  if(invoiceWaiting)return;invoiceWait(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('Gmailを検索しています。通常1〜数分かかります。');
+  if(invoiceWaiting)return;invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
   authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value);
 }
 function saveInvoiceFolder(){
-  if(invoiceWaiting)return;invoiceWait(true);invoiceStatus('保存先フォルダを確認しています。通常1分ほどかかります。');
+  if(invoiceWaiting)return;showInvoiceSearching(false);invoiceWait(true);invoiceStatus('保存先フォルダを確認しています。通常1分ほどかかります。');
   authenticatedRun().withSuccessHandler(r=>pollInvoice(r.jobId)).withFailureHandler(invoiceError).setInvoiceFolder($('invoiceFolder').value);
 }
 function pollInvoice(id){
   clearTimeout(invoicePollTimer);
   authenticatedRun().withSuccessHandler(j=>{
     if(j.status==='error'){invoiceError(new Error(j.message));return;}
-    if(j.status!=='done'){invoiceStatus((j.type==='search'?'請求書を検索・読み取り中':'処理中')+'です。通常1〜数分かかります。'+(j.scanned?'（'+j.scanned+'通確認済み）':''));invoicePollTimer=setTimeout(()=>pollInvoice(id),5000);return;}
-    invoiceWait(false);
+    if(j.status!=='done'){if(j.type==='search')showInvoiceSearching(true);invoiceStatus((j.type==='search'?'探しています… Gmailから請求書を検索・読み取り中':'処理中')+'です。通常1〜数分かかります。'+(j.scanned?'（'+j.scanned+'通確認済み）':''));invoicePollTimer=setTimeout(()=>pollInvoice(id),5000);return;}
+    showInvoiceSearching(false);invoiceWait(false);
     if(j.type==='search'){invoiceItems=j.items||[];invoiceStatus(j.message);renderInvoiceResults();}
     else if(j.type==='folder'){$('invoiceDestination').textContent='保存先：'+j.result.folderName;$('invoiceFolder').value=j.result.folderUrl;invoiceStatus('保存先を変更しました。');}
     else if(j.type==='save'){invoiceStatus(j.result.existing?'同じ請求書は保存済みです。':'PDFを保存しました。');const p=document.createElement('p'),a=document.createElement('a');a.href=safeUrl(j.result.url);a.target='_blank';a.rel='noopener';a.textContent=j.result.name+' をGoogle Driveで開く';p.appendChild(a);$('invoiceResults').prepend(p);}
@@ -463,7 +471,7 @@ function prepareInvoice(i){
   authenticatedRun().withSuccessHandler(p=>{invoiceWait(false);invoiceConfirmation={jobId:invoiceSearchJob,itemId:c.id,nonce:p.nonce};$('invoiceConfirmName').textContent=p.filename;$('invoiceConfirmFolder').textContent='保存先：'+p.folderName;$('invoiceConfirm').showModal();}).withFailureHandler(invoiceError).previewInvoiceSave(invoiceSearchJob,c.id,$('invDue'+i).value,$('invAmount'+i).value);
 }
 function confirmInvoice(){
-  if(invoiceWaiting||!invoiceConfirmation)return;invoiceWait(true);const p=invoiceConfirmation;
+  if(invoiceWaiting||!invoiceConfirmation)return;showInvoiceSearching(false);invoiceWait(true);const p=invoiceConfirmation;
   authenticatedRun().withSuccessHandler(r=>{$('invoiceConfirm').close();invoiceConfirmation=null;invoiceStatus('PDFを保存しています。通常1分ほどかかります。');pollInvoice(r.jobId);}).withFailureHandler(invoiceError).confirmInvoiceSave(p.jobId,p.itemId,p.nonce);
 }
 
