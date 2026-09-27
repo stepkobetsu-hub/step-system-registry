@@ -205,9 +205,12 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/type: "media-state", from: sender\.id/);
     expect(app).toContain("📹 ビデオ OFF");
     expect(app).toContain("🎤 マイク OFF");
+    expect(html).toContain('id="featured-mic-off"');
+    expect(app).toMatch(/function updateFeaturedMediaState/);
     expect(app).toMatch(/function sendMediaState/);
     expect(app).toMatch(/remoteMedia\?\.audio===false&&remoteMedia\?\.video===false/);
     expect(css).toMatch(/\.camera-off/);
     expect(css).toMatch(/\.mic-off/);
+    expect(css).toMatch(/\.featured-mic-off/);
   });
 });
