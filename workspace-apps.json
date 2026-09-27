@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "STEP 教室ビデオ通話",
+      "状態": "**本番使用中（Fire APK v0.2.7・固定release署名）**",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/step-system-registry/classroom-video-install.html<br>**固定APK:** https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk<br>**本番Worker:** https://step-classroom-video.stepkobetsu.workers.dev/"
+    },
+    {
       "正式名称": "デジタルカレンダー",
       "状態": "本番公開中（Sites版54・Fire 7／Windows 10・11）",
       "利用者向けURL": "https://fire-digital-calendar.mintcocoajasmine.chatgpt.site"
