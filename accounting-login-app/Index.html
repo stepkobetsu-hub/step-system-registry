@@ -44,7 +44,7 @@
   <div class="wrap" id="appView" hidden>
     <div class="top">
       <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。登録するサービスのパスワードはアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
-      <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
+      <div class="top-actions"><button class="btn primary" onclick="openInvoices()">請求書を探す</button><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
     <div class="toolbar">
       <div class="searchrow"><div class="search">🔎<input aria-label="検索" id="search" placeholder="サービス名、ID、勘定科目、メモなどを検索" autocomplete="off"></div><span class="count" id="count"></span></div>
@@ -72,6 +72,26 @@
     </div>
     <div class="modalFoot"><button type="button" class="btn danger" id="deleteBtn" onclick="removeEntry()">削除</button><div class="rightBtns"><button type="button" class="btn" onclick="editDialog.close()">キャンセル</button><button class="btn primary" type="submit">保存</button></div></div>
   </form></dialog>
+
+<dialog id="invoiceDialog" aria-labelledby="invoiceTitle"><div class="modal">
+  <div class="modalHead"><h2 id="invoiceTitle">Gmailから請求書を保存</h2><button class="x" aria-label="請求書画面を閉じる" onclick="closeInvoices()">×</button></div>
+  <p class="help">取引先と支払い月を選んで検索します。PDFの保存前に、ファイル名と保存先を確認できます。</p>
+  <form onsubmit="event.preventDefault();searchInvoices()"><div class="formGrid">
+    <div class="field"><label for="invoiceVendor">取引先名</label><select id="invoiceVendor"><option value="exseed">エクシード</option><option value="esia">イージア</option></select></div>
+    <div class="field"><label for="invoiceMonth">支払い月</label><input id="invoiceMonth" type="month" required></div>
+  </div><p class="help">支払期限・支払予定日の月で照合します。検索範囲は支払い月の前3か月から翌月の受信分です。</p>
+  <button id="invoiceSearchBtn" class="btn primary" type="submit">Gmailで請求書を探す</button></form>
+  <details style="margin:18px 0"><summary>保存先の設定</summary><p class="help">指定Gmailアカウントが保存できるGoogle Driveフォルダを設定できます。このアプリの共通設定です。</p><div class="field"><label for="invoiceFolder">保存先フォルダのURL</label><input id="invoiceFolder" type="text" placeholder="https://drive.google.com/drive/folders/…"></div><button id="invoiceFolderBtn" class="btn" style="margin-top:8px" onclick="saveInvoiceFolder()">保存先を変更</button></details>
+  <p id="invoiceDestination" class="help"></p>
+  <div id="invoiceStatus" role="status" aria-live="polite" style="margin:16px 0;white-space:pre-wrap"></div>
+  <div id="invoiceResults"></div>
+</div></dialog>
+<dialog id="invoiceConfirm" aria-labelledby="invoiceConfirmTitle"><div class="modal">
+  <div class="modalHead"><h2 id="invoiceConfirmTitle">このタイトルで保存しますが、OKですか？</h2></div>
+  <p id="invoiceConfirmName" style="font-weight:800;overflow-wrap:anywhere"></p><p id="invoiceConfirmFolder"></p>
+  <p class="help">元の請求書PDFを保存します。既に同じ内容・名前のPDFがある場合は、そのリンクを表示します。</p>
+  <div class="rightBtns"><button class="btn" onclick="$('invoiceConfirm').close()">キャンセル</button><button id="invoiceConfirmBtn" class="btn primary" onclick="confirmInvoice()">OK・PDFを保存</button></div>
+</div></dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
@@ -104,7 +124,7 @@
       withSuccessHandler(fn){success=fn;return runner},
       withFailureHandler(fn){failure=fn;return runner}
     };
-    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry'].forEach(name=>{
+    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave'].forEach(name=>{
       runner[name]=(...args)=>{
         if(!token){failure(new Error('APP_SESSION_REQUIRED'));return}
         google.script.run
@@ -118,6 +138,7 @@
   function storedSession(){try{return localStorage.getItem(SESSION_STORAGE_KEY)||''}catch{return ''}}
   function clearStoredSession(){try{localStorage.removeItem(SESSION_STORAGE_KEY)}catch{}}
   function showLogin(message=''){
+    resetInvoices();
     sessionEpoch++;sessionToken='';entries=[];loadedOrder=[];sheetUrl='';editingId='';editingRevision='';shownPassword='';
     clearTimeout(secretTimer);clearTimeout(tt);
     [editDialog,memoDialog,secretDialog].forEach(d=>{if(d.open)d.close()});
@@ -366,6 +387,53 @@
   function norm(s){return String(s||'').normalize('NFKC').toLocaleLowerCase('ja').replace(/\s+/g,' ').trim()}
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function attr(s){return esc(s).replace(/`/g,'&#96;')}
+let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false;
+function invoiceStatus(text){$('invoiceStatus').textContent=text;}
+function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn'].forEach(id=>$(id).disabled=on);}
+function invoiceError(e){invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
+function openInvoices(){
+  $('invoiceDialog').showModal();
+  if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+  authenticatedRun().withSuccessHandler(s=>{
+    $('invoiceFolder').value=s.folderUrl||'';$('invoiceDestination').textContent='検索するGmail：'+s.mailbox+'\n保存先：'+(s.folderName||'未設定');
+    if(!s.ready)invoiceStatus('Gmail接続の初期設定がまだ完了していません。');
+    else if(!s.healthy)invoiceStatus('Gmail接続の応答を待っています。長く続く場合は管理者に連絡してください。');
+  }).withFailureHandler(invoiceError).getInvoiceSettings();
+}
+function closeInvoices(){ $('invoiceDialog').close(); }
+function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;invoiceWait(false);['invoiceDialog','invoiceConfirm'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
+function searchInvoices(){
+  if(invoiceWaiting)return;invoiceWait(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('Gmailを検索しています。通常1〜数分かかります。');
+  authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value);
+}
+function saveInvoiceFolder(){
+  if(invoiceWaiting)return;invoiceWait(true);invoiceStatus('保存先フォルダを確認しています。通常1分ほどかかります。');
+  authenticatedRun().withSuccessHandler(r=>pollInvoice(r.jobId)).withFailureHandler(invoiceError).setInvoiceFolder($('invoiceFolder').value);
+}
+function pollInvoice(id){
+  clearTimeout(invoicePollTimer);
+  authenticatedRun().withSuccessHandler(j=>{
+    if(j.status==='error'){invoiceError(new Error(j.message));return;}
+    if(j.status!=='done'){invoiceStatus((j.type==='search'?'請求書を検索・読み取り中':'処理中')+'です。通常1〜数分かかります。'+(j.scanned?'（'+j.scanned+'通確認済み）':''));invoicePollTimer=setTimeout(()=>pollInvoice(id),5000);return;}
+    invoiceWait(false);
+    if(j.type==='search'){invoiceItems=j.items||[];invoiceStatus(j.message);renderInvoiceResults();}
+    else if(j.type==='folder'){$('invoiceDestination').textContent='保存先：'+j.result.folderName;$('invoiceFolder').value=j.result.folderUrl;invoiceStatus('保存先を変更しました。');}
+    else if(j.type==='save'){invoiceStatus(j.result.existing?'同じ請求書は保存済みです。':'PDFを保存しました。');const p=document.createElement('p'),a=document.createElement('a');a.href=safeUrl(j.result.url);a.target='_blank';a.rel='noopener';a.textContent=j.result.name+' をGoogle Driveで開く';p.appendChild(a);$('invoiceResults').prepend(p);}
+  }).withFailureHandler(invoiceError).getInvoiceJob(id);
+}
+function renderInvoiceResults(){
+  $('invoiceResults').innerHTML=invoiceItems.map((c,i)=>`<section class="card" style="margin-top:14px"><h3 style="margin-top:0">${esc(c.vendor)}</h3><p>${esc(c.subject)}</p><p class="help">${esc(c.sourceKind)}</p>${c.needsReview?'<p style="color:#b45309">日付または金額を確定できませんでした。元の請求書を確認して入力してください。</p>':''}<div class="formGrid"><div class="field"><label for="invDue${i}">支払日</label><input type="date" id="invDue${i}" value="${attr(c.due)}"></div><div class="field"><label for="invAmount${i}">請求金額（円）</label><input type="number" min="0" step="1" id="invAmount${i}" value="${attr(c.amount)}"></div></div><p><a href="${attr(safeUrl(c.sourceUrl))}" target="_blank" rel="noopener">元のメールを開く</a></p><details><summary>読み取った内容を確認</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(c.evidence)}</pre></details><button class="btn primary" style="margin-top:12px" onclick="prepareInvoice(${i})">保存名を確認</button></section>`).join('');
+}
+function prepareInvoice(i){
+  if(invoiceWaiting)return;const c=invoiceItems[i];invoiceWait(true);
+  authenticatedRun().withSuccessHandler(p=>{invoiceWait(false);invoiceConfirmation={jobId:invoiceSearchJob,itemId:c.id,nonce:p.nonce};$('invoiceConfirmName').textContent=p.filename;$('invoiceConfirmFolder').textContent='保存先：'+p.folderName;$('invoiceConfirm').showModal();}).withFailureHandler(invoiceError).previewInvoiceSave(invoiceSearchJob,c.id,$('invDue'+i).value,$('invAmount'+i).value);
+}
+function confirmInvoice(){
+  if(invoiceWaiting||!invoiceConfirmation)return;invoiceWait(true);const p=invoiceConfirmation;
+  authenticatedRun().withSuccessHandler(r=>{$('invoiceConfirm').close();invoiceConfirmation=null;invoiceStatus('PDFを保存しています。通常1分ほどかかります。');pollInvoice(r.jobId);}).withFailureHandler(invoiceError).confirmInvoiceSave(p.jobId,p.itemId,p.nonce);
+}
+
 </script>
 </body>
 </html>
+
