@@ -4444,5 +4444,29 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="classroom-video-install-qr-link-20260928">
+(() => {
+  const QR_URL='https://stepkobetsu-hub.github.io/step-system-registry/images/classroom-video-install-qr.png';
+  function attach(){
+    document.querySelectorAll('#cards .card, .card').forEach(card=>{
+      if(!String(card.textContent||'').includes('STEP 教室ビデオ通話')) return;
+      if(card.querySelector('[data-classroom-video-install-qr]')) return;
+      const holder=card.querySelector('.actions')||card.querySelector('.daily-links')||card;
+      const a=document.createElement('a');
+      a.href=QR_URL;
+      a.target='_blank';
+      a.rel='noopener noreferrer';
+      a.textContent='インストール用QRコード';
+      a.dataset.classroomVideoInstallQr='true';
+      a.style.cssText='display:inline-block;margin:8px 6px 0 0;padding:9px 12px;border:1px solid #2563eb;border-radius:10px;color:#1d4ed8;background:#eff6ff;font-weight:800;text-decoration:none;';
+      holder.appendChild(a);
+    });
+  }
+  const start=()=>{attach();new MutationObserver(attach).observe(document.getElementById('cards')||document.body,{childList:true,subtree:true});};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
+
 </body>
 </html>
