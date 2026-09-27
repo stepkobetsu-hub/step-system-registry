@@ -3,7 +3,8 @@ import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resol
 
 type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
-type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } | { type: "ping" };
+type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } |
+  { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 
 function withoutBlockedBrowserPorts(servers: IceServer[]): IceServer[] {
@@ -82,6 +83,11 @@ export class VideoRoom extends DurableObject<Env> {
     try { message = JSON.parse(raw) as ClientMessage; } catch { return; }
     if (message.type === "ping") { this.safeSend(socket, { type: "pong", at: Date.now() }); return; }
     if (sender.mode !== "active") return;
+    if (message.type === "media-state") {
+      if (typeof message.audio !== "boolean" || typeof message.video !== "boolean") return;
+      this.broadcast({ type: "media-state", from: sender.id, audio: message.audio, video: message.video }, sender.id, "active");
+      return;
+    }
     if (message.type === "signal") {
       if (typeof message.to !== "string" || message.to === sender.id || (!message.description && !message.candidate && message.restart !== true)) return;
       this.sendTo(message.to, { ...message, from: sender.id, fromName: sender.name });
