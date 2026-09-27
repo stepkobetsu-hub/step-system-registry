@@ -1,0 +1,10 @@
+{
+  "name": "STEP 教室ビデオ",
+  "short_name": "教室ビデオ",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#061727",
+  "theme_color": "#102a43",
+  "icons": []
+}
