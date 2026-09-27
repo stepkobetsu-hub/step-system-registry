@@ -6,6 +6,7 @@ type SignalMessage = { type: "signal"; to: string; description?: unknown; candid
 type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
   { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
+const V032_DEPLOYED_AT = 1_790_532_911_000;
 
 function withoutBlockedBrowserPorts(servers: IceServer[]): IceServer[] {
   return servers.map((server) => ({
@@ -97,14 +98,17 @@ export class VideoRoom extends DurableObject<Env> {
   }
 
   private async registerDevice(request: Request): Promise<Response> {
-    const body: { installationId?: string; preferredName?: string; ip?: string; verifiedLegacyId?: string } =
-      await request.json<{ installationId?: string; preferredName?: string; ip?: string; verifiedLegacyId?: string }>().catch(() => ({}));
+    const body: { installationId?: string; preferredName?: string; ip?: string; verifiedLegacyId?: string; verifiedRegisteredId?: string; recoveryLegacyId?: string } =
+      await request.json<{ installationId?: string; preferredName?: string; ip?: string; verifiedLegacyId?: string; verifiedRegisteredId?: string; recoveryLegacyId?: string }>().catch(() => ({}));
     if (!body.installationId || !/^[a-f0-9-]{32,64}$/i.test(body.installationId)) return json({ error: "登録情報が不正です" }, 400);
-    const existing = this.ctx.storage.sql.exec<{ id: string; name: string; credential: string }>(
-      "SELECT id, name, credential FROM registered_devices WHERE installation_id = ?", body.installationId
+    const existing = this.ctx.storage.sql.exec<{ id: string; name: string; credential: string; created_at: number }>(
+      "SELECT id, name, credential, created_at FROM registered_devices WHERE installation_id = ?", body.installationId
     ).toArray()[0];
     if (existing) {
       if (body.verifiedLegacyId && body.verifiedLegacyId !== existing.id) this.retireLegacyDevice(body.verifiedLegacyId, existing.id);
+      if (existing.created_at < V032_DEPLOYED_AT && body.verifiedRegisteredId === existing.id && body.recoveryLegacyId && body.recoveryLegacyId !== existing.id) {
+        this.retireLegacyDevice(body.recoveryLegacyId, existing.id);
+      }
       return json({ device: { id: existing.id, name: existing.name }, credential: existing.credential });
     }
     const now = Date.now(), ip = (body.ip || "unknown").slice(0, 80), since = now - 86_400_000;
@@ -302,10 +306,14 @@ export default {
     if (url.pathname === "/api/register" && request.method === "POST") {
       const body: {
         installationId?: string; preferredName?: string; legacyDeviceId?: string; legacyCredential?: string;
+        registeredDeviceId?: string; registeredCredential?: string;
       } = await request.json<{
         installationId?: string; preferredName?: string; legacyDeviceId?: string; legacyCredential?: string;
+        registeredDeviceId?: string; registeredCredential?: string;
       }>().catch(() => ({}));
       let verifiedLegacyId: string | undefined;
+      let verifiedRegisteredId: string | undefined;
+      let recoveryLegacyId: string | undefined;
       if (body.legacyDeviceId || body.legacyCredential) {
         let devices;
         try { devices = parseDevices(env.DEVICE_TOKENS); }
@@ -316,12 +324,31 @@ export default {
         }
         verifiedLegacyId = identity.canonical.id;
       }
+      if (body.registeredDeviceId || body.registeredCredential) {
+        if (!body.registeredDeviceId || !body.registeredCredential) return json({ error: "登録済み端末を確認できません" }, 401);
+        const authenticated = await env.ROOMS.getByName("step-main").fetch("https://registry.internal/authenticate", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ deviceId: body.registeredDeviceId, credential: body.registeredCredential })
+        });
+        if (!authenticated.ok) return json({ error: "登録済み端末を確認できません" }, 401);
+        verifiedRegisteredId = (await authenticated.json<{ device: { id: string } }>()).device.id;
+        const legacyName = /^(神領|大手町)(\d{1,2})$/.exec(String(body.preferredName || "").trim());
+        if (legacyName) {
+          let devices;
+          try { devices = parseDevices(env.DEVICE_TOKENS); }
+          catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
+          const candidate = `${legacyName[1] === "神領" ? "jinryo" : "otemachi"}-${legacyName[2]}`;
+          recoveryLegacyId = resolveDeviceIdentity(candidate, devices)?.canonical.id;
+        }
+      }
       return env.ROOMS.getByName("step-main").fetch("https://registry.internal/register", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({
           installationId: body.installationId,
           preferredName: body.preferredName,
           verifiedLegacyId,
+          verifiedRegisteredId,
+          recoveryLegacyId,
           ip: request.headers.get("cf-connecting-ip") || "unknown"
         })
       });

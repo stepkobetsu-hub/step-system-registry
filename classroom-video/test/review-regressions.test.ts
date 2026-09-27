@@ -207,6 +207,10 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/this\.ctx\.getWebSockets\(`device:\$\{id\}`\)/);
     expect(worker).toMatch(/Device migrated/);
     expect(worker).toMatch(/if \(this\.isLegacyRetired\(id\)\).*status: 401/s);
+    expect(app).toMatch(/registeredDeviceId:previous\.deviceId/);
+    expect(app).toMatch(/registeredCredential:previous\.token/);
+    expect(worker).toMatch(/existing\.created_at < V032_DEPLOYED_AT/);
+    expect(worker).toMatch(/verifiedRegisteredId === existing\.id/);
   });
 
   it("removes sockets that stopped sending presence heartbeats", () => {
