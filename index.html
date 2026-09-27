@@ -4410,7 +4410,7 @@ applyAssetInfo=function(item){
     'システム名':'STEP 教室ビデオ通話',
     '正式名称':'STEP 教室ビデオ通話（Fireタブレット用）',
     '分類':'管理・運営',
-    '状態':'本番使用中（v0.3.2-fire・固定release署名）',
+    '状態':'本番使用中（v0.3.3-fire・固定release署名）',
     '利用者':'管理者・スタッフ',
     '運用担当':'管理者',
     '概要':'神領校と大手町校をFire HD 8で長時間つなぐ教室間ビデオ通話。複数端末WebRTC mesh、相手教室だけへの呼び出し、再接続、休止運転に対応。',
@@ -4432,7 +4432,7 @@ applyAssetInfo=function(item){
     '変更時の注意':'自動登録credential、TURN秘密値、固定release署名鍵を公開GitHub・公開台帳へ掲載しない。固定release署名鍵を紛失しない。',
     '確認日':'2026年9月27日',
     '確認済み事項':['Fire向け固定release署名','v1/v2署名','固定APK URL','複数端末接続','教室別呼び出し','操作バー自動非表示','下スワイプ非表示','自端末赤丸表示','端末名選択','ダブルタップAPK再起動','トリプルタップAPK完全終了'],
-    '確認状況':'v0.3.2-fireで固定APK初回起動時の自動登録、認証済み旧IDの無効化、無通信socketのpresence除去を実装。1物理端末を1件だけ表示し、自由表示名と個別呼び出しを維持。'
+    '確認状況':'v0.3.3-fireで自動登録、旧ID無効化、無通信presence除去を維持。Fire HD 8向けに右側小窓を縮小し、重ならない間隔で配置。'
   };
   const base=organizeEntryImport;
   organizeEntryImport=function(items){
