@@ -47,6 +47,13 @@ export function resolveDeviceIdentity(requestedId: string, devices: Map<string, 
   return { configured, canonical: { ...configured, id: `${campusId}-${slot}` } };
 }
 
+export function displayNameForDevice(device: Device, requestedName?: string): string {
+  const custom = requestedName?.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 24);
+  if (custom) return custom;
+  const slot = /-([1-4])$/.exec(device.id)?.[1];
+  return slot ? `${device.name} ${slot}` : device.name;
+}
+
 export async function tokensEqual(left: string, right: string): Promise<boolean> {
   const key = await crypto.subtle.importKey("raw", encoder.encode("step-token-compare"), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const [a, b] = await Promise.all([
