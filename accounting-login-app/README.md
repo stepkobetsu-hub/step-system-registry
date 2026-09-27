@@ -6,7 +6,7 @@ Google Sheets の「経理ログイン管理」シートをデータ源にした
 
 [経理ログイン管理を開く](https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec)
 
-2026年9月27日にバージョン28へ更新しました。利用URLは変更していません。
+2026年9月27日にバージョン29へ更新しました。利用URLは変更していません。
 
 - 実行ユーザー：デプロイした管理アカウント。デプロイのアクセス設定：全員（匿名で開けるのはログイン画面のみ）。
 - Googleアカウントではなく、指定の講師マスターのA列（管理者ID）、AJ列（パスワード）、AK列（権限）で認証します。AKが数値で2以上、かつID・パスワードが一致する場合のみ利用できます。1行目もデータとして扱います。
@@ -89,9 +89,9 @@ J列はアプリが各項目を安定して識別するための内部IDです�
 
 ## ファビコン
 
-- 経理ログイン管理専用の青い「￥＋帳簿」PNGを使用します。
+- 経理ログイン管理専用の緑の電卓＋金色の円マークPNGを使用します。
 - 2026-09-27、入口表示時のGoogle追加認証を避けるため、Driveへコピーする方式を廃止しました。
-- 現在は `https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png` を `setFaviconUrl()` へ直接指定します。
+- 現在は `https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-calculator-yen-v3.png` を `setFaviconUrl()` へ直接指定します。
 - これにより、Webアプリを開くだけでDrive権限を要求しない構成にしています。
 
 ## Gmail請求書の検索・保存
