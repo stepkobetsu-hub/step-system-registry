@@ -1,7 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
-type Attachment = { id: string; name: string };
+type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
 type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
@@ -43,7 +43,8 @@ function socketAttachment(socket: WebSocket): Attachment | null {
   const value: unknown = socket.deserializeAttachment();
   if (!value || typeof value !== "object") return null;
   const attachment = value as Partial<Attachment>;
-  return typeof attachment.id === "string" && typeof attachment.name === "string" ? attachment as Attachment : null;
+  return typeof attachment.id === "string" && typeof attachment.name === "string" &&
+    (attachment.mode === "active" || attachment.mode === "standby") ? attachment as Attachment : null;
 }
 
 export class VideoRoom extends DurableObject<Env> {
@@ -57,15 +58,19 @@ export class VideoRoom extends DurableObject<Env> {
   fetch(request: Request): Response {
     if (request.headers.get("upgrade") !== "websocket") return new Response("WebSocket required", { status: 426 });
     const id = request.headers.get("x-device-id");
-    const name = request.headers.get("x-device-name");
+    const encodedName = request.headers.get("x-device-name");
+    const mode = request.headers.get("x-device-mode") === "standby" ? "standby" : "active";
+    let name = "";
+    try { name = decodeURIComponent(encodedName ?? ""); } catch { return new Response("Unauthorized", { status: 401 }); }
     if (!id || !name) return new Response("Unauthorized", { status: 401 });
 
-    for (const current of this.ctx.getWebSockets(`device:${id}`)) current.close(4001, "Replaced by a new connection");
+    for (const current of this.ctx.getWebSockets(`device:${id}`)) this.closeSocket(current, 4001, "Replaced by a new connection");
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     this.ctx.acceptWebSocket(server, [`device:${id}`]);
-    server.serializeAttachment({ id, name } satisfies Attachment);
-    server.send(JSON.stringify({ type: "welcome", self: { id, name }, peers: this.peers(id) }));
+    server.serializeAttachment({ id, name, mode, connectedAt: Date.now() } satisfies Attachment);
+    this.safeSend(server, { type: "welcome", self: { id, name }, mode, peers: this.peers(id) });
+    if (mode === "active") this.broadcast({ type: "wake", from: { id, name } }, id, "standby");
     this.broadcast({ type: "presence", peers: this.peers() }, id);
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -75,7 +80,8 @@ export class VideoRoom extends DurableObject<Env> {
     if (!sender || typeof raw !== "string" || raw.length > 32_768) return;
     let message: ClientMessage;
     try { message = JSON.parse(raw) as ClientMessage; } catch { return; }
-    if (message.type === "ping") { socket.send(JSON.stringify({ type: "pong", at: Date.now() })); return; }
+    if (message.type === "ping") { this.safeSend(socket, { type: "pong", at: Date.now() }); return; }
+    if (sender.mode !== "active") return;
     if (message.type === "signal") {
       if (typeof message.to !== "string" || message.to === sender.id || (!message.description && !message.candidate && message.restart !== true)) return;
       this.sendTo(message.to, { ...message, from: sender.id, fromName: sender.name });
@@ -86,7 +92,7 @@ export class VideoRoom extends DurableObject<Env> {
       const senderCampus = campusOfDevice(sender.id);
       if (!senderCampus) return;
       const recent = this.ctx.storage.sql.exec<{ created_at: number }>("SELECT created_at FROM calls WHERE sender = ? ORDER BY created_at DESC LIMIT 1", sender.id).toArray()[0];
-      if (recent && Date.now() - recent.created_at < 10_000) { socket.send(JSON.stringify({ type: "cooldown" })); return; }
+      if (recent && Date.now() - recent.created_at < 10_000) { this.safeSend(socket, { type: "cooldown" }); return; }
       this.ctx.storage.sql.exec("INSERT INTO calls (id, sender, created_at) VALUES (?, ?, ?)", message.callId, sender.id, Date.now());
       this.broadcastToCampus(senderCampus === "jinryo" ? "otemachi" : "jinryo", { type: "call", callId: message.callId, from: sender });
       return;
@@ -103,19 +109,37 @@ export class VideoRoom extends DurableObject<Env> {
   }
 
   webSocketClose(socket: WebSocket): void { const id = socketAttachment(socket)?.id; this.broadcast({ type: "presence", peers: this.peers() }, id); }
-  webSocketError(socket: WebSocket): void { const id = socketAttachment(socket)?.id; socket.close(1011, "Socket error"); this.broadcast({ type: "presence", peers: this.peers() }, id); }
+  webSocketError(socket: WebSocket): void { const id = socketAttachment(socket)?.id; this.closeSocket(socket, 1011, "Socket error"); this.broadcast({ type: "presence", peers: this.peers() }, id); }
 
   private peers(exclude?: string): Attachment[] {
-    return this.ctx.getWebSockets().map(socketAttachment).filter((peer): peer is Attachment => Boolean(peer && peer.id !== exclude));
+    const peers = new Map<string, Attachment>();
+    for (const socket of this.ctx.getWebSockets()) {
+      if (socket.readyState !== WebSocket.OPEN) continue;
+      const peer = socketAttachment(socket);
+      if (!peer || peer.mode !== "active" || peer.id === exclude) continue;
+      const previous = peers.get(peer.id);
+      if (!previous || previous.connectedAt < peer.connectedAt) peers.set(peer.id, peer);
+    }
+    return [...peers.values()].map(({ id, name, mode, connectedAt }) => ({ id, name, mode, connectedAt }));
   }
-  private sendTo(id: string, value: unknown): void { for (const socket of this.ctx.getWebSockets(`device:${id}`)) socket.send(JSON.stringify(value)); }
+  private safeSend(socket: WebSocket, value: unknown): boolean {
+    if (socket.readyState !== WebSocket.OPEN) return false;
+    try { socket.send(typeof value === "string" ? value : JSON.stringify(value)); return true; }
+    catch (error) { console.warn(JSON.stringify({ event: "websocket_send_skipped", error: String(error) })); return false; }
+  }
+  private closeSocket(socket: WebSocket, code: number, reason: string): void {
+    if (socket.readyState === WebSocket.CLOSING || socket.readyState === WebSocket.CLOSED) return;
+    try { socket.close(code, reason); } catch { /* already closing */ }
+  }
+  private sendTo(id: string, value: unknown): void { for (const socket of this.ctx.getWebSockets(`device:${id}`)) this.safeSend(socket, value); }
   private broadcastToCampus(campus: "jinryo" | "otemachi", value: unknown): void {
-    const body = JSON.stringify(value);
-    for (const socket of this.ctx.getWebSockets()) if (campusOfDevice(socketAttachment(socket)?.id ?? "") === campus) socket.send(body);
+    for (const socket of this.ctx.getWebSockets()) if (campusOfDevice(socketAttachment(socket)?.id ?? "") === campus) this.safeSend(socket, value);
   }
-  private broadcast(value: unknown, exclude?: string): void {
-    const body = JSON.stringify(value);
-    for (const socket of this.ctx.getWebSockets()) if (socketAttachment(socket)?.id !== exclude) socket.send(body);
+  private broadcast(value: unknown, exclude?: string, mode?: Attachment["mode"]): void {
+    for (const socket of this.ctx.getWebSockets()) {
+      const peer = socketAttachment(socket);
+      if (peer?.id !== exclude && (!mode || peer?.mode === mode)) this.safeSend(socket, value);
+    }
   }
 }
 
@@ -149,7 +173,8 @@ export default {
       const session = await verifyTicket(ticket, env.SESSION_SECRET);
       if (!session) return new Response("Unauthorized", { status: 401 });
       const headers = new Headers(request.headers);
-      headers.set("x-device-id", session.id); headers.set("x-device-name", session.name);
+      const mode = url.searchParams.get("mode") === "standby" ? "standby" : "active";
+      headers.set("x-device-id", session.id); headers.set("x-device-name", encodeURIComponent(session.name)); headers.set("x-device-mode", mode);
       return env.ROOMS.getByName("step-main").fetch(new Request(request, { headers }));
     }
     return env.ASSETS.fetch(request);

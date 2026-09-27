@@ -29,6 +29,23 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/serverNow: Date\.now\(\)/);
   });
 
+  it("keeps a lightweight standby connection and wakes when another tablet joins", () => {
+    expect(app).toMatch(/mode=standby/);
+    expect(app).toMatch(/message\.type==="wake"/);
+    expect(app).toMatch(/startStandby\(\)/);
+    expect(app).toMatch(/function enterRest\(\).*startStandby\(\)/);
+    expect(worker).toMatch(/mode === "active".*type: "wake"/s);
+    expect(worker).toMatch(/peer\.mode !== "active"/);
+  });
+
+  it("skips stale sockets without interrupting signaling", () => {
+    expect(worker).toMatch(/socket\.readyState !== WebSocket\.OPEN/);
+    expect(worker).toMatch(/private safeSend/);
+    expect(worker).toMatch(/websocket_send_skipped/);
+    expect(worker).toMatch(/const peers = new Map<string, Attachment>/);
+    expect(worker).toMatch(/encodeURIComponent\(session\.name\)/);
+  });
+
   it("limits WebView navigation and permissions to the configured origin", () => {
     expect(android).toMatch(/shouldOverrideUrlLoading/);
     expect(android).toMatch(/!isAllowedOrigin\(request\.getUrl\(\)\)/);
