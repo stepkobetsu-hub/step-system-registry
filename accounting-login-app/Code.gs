@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-allowed-accounts';
+const APP_VERSION = '2026-09-27-browser-sessions';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
@@ -23,6 +23,47 @@ function requireAllowedUser_() {
     throw new Error('このアカウントには利用権限がありません。許可されたGoogleアカウントでログインしてください。');
   }
   return email;
+}
+
+
+const APP_SESSION_PREFIX = 'ACCOUNTING_APP_SESSION_';
+
+// Tokens are browser-specific, tied to the authenticated Google user, and
+// remain valid until that browser logs out. Only a SHA-256 digest is stored.
+function appSessionKey_(token) {
+  if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) {
+    throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  }
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, token);
+  return APP_SESSION_PREFIX + digest.map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');
+}
+
+function requireAppSession_(token) {
+  const email = requireAllowedUser_();
+  const value = PropertiesService.getUserProperties().getProperty(appSessionKey_(token));
+  if (!value || JSON.parse(value).email !== email) {
+    throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  }
+  return email;
+}
+
+function loginApp() {
+  const email = requireAllowedUser_();
+  const token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').toLowerCase();
+  PropertiesService.getUserProperties().setProperty(
+    appSessionKey_(token), JSON.stringify({email, createdAt: new Date().toISOString()})
+  );
+  return {token, email};
+}
+
+function logoutApp(token) {
+  requireAllowedUser_();
+  PropertiesService.getUserProperties().deleteProperty(appSessionKey_(token));
+  return {ok: true};
+}
+
+function getLoginAccount() {
+  return {email: requireAllowedUser_()};
 }
 
 function getFaviconUrl_() {
@@ -46,7 +87,7 @@ function getFaviconUrl_() {
   return 'https://drive.google.com/uc?id=' + encodeURIComponent(fileId) + '&export=download&format=png';
 }
 
-function setupSpreadsheet() {
+function setupSpreadsheet_() {
   requireAllowedUser_();
   PropertiesService.getScriptProperties()
     .setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
@@ -63,15 +104,15 @@ function doGet() {
     .setFaviconUrl(getFaviconUrl_())
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
-function getAppData() {
-  requireAllowedUser_();
+function getAppData(sessionToken) {
+  requireAppSession_(sessionToken);
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     const ss = getSpreadsheet_();
     const sheet = getSheet_(ss);
     const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION };
+    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION, userEmail: requireAllowedUser_() };
 
     ensureOrderHeader_(sheet);
     const values = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
@@ -113,15 +154,15 @@ function getAppData() {
 
     entries.sort((a, b) => (a.sortOrder - b.sortOrder) || (a._sheetRow - b._sheetRow));
     entries.forEach(e => delete e._sheetRow);
-    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION };
+    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION, userEmail: requireAllowedUser_() };
   } finally {
     SpreadsheetApp.flush();
     lock.releaseLock();
   }
 }
 
-function saveEntry(payload) {
-  requireAllowedUser_();
+function saveEntry(payload, sessionToken) {
+  requireAppSession_(sessionToken);
   payload = payload || {};
   const item = normalizeEntry_(payload);
   if (!item.serviceName) throw new Error('サービス名を入力してください。');
@@ -167,8 +208,8 @@ function saveEntry(payload) {
   }
 }
 
-function saveCardOrder(ids, expectedIds) {
-  requireAllowedUser_();
+function saveCardOrder(ids, expectedIds, sessionToken) {
+  requireAppSession_(sessionToken);
   if (!Array.isArray(ids) || !ids.length) throw new Error('並べ替えデータがありません。');
   ids = ids.map(id => clean_(id, 100)).filter(Boolean);
   if (new Set(ids).size !== ids.length) throw new Error('並べ替えデータが重複しています。');
@@ -208,8 +249,8 @@ function saveCardOrder(ids, expectedIds) {
   }
 }
 
-function getPassword(id) {
-  requireAllowedUser_();
+function getPassword(id, sessionToken) {
+  requireAppSession_(sessionToken);
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const sheet = getSheet_(getSpreadsheet_());
@@ -219,8 +260,8 @@ function getPassword(id) {
   return { ok: true, hasPassword: true, password: value };
 }
 
-function clearPassword(id) {
-  requireAllowedUser_();
+function clearPassword(id, sessionToken) {
+  requireAppSession_(sessionToken);
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
@@ -233,8 +274,8 @@ function clearPassword(id) {
   } finally { lock.releaseLock(); }
 }
 
-function deleteEntry(id, revision) {
-  requireAllowedUser_();
+function deleteEntry(id, revision, sessionToken) {
+  requireAppSession_(sessionToken);
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
