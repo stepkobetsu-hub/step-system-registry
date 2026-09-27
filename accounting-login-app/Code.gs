@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-admin-id-login';
+const APP_VERSION = '2026-09-27-invoice-search';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
@@ -488,3 +488,212 @@ function secretKey_(id) {
 function makeId_() {
   return 'ACC-' + Utilities.getUuid().replace(/-/g, '').slice(0, 10).toUpperCase();
 }
+
+// Invoice jobs are executed ONLY by the mailbox owner's installable trigger.
+// Browser callers and the web deployment never receive Gmail credentials.
+const INV_OWNER = 'mintcocoajasmine@gmail.com';
+const INV_JOB = 'INV_JOB_V1_';
+const INV_ITEM = 'INV_ITEM_V1_';
+const INV_CONFIG = 'INV_CONFIG_V1';
+const INV_WORKER = 'INV_WORKER_V1';
+function invConfig_(){return invRead_(INV_CONFIG)||{folderId:'1GBJvElFr4Ynhv9ICcjncCYTUQnRTgy9B',folderName:'CamScanner',folderUrl:'https://drive.google.com/drive/folders/1GBJvElFr4Ynhv9ICcjncCYTUQnRTgy9B'};}
+const INV_VENDORS = {
+  exseed: {name:'エクシード', query:'from:noreply@misoca.jp subject:エクシード subject:請求書'},
+  esia: {name:'イージア', query:'from:e-sia.jp subject:請求'}
+};
+function invProps_(){return PropertiesService.getScriptProperties();}
+function invRead_(key){const s=invProps_().getProperty(key);return s?JSON.parse(s):null;}
+function invWrite_(key,value){const s=JSON.stringify(value);if(Utilities.newBlob(s).getBytes().length>8500)throw new Error('処理データが大きすぎます。');invProps_().setProperty(key,s);}
+function invLock_(fn){const l=LockService.getScriptLock();l.waitLock(10000);try{return fn();}finally{l.releaseLock();}}
+function invId_(){return Utilities.getUuid().replace(/-/g,'');}
+function invOwner_(){if(Session.getEffectiveUser().getEmail().toLowerCase()!==INV_OWNER)throw new Error('請求書の処理は指定のGmailアカウントで実行してください。');}
+function invJobFor_(id,token){const admin=requireAppSession_(token);if(!/^[a-f0-9]{32}$/.test(String(id)))throw new Error('処理IDが不正です。');const j=invRead_(INV_JOB+id);if(!j||j.admin!==admin||Date.now()-j.created>86400000)throw new Error('検索結果の有効期限が切れました。もう一度検索してください。');return j;}
+function getInvoiceSettings(token){
+  requireAppSession_(token);const c=invConfig_();const w=invRead_(INV_WORKER)||{};
+  return {mailbox:INV_OWNER,folderId:c.folderId||'',folderName:c.folderName||'',folderUrl:c.folderUrl||'',ready:!!w.installed,healthy:!!w.lastRun&&Date.now()-w.lastRun<300000};
+}
+function invNewJob_(type,data,token){
+  const admin=requireAppSession_(token);const w=invRead_(INV_WORKER)||{};
+  if(!w.installed)throw new Error('Gmail接続の初期設定がまだ完了していません。');
+  return invLock_(()=>{
+    const all=invProps_().getProperties();let active=0;
+    Object.keys(all).filter(k=>k.startsWith(INV_JOB)).forEach(k=>{const j=JSON.parse(all[k]);if(Date.now()-j.created>86400000){invProps_().deleteProperty(k);(j.items||[]).forEach(id=>invProps_().deleteProperty(INV_ITEM+id));}else if(['queued','working'].includes(j.status))active++;});
+    if(active>=8)throw new Error('処理中の依頼が多いため、少し待ってお試しください。');
+    const j=Object.assign({id:invId_(),admin,type,status:'queued',created:Date.now(),items:[],errors:0},data);
+    invWrite_(INV_JOB+j.id,j);return {jobId:j.id};
+  });
+}
+function startInvoiceSearch(vendor,month,token){
+  requireAppSession_(token);if(!Object.prototype.hasOwnProperty.call(INV_VENDORS,vendor)||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(String(month)))throw new Error('取引先と支払い月を選択してください。');
+  return invNewJob_('search',{vendor,month},token);
+}
+function setInvoiceFolder(value,token){
+  requireAppSession_(token);const v=String(value||'').trim();const m=v.match(/^https:\/\/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([\w-]+)(?:[?#].*)?$/);const id=m?m[1]:v;
+  if(!/^[\w-]{10,150}$/.test(id))throw new Error('Google DriveのフォルダURLを入力してください。');
+  return invNewJob_('folder',{folderId:id},token);
+}
+function getInvoiceJob(id,token){
+  const j=invJobFor_(id,token);const result={id:j.id,type:j.type,status:j.status,message:j.message||'',errors:j.errors||0,scanned:j.scanned||0};
+  if(j.status==='done'&&j.type==='search')result.items=j.items.map(k=>invRead_(INV_ITEM+k)).filter(Boolean).map(c=>({id:c.id,vendor:INV_VENDORS[c.vendor].name,subject:c.subject,due:c.due||'',amount:c.amount==null?'':c.amount,needsReview:!c.due||c.amount==null,evidence:c.evidence||'',sourceUrl:c.sourceUrl,sourceKind:c.source.kind==='misoca'?'Misocaの請求書PDF':'メール添付の請求書PDF'}));
+  if(j.status==='done'&&j.result)result.result=j.result;
+  return result;
+}
+function previewInvoiceSave(jobId,itemId,due,amount,token){
+  const j=invJobFor_(jobId,token);if(j.status!=='done'||j.type!=='search'||!j.items.includes(itemId))throw new Error('検索結果を確認してください。');
+  const c=invRead_(INV_ITEM+itemId);const d=invValidDate_(String(due));const a=String(amount).replace(/,/g,'');
+  if(!d||d.slice(0,7)!==j.month||!/^\d{1,12}$/.test(a))throw new Error('選択月の支払日と、整数の請求金額を確認してください。');
+  const cfg=invConfig_();if(!cfg||!cfg.folderId)throw new Error('保存先フォルダを設定してください。');
+  const p={nonce:invId_(),expires:Date.now()+600000,due:d,amount:Number(a),filename:d.replace(/-/g,'')+'_'+INV_VENDORS[c.vendor].name+'_'+Number(a)+'.pdf',folderId:cfg.folderId,folderName:cfg.folderName,folderUrl:cfg.folderUrl};
+  c.preview=p;invWrite_(INV_ITEM+itemId,c);return p;
+}
+function confirmInvoiceSave(jobId,itemId,nonce,token){
+  const j=invJobFor_(jobId,token);if(!j.items.includes(itemId))throw new Error('検索結果が不正です。');
+  return invLock_(()=>{
+    const c=invRead_(INV_ITEM+itemId),p=c&&c.preview;
+    if(!p||p.nonce!==nonce||p.expires<Date.now())throw new Error('保存確認の期限が切れました。もう一度確認してください。');
+    if(p.saveJob)return {jobId:p.saveJob};
+    const save={id:invId_(),admin:j.admin,type:'save',status:'queued',created:Date.now(),itemId,preview:p,items:[]};
+    p.saveJob=save.id;invWrite_(INV_ITEM+itemId,c);invWrite_(INV_JOB+save.id,save);return {jobId:save.id};
+  });
+}
+// Run once in the editor as INV_OWNER after authorizing Gmail read-only and Drive.
+function setupInvoiceConnection(){ invOwner_(); installInvoiceWorker_(); }
+function installInvoiceWorker_(){
+  invOwner_();const p=Gmail.Users.getProfile('me');if(p.emailAddress.toLowerCase()!==INV_OWNER)throw new Error('Gmailアカウントが一致しません。');
+  if(!ScriptApp.getProjectTriggers().some(t=>t.getHandlerFunction()==='processInvoiceJobs_'))ScriptApp.newTrigger('processInvoiceJobs_').timeBased().everyMinutes(1).create();
+  invWrite_(INV_WORKER,{installed:true,lastRun:Date.now()});
+  console.log('請求書検索の接続設定が完了しました。');
+}
+function processInvoiceJobs_(){
+  invOwner_();const l=LockService.getUserLock();if(!l.tryLock(1000))return;
+  try{
+    invWrite_(INV_WORKER,{installed:true,lastRun:Date.now()});
+    const all=invProps_().getProperties();const jobs=Object.keys(all).filter(k=>k.startsWith(INV_JOB)).map(k=>JSON.parse(all[k])).filter(j=>['queued','working'].includes(j.status)).sort((a,b)=>a.created-b.created);
+    const started=Date.now();
+    for(const j of jobs){
+      if(Date.now()-started>220000)break;
+      try{
+        const record=getAdminRecord_(j.admin);if(!eligibleAdmin_(record))throw new Error('利用権限が変更されました。');
+        if(Date.now()-j.created>86400000)throw new Error('処理の有効期限が切れました。');
+        j.status='working';invWrite_(INV_JOB+j.id,j);
+        if(j.type==='folder'){j.result=invCheckFolder_(j.folderId);invWrite_(INV_CONFIG,j.result);j.status='done';}
+        else if(j.type==='search')invSearchStep_(j,started);
+        else if(j.type==='save'){j.result=invSave_(j);j.status='done';}
+      }catch(e){j.status='error';j.message=String(e.message||e).slice(0,600);}
+      invWrite_(INV_JOB+j.id,j);
+    }
+  }finally{l.releaseLock();}
+}
+function invCheckFolder_(id){
+  const f=Drive.Files.get(id,{fields:'id,name,mimeType,trashed,webViewLink,capabilities(canAddChildren)'});
+  if(f.trashed||f.mimeType!=='application/vnd.google-apps.folder'||!f.capabilities.canAddChildren)throw new Error('指定Gmailアカウントが保存できるフォルダを選択してください。');
+  return {folderId:f.id,folderName:f.name,folderUrl:f.webViewLink||'https://drive.google.com/drive/folders/'+f.id};
+}
+function invQuery_(vendor,month){
+  const [y,m]=month.split('-').map(Number),from=new Date(Date.UTC(y,m-4,1)),to=new Date(Date.UTC(y,m+1,1));
+  const fmt=d=>d.toISOString().slice(0,10).replace(/-/g,'/');
+  return INV_VENDORS[vendor].query+' after:'+fmt(from)+' before:'+fmt(to)+' -in:trash -in:spam';
+}
+function invSearchStep_(j,started){
+  if(!j.ids){const r=Gmail.Users.Messages.list('me',{q:invQuery_(j.vendor,j.month),maxResults:100});j.ids=(r.messages||[]).map(x=>x.id);j.more=!!r.nextPageToken;j.cursor=0;}
+  let processed=0;
+  while(j.cursor<j.ids.length&&processed<5&&Date.now()-started<210000){
+    const id=j.ids[j.cursor++];j.scanned=(j.scanned||0)+1;processed++;
+    try{invReadMessage_(j,id);}catch(e){j.errors++;j.lastError=String(e.message||e).slice(0,250);}
+    invWrite_(INV_JOB+j.id,j);
+  }
+  if(j.cursor>=j.ids.length){j.status='done';j.message=j.more?'検索件数が上限に達しました。一部のメールは未確認です。':j.errors?'読み取れないメールが'+j.errors+'件ありました。'+(j.lastError||''):j.items.length?'請求書が見つかりました。内容を確認してください。':'見つかりませんでした。';}
+}
+function invParts_(p,out){out=out||[];if(p)out.push(p);(p&&p.parts||[]).forEach(x=>invParts_(x,out));return out;}
+function invDecode_(data){
+  if(Array.isArray(data))return data;
+  let s=String(data).replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+  s+='='.repeat((4-s.length%4)%4);return Utilities.base64Decode(s);
+}
+function invHeader_(p,name){const h=(p.headers||[]).find(h=>h.name.toLowerCase()===name.toLowerCase());return h?h.value:'';}
+function invText_(parts){return parts.filter(p=>p.mimeType==='text/plain'||p.mimeType==='text/html').map(p=>{
+  if(!p.body||!p.body.data)return '';const ct=invHeader_(p,'Content-Type'),cs=(ct.match(/charset=["']?([^;"'\s]+)/i)||[])[1]||'UTF-8';
+  const s=Utilities.newBlob(invDecode_(p.body.data)).getDataAsString(cs);return p.mimeType==='text/html'?s.replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' '):s;
+}).join('\n');}
+function invReadMessage_(j,id){
+  const msg=Gmail.Users.Messages.get('me',id,{format:'full'}),parts=invParts_(msg.payload),subject=invHeader_(msg.payload,'Subject'),from=invHeader_(msg.payload,'From');
+  if(j.vendor==='exseed'&&(!/noreply@misoca\.jp/i.test(from)||!/エクシード/.test(subject)))return;
+  if(j.vendor==='esia'&&!/@e-sia\.jp\b/i.test(from))return;
+  const body=invText_(parts),sources=[];
+  if(j.vendor==='exseed'){
+    const links=[...new Set(body.match(/https:\/\/app\.misoca\.jp\/receive_documents\/[a-f0-9-]{36}\b/g)||[])];
+    links.forEach(url=>sources.push({kind:'misoca',url: url+'/pdf',messageId:id}));
+  }else parts.filter(p=>p.mimeType==='application/pdf'||/\.pdf$/i.test(p.filename||'')).forEach(p=>sources.push({kind:'attachment',messageId:id,partId:p.partId,filename:p.filename}));
+  if(!sources.length)throw new Error('請求書PDFの添付または取得リンクがありません。');
+  for(const source of sources.slice(0,8)){
+    let parsed=j.vendor==='exseed'?invParse_(body,j.vendor,j.month):null;
+    if(parsed&&parsed.due&&parsed.due.slice(0,7)!==j.month)continue;
+    const blob=invPdf_(source),fingerprint=invBlobHash_(blob);
+    if(!parsed||!parsed.due||parsed.amount==null){const text=invOcr_(blob);parsed=invParse_(text,j.vendor,j.month);}
+    if(parsed.due&&parsed.due.slice(0,7)!==j.month)continue;
+    if(j.items.map(k=>invRead_(INV_ITEM+k)).some(c=>c&&c.fingerprint===fingerprint))continue;
+    const c={id:invId_(),vendor:j.vendor,subject:String(subject).slice(0,250),source,fingerprint,due:parsed.due,amount:parsed.amount,evidence:parsed.evidence,created:Date.now(),sourceUrl:'https://mail.google.com/mail/u/?authuser='+encodeURIComponent(INV_OWNER)+'#all/'+id};
+    if(j.items.length>=20)throw new Error('候補が20件を超えました。');
+    invWrite_(INV_ITEM+c.id,c);j.items.push(c.id);
+  }
+}
+function invPdf_(source){
+  let b;
+  if(source.kind==='misoca'){
+    if(!/^https:\/\/app\.misoca\.jp\/receive_documents\/[a-f0-9-]{36}\/pdf$/.test(source.url))throw new Error('請求書URLが不正です。');
+    const r=UrlFetchApp.fetch(source.url,{followRedirects:false,muteHttpExceptions:true});
+    if(r.getResponseCode()!==200)throw new Error('MisocaのPDFを取得できませんでした（'+r.getResponseCode()+'）。');b=r.getBlob();
+  }else{
+    const msg=Gmail.Users.Messages.get('me',source.messageId,{format:'full'});const p=invParts_(msg.payload).find(p=>p.partId===source.partId);
+    if(!p)throw new Error('添付ファイルが見つかりません。');
+    const data=p.body.data||(p.body.attachmentId&&Gmail.Users.Messages.Attachments.get('me',source.messageId,p.body.attachmentId).data);
+    if(!data)throw new Error('添付PDFを読み込めません。');b=Utilities.newBlob(invDecode_(data),'application/pdf',source.filename);
+  }
+  const bytes=b.getBytes();if(bytes.length>10000000||bytes.length<5||String.fromCharCode(...bytes.slice(0,5))!=='%PDF-')throw new Error('10MB以下のPDFではありません。');
+  return b.setContentType('application/pdf');
+}
+function invBlobHash_(blob){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,blob.getBytes()).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');}
+function invOcr_(blob){
+  const f=Drive.Files.create({name:'請求書読取一時_'+invId_(),mimeType:'application/vnd.google-apps.document'},blob,{ocrLanguage:'ja',fields:'id'});
+  try{return DocumentApp.openById(f.id).getBody().getText();}finally{Drive.Files.update({trashed:true},f.id);}
+}
+function invValidDate_(s){const m=String(s).match(/^(20\d{2})-(\d{2})-(\d{2})$/);if(!m)return '';const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));return d.toISOString().slice(0,10)===s?s:'';}
+function invParse_(text,vendor,month){
+  const t=String(text).normalize('NFKC').replace(/[ \t\u3000]+/g,' '),compact=t.replace(/\s/g,'');
+  const datePattern='(20\\d{2})[年/.-](\\d{1,2})[月/.-](\\d{1,2})日?';
+  const label=vendor==='exseed'?'お支払い期限':'お支払予定日';
+  let dm=compact.match(new RegExp(label+'[】:\\s]*'+datePattern));let due='';
+  const iso=m=>invValidDate_(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0'));
+  if(dm)due=iso(dm);
+  // OCR may read table headings before all values. Only use a unique date in
+  // the selected payment month, and only if the expected due-date label exists.
+  if(!due&&compact.includes(label)){
+    const dates=[...compact.matchAll(new RegExp(datePattern,'g'))].map(iso).filter(d=>d&&d.slice(0,7)===month);
+    if(new Set(dates).size===1)due=dates[0];
+  }
+  const amountLabel=vendor==='exseed'?'ご請求金額':'今回御請求額';
+  const am=compact.match(new RegExp(amountLabel+'[】:\\s]*[¥￥]?([0-9][0-9,]*)(?:円|[-−]|$)'));
+  let amount=am?Number(am[1].replace(/,/g,'')):null;
+  if(amount==null&&vendor==='esia'){
+    // e-sia's five-column balance table: previous, received, carried, sales,
+    // current. Require the complete heading and verify the balance equation.
+    const table=t.match(/前\s*回\s*御\s*請\s*求\s*額[\s\S]{0,160}?今\s*回\s*御\s*請\s*求\s*額\s*\n?\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)(?=\s|$)/);
+    if(table){const n=table.slice(1).map(v=>Number(v.replace(/,/g,'')));if(n.every(Number.isSafeInteger)&&n[0]-n[1]===n[2]&&n[2]+n[3]===n[4])amount=n[4];}
+    if(amount==null){const direct=t.match(/(?:^|\n)今\s*回\s*御\s*請\s*求\s*額\s*[¥￥]?\s*([\d,]+)(?=\s*(?:円|\n|$))/);if(direct)amount=Number(direct[1].replace(/,/g,''));}
+  }
+  if(amount!==null&&(!Number.isSafeInteger(amount)||amount<0||amount>999999999999))amount=null;
+  return {due,amount,evidence:t.slice(0,1600)};
+}
+function invSave_(j){
+  const c=invRead_(INV_ITEM+j.itemId);if(!c)throw new Error('検索結果が期限切れです。');
+  const p=j.preview,cfg=invCheckFolder_(p.folderId),blob=invPdf_(c.source);
+  if(invBlobHash_(blob)!==c.fingerprint)throw new Error('確認後に請求書が変更されました。もう一度検索してください。');
+  const folder=DriveApp.getFolderById(cfg.folderId),existing=folder.getFilesByName(p.filename);
+  while(existing.hasNext()){
+    const f=existing.next();if(f.getMimeType()==='application/pdf'&&invBlobHash_(f.getBlob())===c.fingerprint)return {url:f.getUrl(),name:f.getName(),existing:true};
+    throw new Error('同じ名前で内容が異なるファイルがあります。保存先を変更して確認してください。');
+  }
+  const f=folder.createFile(blob.setName(p.filename));return {url:f.getUrl(),name:f.getName(),existing:false};
+}
+
+
