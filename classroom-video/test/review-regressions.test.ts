@@ -15,7 +15,8 @@ describe("PR review regressions", () => {
   });
 
   it("offers only 5 through 12 hours and defaults to 6", () => {
-    const values = [...new Set([...html.matchAll(/<option value="(\d+)"/g)].map((match) => Number(match[1])))];
+    const durationSelect = html.match(/<select id="duration-hours">([\s\S]*?)<\/select>/)?.[1] ?? "";
+    const values = [...durationSelect.matchAll(/<option value="(\d+)"/g)].map((match) => Number(match[1]));
     expect(values).toEqual([5, 6, 7, 8, 9, 10, 11, 12]);
     expect(html).toContain('<option value="6" selected>');
   });
@@ -60,11 +61,34 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/window\.StepNative\?\.saveConfig/);
   });
 
-  it("keeps immersive fullscreen and auto-hides the controls", () => {
+  it("keeps immersive fullscreen and auto-hides the controls after five seconds", () => {
     expect(android).toMatch(/SYSTEM_UI_FLAG_IMMERSIVE_STICKY/);
     expect(android).toMatch(/onWindowFocusChanged/);
     expect(app).toMatch(/controls-hidden/);
-    expect(app).toMatch(/7000/);
+    expect(app).toMatch(/function validControlsTimeout/);
+    expect(app).toMatch(/controlsTimeout\?\?5/);
+    expect(html).toContain('<option value="5" selected>5秒（標準）</option>');
+    for (const value of [3, 5, 8, 10, 15, 0]) {
+      expect(html).toContain(`<option value="${value}"`);
+    }
+    expect(app).toMatch(/Math\.abs\(dy\)>60/);
+    expect(app).toMatch(/if\(dy>0\)hideControls\(\)/);
+  });
+
+  it("creates video tiles only for live streams and removes stale frames", () => {
+    expect(app).toMatch(/requestAnimationFrame/);
+    expect(app).toMatch(/pc\.ontrack=.*tileFor\(peerInfo,event\.streams\[0\]\)/);
+    expect(app).toMatch(/if\(video\)video\.srcObject=null/);
+    expect(app).toMatch(/if\(removeTile\)entry\.tile\.remove\(\)/);
+    expect(app).toMatch(/state\.peers\.delete\(peerId\)/);
+    expect(html).toContain("接続相手を待っています");
+  });
+
+  it("persists and shares the configurable tablet name", () => {
+    expect(html).toContain('id="settings-tablet-name"');
+    expect(app).toMatch(/tabletName:\(value\.tabletName/);
+    expect(app).toMatch(/body:JSON\.stringify\(\{deviceId:saved\.deviceId,tabletName:saved\.tabletName\}\)/);
+    expect(worker).toMatch(/displayNameForDevice\(identity\.canonical, body\.tabletName\)/);
   });
 
   it("generates short-lived TURN credentials without exposing the long-lived key", () => {

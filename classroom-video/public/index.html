@@ -40,8 +40,9 @@
     </section>
 
     <section id="call" class="call hidden">
+      <div id="empty-state" class="empty-state">接続相手を待っています</div>
       <div id="remote-grid" class="remote-grid" aria-label="相手映像"></div>
-      <figure id="local-tile" class="local-tile"><video id="local-video" autoplay playsinline muted></video><figcaption>この端末</figcaption></figure>
+      <figure id="local-tile" class="local-tile"><video id="local-video" autoplay playsinline muted></video><figcaption id="local-name">この端末</figcaption></figure>
       <header><span id="status-dot"></span><span id="status">接続中</span><strong id="peer-summary">相手を待っています</strong></header>
       <div id="notice" class="notice hidden" role="status"></div>
       <div id="incoming" class="incoming hidden">
@@ -58,6 +59,17 @@
       <section id="settings" class="settings hidden" aria-labelledby="settings-title">
         <h2 id="settings-title">端末設定</h2>
         <p>端末：<strong id="settings-device"></strong></p>
+        <label>タブレット名
+          <input id="settings-tablet-name" maxlength="24" placeholder="例：神領 正面">
+        </label>
+        <label>操作バー表示時間
+          <select id="settings-controls-timeout">
+             <option value="3">3秒</option><option value="5" selected>5秒（標準）</option>
+            <option value="8">8秒</option><option value="10">10秒</option>
+            <option value="15">15秒</option><option value="0">常時表示</option>
+          </select>
+        </label>
+        <label class="check-label"><input id="settings-show-self" type="checkbox" checked> 自分映像を表示</label>
         <label>次回からの連続運転時間
           <select id="settings-duration">
             <option value="5">5時間</option><option value="6">6時間（標準）</option>

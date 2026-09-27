@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { createTicket, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
+import { createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
 type Attachment = { id: string; name: string };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown };
@@ -114,13 +114,13 @@ export class VideoRoom extends DurableObject<Env> {
 async function sessionResponse(request: Request, env: Env): Promise<Response> {
   const authorization = request.headers.get("authorization") ?? "";
   const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  const body: { deviceId?: string } = await request.json<{ deviceId?: string }>().catch(() => ({}));
+  const body: { deviceId?: string; tabletName?: string } = await request.json<{ deviceId?: string; tabletName?: string }>().catch(() => ({}));
   if (!body.deviceId || !token) return json({ error: "端末設定が必要です" }, 401);
   let devices;
   try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
   const identity = resolveDeviceIdentity(body.deviceId, devices);
   if (!identity || !(await tokensEqual(token, identity.configured.token))) return json({ error: "端末を確認できません" }, 401);
-  const canonicalDevice = identity.canonical;
+  const canonicalDevice = { ...identity.canonical, name: displayNameForDevice(identity.canonical, body.tabletName) };
   const exp = Date.now() + 15 * 60_000;
   const ticket = await createTicket({ id: canonicalDevice.id, name: canonicalDevice.name, exp }, env.SESSION_SECRET);
   let iceServers: IceServer[];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTicket, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "../src/auth";
+import { createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "../src/auth";
 
 describe("device authentication", () => {
   it("parses two provisioned devices", () => {
@@ -39,5 +39,11 @@ describe("device authentication", () => {
     expect(resolveDeviceIdentity("otemachi", devices)?.canonical.id).toBe("otemachi-1");
     expect(resolveDeviceIdentity("otemachi-4", devices)?.canonical.id).toBe("otemachi-4");
     expect(resolveDeviceIdentity("jinryo-5", devices)).toBeNull();
+  });
+
+  it("uses a safe custom tablet name without changing the internal id", () => {
+    expect(displayNameForDevice({ id: "jinryo-2", name: "神領校" })).toBe("神領校 2");
+    expect(displayNameForDevice({ id: "jinryo-2", name: "神領校" }, " 神領 正面\n")).toBe("神領 正面");
+    expect(displayNameForDevice({ id: "otemachi-1", name: "大手町校" }, "x".repeat(40))).toHaveLength(24);
   });
 });

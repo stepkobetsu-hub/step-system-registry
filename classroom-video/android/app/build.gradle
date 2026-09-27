@@ -7,8 +7,8 @@ android {
         applicationId 'jp.stepkobetsu.classroomvideo'
         minSdk 22
         targetSdk 28
-        versionCode 3
-        versionName '0.2.0-fire'
+        versionCode 4
+        versionName '0.2.1-fire'
         buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.stepkobetsu.workers.dev/"'
     }
     buildFeatures { buildConfig true }
