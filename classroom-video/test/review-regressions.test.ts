@@ -110,11 +110,15 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/else showControls\(\);/);
   });
 
-  it("requires a triple tap before exiting the APK", () => {
-    expect(html).toContain("3回タップでアプリ終了");
+  it("restarts on a double tap and exits on a triple tap", () => {
+    expect(html).toContain("2回：再起動／3回：完全終了");
     expect(app).toMatch(/state\.hangupTaps\+=1/);
-    expect(app).toMatch(/state\.hangupTaps<3/);
+    expect(app).toMatch(/state\.hangupTaps===2/);
+    expect(app).toMatch(/setTimeout\(restartApplication,900\)/);
+    expect(app).toMatch(/StepNative\?\.restartApp/);
     expect(app).toMatch(/StepNative\?\.exitApp/);
+    expect(android).toMatch(/@JavascriptInterface public void restartApp/);
+    expect(android).toMatch(/recreate\(\)/);
     expect(android).toMatch(/@JavascriptInterface public void exitApp/);
     expect(android).toMatch(/finishAndRemoveTask\(\)/);
   });

@@ -155,6 +155,10 @@ public final class MainActivity extends Activity {
             runOnUiThread(() -> finishAndRemoveTask());
         }
 
+        @JavascriptInterface public void restartApp() {
+            runOnUiThread(() -> recreate());
+        }
+
         @JavascriptInterface public void playChime() {
             runOnUiThread(() -> {
                 AudioManager audio = (AudioManager) getSystemService(AUDIO_SERVICE);
