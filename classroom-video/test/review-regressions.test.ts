@@ -165,9 +165,9 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/signaling=.*ice=.*connection=.*tracks=/);
   });
 
-  it("keeps a customizable tablet name aligned with the internal device id", () => {
+  it("keeps a customizable tablet name separate from the immutable device id", () => {
     expect(html).toContain('id="settings-tablet-name"');
-    expect(html).toContain('placeholder="jinryo-phone-1"');
+    expect(html).toContain('id="settings-tablet-name" readonly');
     expect(html).toContain('id="settings-display-name"');
     expect(app).toMatch(/tabletName:normalizedTabletName/);
     expect(app).toMatch(/displayName:config\.tabletName/);
@@ -184,9 +184,22 @@ describe("PR review regressions", () => {
     expect(html).toContain('id="call-target-picker"');
   });
 
-  it("supports custom device ids and display names", () => {
+  it("automatically registers each installation without exposing a shared token", () => {
+    expect(android).toMatch(/@JavascriptInterface public String getInstallationId/);
+    expect(android).toMatch(/UUID\.randomUUID\(\)/);
+    expect(app).toMatch(/async function ensureRegistration/);
+    expect(app).toMatch(/fetch\("\/api\/register"/);
+    expect(app).toMatch(/registrationVersion:1/);
+    expect(worker).toMatch(/registered_devices/);
+    expect(worker).toMatch(/registration_attempts/);
+    expect(worker).toMatch(/recent >= 30 \|\| total >= 200/);
+    expect(worker).toMatch(/randomCredential\(\)/);
+    expect(html).toContain("IDやトークンの入力は不要です");
+    expect(html).toContain('class="hidden">端末ID');
+  });
+
+  it("supports custom display names without changing device identity", () => {
     expect(app).toMatch(/displayName:config\.tabletName/);
-    expect(app).toMatch(/params\.get\("name"\)/);
     expect(html).toContain('id="settings-display-name"');
     expect(worker).toMatch(/body\.displayName/);
   });
