@@ -136,6 +136,27 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/message\.restart !== true/);
   });
 
+  it("restarts the APK when real inbound media or WebSocket traffic stalls", () => {
+    expect(app).toMatch(/pc\.getStats\(\)/);
+    expect(app).toMatch(/report\.type!=="inbound-rtp"/);
+    expect(app).toMatch(/bytesReceived/);
+    expect(app).toMatch(/framesDecoded/);
+    expect(app).toMatch(/limit=attempt\?8000:18000/);
+    expect(app).toMatch(/state\.lastPongAt>55000|now-state\.lastPongAt>55000/);
+    expect(app).toMatch(/setInterval\(runWatchdog,5000\)/);
+    expect(app).toMatch(/removeFrozenFrame\(entry\)/);
+  });
+
+  it("prevents restart loops and restarts after a long background pause", () => {
+    expect(app).toMatch(/now-previous\.at<60000/);
+    expect(app).toMatch(/!navigator\.onLine/);
+    expect(app).toMatch(/RESTART_CONNECT_KEY,"resume"/);
+    expect(app).toMatch(/StepVideoNativeResume/);
+    expect(android).toMatch(/SystemClock\.elapsedRealtime\(\)/);
+    expect(android).toMatch(/elapsed >= 8000L/);
+    expect(android).toMatch(/evaluateJavascript/);
+  });
+
   it("shows WebRTC diagnostics only from settings", () => {
     expect(html).toContain('id="diagnostics-toggle"');
     expect(html).toContain('id="diagnostics" class="diagnostics hidden"');

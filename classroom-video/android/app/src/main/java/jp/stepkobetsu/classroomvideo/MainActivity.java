@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
@@ -29,6 +30,7 @@ public final class MainActivity extends Activity {
     private static final String PREFS = "step_video_device";
     private static final String PREF_CONFIG = "config_json";
     private WebView webView;
+    private long backgroundedAt;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -111,8 +113,22 @@ public final class MainActivity extends Activity {
     }
 
     @Override public void onBackPressed() { /* 教室端末で誤って終了しない */ }
-    @Override protected void onResume() { super.onResume(); enterImmersiveMode(); if (webView != null) webView.onResume(); }
-    @Override protected void onPause() { if (webView != null) webView.onPause(); super.onPause(); }
+    @Override protected void onResume() {
+        super.onResume();
+        enterImmersiveMode();
+        if (webView != null) webView.onResume();
+        if (backgroundedAt > 0L && webView != null) {
+            long elapsed = SystemClock.elapsedRealtime() - backgroundedAt;
+            backgroundedAt = 0L;
+            if (elapsed >= 8000L) webView.postDelayed(() -> webView.evaluateJavascript(
+                "window.StepVideoNativeResume&&window.StepVideoNativeResume(" + elapsed + ")", null), 300L);
+        }
+    }
+    @Override protected void onPause() {
+        backgroundedAt = SystemClock.elapsedRealtime();
+        if (webView != null) webView.onPause();
+        super.onPause();
+    }
     @Override public void onWindowFocusChanged(boolean hasFocus) { super.onWindowFocusChanged(hasFocus); if (hasFocus) enterImmersiveMode(); }
 
     private boolean isAllowedOrigin(Uri candidate) {
