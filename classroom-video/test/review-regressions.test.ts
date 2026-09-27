@@ -189,13 +189,33 @@ describe("PR review regressions", () => {
     expect(android).toMatch(/UUID\.randomUUID\(\)/);
     expect(app).toMatch(/async function ensureRegistration/);
     expect(app).toMatch(/fetch\("\/api\/register"/);
-    expect(app).toMatch(/registrationVersion:1/);
+    expect(app).toMatch(/registrationVersion:2/);
     expect(worker).toMatch(/registered_devices/);
     expect(worker).toMatch(/registration_attempts/);
     expect(worker).toMatch(/recent >= 30 \|\| total >= 200/);
     expect(worker).toMatch(/randomCredential\(\)/);
     expect(html).toContain("IDやトークンの入力は不要です");
     expect(html).toContain('class="hidden">端末ID');
+  });
+
+  it("retires an authenticated legacy identity and keeps one presence per installation", () => {
+    expect(app).toMatch(/legacyDeviceId:previous\.deviceId/);
+    expect(app).toMatch(/legacyCredential:previous\.token/);
+    expect(worker).toMatch(/retired_legacy_devices/);
+    expect(worker).toMatch(/tokensEqual\(body\.legacyCredential, identity\.configured\.token\)/);
+    expect(worker).toMatch(/this\.retireLegacyDevice\(body\.verifiedLegacyId, existing\.id\)/);
+    expect(worker).toMatch(/this\.ctx\.getWebSockets\(`device:\$\{id\}`\)/);
+    expect(worker).toMatch(/Device migrated/);
+    expect(worker).toMatch(/if \(this\.isLegacyRetired\(id\)\).*status: 401/s);
+  });
+
+  it("removes sockets that stopped sending presence heartbeats", () => {
+    expect(worker).toMatch(/lastSeenAt/);
+    expect(worker).toMatch(/sender\.lastSeenAt = Date\.now\(\)/);
+    expect(worker).toMatch(/Date\.now\(\) - 70_000/);
+    expect(worker).toMatch(/Presence timeout/);
+    expect(worker).toMatch(/async alarm\(\)/);
+    expect(worker).toMatch(/setAlarm\(Date\.now\(\) \+ 30_000\)/);
   });
 
   it("supports custom display names without changing device identity", () => {
