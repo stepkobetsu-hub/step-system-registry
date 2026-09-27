@@ -2,12 +2,14 @@
 
 Fire HD 8 第10世代の神領校・大手町校2台を、1タップで固定ルームにつなぐ初版です。映像・音声は WebRTC P2P、認証・シグナリング・呼び出し通知は Cloudflare Worker / Durable Object を使用します。映像はサーバーを通りません（TURNリレーが必要な場合を除く）。
 
+- 本番URL: `https://step-classroom-video.stepkobetsu.workers.dev/`
+
 ## 初版に含む機能
 
 - ログイン・会議コードなしの「教室をつなぐ」ボタン
 - 相手映像全画面、自分映像右下、360p〜480p・最大20fps
 - マイク／カメラのON/OFF
-- マイク状態に依存しない穏やかな呼び出し音、画面表示、確認応答、10秒クールダウン
+- マイク状態に依存しない穏やかな呼び出し音、画面表示、確認応答、10秒クールダウン。APKでは通話のメディア音量と分離したアラーム音量を使用
 - Wi-Fi瞬断、WebSocket・WebRTC切断時の自動再接続（1〜15秒の指数バックオフ）
 - Wake Lock と Android `FLAG_KEEP_SCREEN_ON`
 - 5〜12時間から選べる連続動作時間（標準6時間）と、終了後にカメラ・マイク・WebRTC・WebSocket・Wake Lockを解放する休止画面
@@ -27,6 +29,8 @@ npm run check
 npx wrangler secret put DEVICE_TOKENS
 npx wrangler secret put SESSION_SECRET
 npx wrangler secret put ICE_SERVERS_JSON
+npx wrangler secret put TURN_KEY_ID
+npx wrangler secret put TURN_KEY_API_TOKEN
 npx wrangler deploy
 ```
 
@@ -39,13 +43,15 @@ npx wrangler deploy
 ]
 ```
 
-`SESSION_SECRET` も32バイト以上のランダム値にします。`ICE_SERVERS_JSON` はSTUNだけで接続できない回線のためのTURN設定です。例（値はTURN事業者から取得）:
+`SESSION_SECRET` も32バイト以上のランダム値にします。本番ではCloudflare TURNキーのIDを `TURN_KEY_ID`、APIトークンを `TURN_KEY_API_TOKEN` に保存します。Workerが認証済み端末ごとに有効期間13時間の短期ICE資格情報を生成し、長期TURNキーを端末へ渡しません。ブラウザでタイムアウトしやすい53番ポートはWorker側で除外します。
+
+`ICE_SERVERS_JSON` は緊急時の代替TURN設定用で、本番のCloudflare TURN利用時は `[]` を設定します。別TURN事業者へ切り替える場合の形式:
 
 ```json
 [{"urls":["turn:turn.example.jp:3478?transport=udp","turns:turn.example.jp:443?transport=tcp"],"username":"端末用ユーザー","credential":"秘密値"}]
 ```
 
-TURNなしでも同一Wi-Fiや一般的なNAT間では接続できますが、異なる回線で確実につなぐ完成条件にはTURNが必要です。TURN転送量には事業者の利用料金がかかります。設定後、UDPを遮断した回線でも `relay` candidate で映像・音声が継続することを確認してください。
+TURNなしでも同一Wi-Fiや一般的なNAT間では接続できますが、異なる回線で確実につなぐ完成条件にはTURNが必要です。TURN転送量には利用料金がかかる場合があります。設定後、UDPを遮断した回線でも `relay` candidate で映像・音声が継続することを確認してください。
 
 ## 端末への設定（初回だけ）
 
@@ -59,15 +65,18 @@ TURNなしでも同一Wi-Fiや一般的なNAT間では接続できますが、�
 
 ## APKへ切り替える場合
 
-`android/app/build.gradle` の `APP_URL` を実際のWorker URLへ変更し、GitHub Actionsの **Build classroom video** からAPKを取得します。正式配布時は組織のkeystoreでrelease署名し、keystoreとパスワードはGitHub Secretsで管理してください。Fire端末では「不明なアプリのインストール」を一時的に許可してAPKを導入し、導入後は許可を戻します。
+`android/app/build.gradle` の `APP_URL` は本番Worker URLに固定済みです。GitHub Actionsの **Build classroom video** からAPKを取得します。正式配布時は組織のkeystoreでrelease署名し、keystoreとパスワードはGitHub Secretsで管理してください。Fire端末では「不明なアプリのインストール」を一時的に許可してAPKを導入し、導入後は許可を戻します。
 
-ブラウザ/PWAで連続試験中に、画面消灯、カメラ停止、WebView終了が再現した場合はAPKを採用します。APKは全画面・横向き固定・通話中の画面点灯維持・戻るキー無効化を追加しています。WebViewは設定したWorkerと同一originへの遷移だけを許可し、カメラ／マイク権限もそのoriginの必要なリソースだけへ限定します。Web Audioが自動再生制限で停止した場合は、APK側の短い通知音をフォールバック再生します。ただし映像エンジンはFire OSのSystem WebViewを使うため、端末のSystem WebView更新も確認してください。
+ブラウザ/PWAで連続試験中に、画面消灯、カメラ停止、WebView終了が再現した場合はAPKを採用します。APKは全画面・横向き固定・通話中の画面点灯維持・戻るキー無効化を追加しています。WebViewは設定したWorkerと同一originへの遷移だけを許可し、カメラ／マイク権限もそのoriginの必要なリソースだけへ限定します。呼び出し音は `STREAM_ALARM` で再生し、アラーム音量が低い場合だけ最大の65%へ一時的に上げ、3.5秒後に元の値へ戻します。おやすみモードや端末ポリシーによる拒否は突破せず、画面通知で補完します。ただし映像エンジンはFire OSのSystem WebViewを使うため、端末のSystem WebView更新も確認してください。
 
 ## 5〜12時間の実機受け入れ試験
 
 各端末を給電し、バッテリー最適化対象外にして次を記録します。
 
 1. 2台で接続し、映像・音声、マイクOFF、カメラOFF、両方向の呼び出しと確認を確認。接続から時間が経った状態でも、画面通知だけでなく呼び出し音が確実に鳴ることを確認する。
+   - メディア音量を小さくした状態と0に近い状態で、アラーム系の呼び出し音が聞こえること。
+   - アラーム音量を低くして呼び出し、実用的な音量で鳴った後に元のアラーム音量へ戻ること。
+   - おやすみモード等で音が禁止される場合も、大きな呼び出し表示・穏やかな点滅・確認ボタンが残ること。
 2. 30分後、片方のWi-Fiを20秒OFF→ON。操作なしで「接続済み」に戻り、音声・映像も戻ることを確認。
 3. 2時間後と4時間後にも同じ瞬断試験を行う。
 4. 標準6時間で開始し、到達時にカメラ・マイクの利用表示が消え、通信が終了して「休止中」へ移ることを確認する。アプリを終了・再起動しても休止中のままであることを確認する。

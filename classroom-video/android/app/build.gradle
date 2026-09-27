@@ -9,7 +9,7 @@ android {
         targetSdk 35
         versionCode 1
         versionName '0.1.0'
-        buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.REPLACE.workers.dev/"'
+        buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.stepkobetsu.workers.dev/"'
     }
     buildFeatures { buildConfig true }
 }

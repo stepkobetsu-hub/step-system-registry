@@ -90,6 +90,10 @@ public final class MainActivity extends Activity {
     }
 
     private final class StepNativeBridge {
+        private final Handler alarmHandler = new Handler(Looper.getMainLooper());
+        private Integer originalAlarmVolume;
+        private Runnable restoreAlarmVolume;
+
         @JavascriptInterface public void setActive(boolean active) {
             runOnUiThread(() -> {
                 if (active) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -99,12 +103,27 @@ public final class MainActivity extends Activity {
 
         @JavascriptInterface public void playChime() {
             runOnUiThread(() -> {
-                ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 55);
-                Handler handler = new Handler(Looper.getMainLooper());
+                AudioManager audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+                if (restoreAlarmVolume != null) alarmHandler.removeCallbacks(restoreAlarmVolume);
+                if (originalAlarmVolume == null) originalAlarmVolume = audio.getStreamVolume(AudioManager.STREAM_ALARM);
+                int target = Math.max(1, (int) Math.ceil(audio.getStreamMaxVolume(AudioManager.STREAM_ALARM) * 0.65));
+                try {
+                    if (audio.getStreamVolume(AudioManager.STREAM_ALARM) < target) audio.setStreamVolume(AudioManager.STREAM_ALARM, target, 0);
+                } catch (RuntimeException ignored) { /* DNDや端末ポリシーを無理に突破しない */ }
+                ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_ALARM, 65);
                 for (int delay = 0; delay <= 2800; delay += 700) {
-                    handler.postDelayed(() -> tone.startTone(ToneGenerator.TONE_PROP_ACK, 320), delay);
+                    alarmHandler.postDelayed(() -> tone.startTone(ToneGenerator.TONE_PROP_ACK, 320), delay);
                 }
-                handler.postDelayed(tone::release, 3500);
+                restoreAlarmVolume = () -> {
+                    tone.release();
+                    if (originalAlarmVolume != null) {
+                        try { audio.setStreamVolume(AudioManager.STREAM_ALARM, originalAlarmVolume, 0); }
+                        catch (RuntimeException ignored) { /* 現在値を維持 */ }
+                    }
+                    originalAlarmVolume = null;
+                    restoreAlarmVolume = null;
+                };
+                alarmHandler.postDelayed(restoreAlarmVolume, 3500);
             });
         }
     }
