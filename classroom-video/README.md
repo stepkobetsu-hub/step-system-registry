@@ -1,16 +1,17 @@
-# STEP 教室間ビデオ通話 v0.3.2
+# STEP 教室間ビデオ通話 v0.3.3
 
 Fire HD 8やAndroid端末を、1タップで固定ルームにつなぎます。端末はAPK初回起動時に自動登録され、映像・音声はWebRTC P2P、端末認証・シグナリング・呼び出し通知はCloudflare Worker / Durable Objectを使用します。
 
 - 本番URL: `https://step-classroom-video.stepkobetsu.workers.dev/`
 
-## v0.3.2に含む機能
+## v0.3.3に含む機能
 
 - ログイン・会議コードなしの「教室をつなぐ」ボタン
 - 固定APKの初回起動だけで、端末固有ID・専用credential・`STEP端末N`表示名を自動発行（ID・トークン・設定QRの入力不要）
 - v0.3.0以前の端末は上書き更新後の初回起動で旧表示名を引き継ぎ、新しい端末固有credentialへ自動移行
 - 移行元の旧IDは旧credential検証後に無効化し、既存socketも終了。70秒以上pingがない接続はpresenceから自動削除
 - すでにv0.3.1へ移行済みの端末は、発行済みの端末固有credentialで本人確認して移行対応を補完し、旧IDの再接続を禁止
+- Fire HD 8の横画面に合わせて右側の小窓を縮小し、小窓同士が重ならない間隔で自動配置
 - `jinryo-phone-1` のような追加端末IDと「管理者スマホ」など任意の表示名に対応（IDは校舎名から始め、重複させない）
 - 呼び出しボタンから現在オンラインの端末を1台選び、その端末だけを鳴らす個別呼び出し
 - 参加端末ごとに独立したPeerConnectionを持つmesh接続と複数映像の同時表示

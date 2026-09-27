@@ -111,6 +111,16 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/else showControls\(\);/);
   });
 
+  it("keeps Fire HD 8 thumbnail videos small and vertically separated", () => {
+    expect(css).toMatch(/\.remote-tile\.thumbnail\{[^}]*width:19vw/);
+    expect(css).toMatch(/max-width:240px/);
+    expect(css).toMatch(/min-width:140px/);
+    expect(app).toMatch(/function thumbnailLayout\(\)/);
+    expect(app).toMatch(/step:width\*\.75\+12/);
+    expect(app).toMatch(/thumbnail\.edge\+\(index-1\)\*thumbnail\.step/);
+    expect(app).not.toContain("(index-1)*150");
+  });
+
   it("restarts on a double tap and exits on a triple tap", () => {
     expect(html).toContain("2回：再起動／3回：完全終了");
     expect(app).toMatch(/state\.hangupTaps\+=1/);
