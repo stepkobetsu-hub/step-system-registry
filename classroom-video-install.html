@@ -23,19 +23,30 @@
     <p class="lead">神領校・大手町校のFireタブレット用<br>教室間ビデオ通話アプリ</p>
     <a class="download" href="https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk">最新版APKをダウンロード</a>
     <p class="filename">STEP-Classroom-Video-Fire.apk</p>
-    <p class="version">最新版は固定URLから配布｜v0.2.9-fire 以降も同じURLを使用</p><div style="margin:22px auto 6px;max-width:320px"><a href="./images/classroom-video-install-qr.png" target="_blank" rel="noopener"><img src="./images/classroom-video-install-qr.png" alt="STEP 教室ビデオ 最新APK インストール用QRコード" style="width:100%;height:auto;display:block;border:1px solid #dbe4f0;border-radius:14px;background:#fff;padding:10px"></a></div><p style="margin:8px 0 0;font-weight:800">インストール用QRコード</p><p style="margin:4px 0 0;color:#64748b;font-size:14px">このQRをFireタブレットで読むと、最新版APKを直接ダウンロードします。</p>
+    <p class="version">最新版は固定URLから配布｜v0.3.0-fire 以降も同じURLを使用</p><div style="margin:22px auto 6px;max-width:320px"><a href="./images/classroom-video-install-qr.png" target="_blank" rel="noopener"><img src="./images/classroom-video-install-qr.png" alt="STEP 教室ビデオ 最新APK インストール用QRコード" style="width:100%;height:auto;display:block;border:1px solid #dbe4f0;border-radius:14px;background:#fff;padding:10px"></a></div><p style="margin:8px 0 0;font-weight:800">インストール用QRコード</p><p style="margin:4px 0 0;color:#64748b;font-size:14px">このQRをFireタブレットで読むと、最新版APKを直接ダウンロードします。</p>
   </div>
   <div class="steps">
-    <h2>新しいFireタブレットへ入れる手順</h2><div class="important"><b>新しい端末は2段階です。</b><br>①このページのインストール用QRでAPKを入れる<br>②アプリの初期設定画面が出たら、管理者保管の「端末別設定QR」（神領1〜3／大手町1〜3）を読む<br><br>端末ID・端末トークンは手入力しません。</div>
+    <h2>新しいFireタブレットへ入れる手順</h2><div class="important"><b>新しい端末は2段階です。</b><br>①このページのインストール用QRでAPKを入れる<br>②アプリの初期設定画面が出たら、その端末専用の「端末別設定QR」を読む<br><br>端末ID・端末トークンは手入力しません。</div>
     <ol>
       <li>このページの「最新版APKをダウンロード」を押します。</li>
       <li>入れるファイルは <b>STEP-Classroom-Video-Fire.apk</b> です。これ以外の旧debug APKやZIPは使いません。</li>
       <li>「不明なアプリのインストール」を求められた場合は、Silkブラウザだけ一時的に許可します。</li>
       <li>APKを開いて「インストール」または既存端末なら「更新」を押します。</li>
-      <li>新規端末は、管理者が保管している <b>端末別設定QR</b>（神領1〜3／大手町1〜3）を1回だけ読みます。長いトークンの手入力はしません。</li>
+      <li>新規端末は、その端末専用の <b>端末別設定QR</b> を1回だけ読みます。既存の神領1〜3／大手町1〜3は従来QRをそのまま使用できます。追加端末は管理者が新しい専用QRを作成します。長いトークンの手入力はしません。</li>
       <li>カメラ・マイクを許可し、「教室をつなぐ」を押します。</li>
     </ol>
     <div class="important">新しい端末にインストールするのは、固定URLの <b>STEP-Classroom-Video-Fire.apk</b> です。端末別設定QRには秘密情報が入るため、公開台帳には置きません。</div>
+    <h2 style="margin-top:24px">追加端末の名前の付け方</h2>
+    <p class="note">端末IDは重複しない英数字IDにします。教室ごとに <b>jinryo-</b> または <b>otemachi-</b> から始めます。表示名は日本語で自由に付けられます。</p>
+    <div class="important" style="font-weight:600">
+      例：<br>
+      神領の追加タブレット → <code>jinryo-4</code> ／ 表示名「神領4」<br>
+      大手町の追加タブレット → <code>otemachi-4</code> ／ 表示名「大手町4」<br>
+      神領側のスマホ → <code>jinryo-phone-1</code> ／ 表示名「管理者スマホ」<br>
+      大手町側のスマホ → <code>otemachi-phone-1</code> ／ 表示名「大手町スマホ」
+    </div>
+    <p class="note">追加端末の設定QRは、公開ページには置きません。管理者側で専用QRを作成して、その端末だけに読み込ませます。既存6台の設定QRはそのまま利用できます。</p>
+    <p class="note">v0.3.0では「呼び出す」を押すと現在接続中の端末一覧が表示され、鳴らしたい1台だけを選択できます。</p>
     <p class="note">v0.2.0以降の固定release署名版は原則そのまま上書き更新できます。旧debug署名版だけは更新に失敗する場合があるため、その場合のみ旧版をアンインストールしてから入れ直します。</p>
     <p class="note url">固定APK URL：https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk</p>
     <p class="note url">本番Worker：https://step-classroom-video.stepkobetsu.workers.dev/</p>
