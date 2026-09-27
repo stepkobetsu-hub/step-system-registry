@@ -15,8 +15,21 @@
       <p>管理者から渡された端末IDと端末トークンを最初の1回だけ入力します。</p>
       <label>端末ID<input id="device-id" autocomplete="off" placeholder="shinryo"></label>
       <label>端末トークン<input id="device-token" type="password" autocomplete="off"></label>
+      <label>連続動作時間
+        <select id="duration-hours">
+          <option value="5">5時間</option><option value="6" selected>6時間（標準）</option>
+          <option value="7">7時間</option><option value="8">8時間</option>
+          <option value="9">9時間</option><option value="10">10時間</option>
+          <option value="11">11時間</option><option value="12">12時間</option>
+        </select>
+      </label>
       <button id="save-setup" class="primary">この端末に保存</button>
       <p id="setup-error" class="error" role="alert"></p>
+    </section>
+
+    <section id="rest" class="rest hidden" role="button" tabindex="0" aria-label="休止中。起動するには画面をタップしてください。">
+      <strong>休止中</strong>
+      <span>起動するには画面をタップしてください。</span>
     </section>
 
     <section id="home" class="home hidden">

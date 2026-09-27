@@ -97,7 +97,7 @@ async function sessionResponse(request: Request, env: Env): Promise<Response> {
   if (env.ICE_SERVERS_JSON) {
     try { iceServers.push(...JSON.parse(env.ICE_SERVERS_JSON) as IceServer[]); } catch { return json({ error: "TURN設定エラー" }, 500); }
   }
-  return json({ ticket, expiresAt: exp, device: { id: device.id, name: device.name }, iceServers });
+  return json({ ticket, expiresAt: exp, serverNow: Date.now(), device: { id: device.id, name: device.name }, iceServers });
 }
 
 export default {
