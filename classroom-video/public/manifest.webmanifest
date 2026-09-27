@@ -3,7 +3,7 @@
   "short_name": "教室ビデオ",
   "start_url": "/",
   "display": "fullscreen",
-  "orientation": "landscape",
+  "orientation": "any",
   "background_color": "#061727",
   "theme_color": "#102a43",
   "icons": []
