@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-browser-sessions';
+const APP_VERSION = '2026-09-27-admin-id-login';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
@@ -10,60 +10,102 @@ const FAVICON_SOURCE_URL =
 const FAVICON_FILE_ID_KEY = 'ACCOUNTING_FAVICON_DRIVE_FILE_ID';
 
 
-const ALLOWED_USERS_PROPERTY = 'ACCOUNTING_ALLOWED_EMAILS';
 
-// Deploy as the user accessing the web app. Never fall back to the deployer's
-// effective identity: it would authorize other visitors as the owner.
-function requireAllowedUser_() {
-  const email = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
-  const allowed = String(PropertiesService.getScriptProperties()
-    .getProperty(ALLOWED_USERS_PROPERTY) || '')
-    .split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
-  if (!email || !allowed.includes(email)) {
-    throw new Error('このアカウントには利用権限がありません。許可されたGoogleアカウントでログインしてください。');
-  }
-  return email;
+const ADMIN_SPREADSHEET_ID = '1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E';
+const ADMIN_SHEET_ID = 2020620808;
+const ADMIN_SESSION_PREFIX = 'ACCOUNTING_ADMIN_SESSION_V2_';
+const ADMIN_SALT_KEY = 'ACCOUNTING_ADMIN_AUTH_SALT';
+
+// The web app executes as its owner. The master is never sent to the client.
+function getAdminRecord_(adminId) {
+  const sheet = SpreadsheetApp.openById(ADMIN_SPREADSHEET_ID).getSheetById(ADMIN_SHEET_ID);
+  if (!sheet) throw new Error('ログイン台帳を確認できません。管理者に連絡してください。');
+  const count = sheet.getLastRow();
+  if (!count) return null;
+  const ids = sheet.getRange(1, 1, count, 1).getDisplayValues();
+  const matches = [];
+  ids.forEach((row, index) => { if (String(row[0]).trim() === adminId) matches.push(index + 1); });
+  if (matches.length !== 1) return null;
+  const values = sheet.getRange(matches[0], 36, 1, 2).getDisplayValues()[0];
+  const level = Number(String(values[1]).trim());
+  return {id: adminId, password: String(values[0] || ''), level};
 }
-
-
-const APP_SESSION_PREFIX = 'ACCOUNTING_APP_SESSION_';
-
-// Tokens are browser-specific, tied to the authenticated Google user, and
-// remain valid until that browser logs out. Only a SHA-256 digest is stored.
+function eligibleAdmin_(record) {
+  return !!record && !!record.password && Number.isFinite(record.level) && record.level >= 2;
+}
+function authDigest_(value) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value)
+    .map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');
+}
+function equalDigest_(a, b) {
+  let difference = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) difference |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return difference === 0;
+}
+function credentialFingerprint_(record) {
+  const props = PropertiesService.getScriptProperties();
+  let salt = props.getProperty(ADMIN_SALT_KEY);
+  if (!salt) {
+    salt = Utilities.getUuid() + Utilities.getUuid();
+    props.setProperty(ADMIN_SALT_KEY, salt);
+  }
+  return authDigest_(JSON.stringify([salt, record.id, record.password]));
+}
 function appSessionKey_(token) {
   if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) {
     throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
   }
-  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, token);
-  return APP_SESSION_PREFIX + digest.map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');
+  return ADMIN_SESSION_PREFIX + authDigest_(token);
 }
-
 function requireAppSession_(token) {
-  const email = requireAllowedUser_();
-  const value = PropertiesService.getUserProperties().getProperty(appSessionKey_(token));
-  if (!value || JSON.parse(value).email !== email) {
-    throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  const props = PropertiesService.getScriptProperties();
+  const key = appSessionKey_(token);
+  const stored = props.getProperty(key);
+  let session;
+  try { session = stored ? JSON.parse(stored) : null; } catch (_) {}
+  if (!session || !session.adminId) throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  const record = getAdminRecord_(session.adminId);
+  if (!eligibleAdmin_(record) || !equalDigest_(credentialFingerprint_(record), session.credentialFingerprint || '')) {
+    props.deleteProperty(key);
+    throw new Error('APP_SESSION_REQUIRED: ログイン情報または利用権限が変更されました。');
   }
-  return email;
+  return record.id;
 }
-
-function loginApp() {
-  const email = requireAllowedUser_();
-  const token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').toLowerCase();
-  PropertiesService.getUserProperties().setProperty(
-    appSessionKey_(token), JSON.stringify({email, createdAt: new Date().toISOString()})
-  );
-  return {token, email};
+function loginApp(adminId, password) {
+  const invalid = '管理者IDまたはパスワードが正しくないか、利用権限がありません。';
+  if (typeof adminId !== 'string' || typeof password !== 'string' || !adminId.trim() || adminId.length > 200 || !password || password.length > 512) {
+    throw new Error(invalid);
+  }
+  adminId = adminId.trim();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const cache = CacheService.getScriptCache();
+    const failureKey = 'ACCOUNTING_LOGIN_FAILURE_' + authDigest_(adminId);
+    const globalKey = 'ACCOUNTING_LOGIN_FAILURE_GLOBAL';
+    const failures = Number(cache.get(failureKey) || 0);
+    const totalFailures = Number(cache.get(globalKey) || 0);
+    if (failures >= 8 || totalFailures >= 200) {
+      throw new Error('ログインの試行回数が多いため、10分ほど待ってからお試しください。');
+    }
+    const record = getAdminRecord_(adminId);
+    const passwordMatches = equalDigest_(authDigest_(password), authDigest_(record ? record.password : ''));
+    if (!eligibleAdmin_(record) || !passwordMatches) {
+      cache.put(failureKey, String(failures + 1), 600);
+      cache.put(globalKey, String(totalFailures + 1), 600);
+      throw new Error(invalid);
+    }
+    cache.remove(failureKey);
+    const token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').toLowerCase();
+    PropertiesService.getScriptProperties().setProperty(appSessionKey_(token), JSON.stringify({
+      adminId: record.id, credentialFingerprint: credentialFingerprint_(record), createdAt: new Date().toISOString()
+    }));
+    return {token, adminId: record.id};
+  } finally { lock.releaseLock(); }
 }
-
 function logoutApp(token) {
-  requireAllowedUser_();
-  PropertiesService.getUserProperties().deleteProperty(appSessionKey_(token));
+  PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(token));
   return {ok: true};
-}
-
-function getLoginAccount() {
-  return {email: requireAllowedUser_()};
 }
 
 function getFaviconUrl_() {
@@ -88,7 +130,6 @@ function getFaviconUrl_() {
 }
 
 function setupSpreadsheet_() {
-  requireAllowedUser_();
   PropertiesService.getScriptProperties()
     .setProperty('SPREADSHEET_ID', DEFAULT_SPREADSHEET_ID);
 
@@ -98,21 +139,20 @@ function setupSpreadsheet_() {
 }
 
 function doGet() {
-  requireAllowedUser_();
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('経理ログイン管理')
     .setFaviconUrl(getFaviconUrl_())
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function getAppData(sessionToken) {
-  requireAppSession_(sessionToken);
+  const adminId = requireAppSession_(sessionToken);
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     const ss = getSpreadsheet_();
     const sheet = getSheet_(ss);
     const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION, userEmail: requireAllowedUser_() };
+    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION, adminId };
 
     ensureOrderHeader_(sheet);
     const values = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
@@ -154,7 +194,7 @@ function getAppData(sessionToken) {
 
     entries.sort((a, b) => (a.sortOrder - b.sortOrder) || (a._sheetRow - b._sheetRow));
     entries.forEach(e => delete e._sheetRow);
-    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION, userEmail: requireAllowedUser_() };
+    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION, adminId };
   } finally {
     SpreadsheetApp.flush();
     lock.releaseLock();
