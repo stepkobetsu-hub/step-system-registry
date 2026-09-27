@@ -655,7 +655,11 @@ function invPdf_(source){
 function invBlobHash_(blob){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,blob.getBytes()).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');}
 function invOcr_(blob){
   const f=Drive.Files.create({name:'請求書読取一時_'+invId_(),mimeType:'application/vnd.google-apps.document'},blob,{ocrLanguage:'ja',fields:'id'});
-  try{return DocumentApp.openById(f.id).getBody().getText();}finally{Drive.Files.update({trashed:true},f.id);}
+  try{
+    const r=UrlFetchApp.fetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(f.id)+'/export?mimeType=text%2Fplain',{headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()},muteHttpExceptions:true,followRedirects:false});
+    if(r.getResponseCode()!==200)throw new Error('PDFの文字を読み取れませんでした（'+r.getResponseCode()+'）。');
+    return r.getContentText('UTF-8');
+  }finally{Drive.Files.update({trashed:true},f.id);}
 }
 function invValidDate_(s){const m=String(s).match(/^(20\d{2})-(\d{2})-(\d{2})$/);if(!m)return '';const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));return d.toISOString().slice(0,10)===s?s:'';}
 function invParse_(text,vendor,month){
