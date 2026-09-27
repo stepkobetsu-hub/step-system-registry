@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d47a1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>STEP 教室ビデオ｜Fireタブレット インストール</title>
+  <style>
+    :root{--blue:#0d47a1;--blue2:#1565c0;--ink:#172033;--muted:#64748b;--line:#dbe4f0;--soft:#f4f8fd}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px 16px 48px;background:linear-gradient(145deg,#edf5ff,#fff 52%,#f5f9ff);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+    main{width:min(720px,100%);margin:auto}.card{overflow:hidden;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 18px 54px rgba(15,70,140,.12)}
+    .hero{padding:34px 28px 28px;text-align:center}.icon{width:92px;height:92px;margin:0 auto 18px;border-radius:24px;background:linear-gradient(135deg,#1565c0,#5e35b1);display:grid;place-items:center;color:#fff;font-size:48px}
+    h1{margin:0;font-size:clamp(28px,7vw,40px)}.lead{margin:10px 0 22px;color:var(--muted);line-height:1.7}.download{display:flex;align-items:center;justify-content:center;min-height:64px;padding:14px 18px;border-radius:16px;background:var(--blue);color:#fff;text-decoration:none;font-size:20px;font-weight:800}.download:active{background:var(--blue2)}
+    .filename{margin:12px 0 0;font-family:Consolas,monospace;font-weight:800}.version{margin:6px 0 0;color:var(--muted);font-size:14px}.steps{padding:26px 28px 30px;border-top:1px solid var(--line);background:var(--soft)}h2{margin:0 0 16px;font-size:21px}ol{margin:0;padding-left:1.5em}li{margin:0 0 12px;line-height:1.65}
+    .important{margin:18px 0;padding:16px;border:2px solid #90caf9;border-radius:14px;background:#fff;font-weight:700;line-height:1.7}.note{margin-top:16px;color:#41556e;font-size:14px;line-height:1.65}.url{overflow-wrap:anywhere;font-size:13px}
+  </style>
+</head>
+<body><main><section class="card">
+  <div class="hero">
+    <div class="icon" aria-hidden="true">▰</div>
+    <h1>STEP 教室ビデオ</h1>
+    <p class="lead">神領校・大手町校のFireタブレット用<br>教室間ビデオ通話アプリ</p>
+    <a class="download" href="https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk">最新版APKをダウンロード</a>
+    <p class="filename">STEP-Classroom-Video-Fire.apk</p>
+    <p class="version">最新版は固定URLから配布｜v0.2.7-fire 以降も同じURLを使用</p>
+  </div>
+  <div class="steps">
+    <h2>新しいFireタブレットへ入れる手順</h2>
+    <ol>
+      <li>このページの「最新版APKをダウンロード」を押します。</li>
+      <li>入れるファイルは <b>STEP-Classroom-Video-Fire.apk</b> です。これ以外の旧debug APKやZIPは使いません。</li>
+      <li>「不明なアプリのインストール」を求められた場合は、Silkブラウザだけ一時的に許可します。</li>
+      <li>APKを開いて「インストール」または既存端末なら「更新」を押します。</li>
+      <li>新規端末は、管理者が保管している <b>端末別設定QR</b>（神領1〜3／大手町1〜3）を1回だけ読みます。長いトークンの手入力はしません。</li>
+      <li>カメラ・マイクを許可し、「教室をつなぐ」を押します。</li>
+    </ol>
+    <div class="important">新しい端末にインストールするのは、固定URLの <b>STEP-Classroom-Video-Fire.apk</b> です。端末別設定QRには秘密情報が入るため、公開台帳には置きません。</div>
+    <p class="note">v0.2.0以降の固定release署名版は原則そのまま上書き更新できます。旧debug署名版だけは更新に失敗する場合があるため、その場合のみ旧版をアンインストールしてから入れ直します。</p>
+    <p class="note url">固定APK URL：https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk</p>
+    <p class="note url">本番Worker：https://step-classroom-video.stepkobetsu.workers.dev/</p>
+  </div>
+</section></main></body></html>
