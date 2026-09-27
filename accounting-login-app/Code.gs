@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-entry-favicon-fix';
+const APP_VERSION = '2026-09-27-invoice-search-favicon-fix';
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
@@ -654,6 +654,11 @@ function invParse_(text,vendor,month){
   let dm=compact.match(new RegExp(label+'[】:\\s]*'+datePattern));let due='';
   const iso=m=>invValidDate_(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0'));
   if(dm)due=iso(dm);
+  if(!due&&vendor==='esia'){
+    const block=compact.match(/お支払予定日([\s\S]*?)(?:今回御入金額|前回御請求額)/);
+    const dates=block?[...block[1].matchAll(new RegExp(datePattern,'g'))].map(iso).filter(Boolean):[];
+    if(dates.length===2&&dates[1]>=dates[0]&&Date.parse(dates[1])-Date.parse(dates[0])<=62*86400000)due=dates[1];
+  }
   // OCR may read table headings before all values. Only use a unique date in
   // the selected payment month, and only if the expected due-date label exists.
   if(!due&&compact.includes(label)){
