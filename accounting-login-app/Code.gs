@@ -5,7 +5,7 @@ const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
 const APP_VERSION = '2026-09-27-invoice-search-favicon-fix';
 
 const FAVICON_SOURCE_URL =
-  'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-login-favicon-v2.png';
+  'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-calculator-yen-v3.png';
 
 const FAVICON_FILE_ID_KEY = 'ACCOUNTING_FAVICON_DRIVE_FILE_ID';
 
