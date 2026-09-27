@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.wrangler-dry-run/
+android/.gradle/
+android/app/build/
+*.jks
+*.keystore

@@ -1,0 +1,15 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'jp.stepkobetsu.classroomvideo'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'jp.stepkobetsu.classroomvideo'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+        buildConfigField 'String', 'APP_URL', '"https://step-classroom-video.REPLACE.workers.dev/"'
+    }
+    buildFeatures { buildConfig true }
+}
