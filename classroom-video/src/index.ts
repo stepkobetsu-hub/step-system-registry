@@ -118,16 +118,21 @@ async function sessionResponse(request: Request, env: Env): Promise<Response> {
   if (!body.deviceId || !token) return json({ error: "端末設定が必要です" }, 401);
   let devices;
   try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
-  const device = devices.get(body.deviceId);
+  // Canonical device ID is "jinryo". Keep compatibility with the existing
+  // production secret entry "shinryo" so the already-issued token remains valid.
+  const requestedId = body.deviceId === "shinryo" ? "jinryo" : body.deviceId;
+  const lookupId = requestedId === "jinryo" ? (devices.has("jinryo") ? "jinryo" : "shinryo") : requestedId;
+  const device = devices.get(lookupId);
   if (!device || !(await tokensEqual(token, device.token))) return json({ error: "端末を確認できません" }, 401);
+  const canonicalDevice = requestedId === "jinryo" ? { ...device, id: "jinryo" } : device;
   const exp = Date.now() + 15 * 60_000;
-  const ticket = await createTicket({ id: device.id, name: device.name, exp }, env.SESSION_SECRET);
+  const ticket = await createTicket({ id: canonicalDevice.id, name: canonicalDevice.name, exp }, env.SESSION_SECRET);
   let iceServers: IceServer[];
   try { iceServers = await createIceServers(env); } catch (error) {
     console.error(JSON.stringify({ event: "turn_configuration_error", error: String(error) }));
     return json({ error: "TURN設定エラー" }, 503);
   }
-  return json({ ticket, expiresAt: exp, serverNow: Date.now(), device: { id: device.id, name: device.name }, iceServers });
+  return json({ ticket, expiresAt: exp, serverNow: Date.now(), device: { id: canonicalDevice.id, name: canonicalDevice.name }, iceServers });
 }
 
 export default {
