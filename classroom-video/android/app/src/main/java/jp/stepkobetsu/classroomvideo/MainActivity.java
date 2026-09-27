@@ -3,6 +3,7 @@ package jp.stepkobetsu.classroomvideo;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -56,22 +57,32 @@ public final class MainActivity extends Activity {
                     if (!isAllowedOrigin(request.getOrigin())) { request.deny(); return; }
                     List<String> allowed = new ArrayList<>();
                     for (String resource : request.getResources()) {
-                        if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource) && checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) allowed.add(resource);
-                        if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource) && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) allowed.add(resource);
+                        if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource) && hasPermission(Manifest.permission.CAMERA)) allowed.add(resource);
+                        if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource) && hasPermission(Manifest.permission.RECORD_AUDIO)) allowed.add(resource);
                     }
                     if (allowed.isEmpty()) request.deny(); else request.grant(allowed.toArray(new String[0]));
                 });
             }
         });
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-            checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+            (!hasPermission(Manifest.permission.CAMERA) || !hasPermission(Manifest.permission.RECORD_AUDIO))) {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, MEDIA_PERMISSION_REQUEST);
-        } else webView.loadUrl(BuildConfig.APP_URL);
+        } else {
+            webView.loadUrl(BuildConfig.APP_URL);
+        }
     }
 
-    @Override public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
-        super.onRequestPermissionsResult(code, permissions, results);
-        if (code == MEDIA_PERMISSION_REQUEST && results.length == 2 && results[0] == PackageManager.PERMISSION_GRANTED && results[1] == PackageManager.PERMISSION_GRANTED) webView.loadUrl(BuildConfig.APP_URL);
+    private boolean hasPermission(String permission) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+            checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
+        if (code == MEDIA_PERMISSION_REQUEST && results.length == 2 &&
+            results[0] == PackageManager.PERMISSION_GRANTED &&
+            results[1] == PackageManager.PERMISSION_GRANTED) {
+            webView.loadUrl(BuildConfig.APP_URL);
+        }
     }
 
     @Override public void onBackPressed() { /* 教室端末で誤って終了しない */ }
@@ -109,7 +120,7 @@ public final class MainActivity extends Activity {
                 int target = Math.max(1, (int) Math.ceil(audio.getStreamMaxVolume(AudioManager.STREAM_ALARM) * 0.65));
                 try {
                     if (audio.getStreamVolume(AudioManager.STREAM_ALARM) < target) audio.setStreamVolume(AudioManager.STREAM_ALARM, target, 0);
-                } catch (RuntimeException ignored) { /* DNDや端末ポリシーを無理に突破しない */ }
+                } catch (RuntimeException ignored) { }
                 ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_ALARM, 65);
                 for (int delay = 0; delay <= 2800; delay += 700) {
                     alarmHandler.postDelayed(() -> tone.startTone(ToneGenerator.TONE_PROP_ACK, 320), delay);
@@ -118,7 +129,7 @@ public final class MainActivity extends Activity {
                     tone.release();
                     if (originalAlarmVolume != null) {
                         try { audio.setStreamVolume(AudioManager.STREAM_ALARM, originalAlarmVolume, 0); }
-                        catch (RuntimeException ignored) { /* 現在値を維持 */ }
+                        catch (RuntimeException ignored) { }
                     }
                     originalAlarmVolume = null;
                     restoreAlarmVolume = null;
