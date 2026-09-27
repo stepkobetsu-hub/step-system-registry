@@ -24,7 +24,7 @@ describe("PR review regressions", () => {
   it("persists rest state and releases call resources", () => {
     expect(app).toMatch(/resting:true/);
     expect(app).toMatch(/getTracks\(\)\.forEach\(\(track\)=>track\.stop\(\)\)/);
-    expect(app).toMatch(/state\.ws\?\.close\(\)/);
+    expect(app).toMatch(/ws\?\.close\(\)/);
     expect(app).toMatch(/state\.wakeLock\?\.release\(\)/);
     expect(worker).toMatch(/serverNow: Date\.now\(\)/);
   });
@@ -71,8 +71,10 @@ describe("PR review regressions", () => {
     for (const value of [3, 5, 8, 10, 15, 0]) {
       expect(html).toContain(`<option value="${value}"`);
     }
-    expect(app).toMatch(/Math\.abs\(dy\)>60/);
+    expect(app).toMatch(/Math\.abs\(dy\)>=60/);
     expect(app).toMatch(/if\(dy>0\)hideControls\(\)/);
+    expect(app).toMatch(/addEventListener\("touchstart"/);
+    expect(app).toMatch(/addEventListener\("touchend"/);
   });
 
   it("creates video tiles only for live streams and removes stale frames", () => {
@@ -103,11 +105,31 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/signaling=.*ice=.*connection=.*tracks=/);
   });
 
-  it("persists and shares the configurable tablet name", () => {
+  it("keeps the selected tablet name aligned with the internal device id", () => {
     expect(html).toContain('id="settings-tablet-name"');
-    expect(app).toMatch(/tabletName:\(value\.tabletName/);
-    expect(app).toMatch(/body:JSON\.stringify\(\{deviceId:saved\.deviceId,tabletName:saved\.tabletName\}\)/);
-    expect(worker).toMatch(/displayNameForDevice\(identity\.canonical, body\.tabletName\)/);
+    for (const id of ["jinryo-1", "jinryo-2", "jinryo-3", "otemachi-1", "otemachi-2", "otemachi-3"]) {
+      expect(html).toContain(`option value="${id}"`);
+    }
+    expect(app).toMatch(/tabletName:defaultTabletName\(deviceId\)/);
+    expect(app).toMatch(/body:JSON\.stringify\(\{deviceId:config\.deviceId\}\)/);
+    expect(worker).toMatch(/displayNameForDevice\(identity\.canonical\)/);
+  });
+
+  it("routes calls only to the opposite campus and closes acknowledged alerts", () => {
+    expect(worker).toMatch(/campusOfDevice\(sender\.id\)/);
+    expect(worker).toMatch(/broadcastToCampus\(senderCampus === "jinryo" \? "otemachi" : "jinryo"/);
+    expect(worker).toMatch(/type: "call-acknowledged"/);
+    expect(app).toMatch(/message\.type==="call-acknowledged"/);
+  });
+
+  it("marks only the local device and fully resets realtime state on stop", () => {
+    expect(app).toMatch(/function setSelfLabel/);
+    expect(app).toMatch(/marker\.className="self-marker"/);
+    expect(app).toMatch(/caption\.textContent=peer\.name/);
+    expect(app).toMatch(/state\.candidateQueues\.clear\(\)/);
+    expect(app).toMatch(/state\.generation\+=1/);
+    expect(app).toMatch(/state\.featuredPeerId=null/);
+    expect(app).toMatch(/ui\["remote-grid"\]\.textContent=""/);
   });
 
   it("generates short-lived TURN credentials without exposing the long-lived key", () => {
