@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
 type Attachment = { id: string; name: string };
-type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown };
+type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
 type ClientMessage = SignalMessage | { type: "call"; callId: string } | { type: "ack"; callId: string } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 
@@ -77,7 +77,7 @@ export class VideoRoom extends DurableObject<Env> {
     try { message = JSON.parse(raw) as ClientMessage; } catch { return; }
     if (message.type === "ping") { socket.send(JSON.stringify({ type: "pong", at: Date.now() })); return; }
     if (message.type === "signal") {
-      if (typeof message.to !== "string" || message.to === sender.id || (!message.description && !message.candidate)) return;
+      if (typeof message.to !== "string" || message.to === sender.id || (!message.description && !message.candidate && message.restart !== true)) return;
       this.sendTo(message.to, { ...message, from: sender.id, fromName: sender.name });
       return;
     }

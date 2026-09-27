@@ -78,12 +78,14 @@
             <option value="11">11時間</option><option value="12">12時間</option>
           </select>
         </label>
-        <div class="settings-actions">
-          <button id="chime-test">呼び出し音テスト</button>
-          <button id="settings-save" class="primary">保存</button>
-          <button id="settings-close">閉じる</button>
-        </div>
-        <button id="reset-device" class="reset-device">端末設定をリセット</button>
+         <div class="settings-actions">
+           <button id="chime-test">呼び出し音テスト</button>
+           <button id="diagnostics-toggle">診断</button>
+           <button id="settings-save" class="primary">保存</button>
+           <button id="settings-close">閉じる</button>
+         </div>
+         <pre id="diagnostics" class="diagnostics hidden" aria-live="polite"></pre>
+         <button id="reset-device" class="reset-device">端末設定をリセット</button>
       </section>
     </section>
   </main>

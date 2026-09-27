@@ -77,11 +77,30 @@ describe("PR review regressions", () => {
 
   it("creates video tiles only for live streams and removes stale frames", () => {
     expect(app).toMatch(/requestAnimationFrame/);
-    expect(app).toMatch(/pc\.ontrack=.*tileFor\(peerInfo,event\.streams\[0\]\)/);
+    expect(app).toMatch(/pc\.ontrack=.*event\.streams&&event\.streams\[0\]/);
+    expect(app).toMatch(/entry\.remoteStream\.addTrack\(event\.track\)/);
     expect(app).toMatch(/if\(video\)video\.srcObject=null/);
     expect(app).toMatch(/if\(removeTile\)entry\.tile\.remove\(\)/);
     expect(app).toMatch(/state\.peers\.delete\(peerId\)/);
     expect(html).toContain("接続相手を待っています");
+  });
+
+  it("uses deterministic negotiation and Fire-compatible ICE recovery", () => {
+    expect(app).toMatch(/function isInitiator\(peerId\)/);
+    expect(app).toMatch(/iceConnectionState==="completed"/);
+    expect(app).toMatch(/pc\.oniceconnectionstatechange/);
+    expect(app).toMatch(/schedulePeerRecovery\(entry,12000\)/);
+    expect(app).toMatch(/entry\.pc\.signalingState!=="stable"/);
+    expect(app).toMatch(/createOffer\(\{iceRestart:replace\}\)/);
+    expect(app).toMatch(/restart:true/);
+    expect(worker).toMatch(/message\.restart !== true/);
+  });
+
+  it("shows WebRTC diagnostics only from settings", () => {
+    expect(html).toContain('id="diagnostics-toggle"');
+    expect(html).toContain('id="diagnostics" class="diagnostics hidden"');
+    expect(app).toMatch(/WebSocket:/);
+    expect(app).toMatch(/signaling=.*ice=.*connection=.*tracks=/);
   });
 
   it("persists and shares the configurable tablet name", () => {
