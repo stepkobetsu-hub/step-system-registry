@@ -12,10 +12,10 @@
   <main id="app">
     <section id="setup" class="panel hidden" aria-labelledby="setup-title">
       <h1 id="setup-title">端末の初期設定</h1>
-      <p>管理者から渡された端末IDと端末トークンを最初の1回だけ入力します。</p>
-      <label>端末ID<input id="device-id" autocomplete="off" placeholder="jinryo-1"></label>
-      <label>端末トークン<input id="device-token" type="password" autocomplete="off"></label>
-      <label>連続動作時間
+      <p>この端末を自動登録しています。IDやトークンの入力は不要です。</p>
+      <label class="hidden">端末ID<input id="device-id" autocomplete="off"></label>
+      <label class="hidden">端末トークン<input id="device-token" type="password" autocomplete="off"></label>
+      <label class="hidden">連続動作時間
         <select id="duration-hours">
           <option value="5">5時間</option><option value="6" selected>6時間（標準）</option>
           <option value="7">7時間</option><option value="8">8時間</option>
@@ -23,7 +23,7 @@
           <option value="11">11時間</option><option value="12">12時間</option>
         </select>
       </label>
-      <button id="save-setup" class="primary">この端末に保存</button>
+      <button id="save-setup" class="primary">自動登録を再試行</button>
       <p id="setup-error" class="error" role="alert"></p>
     </section>
 
@@ -64,8 +64,8 @@
       <section id="settings" class="settings hidden" aria-labelledby="settings-title">
         <h2 id="settings-title">端末設定</h2>
         <p>端末：<strong id="settings-device"></strong></p>
-        <label>端末ID（半角英数字とハイフン）
-          <input id="settings-tablet-name" autocomplete="off" placeholder="jinryo-phone-1">
+        <label>内部端末ID（自動発行・変更不可）
+          <input id="settings-tablet-name" readonly>
         </label>
         <label>画面に表示する端末名
           <input id="settings-display-name" autocomplete="off" maxlength="24" placeholder="管理者スマホ">

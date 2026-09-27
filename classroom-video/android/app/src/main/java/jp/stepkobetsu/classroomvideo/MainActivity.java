@@ -24,11 +24,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public final class MainActivity extends Activity {
     private static final int MEDIA_PERMISSION_REQUEST = 10;
     private static final String PREFS = "step_video_device";
     private static final String PREF_CONFIG = "config_json";
+    private static final String PREF_INSTALLATION_ID = "installation_id";
     private WebView webView;
     private long backgroundedAt;
 
@@ -156,6 +158,15 @@ public final class MainActivity extends Activity {
 
         @JavascriptInterface public String loadConfig() {
             return getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_CONFIG, "");
+        }
+
+        @JavascriptInterface public String getInstallationId() {
+            SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+            String existing = preferences.getString(PREF_INSTALLATION_ID, "");
+            if (existing != null && !existing.isEmpty()) return existing;
+            String created = UUID.randomUUID().toString();
+            preferences.edit().putString(PREF_INSTALLATION_ID, created).commit();
+            return created;
         }
 
         @JavascriptInterface public void saveConfig(String json) {

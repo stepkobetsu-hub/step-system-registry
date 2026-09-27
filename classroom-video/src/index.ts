@@ -40,6 +40,13 @@ function json(data: unknown, status = 200): Response {
   return Response.json(data, { status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
 }
 
+function randomCredential(bytes = 32): string {
+  const value = crypto.getRandomValues(new Uint8Array(bytes));
+  let binary = "";
+  for (const byte of value) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+}
+
 function socketAttachment(socket: WebSocket): Attachment | null {
   const value: unknown = socket.deserializeAttachment();
   if (!value || typeof value !== "object") return null;
@@ -53,10 +60,18 @@ export class VideoRoom extends DurableObject<Env> {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS calls (id TEXT PRIMARY KEY, sender TEXT NOT NULL, created_at INTEGER NOT NULL, acknowledged_by TEXT, acknowledged_at INTEGER)");
+      this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS registered_devices (installation_id TEXT PRIMARY KEY, id TEXT UNIQUE NOT NULL, name TEXT NOT NULL, credential TEXT NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)");
+      this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS registration_attempts (ip TEXT NOT NULL, created_at INTEGER NOT NULL)");
+      this.ctx.storage.sql.exec("CREATE INDEX IF NOT EXISTS registration_attempts_ip_time ON registration_attempts(ip, created_at)");
+      this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS registry_meta (key TEXT PRIMARY KEY, value INTEGER NOT NULL)");
+      this.ctx.storage.sql.exec("INSERT OR IGNORE INTO registry_meta (key, value) VALUES ('device_sequence', 0)");
     });
   }
 
-  fetch(request: Request): Response {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    if (request.method === "POST" && url.pathname === "/register") return this.registerDevice(request);
+    if (request.method === "POST" && url.pathname === "/authenticate") return this.authenticateDevice(request);
     if (request.headers.get("upgrade") !== "websocket") return new Response("WebSocket required", { status: 426 });
     const id = request.headers.get("x-device-id");
     const encodedName = request.headers.get("x-device-name");
@@ -74,6 +89,44 @@ export class VideoRoom extends DurableObject<Env> {
     if (mode === "active") this.broadcast({ type: "wake", from: { id, name } }, id, "standby");
     this.broadcast({ type: "presence", peers: this.peers() }, id);
     return new Response(null, { status: 101, webSocket: client });
+  }
+
+  private async registerDevice(request: Request): Promise<Response> {
+    const body: { installationId?: string; preferredName?: string; ip?: string } =
+      await request.json<{ installationId?: string; preferredName?: string; ip?: string }>().catch(() => ({}));
+    if (!body.installationId || !/^[a-f0-9-]{32,64}$/i.test(body.installationId)) return json({ error: "登録情報が不正です" }, 400);
+    const existing = this.ctx.storage.sql.exec<{ id: string; name: string; credential: string }>(
+      "SELECT id, name, credential FROM registered_devices WHERE installation_id = ?", body.installationId
+    ).toArray()[0];
+    if (existing) return json({ device: { id: existing.id, name: existing.name }, credential: existing.credential });
+    const now = Date.now(), ip = (body.ip || "unknown").slice(0, 80), since = now - 86_400_000;
+    this.ctx.storage.sql.exec("DELETE FROM registration_attempts WHERE created_at < ?", since);
+    const recent = this.ctx.storage.sql.exec<{ count: number }>("SELECT COUNT(*) AS count FROM registration_attempts WHERE ip = ?", ip).toArray()[0]?.count ?? 0;
+    const total = this.ctx.storage.sql.exec<{ count: number }>("SELECT COUNT(*) AS count FROM registered_devices").toArray()[0]?.count ?? 0;
+    if (recent >= 30 || total >= 200) return json({ error: "自動登録の上限に達しました。管理者へ連絡してください" }, 429);
+    const sequence = (this.ctx.storage.sql.exec<{ value: number }>("SELECT value FROM registry_meta WHERE key = 'device_sequence'").toArray()[0]?.value ?? 0) + 1;
+    const id = `device-${randomCredential(12).toLowerCase()}`, credential = randomCredential();
+    const preferredName = typeof body.preferredName === "string" ? body.preferredName.trim().slice(0, 24) : "";
+    const name = preferredName || `STEP端末${sequence}`;
+    this.ctx.storage.sql.exec("UPDATE registry_meta SET value = ? WHERE key = 'device_sequence'", sequence);
+    this.ctx.storage.sql.exec("INSERT INTO registered_devices (installation_id, id, name, credential, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)", body.installationId, id, name, credential, now, now);
+    this.ctx.storage.sql.exec("INSERT INTO registration_attempts (ip, created_at) VALUES (?, ?)", ip, now);
+    return json({ device: { id, name }, credential }, 201);
+  }
+
+  private async authenticateDevice(request: Request): Promise<Response> {
+    const body: { deviceId?: string; credential?: string; displayName?: string } =
+      await request.json<{ deviceId?: string; credential?: string; displayName?: string }>().catch(() => ({}));
+    if (!body.deviceId || !body.credential) return json({ error: "端末設定が必要です" }, 401);
+    const device = this.ctx.storage.sql.exec<{ id: string; name: string; credential: string }>(
+      "SELECT id, name, credential FROM registered_devices WHERE id = ?", body.deviceId
+    ).toArray()[0];
+    if (!device || !(await tokensEqual(body.credential, device.credential))) return json({ error: "端末を確認できません" }, 401);
+    const requestedName = typeof body.displayName === "string" ? body.displayName.trim() : "";
+    if (requestedName.length > 24) return json({ error: "端末名は24文字以内にしてください" }, 400);
+    const name = requestedName || device.name;
+    if (name !== device.name) this.ctx.storage.sql.exec("UPDATE registered_devices SET name = ?, updated_at = ? WHERE id = ?", name, Date.now(), device.id);
+    return json({ device: { id: device.id, name } });
   }
 
   webSocketMessage(socket: WebSocket, raw: string | ArrayBuffer): void {
@@ -156,13 +209,22 @@ async function sessionResponse(request: Request, env: Env): Promise<Response> {
   const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
   const body: { deviceId?: string; displayName?: string } = await request.json<{ deviceId?: string; displayName?: string }>().catch(() => ({}));
   if (!body.deviceId || !token) return json({ error: "端末設定が必要です" }, 401);
-  let devices;
-  try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
-  const identity = resolveDeviceIdentity(body.deviceId, devices);
-  if (!identity || !(await tokensEqual(token, identity.configured.token))) return json({ error: "端末を確認できません" }, 401);
   const requestedName = typeof body.displayName === "string" ? body.displayName.trim() : "";
   if (requestedName.length > 24) return json({ error: "端末名は24文字以内にしてください" }, 400);
-  const canonicalDevice = { ...identity.canonical, name: requestedName || displayNameForDevice(identity.canonical) };
+  let canonicalDevice: { id: string; name: string } | null = null;
+  const registry = env.ROOMS.getByName("step-main");
+  const registered = await registry.fetch("https://registry.internal/authenticate", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ deviceId: body.deviceId, credential: token, displayName: requestedName })
+  });
+  if (registered.ok) canonicalDevice = (await registered.json<{ device: { id: string; name: string } }>()).device;
+  if (!canonicalDevice) {
+    let devices;
+    try { devices = parseDevices(env.DEVICE_TOKENS); } catch (error) { console.error(JSON.stringify({ event: "invalid_device_config", error: String(error) })); return json({ error: "サーバー設定エラー" }, 500); }
+    const identity = resolveDeviceIdentity(body.deviceId, devices);
+    if (!identity || !(await tokensEqual(token, identity.configured.token))) return json({ error: "端末を確認できません" }, 401);
+    canonicalDevice = { ...identity.canonical, name: requestedName || displayNameForDevice(identity.canonical) };
+  }
   const exp = Date.now() + 15 * 60_000;
   const ticket = await createTicket({ id: canonicalDevice.id, name: canonicalDevice.name, exp }, env.SESSION_SECRET);
   let iceServers: IceServer[];
@@ -177,6 +239,13 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/api/health") return json({ ok: true });
+    if (url.pathname === "/api/register" && request.method === "POST") {
+      const body = await request.json<{ installationId?: string; preferredName?: string }>().catch(() => ({}));
+      return env.ROOMS.getByName("step-main").fetch("https://registry.internal/register", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...body, ip: request.headers.get("cf-connecting-ip") || "unknown" })
+      });
+    }
     if (url.pathname === "/api/session" && request.method === "POST") return sessionResponse(request, env);
     if (url.pathname === "/api/ws") {
       const ticket = url.searchParams.get("ticket") ?? "";
