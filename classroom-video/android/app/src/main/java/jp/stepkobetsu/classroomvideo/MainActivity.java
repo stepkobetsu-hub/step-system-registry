@@ -151,6 +151,10 @@ public final class MainActivity extends Activity {
             getSharedPreferences(PREFS, MODE_PRIVATE).edit().remove(PREF_CONFIG).apply();
         }
 
+        @JavascriptInterface public void exitApp() {
+            runOnUiThread(() -> finishAndRemoveTask());
+        }
+
         @JavascriptInterface public void playChime() {
             runOnUiThread(() -> {
                 AudioManager audio = (AudioManager) getSystemService(AUDIO_SERVICE);

@@ -104,6 +104,21 @@ describe("PR review regressions", () => {
     expect(html).toContain("接続相手を待っています");
   });
 
+  it("shows the featured classroom and reveals controls on a screen tap", () => {
+    expect(html).toContain('id="featured-name"');
+    expect(app).toMatch(/ui\["featured-name"\]\.textContent=featured\?\.name/);
+    expect(app).toMatch(/else showControls\(\);/);
+  });
+
+  it("requires a triple tap before exiting the APK", () => {
+    expect(html).toContain("3回タップでアプリ終了");
+    expect(app).toMatch(/state\.hangupTaps\+=1/);
+    expect(app).toMatch(/state\.hangupTaps<3/);
+    expect(app).toMatch(/StepNative\?\.exitApp/);
+    expect(android).toMatch(/@JavascriptInterface public void exitApp/);
+    expect(android).toMatch(/finishAndRemoveTask\(\)/);
+  });
+
   it("uses deterministic negotiation and Fire-compatible ICE recovery", () => {
     expect(app).toMatch(/function isInitiator\(peerId\)/);
     expect(app).toMatch(/iceConnectionState==="completed"/);
