@@ -5,6 +5,7 @@ const app = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
 const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const android = readFileSync(new URL("../android/app/src/main/java/jp/stepkobetsu/classroomvideo/MainActivity.java", import.meta.url), "utf8");
 const worker = readFileSync(new URL("../src/index.ts", import.meta.url), "utf8");
+const css = readFileSync(new URL("../public/style.css", import.meta.url), "utf8");
 
 describe("PR review regressions", () => {
   it("unlocks and reuses one AudioContext before connecting", () => {
@@ -197,5 +198,16 @@ describe("PR review regressions", () => {
     expect(worker).toMatch(/Bearer \$\{env\.TURN_KEY_API_TOKEN\}/);
     expect(worker).toMatch(/!\/:53/);
     expect(worker).not.toMatch(/TURN_KEY_API_TOKEN.*json\(/);
+  });
+
+  it("shows remote camera and microphone off states without false freeze recovery", () => {
+    expect(worker).toMatch(/message\.type === "media-state"/);
+    expect(worker).toMatch(/type: "media-state", from: sender\.id/);
+    expect(app).toContain("📹 ビデオ OFF");
+    expect(app).toContain("🎤 マイク OFF");
+    expect(app).toMatch(/function sendMediaState/);
+    expect(app).toMatch(/remoteMedia\?\.audio===false&&remoteMedia\?\.video===false/);
+    expect(css).toMatch(/\.camera-off/);
+    expect(css).toMatch(/\.mic-off/);
   });
 });
