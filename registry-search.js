@@ -9,7 +9,7 @@ const registrySearch=(()=>{
   const normalize=value=>String(value??'').toLowerCase().normalize('NFKC').replace(/[\s　]+/g,'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96)).replace(/ー/g,'');
   function reading(value){return normalize(value).replace(readingPattern,term=>readings[term]);}
   function toKana(value){const input=normalize(value);return input.replace(/[a-z]+/g,segment=>{let out='';for(let i=0;i<segment.length;){if(segment[i]==='n'&&(i===segment.length-1||segment[i+1]==='n'||!/[aiueoy]/.test(segment[i+1]))){out+='ん';i+=segment[i+1]==='n'?2:1;continue}if(segment[i]===segment[i+1]&&/[bcdfghjklmpqrstvwxyz]/.test(segment[i])&&segment[i]!=='n'){out+='っ';i++;continue}let found=false;for(const length of [3,2,1]){const kana=romaji[segment.slice(i,i+length)];if(kana){out+=kana;i+=length;found=true;break}}if(!found){out+=segment[i];i++}}return out});}
-  function matches(source,query){const q=normalize(query);if(!q)return true;const raw=normalize(source);if(raw.includes(q))return true;const phonetic=reading(source),queryReading=reading(q);return phonetic.includes(toKana(queryReading))||phonetic.includes(queryReading);}
+  function matches(source,query){const words=String(query??'').trim().split(/[\s　]+/).map(normalize).filter(Boolean);if(!words.length)return true;const raw=normalize(source);let phonetic;return words.every(q=>{if(raw.includes(q))return true;phonetic??=reading(source);const queryReading=reading(q);return phonetic.includes(toKana(queryReading))||phonetic.includes(queryReading);});}
   return {matches,normalize,reading,toKana};
 })();
 if(typeof module!=='undefined')module.exports=registrySearch;

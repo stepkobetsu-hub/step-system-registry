@@ -15,3 +15,9 @@ test('details and quoted card name are distinct search scopes',()=>{
   assert.equal(search.matches(`${title} ${details}`,'kouza'),true);
   assert.equal(search.matches(`${title} ${details}`,'口座'),true);
 });
+test('space separated words match anywhere in the card, regardless of order or script',()=>{
+  const title='生徒情報検索';
+  for(const query of ['生徒 検索','検索　生徒','seito kensaku','セイト 検索'])assert.equal(search.matches(title,query),true,query);
+  assert.equal(search.matches(title,'生徒 請求'),false);
+  assert.equal(search.matches(title,'生徒検索'),false);
+});
