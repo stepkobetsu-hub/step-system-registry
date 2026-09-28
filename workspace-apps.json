@@ -150,6 +150,11 @@
       "正式名称": "STEP塾生アプリ（step-hub）",
       "状態": "本番使用中",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-hub/"
+    },
+    {
+      "正式名称": "生徒情報検索",
+      "状態": "本番使用中（詳細表示の高速化は未解決）",
+      "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html"
     }
   ]
 }

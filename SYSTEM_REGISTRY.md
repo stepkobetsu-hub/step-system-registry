@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-09-27
+最終更新: 2026-09-28
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -36,7 +36,7 @@
 - 今後は講師マスターで在籍`1`を設定し、本人が6桁のメール確認番号でLINE登録を完了すると、定期照合が登録シートの最終行まで確認し、未反映またはLINE連携先が変わった講師だけをSupabaseへ追加・更新する。照合では講師コードと講師マスターの在籍・氏名・よみ・教室を確認し、秘密情報を通知へ載せない。
 - 9月23～24日の照合では有効な登録26人とSupabase26人が一致し、差分なし。次の新規登録が実際に自動反映されるまで、新規追加の動作は未検証。表示されない場合は本人登録完了、マスターD列、登録シートの最終行、定期照合の実行結果を順に確認する。
 
-## 登録システム（30件）
+## 登録システム（31件）
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -70,6 +70,7 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・43カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-23 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、証憑自動回収を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
+| 生徒情報検索 | 本番使用中（詳細表示の高速化は未解決） | https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `student_directory.html`、`gas_code.js` | GitHub Pages＋Apps Script＋Google Sheet／面談記録はSupabase | 画面更新とGAS再デプロイを区別し、本番の表示・所要時間を確認 | 2026-09-28（コード確認・最新表示未確認） | 管理者向け独立アプリ。4チャットの作成・変更内容を集約。★生徒マスタへ、口座振替行60％をコード反映。詳細表示は利用者報告で未改善、作業はいったん停止。詳細は docs/student-directory-20260928.md |
 
 ## デジタルカレンダー：本番仕様
 

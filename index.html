@@ -4468,5 +4468,83 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="student-directory-registry-card-20260928">
+(() => {
+  CARD_ANCHORS.unshift(['生徒情報検索','student-directory']);
+  const record={
+  "ID": "student-directory",
+  "システム名": "生徒情報検索",
+  "正式名称": "生徒情報検索",
+  "分類": "生徒管理",
+  "利用者": "管理者",
+  "運用担当": "管理者",
+  "状態": "本番使用中（詳細表示の高速化は未解決）",
+  "概要": "氏名・かな・ローマ字・番号で生徒を検索し、基本情報・連絡先・口座振替・時間割・面談記録を確認する独立アプリ。2026年9月28日の4チャットを集約。詳細表示の速度改善は効果未確認、作業はいったん停止。",
+  "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html",
+  "Google Sheet URL": "https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit#gid=829117795",
+  "Google Sheet名": "生徒マスタ",
+  "使用シート名": "☆マスタ／時間割マスタ",
+  "GitHub URL": "https://github.com/stepkobetsu-hub/seiseki-kanri",
+  "保存基盤": "Google Sheet（生徒情報・時間割の原本）／Supabase（面談記録・検索候補の補助取得）",
+  "正本ファイル": [
+    "seiseki-kanri/student_directory.html",
+    "seiseki-kanri/gas_code.js"
+  ],
+  "最新版の場所": "stepkobetsu-hub/seiseki-kanri main",
+  "APIアクション": [
+    "getStudentDirectoryList",
+    "getStudentDirectoryDetail",
+    "saveStudentDirectory"
+  ],
+  "認証・セッション": "成績管理と同じ管理者ID・パスワードを使用。初回ログイン後はログアウトまで保持。取得・保存はサーバー側で管理者権限を確認。",
+  "主要機能": [
+    "氏名・ひらがな・カタカナ・ローマ字・生徒番号の部分一致検索。候補を選ぶと詳細表示、検索窓は維持。",
+    "氏名・フリガナ・学年・学校名・保護者連絡先・住所・メール等を表示。項目タップで拡大、電話発信、パスワード項目はタップで確認。",
+    "☆マスタと時間割マスタを生徒番号で結合し、曜日・時間・科目・コース・備考を表示。",
+    "口座振替提出（M列）・有効（N列）をチェック式で変更。生徒番号・氏名を含む確認後に保存。",
+    "☆マスタの確認付き編集、数式セルの変更拒否、保存時の競合確認。",
+    "選択生徒の面談記録を新しい順に表示し、面談登録へ移動。",
+    "B列空欄は赤い「退塾」、0はオレンジの「退塾予定」、1は在籍表示を省略。",
+    "「この生徒の成績を見る」を拡大・強調し、生徒名と番号の右側へ配置。左に小型の「★生徒マスタへ」。"
+  ],
+  "仕様メモ": "明るいミント系の画面・ファビコン。検索候補は1行表示、行高130％の調整履歴あり。口座振替行は2026-09-28に70px→42px、上下余白6pxへ変更。チェック欄は24pxを維持。",
+  "連携メモ": [
+    "成績管理から独立した専用ページ。旧入口からの転送を設定した履歴あり。",
+    "検索候補は端末キャッシュを先に表示し、最新一覧を後から取得。検索キーの事前計算・候補の一括描画を実装。",
+    "詳細はGoogle Apps Scriptを経由して原本を取得。数式確認23回を1回にまとめた変更あり。面談記録はSupabaseから別取得。"
+  ],
+  "関連カード": [
+    "生徒マスタ",
+    "成績管理",
+    "面談メモ"
+  ],
+  "作業メモ": "対象チャット：生徒情報検索アプリ作成／生徒情報検索アプリ確認（2件）／生徒アプリ停止確認。2026-09-28に作成・UI調整・検索改善を実施。ユーザーより『候補は早くなったが、選択後の詳細表示はちっとも早くなっていない』との報告。詳細取得方式の変更は未実施。ユーザー指示により高速化作業をいったん停止。",
+  "確認済み事項": [
+    "現行コードの「★生徒マスタへ」：32810317be5a9c790471c04667ffc6ca7d3bbbb2",
+    "口座振替行60％のコード変更：1281e40e80e36041b513a0cf959365f070fbc3c5",
+    "検索候補・詳細取得の改善：PR #32。速度改善の効果は未確認。"
+  ],
+  "未確認項目": [
+    "最新の★ボタンと口座振替行の実画面表示",
+    "生徒選択から詳細表示までの実測時間と処理別内訳",
+    "詳細表示の体感速度改善（利用者報告では未改善）"
+  ],
+  "確認状況": "コード確認済み。最新表示と検索速度の実測は未確認。確認用ブラウザーを利用できなかったため、表示・速度の完了扱いはしない。",
+  "確認日": "2026-09-28",
+  "GitHubドキュメント": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-directory-20260928.md",
+  "更新方法": "画面はseiseki-kanri/mainからGitHub Pagesへ公開。GAS変更は既存プロジェクトへ同期して再デプロイし、実際の詳細取得時間を確認する。",
+  "変更時の注意": "生徒の実データ、パスワード値、管理者セッション情報は公開台帳・GitHubへ掲載しない。今後の高速化は原本の鮮度・保存競合・管理者権限を維持する。"
+};
+  const base=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=base(items);
+    const index=list.findIndex(item=>item['ID']==='student-directory'||String(item['システム名']||item['正式名称']||'')==='生徒情報検索');
+    if(index>=0)list[index]=Object.assign({},list[index],record);
+    else list.push(Object.assign({},record));
+    return list;
+  };
+})();
+</script>
+
 </body>
 </html>
