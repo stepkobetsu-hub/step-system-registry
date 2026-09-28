@@ -8,7 +8,8 @@ const exported=JSON.parse(fs.readFileSync(new URL('../workspace-apps.json',impor
 
 test('業務ホーム公開JSONはSYSTEM_REGISTRY.mdから機械生成した内容と一致する',()=>{
   assert.deepEqual(exported,buildExport(markdown));
-  assert.equal(exported.apps.length,29);
+  assert.equal(exported.apps.length,32);
+  assert.ok(exported.apps.some(app=>app['正式名称']==='STEPシステム資産管理台帳'));
 });
 
 test('公開JSONには業務ホーム自身を含み秘密情報を含めない',()=>{

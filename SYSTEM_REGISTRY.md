@@ -5,6 +5,15 @@
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
+## 台帳画面の検索（2026-09-28）
+
+- 画面上部の「すべて」と表示されていた調査状況の絞り込みを削除し、「カード検索」と「タイトル・説明・詳細を検索」を設置。左メニューの「カードを検索」は継続。
+- カード検索と左メニューはカード名を対象とし、詳細検索はカード名・説明・登録項目を対象とする。分類・状態の絞り込み、および「検索をクリア」は維持。
+- 漢字・ひらがな・カタカナ・ローマ字を照合する。漢字の読みへの変換は台帳で使う主要な語の登録辞書に基づくため、未登録の漢字語の読みは検索対象に含まれない。
+- ２つの新しい検索窓は、通常の入力欄より約30％高い55pxに設定。左メニューの検索窓は従来の高さを維持。
+- 半角・全角スペースで区切った語はすべてを含むカードを検索する。例：「生徒 検索」「検索　生徒」「seito kensaku」。空白なしの「生徒検索」は従来どおり連続した語として扱う。
+- 実装：`index.html`、`registry-search.js`。関連自動テスト17件成功。GitHub Pagesへの公開・更新ファイルの配信を確認済み。
+
 この文書にはAPIキー、パスワード、秘密鍵、セッショントークン、LINE利用者IDを記載しない。台帳は公開GitHub Pagesと同じ公開情報を表示するためログイン不要。送信・編集などの管理操作は台帳から分離し、各システム側で権限確認を維持する。
 
 ## 講師LINE通知・連絡（2026-09-13最終構成）
@@ -36,10 +45,11 @@
 - 今後は講師マスターで在籍`1`を設定し、本人が6桁のメール確認番号でLINE登録を完了すると、定期照合が登録シートの最終行まで確認し、未反映またはLINE連携先が変わった講師だけをSupabaseへ追加・更新する。照合では講師コードと講師マスターの在籍・氏名・よみ・教室を確認し、秘密情報を通知へ載せない。
 - 9月23～24日の照合では有効な登録26人とSupabase26人が一致し、差分なし。次の新規登録が実際に自動反映されるまで、新規追加の動作は未検証。表示されない場合は本人登録完了、マスターD列、登録シートの最終行、定期照合の実行結果を順に確認する。
 
-## 登録システム（31件）
+## 登録システム
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
+| STEPシステム資産管理台帳 | 本番使用中（2026-09-28検索改善） | https://stepkobetsu-hub.github.io/step-system-registry/ | [step-system-registry](https://github.com/stepkobetsu-hub/step-system-registry) | `main` | `index.html`、`registry-search.js`、`SYSTEM_REGISTRY.md` | GitHub Pages＋STEPスタッフ認証＋台帳共有設定 | 本リポジトリの`main`へ反映し、Pages公開と検索結果を確認 | 2026-09-28 | 旧調査状況セレクトを削除し、カード名専用と詳細を含む検索窓を追加。左メニュー検索を保持。主要な漢字語の読み・かな・ローマ字、および「生徒 検索」のようなスペース区切りの複数語AND検索に対応。詳細は本書「台帳画面の検索」を参照 |
 | STEP 教室ビデオ通話 | **本番使用中（Fire APK v0.3.7・固定release署名）** | https://stepkobetsu-hub.github.io/step-system-registry/classroom-video-install.html<br>**インストール用QR:** https://stepkobetsu-hub.github.io/step-system-registry/images/classroom-video-install-qr.png<br>**固定APK:** https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk<br>**本番Worker:** https://step-classroom-video.stepkobetsu.workers.dev/ | [step-system-registry/classroom-video](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/classroom-video) | `main` | `classroom-video/public/`、`classroom-video/src/`、`classroom-video/android/`、固定GitHub Release APK | Cloudflare Worker／Durable Object／Realtime TURN＋Fire APK | **固定APKをインストールして初回起動するだけで端末固有IDとcredentialを自動登録。** 端末別設定QR、端末ID、長いトークンの入力は不要。既存端末も上書き更新時に新方式へ自動移行 | 2026-09-28 | 1物理端末＝1内部ID＝1presence。Fire HD 8は滑らかさ・低遅延優先を標準とし、接続台数とWebRTC統計に応じて送信帯域・fpsを段階調整。v0.3.7では通話途中の動的な解像度変更を抑えて緑画面を低減し、メイン映像の緑画面を検知した場合は該当Peerを先に再接続、復旧しなければAPK再起動へ移行。左下の自分映像にもマイクOFFアイコンを表示。縦・横の自動回転、重ならない小窓、複数端末mesh、個別呼び出し、自由な表示名、5〜12時間運転、2回タップ再起動・3回タップ完全終了に対応。自動登録credential・TURN秘密値・署名秘密鍵は公開台帳に置かない |
 | デジタルカレンダー | 本番公開中（Sites版54・Fire 7／Windows 10・11） | https://fire-digital-calendar.mintcocoajasmine.chatgpt.site | ChatGPT Sites管理ソース＋[step-system-registry/windows-calendar](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/windows-calendar) | `main` | ChatGPT Sites管理ソース、`dist/`一式、`dist/server/index.js`、`scripts/build-worker.mjs`、Windows版の検証用ソース | ChatGPT Sites Worker＋Googleカレンダー閲覧専用Apps Script連携 | Web版はSites管理ソースを更新し、Workerを再生成して新版を公開。更新番号を上げ、Fire 7実機で予定・点・ヘッドラインを確認。WindowsはEdgeのサイトアプリを使用 | 2026-09-23 | 更新54。FireからGoogleへ直接接続せず、同一サイト内APIを経由。応答を45秒まで待ち、更新失敗時は既存予定を保持する。Fire 7実機で復旧確認済み |
 | 子供用の時間制限アプリ | 本番使用中 | https://smartphone-time-manager-download.mintcocoajasmine.chatgpt.site/ | [smartphone-time-manager](https://github.com/stepkobetsu-hub/smartphone-time-manager) | `main` | Androidアプリ `project/app/src/main/`、保護者用Web管理画面、ChatGPT Sites Worker、D1設定DB | Jelly 2（Android 11）＋パソコン／Pixel 9aのブラウザ＋ChatGPT Sites＋D1 | Android変更はGitHub `main`へ反映してAPKを自動ビルド。保護者用管理画面と接続版APKを同じSites URLへ公開し、Jelly 2へ上書き更新 | 2026-09-14 | Family Link／Kidsloxが利用できなかったため作成した専用アプリ。設定画面は保護者PINで保護し、アプリを離れるたび再認証。秘密値・暗証番号・端末接続トークンは台帳へ記載しない |
