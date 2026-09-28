@@ -3,7 +3,7 @@
   "apps": [
     {
       "正式名称": "STEP 教室ビデオ通話",
-      "状態": "**本番使用中（Fire APK v0.3.6・固定release署名）**",
+      "状態": "**本番使用中（Fire APK v0.3.7・固定release署名）**",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-system-registry/classroom-video-install.html<br>**インストール用QR:** https://stepkobetsu-hub.github.io/step-system-registry/images/classroom-video-install-qr.png<br>**固定APK:** https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk<br>**本番Worker:** https://step-classroom-video.stepkobetsu.workers.dev/"
     },
     {
