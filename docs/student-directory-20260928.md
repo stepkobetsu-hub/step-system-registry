@@ -26,11 +26,11 @@
 
 ## 状態
 
-本番使用中（詳細取得一括化・GAS v70）
+本番使用中（生徒詳細の高速表示用データ・GAS v72）
 
 ## 概要
 
-氏名・かな・ローマ字・番号で生徒を検索し、基本情報・連絡先・口座振替・時間割・面談記録を確認する独立アプリ。詳細取得を一括化しGAS v70へ公開。改善後の選択→詳細描画は22.803秒／7.585秒（同一生徒2回）。ばらつきが大きく、追加改善が必要。
+氏名・かな・ローマ字・番号で生徒を検索し、基本情報・連絡先・口座振替・時間割・面談記録を確認する独立アプリ。生徒マスタを原本として330人分の詳細をSupabaseに同期し、検索後の詳細表示を高速化。確認環境では先読みなし522ms、先読み済み4msで詳細表示。端末や通信条件により変動する。
 
 ## 利用者向けURL
 
@@ -54,7 +54,7 @@ https://github.com/stepkobetsu-hub/seiseki-kanri
 
 ## 保存基盤
 
-Google Sheet（生徒情報・時間割の原本）／Supabase（面談記録・検索候補の補助取得）
+Google Sheet（生徒情報・時間割の原本）／Supabase（管理者専用の生徒詳細・検索候補・面談記録の高速表示用データ）
 
 ## 正本ファイル
 
@@ -70,6 +70,9 @@ stepkobetsu-hub/seiseki-kanri main
 - getStudentDirectoryList
 - getStudentDirectoryDetail
 - saveStudentDirectory
+- getStudentDirectorySnapshot（原本から一括取得）
+- installStudentDirectoryAutoSync（5分ごとに取り込むトリガー設定）
+- syncStudentDirectory／ingestStudentDirectory（高速表示用データの更新）
 
 ## 認証・セッション
 
@@ -94,7 +97,8 @@ stepkobetsu-hub/seiseki-kanri main
 
 - 成績管理から独立した専用ページ。旧入口からの転送を設定した履歴あり。
 - 検索候補は端末キャッシュを先に表示し、最新一覧を後から取得。検索キーの事前計算・候補の一括描画を実装。
-- 詳細はGoogle Apps Scriptを経由して原本を取得。数式確認23回を1回にまとめた変更あり。面談記録はSupabaseから別取得。
+- 詳細は管理者認証付きのSupabase Edge Functionから表示用データを取得。原本はGoogle Sheetのまま。保存時はApps Scriptで原本に保存し、返却された確定値を表示用データへ反映。面談記録は別取得。
+- 登録アプリの原本への入力や管理者の原本直接修正はApps Scriptの5分間隔トリガーで一括取り込み。画面を開いている間も最新の原本を確認して更新する。他アプリでの利用にはそれぞれ認証・表示範囲を決めた接続変更が必要。
 
 ## 関連カード
 
@@ -143,7 +147,7 @@ https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-d
 
 ## Apps Scriptバージョン
 
-70
+72
 
 ## 2026-09-28 22時台：選択待ち時間の追加改善
 
@@ -153,3 +157,11 @@ https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-d
 - 検証：通信共有、期限切れ、更新時の破棄、セッション切替、生徒ID不一致拒否のテスト成功。
 - 実画面：確認環境で取得待ち後に通信失敗となり、先読み版の速度は未確認。2〜3秒達成とは扱わない。
 - 制約：先読み完了前の即時選択、候補が3人以上の検索、原本側の応答遅延は引き続き待ち時間が発生する。
+
+## 2026-09-28：生徒マスタの高速表示用データ
+
+原本Google Sheetの☆マスタ・時間割マスタを一括読み込みし、管理者のみアクセスできるSupabaseの生徒詳細テーブルへ330件を同期。公開済みApps Scriptは既存URLのv72、Edge Functionはv14。管理者画面で5分間隔トリガー `syncStudentDirectoryToMirror_` の登録を確認。原本はそのままで、登録アプリや直接修正の内容を定期的に取り込む。編集は原本の競合・数式保護を維持した既存保存処理を通し、その結果を表示用データへ反映する。
+
+実画面で、候補の先読みなし522ms、先読み済み4msで詳細描画を確認（ブラウザー計測、面談記録の別取得を除く）。利用者端末での2～3秒は未計測。トリガーの初回実行結果は登録直後につき未確認。定期同期は最大で約5分＋処理時間の遅れがあり、同期失敗中は古い表示が残り得る。管理者画面の手動更新も可能。
+
+変更：GAS `6056ac7e252614e513a66ef6f46ec3f298bca03f`／`8b0686c0adf16a409abbcde5c40defba9c2ed99f`、Edge `8a41a82e50bf35b5f2eb4569d880adfe733f02a6`、画面 `07deac5adcc23ce4c36f5537bebed4d39fc1f66e`／`318de01df694a14264e978907e9b55d2c78aca75`／`92d3742a9426ce6eb72bde3296973a069705a233`。生徒情報そのもの・認証情報は台帳に含めない。
