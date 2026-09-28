@@ -99,6 +99,7 @@
 
   function unique(values){return [...new Set(values.filter(Boolean))];}
   function defaultClassification(item){
+    if(['student-directory','student-directory-database'].includes(String(item['ID']||'')))return {audiences:['管理者'],purpose:'生徒・成績'};
     const title=String(cardDisplayValues(item).title||item['システム名']||item['正式名称']||'');
     const source=`${title} ${item['概要']||''} ${item['利用者']||''}`;
     const audiences=[];
