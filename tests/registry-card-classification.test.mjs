@@ -44,7 +44,8 @@ test('search and filters call the latest decorated renderer',()=>{
   assert.match(index,/getElementById\('search'\)\.addEventListener\('input',\(\)=>render\(\)\)/);
   assert.match(index,/getElementById\('category'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
   assert.match(index,/getElementById\('status'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
-  assert.match(index,/getElementById\('investigationFilter'\)\.addEventListener\('change',\(\)=>render\(\)\)/);
+  assert.match(index,/getElementById\('cardSearch'\)\.addEventListener\('input',\(\)=>render\(\)\)/);
+  assert.match(index,/getElementById\('detailSearch'\)\.addEventListener\('input',\(\)=>render\(\)\)/);
 });
 
 test('initial shared settings are loaded once without replacing visible cards',()=>{
