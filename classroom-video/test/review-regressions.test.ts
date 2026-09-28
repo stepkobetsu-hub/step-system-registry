@@ -198,6 +198,27 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/route=.*RTT=.*loss=.*tx=.*fps=.*profile=/);
   });
 
+  it("keeps Fire resolution fixed while adapting bitrate and fps", () => {
+    expect(app).toMatch(/function isFireDevice/);
+    expect(app).toMatch(/fixedScaleResolutionDownBy/);
+    expect(app).toMatch(/resolutionConfigured:false/);
+    expect(app).toMatch(/!entry\.resolutionConfigured/);
+    expect(app).toMatch(/isFireDevice\(\)\?"maintain-resolution":"maintain-framerate"/);
+    expect(app).toMatch(/steps=\[\{bitrate:1,fps:0\},\{bitrate:\.72,fps:2\},\{bitrate:\.52,fps:4\}\]/);
+    expect(app).not.toMatch(/steps=\[[^\]]*scale:/);
+  });
+
+  it("detects a persistent green remote frame and escalates peer-first recovery", () => {
+    expect(app).toMatch(/greenSamples:new Map\(\)/);
+    expect(app).toMatch(/greenRecoveries:new Map\(\)/);
+    expect(app).toMatch(/green\/\(pixels\.length\/4\)>=\.9/);
+    expect(app).toMatch(/if\(samples<2\)return false/);
+    expect(app).toMatch(/beginGreenRecovery\(entry\)/);
+    expect(app).toMatch(/removeFrozenFrame\(entry\).*Peer単体再接続を試行/s);
+    expect(app).toMatch(/setTimeout\(\(\)=>\{.*controlledRestart\(`緑画面のPeer復旧失敗/s);
+    expect(app).toMatch(/\},8000\)/);
+  });
+
   it("keeps a customizable tablet name separate from the immutable device id", () => {
     expect(html).toContain('id="settings-tablet-name"');
     expect(html).toContain('id="settings-tablet-name" readonly');
@@ -293,11 +314,18 @@ describe("PR review regressions", () => {
     expect(css).toMatch(/\.mic-off/);
     expect(css).toMatch(/\.featured-mic-off/);
     expect(css).toMatch(/\.remote-tile \.mic-off:after/);
-    expect(css).toMatch(/\.remote-tile \.mic-glyph\{/);
+    expect(css).toMatch(/\.remote-tile \.mic-glyph,\.local-tile \.mic-glyph\{/);
     expect(css).toMatch(/\.remote-tile \.mic-glyph:before/);
     expect(css).toMatch(/\.remote-tile \.mic-glyph:after/);
     expect(app).not.toContain('badge.textContent="🎤"');
     expect(css).toMatch(/\.remote-tile\.main \.mic-off\{display:none\}/);
+  });
+
+  it("shows the microphone-off badge on the local preview and hides it immediately on unmute", () => {
+    expect(html).toContain('id="local-mic-off" class="mic-off hidden"');
+    expect(app).toMatch(/ui\["local-mic-off"\]\.classList\.toggle\("hidden",state\.media\.audio\)/);
+    expect(css).toMatch(/\.remote-tile \.mic-off,\.local-tile \.mic-off/);
+    expect(css).toMatch(/@media\(orientation:portrait\).*\.local-tile \.mic-off/s);
   });
 
   it("supports Fire tablet portrait and landscape rotation without restarting WebRTC", () => {
