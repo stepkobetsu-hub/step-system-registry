@@ -4483,14 +4483,14 @@ applyAssetInfo=function(item){
   "分類": "生徒管理",
   "利用者": "管理者",
   "運用担当": "管理者",
-  "状態": "本番使用中（詳細取得一括化・GAS v70）",
-  "概要": "氏名・かな・ローマ字・番号で生徒を検索し、基本情報・連絡先・口座振替・時間割・面談記録を確認する独立アプリ。詳細取得を一括化しGAS v70へ公開。画面全体の速度は実測確認待ち。",
+  "状態": "本番使用中（高速表示用DB・5分同期）",
+  "概要": "生徒マスタを原本に、330人分の詳細を管理者専用Supabaseへ同期して高速表示。利用者が非常に速くなったと確認。検索・編集は既存画面で行う。",
   "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html",
   "Google Sheet URL": "https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit#gid=829117795",
   "Google Sheet名": "生徒マスタ",
   "使用シート名": "☆マスタ／時間割マスタ",
   "GitHub URL": "https://github.com/stepkobetsu-hub/seiseki-kanri",
-  "保存基盤": "Google Sheet（生徒情報・時間割の原本）／Supabase（面談記録・検索候補の補助取得）",
+  "保存基盤": "原本: Google Sheet「生徒マスタ」☆マスタ／時間割マスタ。高速表示用: Supabase public.student_directory_details。最終同期: student_directory_sync_state。",
   "正本ファイル": [
     "seiseki-kanri/student_directory.html",
     "seiseki-kanri/gas_code.js"
@@ -4499,7 +4499,10 @@ applyAssetInfo=function(item){
   "APIアクション": [
     "getStudentDirectoryList",
     "getStudentDirectoryDetail",
-    "saveStudentDirectory"
+    "saveStudentDirectory",
+    "getStudentDirectorySnapshot",
+    "syncStudentDirectory",
+    "ingestStudentDirectory"
   ],
   "認証・セッション": "成績管理と同じ管理者ID・パスワードを使用。初回ログイン後はログアウトまで保持。取得・保存はサーバー側で管理者権限を確認。",
   "主要機能": [
@@ -4514,11 +4517,12 @@ applyAssetInfo=function(item){
   ],
   "仕様メモ": "明るいミント系の画面・ファビコン。検索候補は1行表示、行高130％の調整履歴あり。口座振替行は2026-09-28に70px→42px、上下余白6pxへ変更。チェック欄は24pxを維持。 ★ボタン・口座振替行60％は利用者が実画面で確認済み。",
   "連携メモ": [
-    "成績管理から独立した専用ページ。旧入口からの転送を設定した履歴あり。",
-    "検索候補は端末キャッシュを先に表示し、最新一覧を後から取得。検索キーの事前計算・候補の一括描画を実装。",
-    "詳細はGoogle Apps Scriptを経由して原本を取得。数式確認23回を1回にまとめた変更あり。面談記録はSupabaseから別取得。"
+    "生徒マスタが唯一の原本。保護者の登録アプリ入力と管理者の直接修正は約5分間隔で表示用DBへ同期。",
+    "詳細は管理者認証付きSupabase Edge Functionから取得し、保存は原本Google Sheetの競合・数式保護を通す。",
+    "他アプリでの利用には権限と返却項目を個別に設計。生徒・保護者に管理者用詳細を公開しない。"
   ],
   "関連カード": [
+    "生徒詳細高速DB",
     "生徒マスタ",
     "成績管理",
     "面談メモ"
@@ -4527,26 +4531,75 @@ applyAssetInfo=function(item){
   "確認済み事項": [
     "現行コードの「★生徒マスタへ」：32810317be5a9c790471c04667ffc6ca7d3bbbb2",
     "口座振替行60％のコード変更：1281e40e80e36041b513a0cf959365f070fbc3c5",
-    "検索候補・詳細取得の改善：PR #32。速度改善の効果は未確認。",
     "利用者による★ボタン・口座振替行60％の本番表示確認",
     "一括読み取りの比較計測（2回ずつ）と返却内容の一致",
-    "GAS v70のデプロイ更新完了、既存URL維持",
-    "改善ソース：seiseki-kanri e94eec99d29adda3162b480cfd88fa540b36bb39"
+    "改善ソース：seiseki-kanri e94eec99d29adda3162b480cfd88fa540b36bb39",
+    "高速表示用DB 330件、管理者認証付き読取、先読みなし522ms・先読み済み4ms（確認環境）",
+    "利用者の本番体感『非常に速くなりました』",
+    "5分トリガーの14:07 UTC実行成功、最終同期330件"
   ],
   "未確認項目": [
-    "ログイン後、生徒選択から詳細表示までの全体時間の実測と利用者の体感速度"
+    "他アプリへの接続は未実施。各アプリの認証・必要項目に応じた実装が必要。"
   ],
-  "確認状況": "★ボタンと口座振替行は利用者確認済み。詳細取得の一括化はサーバー内比較で約45％短縮、返却内容一致。GAS v70本番反映済み。画面全体の速度は未計測。",
+  "確認状況": "利用者が非常に速くなったと確認。330件を同期。画面を閉じたまま2026-09-28 23:07 JSTの自動同期に成功。",
   "確認日": "2026-09-28",
   "GitHubドキュメント": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-directory-20260928.md",
-  "更新方法": "画面はseiseki-kanri/mainからGitHub Pagesへ公開。GAS変更は既存プロジェクトへ同期して再デプロイし、実際の詳細取得時間を確認する。",
+  "更新方法": "保護者の登録と管理者のSheet直接修正は原本Google Sheetへ。約5分ごとの時間主導型トリガーで表示用DBに取り込み。画面を開いている間も更新。画面内の編集は原本を先に保存しDBへ反映。",
   "変更時の注意": "生徒の実データ、パスワード値、管理者セッション情報は公開台帳・GitHubへ掲載しない。今後の高速化は原本の鮮度・保存競合・管理者権限を維持する。",
-  "Apps Scriptバージョン": "70"
+  "Apps Scriptバージョン": "72",
+  "Supabase URL": "https://supabase.com/dashboard/project/wisedgcgwaebtkprdhth/editor",
+  "データベース名": "Supabase wisedgcgwaebtkprdhth / public.student_directory_details",
+  "Apps Script編集URL": "https://script.google.com/home/projects/1ubtigRpAoZ8rKIJ1d2vvEFp_Fk36e0jZJJ92Lef_brg9pssxF5OPaiFh/edit",
+  "GitHubドキュメントURL": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-directory-database.md",
+  "参照システム": "生徒マスタ（原本）、Supabase生徒詳細高速DB、面談メモ"
 };
   const base=organizeEntryImport;
   organizeEntryImport=function(items){
     const list=base(items);
     const index=list.findIndex(item=>item['ID']==='student-directory'||String(item['システム名']||item['正式名称']||'')==='生徒情報検索');
+    if(index>=0)list[index]=Object.assign({},list[index],record);
+    else list.push(Object.assign({},record));
+    return list;
+  };
+})();
+</script>
+
+
+<script id="student-directory-database-card-20260928">
+(() => {
+  CARD_ANCHORS.unshift(['生徒詳細高速DB','student-directory-database']);
+  const record={
+    "ID":"student-directory-database",
+    "システム名":"生徒詳細高速DB",
+    "正式名称":"生徒マスタの高速表示用データベース",
+    "分類":"生徒管理",
+    "利用者":"管理者・システム連携",
+    "運用担当":"管理者",
+    "状態":"本番使用中（330件・5分ごと同期）",
+    "概要":"生徒情報検索を高速化する管理者専用Supabaseデータベース。Google Sheet「生徒マスタ」を原本とし、☆マスタと時間割マスタの詳細を約5分ごとに取り込む。登録アプリ入力・原本の直接修正も反映。",
+    "Supabase URL":"https://supabase.com/dashboard/project/wisedgcgwaebtkprdhth/editor",
+    "Google Sheet URL":"https://docs.google.com/spreadsheets/d/1CIJkTlYUcUkbb8jBdFc6L8D5ubTGsxwNxFv01ten-Zk/edit#gid=829117795",
+    "Apps Script編集URL":"https://script.google.com/home/projects/1ubtigRpAoZ8rKIJ1d2vvEFp_Fk36e0jZJJ92Lef_brg9pssxF5OPaiFh/edit",
+    "GitHub URL":"https://github.com/stepkobetsu-hub/seiseki-kanri",
+    "GitHubドキュメントURL":"https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/student-directory-database.md",
+    "データベース名":"Supabase project wisedgcgwaebtkprdhth",
+    "保存基盤":"原本＝Google Sheet「生徒マスタ」。表示用＝Supabase public.student_directory_details（生徒番号ごとの詳細）／public.student_directory_sync_state（最終成功時刻・件数）。",
+    "用途":"管理者向け生徒検索の詳細を高速表示する。2026-09-28時点330件。画面を閉じたままの5分間隔自動同期も成功。",
+    "APIアクション":["getStudentDirectoryDetail","syncStudentDirectory","ingestStudentDirectory","saveStudentDirectory"],
+    "トリガー":"Apps Script syncStudentDirectoryToMirror_：約5分ごと。最終成功時刻はstudent_directory_sync_stateを確認。",
+    "正本ファイル":["seiseki-kanri/gas_code.js","seiseki-kanri/supabase/functions/seiseki-admin-runtime-v1/index.ts","seiseki-kanri/student_directory.html"],
+    "関連カード":["生徒情報検索","生徒マスタ","成績管理"],
+    "認証・セッション":"詳細には個人情報を含む。RLS有効、匿名や一般認証ユーザーはテーブルを直接閲覧できない。管理者セッションを検証するEdge Functionのみが読む。",
+    "更新方法":"保護者の登録と管理者の修正は原本Google Sheetへ。約5分で表示用DBへ同期。検索画面からの保存は原本への保存成功後、表示用DBも更新。表示用テーブルを直接編集しない。",
+    "障害時の確認":"Apps Scriptの実行数でsyncStudentDirectoryToMirror_の失敗を確認し、Supabaseのstudent_directory_sync_state.last_success_atとrow_countを確認。詳細は説明書を参照。",
+    "変更時の注意":"他アプリはまだ未接続。利用にはアプリごとの認証・返却項目を設計する。生徒・保護者に管理者用詳細JSONを直接公開しない。",
+    "確認状況":"2026-09-28 23:07 JST、画面を閉じた状態の定期同期成功。最終同期330件。利用者が表示速度の改善を確認。",
+    "確認日":"2026-09-28"
+  };
+  const base=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=base(items);
+    const index=list.findIndex(item=>item['ID']==='student-directory-database');
     if(index>=0)list[index]=Object.assign({},list[index],record);
     else list.push(Object.assign({},record));
     return list;
