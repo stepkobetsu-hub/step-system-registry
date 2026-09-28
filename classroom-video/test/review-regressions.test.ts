@@ -150,7 +150,7 @@ describe("PR review regressions", () => {
 
   it("restarts the APK when real inbound media or WebSocket traffic stalls", () => {
     expect(app).toMatch(/pc\.getStats\(\)/);
-    expect(app).toMatch(/report\.type!=="inbound-rtp"/);
+    expect(app).toMatch(/report\.type==="inbound-rtp"/);
     expect(app).toMatch(/bytesReceived/);
     expect(app).toMatch(/framesDecoded/);
     expect(app).toMatch(/limit=attempt\?8000:18000/);
@@ -174,6 +174,28 @@ describe("PR review regressions", () => {
     expect(html).toContain('id="diagnostics" class="diagnostics hidden"');
     expect(app).toMatch(/WebSocket:/);
     expect(app).toMatch(/signaling=.*ice=.*connection=.*tracks=/);
+  });
+
+  it("prioritizes smooth low-latency video and adapts from WebRTC statistics", () => {
+    expect(html).toContain('id="settings-quality-mode"');
+    expect(html).toContain('value="smooth" selected>滑らかさ優先（標準・推奨）');
+    expect(html).toContain('value="quality">画質優先');
+    expect(app).toMatch(/function baseVideoProfile/);
+    expect(app).toMatch(/maxBitrate:600000,maxFramerate:15/);
+    expect(app).toMatch(/maxBitrate:420000,maxFramerate:13/);
+    expect(app).toMatch(/maxBitrate:280000,maxFramerate:11/);
+    expect(app).toMatch(/getParameters/);
+    expect(app).toMatch(/setParameters/);
+    expect(app).toMatch(/scaleResolutionDownBy/);
+    expect(app).toMatch(/degradationPreference="maintain-framerate"|"maintain-framerate"/);
+    expect(app).toMatch(/availableOutgoingBitrate/);
+    expect(app).toMatch(/currentRoundTripTime/);
+    expect(app).toMatch(/packetsLost/);
+    expect(app).toMatch(/framesEncoded/);
+    expect(app).toMatch(/candidateType==="relay"/);
+    expect(app).toMatch(/entry\.poorSamples>=3/);
+    expect(app).toMatch(/entry\.stableSamples>=8/);
+    expect(app).toMatch(/route=.*RTT=.*loss=.*tx=.*fps=.*profile=/);
   });
 
   it("keeps a customizable tablet name separate from the immutable device id", () => {
