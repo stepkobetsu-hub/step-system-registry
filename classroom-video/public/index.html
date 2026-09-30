@@ -42,7 +42,7 @@
     <section id="call" class="call hidden">
       <div id="empty-state" class="empty-state">接続相手を待っています</div>
       <div id="remote-grid" class="remote-grid" aria-label="相手映像"></div>
-      <figure id="local-tile" class="local-tile"><video id="local-video" autoplay playsinline muted></video><div id="local-mic-off" class="mic-off hidden" aria-label="マイクオフ"><span class="mic-glyph" aria-hidden="true"></span></div><figcaption id="local-name">この端末</figcaption></figure>
+      <figure id="local-tile" class="local-tile"><video id="local-video" autoplay playsinline muted></video><div id="local-mic-off" class="mic-off" aria-label="マイクオフ"><span class="mic-glyph" aria-hidden="true"></span></div><figcaption id="local-name">この端末</figcaption></figure>
       <header><span id="status-dot"></span><span id="status">接続中</span><strong id="featured-name" class="featured-name"></strong><strong id="peer-summary">相手を待っています</strong><strong id="featured-mic-off" class="featured-mic-off hidden">🎤 マイク OFF</strong></header>
       <div id="notice" class="notice hidden" role="status"></div>
       <div id="incoming" class="incoming hidden">
@@ -55,11 +55,16 @@
         <button id="call-target-cancel">キャンセル</button>
       </section>
       <nav id="controls" aria-label="通話操作">
-        <button id="mic" aria-pressed="true"><span>🎙</span><b>マイク ON</b></button>
+        <button id="mic" aria-pressed="false"><span>🎙</span><b>マイク OFF</b></button>
         <button id="camera" aria-pressed="true"><span class="video-icon" aria-hidden="true"></span><b>カメラ ON</b></button>
         <button id="alert" class="alert"><span>🔔</span>呼び出す</button>
         <button id="settings-button"><span>⚙</span>設定</button>
         <button id="hangup" class="danger"><span>✕</span><b>終了</b><small>2回：再起動／3回：完全終了</small></button>
+        <div class="remote-mic-controls" role="group" aria-label="中央の相手のマイク操作">
+          <span id="remote-mic-target">相手未接続</span>
+          <button id="remote-mic-on" disabled>相手マイク ON</button>
+          <button id="remote-mic-off" disabled>相手マイク OFF</button>
+        </div>
       </nav>
       <section id="settings" class="settings hidden" aria-labelledby="settings-title">
         <h2 id="settings-title">端末設定</h2>

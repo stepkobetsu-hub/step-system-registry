@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
@@ -33,9 +34,13 @@ public final class MainActivity extends Activity {
     private static final String PREF_INSTALLATION_ID = "installation_id";
     private WebView webView;
     private long backgroundedAt;
+    private float brightnessBaseline;
+    private boolean brightnessPaused = true;
+    private boolean brightnessDestroyed;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        captureBrightnessBaseline();
         enterImmersiveMode();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         webView = new WebView(this);
@@ -117,8 +122,13 @@ public final class MainActivity extends Activity {
     @Override public void onBackPressed() { /* 教室端末で誤って終了しない */ }
     @Override protected void onResume() {
         super.onResume();
+        brightnessPaused = false;
         enterImmersiveMode();
-        if (webView != null) webView.onResume();
+        if (webView != null) {
+            webView.onResume();
+            webView.post(() -> webView.evaluateJavascript(
+                "window.StepVideoNativeBrightnessResume&&window.StepVideoNativeBrightnessResume()", null));
+        }
         if (backgroundedAt > 0L && webView != null) {
             long elapsed = SystemClock.elapsedRealtime() - backgroundedAt;
             backgroundedAt = 0L;
@@ -127,11 +137,33 @@ public final class MainActivity extends Activity {
         }
     }
     @Override protected void onPause() {
+        brightnessPaused = true;
+        clearBrightnessOverride();
         backgroundedAt = SystemClock.elapsedRealtime();
         if (webView != null) webView.onPause();
         super.onPause();
     }
     @Override public void onWindowFocusChanged(boolean hasFocus) { super.onWindowFocusChanged(hasFocus); if (hasFocus) enterImmersiveMode(); }
+
+    private void captureBrightnessBaseline() {
+        float current = getWindow().getAttributes().screenBrightness;
+        if (current < 0f) {
+            current = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 128) / 255f;
+        }
+        brightnessBaseline = Math.max(0.01f, Math.min(1f, current));
+    }
+
+    private void clearBrightnessOverride() {
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
+        getWindow().setAttributes(params);
+    }
+
+    @Override protected void onDestroy() {
+        brightnessDestroyed = true;
+        clearBrightnessOverride();
+        super.onDestroy();
+    }
 
     private boolean isAllowedOrigin(Uri candidate) {
         Uri expected = Uri.parse(BuildConfig.APP_URL);
@@ -148,6 +180,17 @@ public final class MainActivity extends Activity {
         private final Handler alarmHandler = new Handler(Looper.getMainLooper());
         private Integer originalAlarmVolume;
         private Runnable restoreAlarmVolume;
+
+        @JavascriptInterface public void setScreenBrightnessLevel(int level) {
+            if (level < 0 || level > 3) return;
+            runOnUiThread(() -> {
+                if (brightnessPaused || brightnessDestroyed || isFinishing()) return;
+                float[] factors = {1f, 0.75f, 0.55f, 0.35f};
+                WindowManager.LayoutParams params = getWindow().getAttributes();
+                params.screenBrightness = Math.max(0.01f, brightnessBaseline * factors[level]);
+                getWindow().setAttributes(params);
+            });
+        }
 
         @JavascriptInterface public void setActive(boolean active) {
             runOnUiThread(() -> {
