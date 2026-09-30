@@ -1449,3 +1449,12 @@
 「スマホ学校名読み取込み修正」と本チャットの全変更を[詳細台帳](https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/past-exam-scanner-history-20261001.md)へ蓄積。学校一覧の再試行・キャッシュ回避・前回一覧保持・DB未取得時送信停止、Web撮影/PDF方式の試行とDrive PDF選択、Android ML Kit移行、登録完了の大型緑表示・確認ポップアップ、専用ランチャーアイコン、最下部の枠付き「過去問DBへ」、不要なホーム画面追加ボタンの削除、固定署名Secrets保存・上書き更新構成・非公開復元バックアップ・配布URL/QRの維持を記録。
 
 最新は0.2.1 / versionCode 6（PR #40）。固定署名の0.2.0（PR #39）から更新し、差分保存へ対応。既存のSupabase高速DB移行記録を維持。[正式APK](https://github.com/stepkobetsu-hub/seiseki-kanri/releases/download/past-exam-scanner-latest/STEP-PastExam-Scanner.apk)／[Web提出](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_upload.html)／[過去問DB](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html)。ビルド・テスト・Lint・署名照合・APK公開成功、実機でのスキャン/実登録/上書き更新は未検証。旧debug署名版からの移行だけ再インストール、その後は同一キーとpackage ID・増加するversionCodeで更新する。秘密鍵・パスワードは公開台帳へ記載しない。
+
+
+## 2026-10-01 iPhone・Android共通Web版とダウンロードQR
+
+過去問保管DBの登録入口に[STEP過去問スキャナー Web版1.0.0](https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/)を追加。利用者はiPhone配布方式としてWeb版を選択、Androidでも使えるよう指定。iPhoneはファイルアプリ、AndroidはGoogle Driveで書類スキャン・トリミングしたPDFを保存し、Web版で選択して登録する。Safari/Chromeからホーム画面へ追加できる構成。Android専用APK0.2.1はML Kitによるアプリ内スキャン・補正・PDF・登録を維持。
+
+[2種類のQR・インストール案内](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html)：Androidは固定正式APKのダウンロード、iPhoneは共通Web版の起動・ホーム画面追加。Androidも案内からWeb版を開ける。両QRはデコードして固定URLの一致を確認。PNG版を利用者へ提供。
+
+[仕様・更新・検証・制限](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md)。Web版は変更セルのみsavePatch・競合拒否・fileId保持と再試行・DB再読込確認・緑の登録完了表示・枠付きDBリンクに対応。既存接続設定を共有し保存先/認証値は変更しない。Service Workerなし・ネット接続必須。9件の登録関連テスト・構文/差分・QR読取を確認。実機スキャン・ホーム画面追加・PDF選択・実アップロード/DB登録は未検証。既存のDrive権限エラーへの修正とは別作業。これまでの[スキャナー変更履歴](docs/past-exam-scanner-history-20261001.md)も維持。

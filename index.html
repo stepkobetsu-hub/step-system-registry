@@ -130,7 +130,7 @@ const INVESTIGATION_DEFINITIONS=[
   {id:'contact-management-apps-script-url',cardAnchor:'contact-management',cardName:'お問い合わせ管理',text:'Apps Script編集URL',legacyIds:['investigation-contact-management-1-e0fno3']}
 ];
 const GROUPS=[
-  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['Android APK URL','STEP過去問スキャナーAPKをダウンロード'],['Amazon FireインストールURL','Amazon Fireへインストール'],['Amazon Fire APK URL','出退くんAPKを直接ダウンロード'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く'],['時間割マスタ入力URL','時間割マスタ入力を開く']]},
+  {title:'利用する',fields:[['利用者向けURL','利用者向けアプリを開く'],['読み取りURL','読み取りアプリを開く'],['Android APK URL','STEP過去問スキャナーAPKをダウンロード'],['過去問Web URL','過去問スキャナー Web版（iPhone・Android）'],['スキャナーQR URL','Android・iPhoneのQR／インストール案内'],['Amazon FireインストールURL','Amazon Fireへインストール'],['Amazon Fire APK URL','出退くんAPKを直接ダウンロード'],['印刷URL','印刷ページを開く'],['Apps Script WebアプリURL','Webアプリを開く'],['WebアプリURL v12','Webアプリを開く'],['WebアプリURL v6','Webアプリを開く'],['WebアプリURL v5','Webアプリを開く'],['旧WebアプリURL','旧Webアプリを開く'],['旧WebアプリURL 2','旧Webアプリを開く'],['GitHub Pages URL','公開ページを開く'],['時間割マスタ入力URL','時間割マスタ入力を開く']]},
   {title:'管理する',fields:[['管理者向けURL','管理者向けアプリを開く'],['Google Sheet URL','Google Sheetを開く'],['Google Sheet URL 2','Google Sheetを開く'],['Google Sheet URL 3','Google Sheetを開く'],['Supabase URL','Supabase管理画面を開く'],['入力フォームURL','登録画面を開く']]},
   {title:'修正する',fields:[['GitHub URL','GitHubを開く'],['Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL','Apps Scriptを編集'],['旧Apps Script編集URL 2','Apps Scriptを編集'],['旧Apps Script編集URL 3','Apps Scriptを編集']]},
   {title:'メモ・保管場所',fields:[['DriveファイルURL','Driveファイルを開く'],['DriveフォルダURL','Driveフォルダを開く'],['仕様書URL','仕様書を開く'],['バックアップURL','バックアップを開く'],['GitHubドキュメントURL','GitHubドキュメントを開く'],['その他保管場所URL','その他の保管場所を開く']]},
@@ -550,7 +550,7 @@ const CARD_ANCHORS=[['子供用の時間制限アプリ','child-time-manager'],[
 function appendAssetSections(item,article){ASSET_SECTIONS.forEach(def=>{const section=el('section','group');section.append(el('h3','',`【${def.title}】`));let count=0;if(def.title==='関連システム'&&Array.isArray(item['関連カード']))item['関連カード'].forEach(name=>{const row=el('div','meta');row.append(document.createTextNode('関連カード：'));const a=el('a','',name);a.href=`#system-${anchorFromName(name)}`;row.append(a);section.append(row);count++});def.fields.forEach(([field,label])=>{const value=item[field];if(value===undefined||value===null||value===''||(Array.isArray(value)&&!value.length))return;(Array.isArray(value)?value:[value]).forEach(v=>{const text=`${label}：${v}`;section.append(el('div',/(?:Spreadsheet ID|プロジェクトID|AKfy|\b1[A-Za-z0-9_-]{20,})/.test(text)?'meta asset-id':'meta',text));count++})});if(count)article.append(section)})}
 function isTeacherSchedule(item){const name=String(item['システム名']||'');return name.includes('講師スケジュール')||name.includes('講師予定')||name.includes('夏休み出勤')}
 function statusClass(status){const s=String(status||'');if(s.includes('本番運用中'))return 'status-production';if(s.includes('開発中')||s.includes('移行中'))return 'status-progress';if(s.includes('一部使用中'))return 'status-partial';if(s.includes('旧システム')||s.includes('使用終了'))return 'status-old';if(s.includes('要確認')||s.includes('確認中'))return 'status-warning';return ''}
-const DAILY_FIELDS=new Set(['Android APK URL','利用者向けURL','読み取りURL','Amazon FireインストールURL','Amazon Fire APK URL','印刷URL','管理者向けURL','Google Sheet URL','Google Sheet URL 2','Google Sheet URL 3','入力フォームURL','GitHub Pages URL']);
+const DAILY_FIELDS=new Set(['過去問Web URL','スキャナーQR URL','Android APK URL','利用者向けURL','読み取りURL','Amazon FireインストールURL','Amazon Fire APK URL','印刷URL','管理者向けURL','Google Sheet URL','Google Sheet URL 2','Google Sheet URL 3','入力フォームURL','GitHub Pages URL']);
 const GRADE_ADMIN_URL='https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html';
 function isStudentMaster(item){return String(item['システム名']||'').includes('生徒マスタ')}
 function dailyFieldOrder(item){if(isGradeSystem(item))return ['利用者向けURL','管理者向けURL','Google Sheet URL'];if(isJukuCard(item))return ['利用者向けURL','読み取りURL','入力フォームURL','Google Sheet URL'];if(isStudentMaster(item))return ['Google Sheet URL','利用者向けURL','管理者向けURL','入力フォームURL'];return GROUPS.flatMap(g=>g.fields.map(([field,label])=>[field,label])).filter(([field])=>DAILY_FIELDS.has(field))}
@@ -4624,6 +4624,25 @@ applyAssetInfo=function(item){
   organizeEntryImport=function(items){
     return base(items).map(item => item['ID']==='past-exams'||String(item['システム名']||'').includes('過去問') ? Object.assign({},item,patch) : item);
   };
+})();
+</script>
+
+
+<script id="past-exam-web-qr-20261001">
+(() => {
+ const patch={"過去問Web URL": "https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/", "スキャナーQR URL": "https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html", "仕様書URL": "https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md"};
+ const base=organizeEntryImport;
+ organizeEntryImport=function(items){
+  return base(items).map(item=> {
+   if(item['ID']!=='past-exams'&&!String(item['システム名']||'').includes('過去問'))return item;
+   return Object.assign({},item,patch,{
+    '作業メモ':String(item['作業メモ']||'')+'\n2026-10-01：iPhone用の配布方式としてWeb版を選択。共通Web版1.0.0を追加しAndroid Chromeからも利用可能。Android正式APKダウンロードQRとiPhone Web起動・ホーム画面追加QRを作成、インストール案内へ公開。詳細は仕様書。',
+    '仕様メモ':String(item['仕様メモ']||'')+'\nWeb版：iPhoneはファイルの書類スキャンで四隅を調整してPDF保存、AndroidはGoogle Driveでスキャン・トリミングしてPDF保存。共通画面から選んで登録する。Web画面内に文書スキャン/自動切抜きはない。Android専用版はML Kitによる撮影・補正・PDF・登録を一体で行う。Web版は1セルの差分保存、fileId保持・重複防止・DB再読込確認と登録完了表示に対応。',
+    '確認根拠':String(item['確認根拠']||'')+'\nWeb登録関連9テスト、構文・差分、2つのQRのURLデコード照合成功。実機でのホーム画面追加・PDF選択・実アップロード/DB登録は未確認。',
+    '確認日':'2026年10月1日'
+   });
+  });
+ };
 })();
 </script>
 
