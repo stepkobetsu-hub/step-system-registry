@@ -4,6 +4,7 @@ import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resol
 type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
 type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
+  { type: "remote-mic"; to: string; enabled: boolean } |
   { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 const V032_DEPLOYED_AT = 1_790_532_911_000;
@@ -165,6 +166,7 @@ export class VideoRoom extends DurableObject<Env> {
     if (!sender || typeof raw !== "string" || raw.length > 32_768) return;
     let message: ClientMessage;
     try { message = JSON.parse(raw) as ClientMessage; } catch { return; }
+    if (!message || typeof message !== "object") return;
     if (message.type === "ping") {
       sender.lastSeenAt = Date.now();
       socket.serializeAttachment(sender);
@@ -173,6 +175,20 @@ export class VideoRoom extends DurableObject<Env> {
       return;
     }
     if (sender.mode !== "active") return;
+    if (message.type === "remote-mic") {
+      if (typeof message.to !== "string" || message.to === sender.id || typeof message.enabled !== "boolean") return;
+      const now = Date.now();
+      const isCurrent = (candidate: WebSocket) => {
+        const peer = socketAttachment(candidate);
+        return candidate.readyState === WebSocket.OPEN && peer?.mode === "active" &&
+          Number.isFinite(peer.lastSeenAt) && peer.lastSeenAt >= now - 70_000;
+      };
+      // Membership is scoped to this room; closed/replaced/standby sockets cannot act.
+      if (!this.ctx.getWebSockets(`device:${sender.id}`).includes(socket) || !isCurrent(socket)) return;
+      const target = this.ctx.getWebSockets(`device:${message.to}`).find(isCurrent);
+      if (target) this.safeSend(target, { type: "remote-mic", enabled: message.enabled, from: sender.id, fromName: sender.name });
+      return;
+    }
     if (message.type === "media-state") {
       if (typeof message.audio !== "boolean" || typeof message.video !== "boolean") return;
       this.broadcast({ type: "media-state", from: sender.id, audio: message.audio, video: message.video }, sender.id, "active");
