@@ -93,7 +93,7 @@
     },
     {
       "正式名称": "過去問保管DB",
-      "状態": "アップロード障害対応中（所有者承認待ち）",
+      "状態": "本番使用中（アップロード復旧確認済み）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html"
     },
     {
