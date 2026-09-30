@@ -1442,3 +1442,10 @@
 - 伊神切手社を本番設定に追加。送信元 onlineshop@igami.co.jp、件名「商品発送に関するお知らせ」、日付見出し「発行日」、金額見出し「支払合計金額」。添付は領収書のため日付は支払期限ではなく発行日を採用。2026年8月分の検索・自動読取・CamScannerへの保存名確認まで成功。確認時点で保存確定ボタンは押しておらず、実保存は未実施。
 - カスタム取引先CRUD・送信元照合・検索条件検証・曖昧値の扱い・設定変更後の候補保持、既存請求書処理、管理者認証の回帰テストを実施。請求書検索は毎分処理のため通常1〜数分。外部サイトへのリンクだけの新規業者は個別対応が必要。
 - GitHub反映：Code.gs 85217f6e496df2d5b640f50be184a88306010558、Index.html 4f444faf720eb7855f41e3429d4737fe59a789fc、README 411c28a5172711203659467bfee78514d20fd3e3。伊神切手社の追加はv31の本番設定変更。パスワード・トークン・請求書本文・実取引金額はこの公開台帳に記載しない。
+
+
+## 2026-10-01 過去問提出・Androidスキャナー変更履歴の統合
+
+「スマホ学校名読み取込み修正」と本チャットの全変更を[詳細台帳](https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/past-exam-scanner-history-20261001.md)へ蓄積。学校一覧の再試行・キャッシュ回避・前回一覧保持・DB未取得時送信停止、Web撮影/PDF方式の試行とDrive PDF選択、Android ML Kit移行、登録完了の大型緑表示・確認ポップアップ、専用ランチャーアイコン、最下部の枠付き「過去問DBへ」、不要なホーム画面追加ボタンの削除、固定署名Secrets保存・上書き更新構成・非公開復元バックアップ・配布URL/QRの維持を記録。
+
+最新は0.2.1 / versionCode 6（PR #40）。固定署名の0.2.0（PR #39）から更新し、差分保存へ対応。既存のSupabase高速DB移行記録を維持。[正式APK](https://github.com/stepkobetsu-hub/seiseki-kanri/releases/download/past-exam-scanner-latest/STEP-PastExam-Scanner.apk)／[Web提出](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_upload.html)／[過去問DB](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html)。ビルド・テスト・Lint・署名照合・APK公開成功、実機でのスキャン/実登録/上書き更新は未検証。旧debug署名版からの移行だけ再インストール、その後は同一キーとpackage ID・増加するversionCodeで更新する。秘密鍵・パスワードは公開台帳へ記載しない。
