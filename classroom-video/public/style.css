@@ -21,3 +21,13 @@ html[data-idle-brightness="1"]:after{opacity:.25}
 html[data-idle-brightness="2"]:after{opacity:.45}
 html[data-idle-brightness="3"]:after{opacity:.65}
 @media(orientation:portrait){#controls{bottom:137px}.remote-mic-controls{gap:5px}.remote-mic-controls button{font-size:12px;padding:8px 6px}#remote-mic-target{font-size:12px}}
+
+#wake-picker{display:flex;flex-direction:column;overflow:auto}
+#wake-picker h2{margin-bottom:8px}
+#wake-picker p{margin:4px 0 12px;font-size:15px;line-height:1.5}
+#wake-list{flex:1;min-height:0;max-height:none;grid-template-columns:1fr}
+#wake-list button{text-align:left;overflow-wrap:anywhere;font-size:18px}
+#wake-list button:disabled{background:#334155;color:#cbd5e1;cursor:default}
+#wake-close{flex-shrink:0;margin-top:14px;padding:12px;border-radius:12px;background:#475569}
+#wake-status{min-height:1.5em;color:#bae6fd}
+@media(max-width:600px){.remote-mic-controls{flex-wrap:wrap}#remote-mic-target{flex-basis:calc(100% - 150px)}#wake-picker{inset:3% 4%}}
