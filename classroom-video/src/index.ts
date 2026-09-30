@@ -1,10 +1,11 @@
 import { DurableObject } from "cloudflare:workers";
 import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
-type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number };
+type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number; wakeRequestedAt?: number };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
 type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
   { type: "remote-mic"; to: string; enabled: boolean } |
+  { type: "list-devices" } | { type: "wake-device"; to: string } |
   { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 const V032_DEPLOYED_AT = 1_790_532_911_000;
@@ -68,6 +69,7 @@ export class VideoRoom extends DurableObject<Env> {
       this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS registry_meta (key TEXT PRIMARY KEY, value INTEGER NOT NULL)");
       this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS retired_legacy_devices (id TEXT PRIMARY KEY, migrated_to TEXT NOT NULL, retired_at INTEGER NOT NULL)");
       this.ctx.storage.sql.exec("INSERT OR IGNORE INTO registry_meta (key, value) VALUES ('device_sequence', 0)");
+      this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS room_device_names (id TEXT PRIMARY KEY, name TEXT NOT NULL)");
     });
   }
 
@@ -84,6 +86,7 @@ export class VideoRoom extends DurableObject<Env> {
     try { name = decodeURIComponent(encodedName ?? ""); } catch { return new Response("Unauthorized", { status: 401 }); }
     if (!id || !name) return new Response("Unauthorized", { status: 401 });
     if (this.isLegacyRetired(id)) return new Response("Retired device", { status: 401 });
+    this.ctx.storage.sql.exec("INSERT INTO room_device_names (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name", id, name);
 
     for (const current of this.ctx.getWebSockets(`device:${id}`)) this.closeSocket(current, 4001, "Replaced by a new connection");
     const pair = new WebSocketPair();
@@ -93,7 +96,8 @@ export class VideoRoom extends DurableObject<Env> {
     server.serializeAttachment({ id, name, mode, connectedAt, lastSeenAt: connectedAt } satisfies Attachment);
     await this.ensurePresenceAlarm();
     this.safeSend(server, { type: "welcome", self: { id, name }, mode, peers: this.peers(id) });
-    if (mode === "active") this.broadcast({ type: "wake", from: { id, name } }, id, "standby");
+    // A targeted recovery must not cascade into waking every other standby tablet.
+    if (mode === "active" && request.headers.get("x-device-wake-mode") !== "targeted") this.broadcast({ type: "wake", from: { id, name } }, id, "standby");
     this.broadcastPresence();
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -175,6 +179,27 @@ export class VideoRoom extends DurableObject<Env> {
       return;
     }
     if (sender.mode !== "active") return;
+    if (message.type === "list-devices" || message.type === "wake-device") {
+      if (!this.ctx.getWebSockets(`device:${sender.id}`).includes(socket) || !this.isLiveSocket(socket, "active")) return;
+      if (message.type === "list-devices") {
+        this.sendDeviceList(socket, sender.id);
+        return;
+      }
+      if (typeof message.to !== "string" || !message.to || message.to === sender.id) {
+        this.safeSend(socket, { type: "wake-result", to: typeof message.to === "string" ? message.to : "", status: "unavailable" });
+        return;
+      }
+      const target = this.ctx.getWebSockets(`device:${message.to}`).find(candidate => this.isLiveSocket(candidate, "standby"));
+      const targetInfo = target && socketAttachment(target);
+      if (!target || !targetInfo || (targetInfo.wakeRequestedAt && Date.now() - targetInfo.wakeRequestedAt < 30_000)) {
+        this.safeSend(socket, { type: "wake-result", to: message.to, status: "unavailable" });
+        return;
+      }
+      const delivered = this.safeSend(target, { type: "wake", from: { id: sender.id, name: sender.name }, manual: true });
+      if (delivered) target.serializeAttachment({ ...targetInfo, wakeRequestedAt: Date.now() });
+      this.safeSend(socket, { type: "wake-result", to: message.to, status: delivered ? "requested" : "unavailable" });
+      return;
+    }
     if (message.type === "remote-mic") {
       if (typeof message.to !== "string" || message.to === sender.id || typeof message.enabled !== "boolean") return;
       const now = Date.now();
@@ -263,6 +288,32 @@ export class VideoRoom extends DurableObject<Env> {
       const peer = socketAttachment(socket);
       if (peer?.mode === "active") this.safeSend(socket, { type: "presence", peers: this.peers(peer.id) });
     }
+    const devices = this.deviceDirectory();
+    for (const socket of this.ctx.getWebSockets()) {
+      const peer = socketAttachment(socket);
+      if (peer && this.isLiveSocket(socket, "active")) this.safeSend(socket, { type: "device-list", devices: devices.filter(device => device.id !== peer.id) });
+    }
+  }
+  private isLiveSocket(socket: WebSocket, mode: Attachment["mode"]): boolean {
+    const peer = socketAttachment(socket);
+    return socket.readyState === WebSocket.OPEN && peer?.mode === mode &&
+      Number.isFinite(peer.lastSeenAt) && peer.lastSeenAt >= Date.now() - 70_000;
+  }
+  private deviceDirectory(): { id: string; name: string; status: "active" | "standby" | "offline" }[] {
+    const devices = new Map<string, { id: string; name: string; status: "active" | "standby" | "offline" }>();
+    // Only names/IDs leave the room; credentials and installation IDs are never selected.
+    const known = this.ctx.storage.sql.exec<{ id: string; name: string }>(
+      "SELECT id, name FROM room_device_names WHERE id NOT IN (SELECT id FROM retired_legacy_devices) UNION ALL SELECT id, name FROM registered_devices"
+    ).toArray();
+    for (const device of known) devices.set(device.id, { id: device.id, name: device.name, status: "offline" });
+    for (const socket of this.ctx.getWebSockets()) {
+      const peer = socketAttachment(socket);
+      if (peer && this.isLiveSocket(socket, peer.mode)) devices.set(peer.id, { id: peer.id, name: peer.name, status: peer.mode });
+    }
+    return [...devices.values()];
+  }
+  private sendDeviceList(socket: WebSocket, exclude: string): void {
+    this.safeSend(socket, { type: "device-list", devices: this.deviceDirectory().filter(device => device.id !== exclude) });
   }
   private sendTo(id: string, value: unknown): void { for (const socket of this.ctx.getWebSockets(`device:${id}`)) this.safeSend(socket, value); }
   private hasActiveDevice(id: string): boolean {
@@ -377,6 +428,7 @@ export default {
       const headers = new Headers(request.headers);
       const mode = url.searchParams.get("mode") === "standby" ? "standby" : "active";
       headers.set("x-device-id", session.id); headers.set("x-device-name", encodeURIComponent(session.name)); headers.set("x-device-mode", mode);
+      headers.set("x-device-wake-mode", url.searchParams.get("wake") === "targeted" ? "targeted" : "automatic");
       return env.ROOMS.getByName("step-main").fetch(new Request(request, { headers }));
     }
     return env.ASSETS.fetch(request);
