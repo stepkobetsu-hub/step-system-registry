@@ -90,3 +90,5 @@ PRリンクは https://github.com/stepkobetsu-hub/seiseki-kanri/pull/番号 。�
 共通Web版のsavePatch、元セル保持、重複防止、DB再読込確認、fileId保持による登録再試行、競合停止を検証。10テスト成功。ホームアイコン・manifest・登録完了の緑表示/ポップアップ・枠付きDBリンクを実装。実機ホーム画面追加・標準スキャン・実PDF登録は未確認。既存Drive権限エラーの修正とは別。詳細：https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md 。
 
 Web版公開後のブラウザ通信呼出し（fetchのreceiver）を修正し、Web版1.0.1へ更新（seiseki-kanri PR #42、最終修正4784777）。ブラウザreceiverの回帰テストを追加、登録関連10テスト成功。QRの固定URLは維持。
+
+公開後確認：共通Web版1.0.1のブラウザ画面で学校7校の一覧表示と入力の有効化を確認。Android/iPhone両QRの案内ページを公開画面で確認。登録モジュールのURLも版付けし、古い通信コードのキャッシュを回避した（245abbc）。実PDFの登録は共通GAS保存経路のGoogle承認・復旧後に実機確認する。
