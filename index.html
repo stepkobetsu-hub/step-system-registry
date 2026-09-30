@@ -4636,9 +4636,9 @@ applyAssetInfo=function(item){
   return base(items).map(item=> {
    if(item['ID']!=='past-exams'&&!String(item['システム名']||'').includes('過去問'))return item;
    return Object.assign({},item,patch,{
-    '作業メモ':String(item['作業メモ']||'')+'\n2026-10-01：iPhone用の配布方式としてWeb版を選択。共通Web版1.0.0を追加しAndroid Chromeからも利用可能。Android正式APKダウンロードQRとiPhone Web起動・ホーム画面追加QRを作成、インストール案内へ公開。詳細は仕様書。',
+    '作業メモ':String(item['作業メモ']||'')+'\n2026-10-01：iPhone用の配布方式としてWeb版を選択。共通Web版1.0.1を追加しAndroid Chromeからも利用可能。Android正式APKダウンロードQRとiPhone Web起動・ホーム画面追加QRを作成、インストール案内へ公開。詳細は仕様書。',
     '仕様メモ':String(item['仕様メモ']||'')+'\nWeb版：iPhoneはファイルの書類スキャンで四隅を調整してPDF保存、AndroidはGoogle Driveでスキャン・トリミングしてPDF保存。共通画面から選んで登録する。Web画面内に文書スキャン/自動切抜きはない。Android専用版はML Kitによる撮影・補正・PDF・登録を一体で行う。Web版は1セルの差分保存、fileId保持・重複防止・DB再読込確認と登録完了表示に対応。',
-    '確認根拠':String(item['確認根拠']||'')+'\nWeb登録関連9テスト、構文・差分、2つのQRのURLデコード照合成功。実機でのホーム画面追加・PDF選択・実アップロード/DB登録は未確認。',
+    '確認根拠':String(item['確認根拠']||'')+'\nWeb登録関連10テスト、構文・差分、2つのQRのURLデコード照合成功。実機でのホーム画面追加・PDF選択・実アップロード/DB登録は未確認。',
     '確認日':'2026年10月1日'
    });
   });

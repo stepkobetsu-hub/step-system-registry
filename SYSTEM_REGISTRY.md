@@ -1453,8 +1453,8 @@
 
 ## 2026-10-01 iPhone・Android共通Web版とダウンロードQR
 
-過去問保管DBの登録入口に[STEP過去問スキャナー Web版1.0.0](https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/)を追加。利用者はiPhone配布方式としてWeb版を選択、Androidでも使えるよう指定。iPhoneはファイルアプリ、AndroidはGoogle Driveで書類スキャン・トリミングしたPDFを保存し、Web版で選択して登録する。Safari/Chromeからホーム画面へ追加できる構成。Android専用APK0.2.1はML Kitによるアプリ内スキャン・補正・PDF・登録を維持。
+過去問保管DBの登録入口に[STEP過去問スキャナー Web版1.0.1](https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/)を追加。利用者はiPhone配布方式としてWeb版を選択、Androidでも使えるよう指定。iPhoneはファイルアプリ、AndroidはGoogle Driveで書類スキャン・トリミングしたPDFを保存し、Web版で選択して登録する。Safari/Chromeからホーム画面へ追加できる構成。Android専用APK0.2.1はML Kitによるアプリ内スキャン・補正・PDF・登録を維持。
 
 [2種類のQR・インストール案内](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html)：Androidは固定正式APKのダウンロード、iPhoneは共通Web版の起動・ホーム画面追加。Androidも案内からWeb版を開ける。両QRはデコードして固定URLの一致を確認。PNG版を利用者へ提供。
 
-[仕様・更新・検証・制限](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md)。Web版は変更セルのみsavePatch・競合拒否・fileId保持と再試行・DB再読込確認・緑の登録完了表示・枠付きDBリンクに対応。既存接続設定を共有し保存先/認証値は変更しない。Service Workerなし・ネット接続必須。9件の登録関連テスト・構文/差分・QR読取を確認。実機スキャン・ホーム画面追加・PDF選択・実アップロード/DB登録は未検証。既存のDrive権限エラーへの修正とは別作業。これまでの[スキャナー変更履歴](docs/past-exam-scanner-history-20261001.md)も維持。
+[仕様・更新・検証・制限](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md)。Web版は変更セルのみsavePatch・競合拒否・fileId保持と再試行・DB再読込確認・緑の登録完了表示・枠付きDBリンクに対応。既存接続設定を共有し保存先/認証値は変更しない。Service Workerなし・ネット接続必須。10件の登録関連テスト・構文/差分・QR読取を確認。実機スキャン・ホーム画面追加・PDF選択・実アップロード/DB登録は未検証。既存のDrive権限エラーへの修正とは別作業。これまでの[スキャナー変更履歴](docs/past-exam-scanner-history-20261001.md)も維持。

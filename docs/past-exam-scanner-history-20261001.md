@@ -83,8 +83,10 @@ PRリンクは https://github.com/stepkobetsu-hub/seiseki-kanri/pull/番号 。�
 
 ## 2026-10-01 追加：iPhone版・共通Web版・2種類のQR
 
-利用者が「すぐ使えるWebアプリ」を選択。続く質問によりAndroidでも共通Web版を使えるよう整備。Web版1.0.0：https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/ 。iPhoneはファイルアプリ、AndroidはGoogle Driveで書類スキャン・トリミング・PDF保存し、Web画面で選んで登録する。Web内で直接スキャナーを起動する実装ではない。Android専用ML Kit版0.2.1は維持。
+利用者が「すぐ使えるWebアプリ」を選択。続く質問によりAndroidでも共通Web版を使えるよう整備。Web版1.0.1：https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/ 。iPhoneはファイルアプリ、AndroidはGoogle Driveで書類スキャン・トリミング・PDF保存し、Web画面で選んで登録する。Web内で直接スキャナーを起動する実装ではない。Android専用ML Kit版0.2.1は維持。
 
 配布案内：https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html 。Android QRは固定正式APK、iPhone QRはWeb起動・ホーム画面追加。案内からAndroidもWeb版へ進める。QRをデコードし意図したURLを照合、PNGを提供。台帳の既存過去問保管DBカードにWeb版・QR案内・仕様書のリンクと用途の違いを追加。
 
-共通Web版のsavePatch、元セル保持、重複防止、DB再読込確認、fileId保持による登録再試行、競合停止を検証。9テスト成功。ホームアイコン・manifest・登録完了の緑表示/ポップアップ・枠付きDBリンクを実装。実機ホーム画面追加・標準スキャン・実PDF登録は未確認。既存Drive権限エラーの修正とは別。詳細：https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md 。
+共通Web版のsavePatch、元セル保持、重複防止、DB再読込確認、fileId保持による登録再試行、競合停止を検証。10テスト成功。ホームアイコン・manifest・登録完了の緑表示/ポップアップ・枠付きDBリンクを実装。実機ホーム画面追加・標準スキャン・実PDF登録は未確認。既存Drive権限エラーの修正とは別。詳細：https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md 。
+
+Web版公開後のブラウザ通信呼出し（fetchのreceiver）を修正し、Web版1.0.1へ更新（seiseki-kanri PR #42、最終修正4784777）。ブラウザreceiverの回帰テストを追加、登録関連10テスト成功。QRの固定URLは維持。
