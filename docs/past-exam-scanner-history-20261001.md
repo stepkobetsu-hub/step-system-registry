@@ -92,3 +92,30 @@ PRリンクは https://github.com/stepkobetsu-hub/seiseki-kanri/pull/番号 。�
 Web版公開後のブラウザ通信呼出し（fetchのreceiver）を修正し、Web版1.0.1へ更新（seiseki-kanri PR #42、最終修正4784777）。ブラウザreceiverの回帰テストを追加、登録関連10テスト成功。QRの固定URLは維持。
 
 公開後確認：共通Web版1.0.1のブラウザ画面で学校7校の一覧表示と入力の有効化を確認。Android/iPhone両QRの案内ページを公開画面で確認。登録モジュールのURLも版付けし、古い通信コードのキャッシュを回避した（245abbc）。実PDFの登録は共通GAS保存経路のGoogle承認・復旧後に実機確認する。
+
+
+## 2026-10-01 利用者向け整理：公開Web版・QR・操作の違い
+
+iPhone専用インストール版は利用者がもう少し考えるため検討保留。現時点のiPhone向け提供物はWeb版であり、IPAやApp Store版ではない。
+
+| 提供方式 | 撮影・トリミング・PDF保存 | 過去問登録 | 更新 |
+| --- | --- | --- | --- |
+| Android専用版0.2.1 | 専用アプリ内で一通り行う。複数ページ対応 | 続けてアプリ内で登録 | 同じ固定署名の新APKを上書き |
+| iPhone共通Web版1.0.1 | iPhone「ファイル」の書類スキャンで四隅を調整してPDF保存 | SafariでWeb版を開き、学校等を選び、PDFを選択して登録 | Web側の更新で対応 |
+| Android共通Web版1.0.1 | Google Drive等でスキャン・トリミングしてPDF保存 | Chromeで同じWeb版を開き、学校等を選び、PDFを選択して登録 | Web側の更新で対応 |
+
+- [共通Web版を開く](https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/)
+- [Android専用APKをダウンロード](https://github.com/stepkobetsu-hub/seiseki-kanri/releases/download/past-exam-scanner-latest/STEP-PastExam-Scanner.apk)
+- [Android・iPhoneのQRとインストール案内](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html)
+- [Android QR画像（公開SVG）](https://stepkobetsu-hub.github.io/seiseki-kanri/images/past-exam/android-download-qr.svg)：専用APKダウンロード用。提供PNG名 STEP-PastExam-Scanner-Android-QR.png。
+- [iPhone QR画像（公開SVG）](https://stepkobetsu-hub.github.io/seiseki-kanri/images/past-exam/iphone-open-qr.svg)：共通Web版を開く用。提供PNG名 STEP-PastExam-Scanner-iPhone-QR.png。iPhone専用アプリのインストールQRではない。
+- STEP-PastExam-Scanner-QR-guide.jpg は案内画面の画像。最新の使い方案内は上記公開ページを参照。
+- [過去問DBを開く](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html)
+
+Web版のホーム画面追加は任意。Web版でもスキャン・トリミング・PDF保存はできるが、標準/外部アプリで作成してWebで登録する2段階。Android専用版とWeb版は併用可能。専用版では大きな緑の登録完了表示、最下部の枠付き「過去問DBへ」を維持し、不要と指定されたホーム画面追加ボタンは置かない。
+
+### 確認状況の更新
+公開ブラウザで学校一覧7校・入力の有効化と両QR案内を確認済み。登録関連10テスト、QRのデコード照合済み。
+以前の「Google承認・共通保存先の復旧待ち」はその時点の記録。別チャットの最新正本により、2026-10-01 08:28 JST、GAS v131で合成PDFのuploadAll、確認用1セルのsavePatch、loadによるfileId照合が成功。確認セル・PDFの後片付けも完了。既存公開URLは維持、権限修復のためのAPK更新は不要。
+iPhone/Android実機でのスキャンからPDF選択・登録までの一連操作は未確認。サーバーの復旧確認と実機確認を区別する。
+根拠：[共通保存先の復旧記録](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/past-exam-fast-db-20261001.md)。
