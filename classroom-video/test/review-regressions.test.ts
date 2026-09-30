@@ -322,7 +322,7 @@ describe("PR review regressions", () => {
   });
 
   it("shows the microphone-off badge on the local preview and hides it immediately on unmute", () => {
-    expect(html).toContain('id="local-mic-off" class="mic-off hidden"');
+    expect(html).toContain('id="local-mic-off" class="mic-off"');
     expect(app).toMatch(/ui\["local-mic-off"\]\.classList\.toggle\("hidden",state\.media\.audio\)/);
     expect(css).toMatch(/\.remote-tile \.mic-off,\.local-tile \.mic-off/);
     expect(css).toMatch(/@media\(orientation:portrait\).*\.local-tile \.mic-off/s);
