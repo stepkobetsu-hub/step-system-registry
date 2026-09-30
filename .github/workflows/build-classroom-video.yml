@@ -47,12 +47,12 @@ jobs:
           grep -F 'Verified using v1 scheme (JAR signing): true' /tmp/apk-signature.txt
           grep -F 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apk-signature.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee /tmp/apk-badging.txt
-          grep -F "package: name='jp.stepkobetsu.classroomvideo' versionCode='22' versionName='0.3.8-fire'" /tmp/apk-badging.txt
+          grep -F "package: name='jp.stepkobetsu.classroomvideo' versionCode='23' versionName='0.3.9-fire'" /tmp/apk-badging.txt
           grep -F "sdkVersion:'22'" /tmp/apk-badging.txt
           grep -F "targetSdkVersion:'28'" /tmp/apk-badging.txt
           sha256sum "$APK"
       - uses: actions/upload-artifact@v4
-        with: { name: step-classroom-video-v0.3.8-release-apk, path: classroom-video/android/app/build/outputs/apk/release/app-release.apk }
+        with: { name: step-classroom-video-v0.3.9-release-apk, path: classroom-video/android/app/build/outputs/apk/release/app-release.apk }
       - name: Publish stable Fire APK download
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
