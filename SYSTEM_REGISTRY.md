@@ -1458,3 +1458,13 @@
 [2種類のQR・インストール案内](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_scanner_install.html)：Androidは固定正式APKのダウンロード、iPhoneは共通Web版の起動・ホーム画面追加。Androidも案内からWeb版を開ける。両QRはデコードして固定URLの一致を確認。PNG版を利用者へ提供。
 
 [仕様・更新・検証・制限](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/past-exam-web/README.md)。Web版は変更セルのみsavePatch・競合拒否・fileId保持と再試行・DB再読込確認・緑の登録完了表示・枠付きDBリンクに対応。既存接続設定を共有し保存先/認証値は変更しない。Service Workerなし・ネット接続必須。10件の登録関連テスト・構文/差分・QR読取を確認。実機スキャン・ホーム画面追加・PDF選択・実アップロード/DB登録は未検証。既存のDrive権限エラーへの修正とは別作業。これまでの[スキャナー変更履歴](docs/past-exam-scanner-history-20261001.md)も維持。
+
+## 過去問DB 高速化・登録障害の復旧（2026-10-01）
+
+- 画面は https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html のまま。APK配布URLも変更なし。
+- 登録情報はSupabase、PDF／画像は既存Drive。旧Sheetは移行前バックアップで通常保存とは自動同期しない。
+- GAS v130更新時の実行者とPDFフォルダ所有者の不一致による「アクセスが拒否されました」を、所有者 stepkobetsu@gmail.com で同じデプロイをv131に更新して修復。外部DB通信権限も承認済み。共有権限は拡大していない。
+- 08:28 JSTに既存公開API経由のPDFアップロード、1セルの差分保存、登録内容の再読込、確認用データの後片付けがすべて成功。実機スキャン操作は未検証。
+- 今回の権限修復だけならAPK再インストールは不要。登録を再試行する。
+- 接続確認は Apps Script の verifyPastExamFastConnection。承認画面が複数Googleアカウントの同時ログインで開けない場合は、Chromeシークレットで所有者だけにログインして実行する。
+- 所有者・保存先・API・APK・ソース・詳細作業記録のリンクは「過去問保管DB」カードの詳細へ記載。
