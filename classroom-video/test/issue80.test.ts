@@ -105,6 +105,14 @@ function client() {
 }
 
 describe("Issue 80 standby recovery",()=>{
+  it("does not wake on another tablet joining or an automatic wake broadcast",async()=>{
+    const c=client();c.stored.delete("step-video-operation");await c.api.startStandby();
+    const standby=c.sockets[0];standby.open();
+    standby.message({type:"welcome",peers:[{id:"a",name:"A"}]});
+    standby.message({type:"wake",manual:false});await c.tick();
+    expect(c.sockets).toHaveLength(1);expect(c.sessionCount()).toBe(1);
+    expect(c.api.state.local).toBeNull();
+  });
   it("keeps a resting device asleep on welcome, then uses a fresh ticket and starts watchdog after targeted wake",async()=>{
     const c=client();await c.api.startStandby();const standby=c.sockets[0];standby.open();
     standby.message({type:"welcome",peers:[{id:"a",name:"A"}]});await c.tick();expect(c.sockets).toHaveLength(1);
