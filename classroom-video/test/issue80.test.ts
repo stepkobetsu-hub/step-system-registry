@@ -99,7 +99,7 @@ function client() {
     fetch:async()=>({ok:true,json:async()=>({device:{id:"b",name:"B"},ticket:"fresh-"+(++sessionCount),serverNow:Date.now(),expiresAt:Date.now()+900000,iceServers:[]})}),
     setTimeout:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearTimeout:(id:number)=>timers.delete(id),setInterval:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearInterval:(id:number)=>timers.delete(id),requestAnimationFrame:()=>1,
   });
-  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory};"),context);
+  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,renderUrgentTargets,bind};"),context);
   const api=context.api;
   return {api,el,sockets,stored,timers,context,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
@@ -158,5 +158,41 @@ describe("Issue 80 standby recovery",()=>{
     expect(c.api.state.manualStop).toBe(true);expect(c.sockets.at(-1).url).toContain("mode=standby");
     const requests=c.sessionCount();c.sockets.at(-1).message({type:"welcome",peers:[{id:"a",name:"A"}]});await c.tick();
     expect(c.sessionCount()).toBe(requests);
+  });
+});
+
+
+describe("urgent phone server routing",()=>{
+  it("exposes the selected target in presence and rejects signaling to other receivers in either direction",()=>{
+    const r=room(),phone=r.socket("phone"),a=r.socket("a"),b=r.socket("b");phone.info.urgentTarget="a";
+    expect(r.instance.peers("a").find((p:any)=>p.id==="phone").urgentTarget).toBe("a");
+    r.send(phone,{type:"signal",to:"b",description:{type:"offer"}});r.send(b,{type:"signal",to:"phone",candidate:{candidate:"ice"}});
+    expect(phone.sent).toHaveLength(0);expect(b.sent).toHaveLength(0);
+    r.send(phone,{type:"signal",to:"a",description:{type:"offer"}});expect(a.sent.at(-1).from).toBe("phone");
+    r.send(a,{type:"signal",to:"phone",candidate:{candidate:"ice"}});expect(phone.sent.at(-1).from).toBe("a");
+  });
+  it("does not permit phone microphone commands to bypass receiver acknowledgement",()=>{
+    const r=room(),phone=r.socket("phone"),a=r.socket("a");phone.info.urgentTarget="a";
+    r.send(phone,{type:"remote-mic",to:"a",enabled:true});r.send(a,{type:"remote-mic",to:"phone",enabled:true});
+    expect(a.sent).toHaveLength(0);expect(phone.sent).toHaveLength(0);
+  });
+  it("updates the target picker on standby phones when active peers join or leave",()=>{
+    const r=room(),phone=r.socket("phone","standby"),a=r.socket("a");r.instance.broadcastPresence();
+    expect(phone.sent.find((m:any)=>m.type==="presence").peers.map((p:any)=>p.id)).toEqual(["a"]);
+    a.readyState=3;phone.sent=[];r.instance.broadcastPresence();expect(phone.sent[0].peers).toEqual([]);
+  });
+});
+
+describe("urgent phone client interaction",()=>{
+  it("requests only microphone access for urgent contact",async()=>{
+    const c=client();let constraints:any;c.api.state.urgentTarget="a";
+    c.context.navigator.mediaDevices.getUserMedia=async(opts:any)=>{constraints=opts;return {getTracks:()=>[],getAudioTracks:()=>[],getVideoTracks:()=>[]};};
+    await c.api.openMedia();expect(constraints.video).toBe(false);expect(constraints.audio.echoCancellation).toBe(true);
+  });
+  it("keeps the picker current while standby without acquiring camera or joining active media",async()=>{
+    const c=client();await c.api.startStandby();c.sockets[0].open();
+    c.sockets[0].message({type:"presence",peers:[{id:"a",name:"大手1"},{id:"c",name:"神領サブ"},{id:"phone2",name:"携帯",urgentTarget:"a"}]});
+    expect(c.el("urgent-list").children.map((b:any)=>b.textContent)).toEqual(["神領サブ","大手1"]);expect(c.api.state.local).toBeNull();expect(c.sockets).toHaveLength(1);
+    c.sockets[0].message({type:"presence",peers:[]});expect(c.el("urgent-list").children).toHaveLength(0);expect(c.el("urgent-list").textContent).toContain("接続中の教室端末がありません");
   });
 });

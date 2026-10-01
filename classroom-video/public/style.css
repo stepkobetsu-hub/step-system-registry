@@ -29,3 +29,5 @@ nav{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height
 @media(max-width:600px){.remote-mic-controls{flex-wrap:wrap}#remote-mic-target{flex-basis:calc(100% - 150px)}#wake-picker{inset:3% 4%}}
 
 .schedule-times{display:flex;align-items:center;gap:12px}.schedule-times label{flex:1;min-width:0}.schedule-times input{width:100%;box-sizing:border-box}.schedule-help{font-size:14px;line-height:1.6;color:#b9c9d9}
+
+.audio-call video{visibility:hidden}.audio-call::after{content:"音声通話";position:absolute;inset:35% 0;text-align:center;font-size:2rem;color:white}
