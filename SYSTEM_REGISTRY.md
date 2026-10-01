@@ -1468,3 +1468,18 @@
 - 今回の権限修復だけならAPK再インストールは不要。登録を再試行する。
 - 接続確認は Apps Script の verifyPastExamFastConnection。承認画面が複数Googleアカウントの同時ログインで開けない場合は、Chromeシークレットで所有者だけにログインして実行する。
 - 所有者・保存先・API・APK・ソース・詳細作業記録のリンクは「過去問保管DB」カードの詳細へ記載。
+
+
+## 2026-10-01 講師給与計算・出力アプリ：重複整理と確認案内（GAS v63）
+
+- **確認日**：2026年10月1日
+- **Apps Script プロジェクトURL**：https://script.google.com/home/projects/1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn/edit
+- **GitHubドキュメントURL**：https://github.com/stepkobetsu-hub/teacher-portal/blob/main/docs/payroll-gas.md
+- **作業メモ**：2026-10-01：②完成版作成の重複を整理。本番v61でA/B/C/T/U/V/W一致は先頭のみ保持、続いて同じ講師A・日付C・コマ数Wも先頭のみ保持。黄色背景・R列判定背景・P列数式を削除後の行番号に合わせて補正。AB.xlsxのAは320件→221件、重複99件を整理。A189行は保持（Bでの手動削除が誤りだったため）。v62で内容確認案内、v63で作成成功後に点滅開始する条件・年月欄拡大・前月初期表示を反映。既存URL・デプロイID維持。詳細仕様・保存ソースはGitHubドキュメントを参照。
+- **仕様メモ**：重複原因：processGoogleForm_が同日のフォーム回答を全件読み、alignRows_が勤怠とフォームの多い方の件数分を並べるため、同内容の回答が繰り返されると勤怠空欄の追加行が発生。出力前に上記条件で整理し元の回答・打刻は変更しない。②の作成成功後、内容を確認がオレンジ色で点滅し「内容を確認してください。」を表示。押すと停止、再作成で再開。確認待ちはブラウザ内保存（端末間共有なし）。年月選択は幅180px・高さ56px・文字21px。起動時は前月を選択（2026年10月→2026年9月、1月→前年12月）。
+- **確認根拠**：本番Apps Script v63。重複整理221行・99行の完了表示を確認。点滅開始条件・クリック停止・再作成・年月の年越しをコード検証。本番画面で2026年9月初期表示と年月欄拡大を確認。
+- **ソース保存場所**：teacher-portal/gas/PayrollCompletedDedup.gs（重複整理補助関数）、teacher-portal/gas/PayrollAppScreen.html（画面コード）。GAS給与処理本体は上記Apps Scriptプロジェクト。
+
+- 本番URL：https://script.google.com/macros/s/AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9/exec?app=payroll
+- 正本Sheet：https://docs.google.com/spreadsheets/d/1L5aFDXAmfUDkBg8d7X3WqJgMhdMq5tM5sfUZ2G-M58E/edit
+- 第2段階の一致条件は日付・コマ数だけでなく講師番号も含める。異なる講師の行を混同して削除しない。
