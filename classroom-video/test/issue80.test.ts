@@ -99,12 +99,27 @@ function client() {
     fetch:async()=>({ok:true,json:async()=>({device:{id:"b",name:"B"},ticket:"fresh-"+(++sessionCount),serverNow:Date.now(),expiresAt:Date.now()+900000,iceServers:[]})}),
     setTimeout:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearTimeout:(id:number)=>timers.delete(id),setInterval:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearInterval:(id:number)=>timers.delete(id),requestAnimationFrame:()=>1,
   });
-  vm.runInContext(app.replace("  init();","  globalThis.api={state,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,requestRemoteRestart,finishRemoteRestart,receiveAppRestart,openRestartPicker,resumeRestartMode};"),context);
+  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,requestRemoteRestart,finishRemoteRestart,receiveAppRestart,openRestartPicker,resumeRestartMode};"),context);
   const api=context.api;
   return {api,el,sockets,stored,timers,context,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
 
 describe("Issue 80 standby recovery",()=>{
+  it("stops camera tracks if rest starts while the camera permission request is pending",async()=>{
+    const c=client();let finish:any,stopped=false;
+    c.context.navigator.mediaDevices.getUserMedia=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=c.api.openMedia();c.api.state.manualStop=true;c.api.state.generation+=1;
+    finish({getTracks:()=>[{stop:()=>{stopped=true;}}]});await pending;
+    expect(stopped).toBe(true);expect(c.api.state.local).toBeNull();
+  });
+  it("does not wake on another tablet joining or an automatic wake broadcast",async()=>{
+    const c=client();c.stored.delete("step-video-operation");await c.api.startStandby();
+    const standby=c.sockets[0];standby.open();
+    standby.message({type:"welcome",peers:[{id:"a",name:"A"}]});
+    standby.message({type:"wake",manual:false});await c.tick();
+    expect(c.sockets).toHaveLength(1);expect(c.sessionCount()).toBe(1);
+    expect(c.api.state.local).toBeNull();
+  });
   it("keeps a resting device asleep on welcome, then uses a fresh ticket and starts watchdog after targeted wake",async()=>{
     const c=client();await c.api.startStandby();const standby=c.sockets[0];standby.open();
     standby.message({type:"welcome",peers:[{id:"a",name:"A"}]});await c.tick();expect(c.sockets).toHaveLength(1);
@@ -181,10 +196,10 @@ describe("remote app restart",()=>{
   });
   it.each(["active","standby"])("restarts from %s, releases sockets, and preserves registration",async mode=>{
     const c=client();let restarted=0;c.context.window.StepNative={restartApp(){restarted++}};
-    const config=c.stored.get("step-video-device");
+    let config=c.stored.get("step-video-device");
     if(mode==="standby")await c.api.startStandby();else{c.api.state.session={ticket:"test",device:{id:"b"}};c.api.connectSocket();}
     const socket=c.sockets[0];socket.open();expect(socket.sent).toContainEqual({type:"ping",remoteRestart:true});
-    socket.message({type:"restart-app"});
+    config=c.stored.get("step-video-device");socket.message({type:"restart-app"});
     expect(restarted).toBe(1);expect(socket.readyState).toBe(3);expect(JSON.parse(c.stored.get("step-video-device")!)).toEqual(JSON.parse(config!));
     expect(c.stored.has("step-video-operation")).toBe(false);expect(c.stored.get("step-video-restart-connect")).toBe("remote");
     socket.message({type:"restart-app"});expect(restarted).toBe(1);

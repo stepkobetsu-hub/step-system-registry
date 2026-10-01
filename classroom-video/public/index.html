@@ -15,14 +15,6 @@
       <p>この端末を自動登録しています。IDやトークンの入力は不要です。</p>
       <label class="hidden">端末ID<input id="device-id" autocomplete="off"></label>
       <label class="hidden">端末トークン<input id="device-token" type="password" autocomplete="off"></label>
-      <label class="hidden">連続動作時間
-        <select id="duration-hours">
-          <option value="5">5時間</option><option value="6" selected>6時間（標準）</option>
-          <option value="7">7時間</option><option value="8">8時間</option>
-          <option value="9">9時間</option><option value="10">10時間</option>
-          <option value="11">11時間</option><option value="12">12時間</option>
-        </select>
-      </label>
       <button id="save-setup" class="primary">自動登録を再試行</button>
       <p id="setup-error" class="error" role="alert"></p>
     </section>
@@ -105,14 +97,13 @@
           </select>
         </label>
         <label class="check-label"><input id="settings-show-self" type="checkbox" checked> 自分映像を表示</label>
-        <label>次回からの連続運転時間
-          <select id="settings-duration">
-            <option value="5">5時間</option><option value="6">6時間（標準）</option>
-            <option value="7">7時間</option><option value="8">8時間</option>
-            <option value="9">9時間</option><option value="10">10時間</option>
-            <option value="11">11時間</option><option value="12">12時間</option>
-          </select>
-        </label>
+        <label>次回からの連続運転時間帯（日本時間）</label>
+        <div class="schedule-times">
+          <label>開始<input id="settings-schedule-start" type="time" value="12:30" required></label>
+          <span>～</span>
+          <label>終了<input id="settings-schedule-end" type="time" value="22:00" required></label>
+        </div>
+        <p class="schedule-help">時刻による自動起動はしません。休止解除すると、時間帯内は終了時刻まで、時間帯外は1時間接続します。変更は次回の休止解除から有効です。</p>
          <div class="settings-actions">
            <button id="chime-test">呼び出し音テスト</button>
            <button id="diagnostics-toggle">診断</button>

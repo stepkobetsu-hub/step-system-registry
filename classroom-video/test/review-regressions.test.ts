@@ -16,11 +16,13 @@ describe("PR review regressions", () => {
     expect(app).toMatch(/StepNative\.playChime\(\)/);
   });
 
-  it("offers only 5 through 12 hours and defaults to 6", () => {
-    const durationSelect = html.match(/<select id="duration-hours">([\s\S]*?)<\/select>/)?.[1] ?? "";
-    const values = [...durationSelect.matchAll(/<option value="(\d+)"/g)].map((match) => Number(match[1]));
-    expect(values).toEqual([5, 6, 7, 8, 9, 10, 11, 12]);
-    expect(html).toContain('<option value="6" selected>');
+  it("uses editable daily JST times instead of duration hours", () => {
+    expect(html).toContain('id="settings-schedule-start" type="time" value="12:30"');
+    expect(html).toContain('id="settings-schedule-end" type="time" value="22:00"');
+    expect(html).not.toContain('id="settings-duration"');
+    expect(html).not.toContain('id="duration-hours"');
+    expect(app).not.toContain('IDLE_BRIGHTNESS_STEP_MS');
+    expect(css).not.toContain('data-idle-brightness');
   });
 
   it("persists rest state and releases call resources", () => {
