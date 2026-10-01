@@ -25,7 +25,7 @@ function client(device: { id: string; name: string }) {
     callPeer=async (peer)=>{if(shouldConnectMedia(peer))offers.push(peer.id);};
     closePeer=(id)=>{closed.push(id);state.peers.delete(id);};
     configurePeerSenders=async()=>{};sendMediaState=()=>{};
-    globalThis.api={state,campusForPeer,shouldConnectMedia,mediaPeerCount,onPresence,onSignal};
+    globalThis.api={state,campusForPeer,shouldConnectMedia,mediaPeerCount,onPresence,onSignal,outgoingTracks};
   `), Object.assign(context, { offers, closed }));
   const api = context.api;
   api.state.session = { device };
@@ -108,5 +108,23 @@ describe("two campuses with main and sub tablets", () => {
     expect(c.api.shouldConnectMedia({ id: "device-new", name: "STEP端末5" })).toBe(true);
     expect(c.api.shouldConnectMedia(tablets[0])).toBe(false);
     expect(c.api.shouldConnectMedia(undefined)).toBe(false);
+  });
+});
+
+
+describe("temporary urgent phone", () => {
+  const phone={id:"phone",name:"管理者携帯",urgentTarget:"device-c"};
+  it("connects only the selected receiver, preserving two video peers on every tablet",()=>{
+    for(const own of tablets){const c=client(own);c.api.onPresence([...tablets.filter(p=>p.id!==own.id),phone]);expect(c.api.shouldConnectMedia(phone)).toBe(own.id===phone.urgentTarget);expect(c.api.mediaPeerCount()).toBe(2);}
+    const c=client(phone);c.api.state.urgentTarget=phone.urgentTarget;
+    for(const peer of tablets)expect(c.api.shouldConnectMedia(peer)).toBe(peer.id===phone.urgentTarget);
+  });
+  it("sends cloned audio only and keeps it muted until acknowledgement without changing normal tracks",()=>{
+    const c=client(tablets[2]);const audio={kind:"audio",enabled:false,clone(){return {kind:this.kind,enabled:this.enabled};}},video={kind:"video",enabled:true};
+    c.api.state.local={getTracks:()=>[audio,video],getAudioTracks:()=>[audio]};
+    expect(c.api.outgoingTracks(tablets[0])).toEqual([audio,video]);
+    const ringing=c.api.outgoingTracks(phone);expect(ringing).toHaveLength(1);expect(ringing[0].kind).toBe("audio");expect(ringing[0].enabled).toBe(false);
+    c.api.state.urgentAccepted.add(phone.id);expect(c.api.outgoingTracks(phone)[0].enabled).toBe(true);expect(audio.enabled).toBe(false);expect(video.enabled).toBe(true);
+    c.api.onPresence(tablets.filter(p=>p.id!==tablets[2].id));c.api.state.presence.set(phone.id,phone);c.api.onPresence(tablets.filter(p=>p.id!==tablets[2].id));expect(c.api.state.urgentAccepted.has(phone.id)).toBe(false);
   });
 });
