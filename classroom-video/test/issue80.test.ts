@@ -99,12 +99,19 @@ function client() {
     fetch:async()=>({ok:true,json:async()=>({device:{id:"b",name:"B"},ticket:"fresh-"+(++sessionCount),serverNow:Date.now(),expiresAt:Date.now()+900000,iceServers:[]})}),
     setTimeout:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearTimeout:(id:number)=>timers.delete(id),setInterval:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearInterval:(id:number)=>timers.delete(id),requestAnimationFrame:()=>1,
   });
-  vm.runInContext(app.replace("  init();","  globalThis.api={state,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory};"),context);
+  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory};"),context);
   const api=context.api;
   return {api,el,sockets,stored,timers,context,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
 
 describe("Issue 80 standby recovery",()=>{
+  it("stops camera tracks if rest starts while the camera permission request is pending",async()=>{
+    const c=client();let finish:any,stopped=false;
+    c.context.navigator.mediaDevices.getUserMedia=()=>new Promise(resolve=>{finish=resolve;});
+    const pending=c.api.openMedia();c.api.state.manualStop=true;c.api.state.generation+=1;
+    finish({getTracks:()=>[{stop:()=>{stopped=true;}}]});await pending;
+    expect(stopped).toBe(true);expect(c.api.state.local).toBeNull();
+  });
   it("does not wake on another tablet joining or an automatic wake broadcast",async()=>{
     const c=client();c.stored.delete("step-video-operation");await c.api.startStandby();
     const standby=c.sockets[0];standby.open();
