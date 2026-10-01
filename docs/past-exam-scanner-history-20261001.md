@@ -119,3 +119,16 @@ Web版のホーム画面追加は任意。Web版でもスキャン・トリミ�
 以前の「Google承認・共通保存先の復旧待ち」はその時点の記録。別チャットの最新正本により、2026-10-01 08:28 JST、GAS v131で合成PDFのuploadAll、確認用1セルのsavePatch、loadによるfileId照合が成功。確認セル・PDFの後片付けも完了。既存公開URLは維持、権限修復のためのAPK更新は不要。
 iPhone/Android実機でのスキャンからPDF選択・登録までの一連操作は未確認。サーバーの復旧確認と実機確認を区別する。
 根拠：[共通保存先の復旧記録](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/past-exam-fast-db-20261001.md)。
+
+
+## 2026-10-01 学校一覧の待ち時間解消（Android 0.2.2 / Web 1.0.2）
+
+利用者指摘：学校改定は年1回程度なのに、毎回の読込が遅い・失敗する。原因はAndroid/Web両方が起動時に学校一覧のため登録DB全体を取得していたこと。
+
+- [実装コミット](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/750fcfdfd266bf6ad0ef44339fa41854fdd01c72)。Android versionCode 7、Web 1.0.2。
+- 当日の正本7校のID・名称・年間回数を照合し同梱。Android assets/schools.json、Web school-catalog.mjs。初回でも学校一覧取得通信なし。
+- 保存済み学校マスタを優先。Android SharedPreferences schools_v1、Web localStorage stepPastExamWebSchoolsV1。未保存・破損・保存制限時は同梱一覧。登録セル・PDF情報のキャッシュではない。
+- 「学校一覧を更新」で年次改定時などに手動取得。有効な一覧のみ保存。更新失敗でも既存一覧を維持。Android手動取得の全体待ち時間は25秒上限。
+- PDFアップロードとDB登録時の最新データ照合・差分保存・競合拒否・重複防止・登録後fileId再読込は維持。Webページ自体の取得と登録には通信が必要。
+- Androidは固定キーによる0.2.2へ一度上書き更新。固定APK URL・QRを維持。Webは再読込で1.0.2を利用。
+- Web関連13テスト成功（同梱とAndroid資産の一致、保存済み改定優先、破損/ブロック時の復旧、不正/重複ID拒否を含む）。公開ブラウザで7校表示→手動更新成功→ページ再読込後の保存済み表示を確認。Android単体テスト・debugビルド・LintはCIで検証。実機の体感速度・撮影・実登録は未確認。
