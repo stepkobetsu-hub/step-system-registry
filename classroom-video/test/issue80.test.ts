@@ -9,12 +9,12 @@ const worker = readFileSync(new URL("../src/index.ts", import.meta.url), "utf8")
 
 function room() {
   const sockets: any[] = [], known = [{id:"a",name:"A"},{id:"b",name:"B"},{id:"off",name:"Offline"}];
-  const sql: string[] = [];
+  const sql: string[] = [], meta = new Map<string,number>();
   const ctx = {
     blockConcurrencyWhile: () => {}, waitUntil: () => {},
     getWebSockets: (tag?: string) => sockets.filter(s => !tag || tag === `device:${s.info?.id}`),
     acceptWebSocket: (s: any) => sockets.push(s),
-    storage: { getAlarm: async () => 1, sql: { exec: (query: string) => { sql.push(query); return {toArray: () => query.startsWith("SELECT id, name FROM room_device_names") ? known : []}; } }, setAlarm: async () => {} },
+    storage: { getAlarm: async () => 1, sql: { exec: (query: string, ...args: any[]) => { sql.push(query); if(query.startsWith("INSERT INTO registry_meta"))meta.set(args[0],args[1]); return {toArray: () => query.startsWith("SELECT value FROM registry_meta") ? (meta.has(args[0])?[{value:meta.get(args[0])}]:[]) : query.startsWith("SELECT id, name FROM room_device_names") ? known : []}; } }, setAlarm: async () => {} },
   };
   class Socket {
     readyState = 1; info: any; sent: any[] = [];
@@ -99,7 +99,7 @@ function client() {
     fetch:async()=>({ok:true,json:async()=>({device:{id:"b",name:"B"},ticket:"fresh-"+(++sessionCount),serverNow:Date.now(),expiresAt:Date.now()+900000,iceServers:[]})}),
     setTimeout:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearTimeout:(id:number)=>timers.delete(id),setInterval:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearInterval:(id:number)=>timers.delete(id),requestAnimationFrame:()=>1,
   });
-  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory};"),context);
+  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,requestRemoteRestart,finishRemoteRestart,receiveAppRestart,openRestartPicker,resumeRestartMode};"),context);
   const api=context.api;
   return {api,el,sockets,stored,timers,context,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
@@ -158,5 +158,69 @@ describe("Issue 80 standby recovery",()=>{
     expect(c.api.state.manualStop).toBe(true);expect(c.sockets.at(-1).url).toContain("mode=standby");
     const requests=c.sessionCount();c.sockets.at(-1).message({type:"welcome",peers:[{id:"a",name:"A"}]});await c.tick();
     expect(c.sessionCount()).toBe(requests);
+  });
+});
+
+describe("remote app restart",()=>{
+  it.each(["active","standby"])("routes only to the selected %s target and persists cooldown after reconnection",mode=>{
+    const r=room(),a=r.socket("a"),b=r.socket("b",mode),c=r.socket("c",mode);
+    r.send(b,{type:"ping",remoteRestart:true});b.sent=[];
+    r.send(a,{type:"restart-device",to:"b",from:{id:"spoof"}});
+    expect(b.sent).toEqual([{type:"restart-app",from:{id:"a",name:"A"}}]);expect(c.sent).toEqual([]);
+    expect(a.sent.at(-1)).toEqual({type:"restart-result",to:"b",status:"requested"});
+    b.close();const replacement=r.socket("b",mode);r.send(replacement,{type:"ping",remoteRestart:true});replacement.sent=[];
+    r.send(a,{type:"restart-device",to:"b"});expect(a.sent.at(-1).status).toBe("cooldown");expect(replacement.sent).toEqual([]);
+  });
+  it.each(["standby","closed","stale","unregistered","unauthenticated"])("rejects %s sender",mode=>{
+    const r=room(),a=r.socket("a"),b=r.socket("b");b.info.remoteRestart=true;
+    if(mode==="standby")a.info.mode="standby";
+    if(mode==="closed")a.close();if(mode==="stale")a.info.lastSeenAt-=71000;
+    if(mode==="unregistered")r.sockets.splice(0,1);if(mode==="unauthenticated")a.info=null;
+    r.send(a,{type:"restart-device",to:"b"});expect(b.sent).toEqual([]);expect(a.sent).toEqual([]);
+  });
+  it.each(["old","closed","stale","self","missing","malformed"])("rejects %s target",mode=>{
+    const r=room(),a=r.socket("a"),b=r.socket("b");b.info.remoteRestart=mode!=="old";
+    if(mode==="closed")b.close();if(mode==="stale")b.info.lastSeenAt-=71000;
+    r.send(a,{type:"restart-device",to:mode==="self"?"a":mode==="missing"?"x":mode==="malformed"?{}:"b"});
+    expect(b.sent).toEqual([]);expect(a.sent.at(-1).status).toBe(mode==="old"?"unsupported":"unavailable");
+  });
+  it("reports a failed delivery without claiming restart",()=>{
+    const r=room(),a=r.socket("a"),b=r.socket("b");b.info.remoteRestart=true;b.send=()=>{throw Error("closed")};
+    r.send(a,{type:"restart-device",to:"b"});expect(a.sent.at(-1).status).toBe("unavailable");
+  });
+  it("advertises capability only for updated live clients",()=>{
+    const r=room(),a=r.socket("a"),b=r.socket("b","standby");
+    r.send(b,{type:"ping",remoteRestart:true});r.send(a,{type:"list-devices"});
+    expect(a.sent.at(-1).devices.find((d:any)=>d.id==="b").remoteRestart).toBe(true);
+    b.close();r.send(a,{type:"list-devices"});expect(a.sent.at(-1).devices.find((d:any)=>d.id==="b").remoteRestart).toBeUndefined();
+  });
+  it.each(["active","standby"])("restarts from %s, releases sockets, and preserves registration",async mode=>{
+    const c=client();let restarted=0;c.context.window.StepNative={restartApp(){restarted++}};
+    let config=c.stored.get("step-video-device");
+    if(mode==="standby")await c.api.startStandby();else{c.api.state.session={ticket:"test",device:{id:"b"}};c.api.connectSocket();}
+    const socket=c.sockets[0];socket.open();expect(socket.sent).toContainEqual({type:"ping",remoteRestart:true});
+    config=c.stored.get("step-video-device");socket.message({type:"restart-app"});
+    expect(restarted).toBe(1);expect(socket.readyState).toBe(3);expect(JSON.parse(c.stored.get("step-video-device")!)).toEqual(JSON.parse(config!));
+    expect(c.stored.has("step-video-operation")).toBe(false);expect(c.stored.get("step-video-restart-connect")).toBe("remote");
+    socket.message({type:"restart-app"});expect(restarted).toBe(1);
+  });
+  it("boots into a fresh targeted call with microphone off after remote restart",async()=>{
+    const c=client();c.stored.delete("step-video-operation");c.api.resumeRestartMode("remote");c.expire(0);await c.tick();
+    expect(c.sockets.at(-1).url).toContain("mode=active&wake=targeted&ticket=fresh-1");
+    expect(c.api.state.media.audio).toBe(false);expect(JSON.parse(c.stored.get("step-video-operation")!).targetedWake).toBe(true);
+  });
+  it("uses browser reload when the native bridge is unavailable",()=>{
+    const c=client();let reloads=0;c.context.location.reload=()=>reloads++;c.api.receiveAppRestart();expect(reloads).toBe(1);
+  });
+  it("disables offline and old clients, prevents double sends and times out honestly",()=>{
+    const c=client(),sent:any[]=[];c.api.state.ws={readyState:1,send:(s:string)=>sent.push(JSON.parse(s))};
+    c.api.receiveDeviceList({devices:[{id:"a",name:"A",status:"active",remoteRestart:true},{id:"s",name:"S",status:"standby",remoteRestart:true},{id:"old",name:"Old",status:"active"},{id:"off",name:"Off",status:"offline"}]});
+    expect(c.el("restart-list").children.filter((b:any)=>b.disabled)).toHaveLength(2);
+    c.api.requestRemoteRestart("old");c.api.requestRemoteRestart("off");expect(sent).toEqual([]);
+    c.api.requestRemoteRestart("a");c.api.requestRemoteRestart("s");expect(sent).toEqual([{type:"restart-device",to:"a"}]);
+    c.api.finishRemoteRestart({to:"s",status:"requested"});expect(c.api.state.pendingRemoteRestart).not.toBeNull();
+    c.expire(8000);expect(c.el("restart-status").textContent).toContain("送信結果を確認できません");
+    c.api.requestRemoteRestart("s");c.api.finishRemoteRestart({to:"s",status:"requested"});expect(c.el("restart-status").textContent).toContain("指示を送信しました");
+    c.api.requestRemoteRestart("s");c.api.state.ws=null;c.api.invalidateDeviceDirectory();expect(c.api.state.pendingRemoteRestart).toBeNull();expect(c.el("restart-list").children.every((b:any)=>b.disabled)).toBe(true);
   });
 });
