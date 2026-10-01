@@ -16,10 +16,6 @@ nav{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height
 .remote-mic-controls button{min-width:0;flex:0 0 auto;padding:8px 10px;font-size:13px}
 .remote-mic-controls button:disabled{opacity:.45;cursor:default}
 .notice{max-width:calc(100% - 24px);width:max-content;overflow-wrap:anywhere;z-index:14}
-html[data-idle-brightness]:after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;background:#000;opacity:0}
-html[data-idle-brightness="1"]:after{opacity:.25}
-html[data-idle-brightness="2"]:after{opacity:.45}
-html[data-idle-brightness="3"]:after{opacity:.65}
 @media(orientation:portrait){#controls{bottom:137px}.remote-mic-controls{gap:5px}.remote-mic-controls button{font-size:12px;padding:8px 6px}#remote-mic-target{font-size:12px}}
 
 #wake-picker{display:flex;flex-direction:column;overflow:auto}
@@ -31,3 +27,5 @@ html[data-idle-brightness="3"]:after{opacity:.65}
 #wake-close{flex-shrink:0;margin-top:14px;padding:12px;border-radius:12px;background:#475569}
 #wake-status{min-height:1.5em;color:#bae6fd}
 @media(max-width:600px){.remote-mic-controls{flex-wrap:wrap}#remote-mic-target{flex-basis:calc(100% - 150px)}#wake-picker{inset:3% 4%}}
+
+.schedule-times{display:flex;align-items:center;gap:12px}.schedule-times label{flex:1;min-width:0}.schedule-times input{width:100%;box-sizing:border-box}.schedule-help{font-size:14px;line-height:1.6;color:#b9c9d9}

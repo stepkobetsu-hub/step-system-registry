@@ -34,7 +34,7 @@ function client() {
     setTimeout: (callback: () => void, delay: number) => { const id = ++sequence; timers.set(id, { callback, at: now + delay }); return id; },
     clearTimeout: (id: number) => timers.delete(id),
   });
-  vm.runInContext(app.replace("  init();", "  globalThis.testApi={state,applyMediaState,connectSocket,setRemoteMic,receiveRemoteMic,updateRemoteMicControls,bindIdleBrightness,resetIdleBrightness,updateIdleBrightness,incomingCall,videoProfile};"), context);
+  vm.runInContext(app.replace("  init();", "  globalThis.testApi={state,applyMediaState,connectSocket,setRemoteMic,receiveRemoteMic,updateRemoteMicControls,incomingCall,videoProfile};"), context);
   const api = context.testApi;
   api.state.ws = { readyState: 1, send: (value: string) => sent.push(JSON.parse(value)) };
   api.state.session = { device: { id: "a" } };
@@ -81,30 +81,6 @@ describe("Issue 79 client behavior", () => {
     c.api.state.peers.get("c").pc.iceConnectionState = "disconnected";
     c.api.setRemoteMic(true); expect(c.sent).toHaveLength(2);
     expect(c.element("remote-mic-on").disabled).toBe(true);
-  });
-  it("dims at exactly one, two, and three hours and stops scheduling at the last step", () => {
-    const c = client(); c.api.bindIdleBrightness(); c.advance(3599999); expect(c.brightness).toEqual([0]);
-    c.advance(1); expect(c.brightness).toEqual([0, 1]);
-    c.advance(3600000); c.advance(3600000); expect(c.brightness).toEqual([0, 1, 2, 3]); expect(c.timers.size).toBe(0);
-  });
-  it.each(["pointerdown", "touchstart", "click", "keydown", "input", "change"])("restores brightness immediately on %s and restarts the deadline", event => {
-    const c = client(); c.api.bindIdleBrightness(); c.advance(7200000); c.emit(event);
-    expect(c.brightness.at(-1)).toBe(0); expect(c.timers.size).toBe(1);
-    c.advance(3599999); expect(c.brightness.at(-1)).toBe(0); c.advance(1); expect(c.brightness.at(-1)).toBe(1);
-  });
-  it("does not reset idle time on a remote mic message", () => {
-    const c = client(); c.api.bindIdleBrightness(); c.advance(3599999);
-    c.api.receiveRemoteMic({ from: "b", fromName: "B", enabled: true }); c.advance(1); expect(c.brightness.at(-1)).toBe(1);
-  });
-  it("restores brightness on incoming call", () => {
-    const c = client(); c.api.bindIdleBrightness(); c.advance(10800000);
-    c.api.incomingCall({ callId: "call", from: { name: "B" } }); expect(c.brightness.at(-1)).toBe(0);
-  });
-  it("suspends timers in background, resumes elapsed idle time, and clears on pagehide", () => {
-    const c = client(); c.api.bindIdleBrightness(); c.advance(3600000);
-    c.document.visibilityState = "hidden"; c.emit("visibilitychange"); expect(c.timers.size).toBe(0); expect(c.brightness.at(-1)).toBe(0);
-    c.advance(3600000); c.document.visibilityState = "visible"; c.emit("visibilitychange"); expect(c.brightness.at(-1)).toBe(2);
-    c.emit("pagehide"); expect(c.timers.size).toBe(0); expect(c.brightness.at(-1)).toBe(0);
   });
 });
 
