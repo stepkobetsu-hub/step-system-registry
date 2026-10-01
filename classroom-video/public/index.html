@@ -61,6 +61,13 @@
         <div id="wake-list" class="target-list"></div>
         <button id="wake-close">閉じる</button>
       </section>
+      <section id="restart-picker" class="target-picker hidden" aria-labelledby="restart-title">
+        <h2 id="restart-title">相手アプリを再起動</h2>
+        <p>選んだ端末の通話を一度終了し、アプリを起動し直して再接続します。登録・表示名は保持されます。完全終了・通信断・アプリ全体のフリーズ中は操作できません。</p>
+        <p id="restart-status" role="status" aria-live="polite"></p>
+        <div id="restart-list" class="target-list"></div>
+        <button id="restart-close">閉じる</button>
+      </section>
       <nav id="controls" aria-label="通話操作">
         <button id="mic" aria-pressed="false"><span>🎙</span><b>マイク OFF</b></button>
         <button id="camera" aria-pressed="true"><span class="video-icon" aria-hidden="true"></span><b>カメラ ON</b></button>
@@ -69,6 +76,7 @@
         <button id="hangup" class="danger"><span>✕</span><b>終了</b><small>2回：再起動／3回：完全終了</small></button>
         <div class="remote-mic-controls" role="group" aria-label="中央の相手のマイク操作">
           <button id="wake-device">休止端末を起こす</button>
+          <button id="restart-device">相手アプリを再起動</button>
           <span id="remote-mic-target">相手未接続</span>
           <button id="remote-mic-on" disabled>相手マイク ON</button>
           <button id="remote-mic-off" disabled>相手マイク OFF</button>

@@ -1,12 +1,12 @@
 import { DurableObject } from "cloudflare:workers";
 import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
-type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number; wakeRequestedAt?: number };
+type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number; wakeRequestedAt?: number; remoteRestart?: boolean };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
 type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
   { type: "remote-mic"; to: string; enabled: boolean } |
-  { type: "list-devices" } | { type: "wake-device"; to: string } |
-  { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
+  { type: "list-devices" } | { type: "wake-device"; to: string } | { type: "restart-device"; to: string } |
+  { type: "media-state"; audio: boolean; video: boolean } | { type: "ping"; remoteRestart?: boolean };
 type IceServer = { urls: string | string[]; username?: string; credential?: string };
 const V032_DEPLOYED_AT = 1_790_532_911_000;
 
@@ -173,12 +173,33 @@ export class VideoRoom extends DurableObject<Env> {
     if (!message || typeof message !== "object") return;
     if (message.type === "ping") {
       sender.lastSeenAt = Date.now();
+      sender.remoteRestart = message.remoteRestart === true;
       socket.serializeAttachment(sender);
       this.ctx.waitUntil(this.ensurePresenceAlarm());
       this.safeSend(socket, { type: "pong", at: sender.lastSeenAt });
       return;
     }
     if (sender.mode !== "active") return;
+    if (message.type === "restart-device") {
+      if (!this.ctx.getWebSockets(`device:${sender.id}`).includes(socket) || !this.isLiveSocket(socket, "active")) return;
+      const to = typeof message.to === "string" ? message.to : "";
+      const reply = (status: string) => this.safeSend(socket, { type: "restart-result", to, status });
+      if (!to || to === sender.id) { reply("unavailable"); return; }
+      const target = this.ctx.getWebSockets(`device:${to}`).find(candidate => {
+        const peer = socketAttachment(candidate);
+        return peer && this.isLiveSocket(candidate, peer.mode);
+      });
+      if (!target) { reply("unavailable"); return; }
+      if (!socketAttachment(target)?.remoteRestart) { reply("unsupported"); return; }
+      // Persist the cooldown across socket replacement and object hibernation.
+      const key = `remote-restart:${to}`, now = Date.now();
+      const last = this.ctx.storage.sql.exec<{ value: number }>("SELECT value FROM registry_meta WHERE key = ?", key).toArray()[0]?.value;
+      if (last !== undefined && now - last < 60_000) { reply("cooldown"); return; }
+      this.ctx.storage.sql.exec("INSERT INTO registry_meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", key, now);
+      const sent = this.safeSend(target, { type: "restart-app", from: { id: sender.id, name: sender.name } });
+      reply(sent ? "requested" : "unavailable");
+      return;
+    }
     if (message.type === "list-devices" || message.type === "wake-device") {
       if (!this.ctx.getWebSockets(`device:${sender.id}`).includes(socket) || !this.isLiveSocket(socket, "active")) return;
       if (message.type === "list-devices") {
@@ -299,8 +320,8 @@ export class VideoRoom extends DurableObject<Env> {
     return socket.readyState === WebSocket.OPEN && peer?.mode === mode &&
       Number.isFinite(peer.lastSeenAt) && peer.lastSeenAt >= Date.now() - 70_000;
   }
-  private deviceDirectory(): { id: string; name: string; status: "active" | "standby" | "offline" }[] {
-    const devices = new Map<string, { id: string; name: string; status: "active" | "standby" | "offline" }>();
+  private deviceDirectory(): { id: string; name: string; status: "active" | "standby" | "offline"; remoteRestart?: boolean }[] {
+    const devices = new Map<string, { id: string; name: string; status: "active" | "standby" | "offline"; remoteRestart?: boolean }>();
     // Only names/IDs leave the room; credentials and installation IDs are never selected.
     const known = this.ctx.storage.sql.exec<{ id: string; name: string }>(
       "SELECT id, name FROM room_device_names WHERE id NOT IN (SELECT id FROM retired_legacy_devices) UNION ALL SELECT id, name FROM registered_devices"
@@ -308,7 +329,7 @@ export class VideoRoom extends DurableObject<Env> {
     for (const device of known) devices.set(device.id, { id: device.id, name: device.name, status: "offline" });
     for (const socket of this.ctx.getWebSockets()) {
       const peer = socketAttachment(socket);
-      if (peer && this.isLiveSocket(socket, peer.mode)) devices.set(peer.id, { id: peer.id, name: peer.name, status: peer.mode });
+      if (peer && this.isLiveSocket(socket, peer.mode)) devices.set(peer.id, { id: peer.id, name: peer.name, status: peer.mode, ...(peer.remoteRestart ? { remoteRestart: true } : {}) });
     }
     return [...devices.values()];
   }
