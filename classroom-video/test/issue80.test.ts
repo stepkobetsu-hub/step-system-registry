@@ -184,15 +184,39 @@ describe("urgent phone server routing",()=>{
 });
 
 describe("urgent phone client interaction",()=>{
-  it("requests only microphone access for urgent contact",async()=>{
+  it("requests both camera and microphone for direct contact",async()=>{
     const c=client();let constraints:any;c.api.state.urgentTarget="a";
     c.context.navigator.mediaDevices.getUserMedia=async(opts:any)=>{constraints=opts;return {getTracks:()=>[],getAudioTracks:()=>[],getVideoTracks:()=>[]};};
-    await c.api.openMedia();expect(constraints.video).toBe(false);expect(constraints.audio.echoCancellation).toBe(true);
+    await c.api.openMedia();expect(constraints.video.width.ideal).toBe(640);expect(constraints.audio.echoCancellation).toBe(true);
   });
   it("keeps the picker current while standby without acquiring camera or joining active media",async()=>{
     const c=client();await c.api.startStandby();c.sockets[0].open();
     c.sockets[0].message({type:"presence",peers:[{id:"a",name:"大手1"},{id:"c",name:"神領サブ"},{id:"phone2",name:"携帯",urgentTarget:"a"}]});
     expect(c.el("urgent-list").children.map((b:any)=>b.textContent)).toEqual(["神領サブ","大手1"]);expect(c.api.state.local).toBeNull();expect(c.sockets).toHaveLength(1);
-    c.sockets[0].message({type:"presence",peers:[]});expect(c.el("urgent-list").children).toHaveLength(0);expect(c.el("urgent-list").textContent).toContain("接続中の教室端末がありません");
+    c.sockets[0].message({type:"presence",peers:[]});expect(c.el("urgent-list").children).toHaveLength(0);expect(c.el("urgent-list").textContent).toContain("接続できる教室端末がありません");
+  });
+});
+
+describe("exclusive direct video room",()=>{
+  it("reserves one receiver, rejects a second caller, and never wakes other tablets",async()=>{
+    const r=room(),receiver=r.socket("a"),other=r.socket("b"),rest=r.socket("rest","standby");
+    const req=(id:string)=>new Request("https://internal/ws",{headers:{upgrade:"websocket","x-device-id":id,"x-device-name":encodeURIComponent("携帯"),"x-device-urgent-target":"a"}});
+    expect((await r.instance.fetch(req("phone"))).status).toBe(101);
+    expect(receiver.sent.find((m:any)=>m.type==="presence").directPeer).toBe("phone");
+    expect(other.sent.find((m:any)=>m.type==="presence").peers.find((p:any)=>p.id==="a").directPeer).toBe("phone");
+    expect(rest.sent.some((m:any)=>m.type==="wake")).toBe(false);expect((await r.instance.fetch(req("second"))).status).toBe(409);
+    const phone=r.sockets.find((s:any)=>s.info?.id==="phone");receiver.sent=[];other.sent=[];
+    r.send(other,{type:"signal",to:"a",description:{type:"offer"}});r.send(receiver,{type:"signal",to:"b",candidate:{candidate:"ice"}});
+    expect(receiver.sent).toHaveLength(0);expect(other.sent).toHaveLength(0);
+    r.send(phone,{type:"signal",to:"a",description:{type:"offer"}});expect(receiver.sent.at(-1).from).toBe("phone");
+  });
+  it("lets either participant hang up and restores receiver presence",()=>{
+    for(const by of ["a","phone"]){const r=room(),a=r.socket("a"),phone=r.socket("phone");phone.info.urgentTarget="a";const other=r.socket("b");
+      r.send(other,{type:"urgent-end",to:"phone"});expect(phone.readyState).toBe(1);
+      r.send(by==="a"?a:phone,{type:"urgent-end",to:by==="a"?"phone":"a"});expect(phone.readyState).toBe(3);expect(a.sent.at(-2).directPeer).toBeUndefined();expect(r.instance.directPeerFor("a")).toBeUndefined();
+    }
+  });
+  it("ends the phone session when the receiver disconnects and releases stale reservations",()=>{
+    const r=room(),a=r.socket("a"),phone=r.socket("phone");phone.info.urgentTarget="a";a.readyState=3;r.instance.broadcastPresence();expect(phone.readyState).toBe(3);expect(r.instance.directPeerFor("a")).toBeUndefined();
   });
 });

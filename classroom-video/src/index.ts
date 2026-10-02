@@ -1,9 +1,9 @@
 import { DurableObject } from "cloudflare:workers";
 import { campusOfDevice, createTicket, displayNameForDevice, parseDevices, resolveDeviceIdentity, tokensEqual, verifyTicket } from "./auth";
 
-type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number; wakeRequestedAt?: number; urgentTarget?: string };
+type Attachment = { id: string; name: string; mode: "active" | "standby"; connectedAt: number; lastSeenAt: number; wakeRequestedAt?: number; urgentTarget?: string; directPeer?: string };
 type SignalMessage = { type: "signal"; to: string; description?: unknown; candidate?: unknown; restart?: boolean };
-type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } |
+type ClientMessage = SignalMessage | { type: "call"; callId: string; to: string } | { type: "ack"; callId: string } | { type: "urgent-end"; to: string } |
   { type: "remote-mic"; to: string; enabled: boolean } |
   { type: "list-devices" } | { type: "wake-device"; to: string } |
   { type: "media-state"; audio: boolean; video: boolean } | { type: "ping" };
@@ -89,7 +89,7 @@ export class VideoRoom extends DurableObject<Env> {
     this.ctx.storage.sql.exec("INSERT INTO room_device_names (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name", id, name);
 
     const urgentTarget = request.headers.get("x-device-urgent-target") || undefined;
-    if (urgentTarget && (urgentTarget === id || !this.peers(id).some(peer => peer.id === urgentTarget && !peer.urgentTarget))) return new Response("Target unavailable", { status: 409 });
+    if (urgentTarget && (urgentTarget === id || !this.peers(id).some(peer => peer.id === urgentTarget && !peer.urgentTarget && !this.directPeerFor(urgentTarget, id)))) return new Response("Target unavailable", { status: 409 });
     for (const current of this.ctx.getWebSockets(`device:${id}`)) this.closeSocket(current, 4001, "Replaced by a new connection");
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
@@ -97,7 +97,7 @@ export class VideoRoom extends DurableObject<Env> {
     const connectedAt = Date.now();
     server.serializeAttachment({ id, name, mode, ...(urgentTarget ? { urgentTarget } : {}), connectedAt, lastSeenAt: connectedAt } satisfies Attachment);
     await this.ensurePresenceAlarm();
-    this.safeSend(server, { type: "welcome", self: { id, name }, mode, peers: this.peers(id) });
+    this.safeSend(server, { type: "welcome", self: { id, name }, mode, directPeer: this.directPeerFor(id), peers: this.peers(id) });
     // A targeted recovery must not cascade into waking every other standby tablet.
     if (mode === "active" && !urgentTarget && request.headers.get("x-device-wake-mode") !== "targeted") this.broadcast({ type: "wake", from: { id, name } }, id, "standby");
     this.broadcastPresence();
@@ -202,10 +202,18 @@ export class VideoRoom extends DurableObject<Env> {
       this.safeSend(socket, { type: "wake-result", to: message.to, status: delivered ? "requested" : "unavailable" });
       return;
     }
+    if (message.type === "urgent-end") {
+      if (!this.isLiveSocket(socket, "active") || this.directPeerFor(sender.id) !== message.to) return;
+      const phoneId = sender.urgentTarget ? sender.id : message.to;
+      for (const phone of this.ctx.getWebSockets(`device:${phoneId}`)) this.closeSocket(phone, 4003, "Direct call ended");
+      this.broadcastPresence();
+      return;
+    }
     if ((message.type === "signal" || message.type === "call" || message.type === "remote-mic") && typeof message.to === "string") {
       const target = this.peers(sender.id).find(peer => peer.id === message.to);
+      if ((this.directPeerFor(sender.id) && this.directPeerFor(sender.id) !== message.to) || (this.directPeerFor(message.to) && this.directPeerFor(message.to) !== sender.id)) return;
       if ((sender.urgentTarget && sender.urgentTarget !== message.to) || (target?.urgentTarget && target.urgentTarget !== sender.id)) return;
-      // Urgent calls use explicit receiver acknowledgement, never remote microphone activation.
+      // Direct participants use their own microphone buttons; remote activation is unnecessary.
       if (message.type === "remote-mic" && (sender.urgentTarget || target?.urgentTarget)) return;
     }
     if (message.type === "remote-mic") {
@@ -282,7 +290,7 @@ export class VideoRoom extends DurableObject<Env> {
       const previous = peers.get(peer.id);
       if (!previous || previous.connectedAt < peer.connectedAt) peers.set(peer.id, peer);
     }
-    return [...peers.values()].map(({ id, name, mode, connectedAt, lastSeenAt, urgentTarget }) => ({ id, name, mode, connectedAt, lastSeenAt, ...(urgentTarget ? { urgentTarget } : {}) }));
+    return [...peers.values()].map(({ id, name, mode, connectedAt, lastSeenAt, urgentTarget }) => ({ id, name, mode, connectedAt, lastSeenAt, ...(urgentTarget ? { urgentTarget } : {}), ...(this.directPeerFor(id) ? { directPeer: this.directPeerFor(id) } : {}) }));
   }
   private safeSend(socket: WebSocket, value: unknown): boolean {
     if (socket.readyState !== WebSocket.OPEN) return false;
@@ -293,10 +301,25 @@ export class VideoRoom extends DurableObject<Env> {
     if (socket.readyState === WebSocket.CLOSING || socket.readyState === WebSocket.CLOSED) return;
     try { socket.close(code, reason); } catch { /* already closing */ }
   }
+  private directPeerFor(id: string, excludePhone?: string): string | undefined {
+    for (const socket of this.ctx.getWebSockets()) {
+      if (!this.isLiveSocket(socket, "active")) continue;
+      const peer = socketAttachment(socket);
+      if (!peer?.urgentTarget || peer.id === excludePhone) continue;
+      if (peer.id === id) return peer.urgentTarget;
+      if (peer.urgentTarget === id) return peer.id;
+    }
+    return undefined;
+  }
   private broadcastPresence(): void {
+    // Losing the receiver ends the temporary phone session rather than reconnecting forever.
     for (const socket of this.ctx.getWebSockets()) {
       const peer = socketAttachment(socket);
-      if (peer) this.safeSend(socket, { type: "presence", peers: this.peers(peer.id) });
+      if (peer?.urgentTarget && this.isLiveSocket(socket, "active") && !this.ctx.getWebSockets(`device:${peer.urgentTarget}`).some(target => this.isLiveSocket(target, "active"))) this.closeSocket(socket, 4003, "Receiver disconnected");
+    }
+    for (const socket of this.ctx.getWebSockets()) {
+      const peer = socketAttachment(socket);
+      if (peer) this.safeSend(socket, { type: "presence", directPeer: this.directPeerFor(peer.id), peers: this.peers(peer.id) });
     }
     const devices = this.deviceDirectory();
     for (const socket of this.ctx.getWebSockets()) {

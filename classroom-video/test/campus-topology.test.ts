@@ -24,8 +24,8 @@ function client(device: { id: string; name: string }) {
   vm.runInContext(app.replace("  init();", `
     callPeer=async (peer)=>{if(shouldConnectMedia(peer))offers.push(peer.id);};
     closePeer=(id)=>{closed.push(id);state.peers.delete(id);};
-    configurePeerSenders=async()=>{};sendMediaState=()=>{};
-    globalThis.api={state,campusForPeer,shouldConnectMedia,mediaPeerCount,onPresence,onSignal,outgoingTracks};
+    configurePeerSenders=async()=>{};sendMediaState=()=>{};applyMediaState=()=>{};playChime=()=>{};notify=()=>{};ui.hangup.querySelector=()=>({textContent:""});
+    globalThis.api={state,campusForPeer,shouldConnectMedia,mediaPeerCount,onPresence,onSignal,outgoingTracks,setDirectPeer};
   `), Object.assign(context, { offers, closed }));
   const api = context.api;
   api.state.session = { device };
@@ -112,19 +112,25 @@ describe("two campuses with main and sub tablets", () => {
 });
 
 
-describe("temporary urgent phone", () => {
-  const phone={id:"phone",name:"管理者携帯",urgentTarget:"device-c"};
-  it("connects only the selected receiver, preserving two video peers on every tablet",()=>{
-    for(const own of tablets){const c=client(own);c.api.onPresence([...tablets.filter(p=>p.id!==own.id),phone]);expect(c.api.shouldConnectMedia(phone)).toBe(own.id===phone.urgentTarget);expect(c.api.mediaPeerCount()).toBe(2);}
-    const c=client(phone);c.api.state.urgentTarget=phone.urgentTarget;
-    for(const peer of tablets)expect(c.api.shouldConnectMedia(peer)).toBe(peer.id===phone.urgentTarget);
+describe("temporary direct video phone", () => {
+  const phone={id:"phone",name:"管理者携帯",urgentTarget:"device-c",directPeer:"device-c"};
+  const busy=tablets.map(p=>p.id==="device-c"?{...p,directPeer:"phone"}:p);
+  it("switches the receiving tablet from two classroom streams to exactly one phone stream and restores it",()=>{
+    const c=client(tablets[2]);c.api.onPresence(tablets.filter(p=>p.id!=="device-c"));expect(c.api.mediaPeerCount()).toBe(2);
+    for(const peer of [tablets[0],tablets[1]])c.api.state.peers.set(peer.id,{info:peer});
+    c.api.onPresence([...busy.filter(p=>p.id!=="device-c"),phone],"phone");expect(c.api.mediaPeerCount()).toBe(1);expect(c.closed).toEqual(expect.arrayContaining(["device-a","device-b"]));
+    expect(c.api.state.media).toEqual({audio:true,video:true});
+    for(const peer of busy)expect(c.api.shouldConnectMedia(peer)).toBe(false);expect(c.api.shouldConnectMedia(phone)).toBe(true);
+    c.api.onPresence(tablets.filter(p=>p.id!=="device-c"),null);expect(c.api.mediaPeerCount()).toBe(2);expect(c.api.state.media).toEqual({audio:false,video:true});
   });
-  it("sends cloned audio only and keeps it muted until acknowledgement without changing normal tracks",()=>{
-    const c=client(tablets[2]);const audio={kind:"audio",enabled:false,clone(){return {kind:this.kind,enabled:this.enabled};}},video={kind:"video",enabled:true};
-    c.api.state.local={getTracks:()=>[audio,video],getAudioTracks:()=>[audio]};
-    expect(c.api.outgoingTracks(tablets[0])).toEqual([audio,video]);
-    const ringing=c.api.outgoingTracks(phone);expect(ringing).toHaveLength(1);expect(ringing[0].kind).toBe("audio");expect(ringing[0].enabled).toBe(false);
-    c.api.state.urgentAccepted.add(phone.id);expect(c.api.outgoingTracks(phone)[0].enabled).toBe(true);expect(audio.enabled).toBe(false);expect(video.enabled).toBe(true);
-    c.api.onPresence(tablets.filter(p=>p.id!==tablets[2].id));c.api.state.presence.set(phone.id,phone);c.api.onPresence(tablets.filter(p=>p.id!==tablets[2].id));expect(c.api.state.urgentAccepted.has(phone.id)).toBe(false);
+  it("prevents all other tablets from connecting to the busy receiver or phone",()=>{
+    for(const own of tablets.filter(p=>p.id!=="device-c")){const c=client(own);c.api.onPresence([...busy.filter(p=>p.id!==own.id),phone]);expect(c.api.shouldConnectMedia(busy[2])).toBe(false);expect(c.api.shouldConnectMedia(phone)).toBe(false);expect(c.api.mediaPeerCount()).toBeLessThanOrEqual(2);}
+    const c=client(phone);c.api.state.urgentTarget="device-c";for(const p of busy)expect(c.api.shouldConnectMedia(p)).toBe(p.id==="device-c");
+  });
+  it("sends both camera and microphone tracks without cloning or waiting for acknowledgement",()=>{
+    const c=client(phone);c.api.state.urgentTarget="device-c";const tracks=[{kind:"audio",enabled:true},{kind:"video",enabled:true}];c.api.state.local={getTracks:()=>tracks};expect(c.api.outgoingTracks(tablets[2])).toBe(tracks);
+  });
+  it("restores the receiver's previous microphone and camera choices on hangup",()=>{
+    const c=client(tablets[2]);c.api.state.media={audio:true,video:false};c.api.setDirectPeer("phone");expect(c.api.state.media.video).toBe(true);c.api.setDirectPeer(null);expect(c.api.state.media).toEqual({audio:true,video:false});
   });
 });
