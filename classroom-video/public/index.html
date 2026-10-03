@@ -30,8 +30,14 @@
       <button id="connect" class="connect-button">教室をつなぐ</button>
       <button id="home-wake-device" class="primary" style="width:min(84vw,520px);margin-top:18px">休止端末を起こす</button>
       <p>直通通話中は、選んだ端末の教室間接続を一時停止します。</p>
-      <div id="urgent-list" class="target-list hidden" aria-live="polite"></div>
       <p id="home-message">1回押すだけで相手教室につながります</p>
+    </section>
+
+    <section id="urgent-picker" class="target-picker hidden" aria-labelledby="urgent-title">
+      <h2 id="urgent-title">接続する端末を選択</h2>
+      <p>ビデオ通話する相手を1台選んでください。</p>
+      <div id="urgent-list" class="target-list" aria-live="polite"></div>
+      <button id="urgent-close" class="picker-close">閉じる</button>
     </section>
 
       <section id="wake-picker" class="target-picker hidden" aria-labelledby="wake-title">

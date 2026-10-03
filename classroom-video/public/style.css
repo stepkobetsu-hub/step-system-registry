@@ -29,3 +29,5 @@ nav{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height
 @media(max-width:600px){.remote-mic-controls{flex-wrap:wrap}#remote-mic-target{flex-basis:calc(100% - 150px)}#wake-picker{inset:3% 4%}}
 
 .schedule-times{display:flex;align-items:center;gap:12px}.schedule-times label{flex:1;min-width:0}.schedule-times input{width:100%;box-sizing:border-box}.schedule-help{font-size:14px;line-height:1.6;color:#b9c9d9}
+
+.target-picker{display:flex;flex-direction:column;max-height:90vh;overflow:auto}.target-picker .target-list{flex:1;min-height:0}.picker-close{margin-top:18px;padding:16px;border-radius:14px;background:#475569;font-size:22px;font-weight:800;flex-shrink:0}.target-list button{min-height:64px;overflow-wrap:anywhere}.target-list button:disabled{background:#475569;color:#cbd5e1;cursor:default}@media(orientation:portrait){.target-picker .target-list button{font-size:22px;padding:18px}.target-picker h2{font-size:26px}.target-picker p{margin:0 0 16px}}
