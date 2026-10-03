@@ -4709,9 +4709,11 @@ applyAssetInfo=function(item){
 
 <script id="permission-management-20261004">
 (() => {
- const record={'ID':'step-permission-management','システム名':'STEP 権限管理','分類':'管理・運営','状態':'本番（既存アプリへの連携前）','利用者':'塾長（職員権限4）','利用者向けURL':'https://step-permissions.mintcocoajasmine.chatgpt.site','概要':'台帳の38項目を対象に利用・閲覧・入力編集・承認・削除・設定変更の権限、対象校舎、利用者別の停止・禁止、新規アプリ追加と変更履歴を管理。共通設定に未接続の既存アプリには制限は反映されません。','管理':'ChatGPT所有者限定＋共通スタッフ認証の権限4','保存基盤':'Sites Worker＋D1','確認日':'2026年10月4日','作業メモ':'管理画面の公開完了。型チェック・権限判定29ケース成功。実ログイン・保存の利用者確認は未実施。既存アプリ連携済み0件。設定保存のみで既存講師マスタや各アプリの権限を変更するものではありません。','関連ドキュメント':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/permission-management-20261004.md'};
+ const record={'ID':'step-permission-management','システム名':'権限管理（塾長用）','正式名称':'STEP 権限管理','分類':'管理・運営','状態':'本番使用中','利用者':'塾長（職員権限4）','利用者向けURL':'https://step-permissions.mintcocoajasmine.chatgpt.site','概要':'各アプリの利用・閲覧・入力・削除などの権限をまとめて設定。スタッフ用成績管理・面談記録・生徒名簿は保存した設定が反映されます。','管理':'ChatGPT所有者限定＋共通スタッフ認証の権限4','保存基盤':'Sites Worker＋D1','確認日':'2026年10月4日','仕様メモ':'登録40項目。成績管理はスタッフ用と生徒・保護者用を分離。受付カード読み取りとエントリーシート読み取りも別々に登録。名前から各アプリを別タブで開けます。適用済みの3アプリは次の操作時にサーバーで権限を確認。それ以外の未連携アプリは設定保存だけでは制限が変わりません。','作業メモ':'2026-10-04：独立カードとして権限管理を掲載。リンクを権限管理アプリへ設定。保存変更による許可・拒否、利用停止・校舎制限を検証。受付カードとエントリーシートのリンク先・保存済み登録内容を確認。','GitHubドキュメントURL':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/permission-management-20261004.md'};
  const base=organizeEntryImport;
- organizeEntryImport=function(items){const list=base(items);if(!list.some(x=>x.ID===record.ID))list.push(Object.assign({},record));return list;};
+ organizeEntryImport=function(items){const list=base(items);const index=list.findIndex(x=>x.ID===record.ID);if(index<0)list.push(Object.assign({},record));else list[index]=Object.assign({},list[index],record);return list;};
+ const previous=linkLabel;
+ linkLabel=function(item,field,fallback){if(item.ID===record.ID&&field==='利用者向けURL')return '権限管理アプリを開く';return previous(item,field,fallback);};
 })();
 </script>
 <script id="reception-entry-separate-apps-20261004">
