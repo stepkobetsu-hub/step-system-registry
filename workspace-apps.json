@@ -89,7 +89,7 @@
     {
       "正式名称": "受付カード読み取り",
       "状態": "本番使用中",
-      "利用者向けURL": "https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit"
+      "利用者向けURL": "https://juku-card-system.onrender.com/"
     },
     {
       "正式名称": "過去問保管DB",

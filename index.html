@@ -4714,5 +4714,32 @@ applyAssetInfo=function(item){
  organizeEntryImport=function(items){const list=base(items);if(!list.some(x=>x.ID===record.ID))list.push(Object.assign({},record));return list;};
 })();
 </script>
+<script id="reception-entry-separate-apps-20261004">
+(() => {
+ const receptionUrl='https://juku-card-system.onrender.com/';
+ const entryUrl='https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html';
+ const base=organizeEntryImport;
+ organizeEntryImport=function(items){
+  const list=base(items);
+  let reception=list.find(item=>isJukuCard(item)||String(item['システム名']||'').includes('受付カード'));
+  if(!reception){reception={'ID':'juku-card'};list.push(reception);}
+  const entryFormUrl=reception['入力フォームURL'];
+  Object.assign(reception,{'ID':'juku-card','システム名':'受付カード読み取り','正式名称':'受付カード読み取り','分類':'受付・事務','状態':'本番使用中','利用者':'スタッフ','利用者向けURL':receptionUrl,'概要':'受付カードを読み取るアプリ。エントリーシート読み取りとは別のアプリです。','確認日':'2026年10月4日','作業メモ':'起動リンクを保存先Google Sheetから受付カード読み取りアプリへ訂正。エントリーシート読み取りは独立カードへ分離。'});
+  delete reception['読み取りURL'];
+  delete reception['入力フォームURL'];
+  let entry=list.find(item=>item['ID']==='entry-sheet-import'||String(item['システム名']||'')==='エントリーシート読み取り');
+  if(!entry){entry={'ID':'entry-sheet-import'};list.splice(list.indexOf(reception)+1,0,entry);}
+  Object.assign(entry,{'ID':'entry-sheet-import','システム名':'エントリーシート読み取り','正式名称':'エントリーシート読み取り','分類':'受付・事務','状態':'本番使用中','利用者':'スタッフ','利用者向けURL':entryUrl,'GitHub URL':'https://github.com/stepkobetsu-hub/seiseki-kanri','正本ファイル':'entry_import.html','概要':'エントリーシートを読み取るアプリ。受付カード読み取りとは別のアプリです。'});
+  if(entryFormUrl)entry['入力フォームURL']=entryFormUrl;
+  return list;
+ };
+ const previousLabel=linkLabel;
+ linkLabel=function(item,field,fallback){
+  if(item['ID']==='entry-sheet-import'&&field==='利用者向けURL')return 'エントリーシート読み取りアプリを開く';
+  return previousLabel(item,field,fallback);
+ };
+})();
+</script>
+
 </body>
 </html>
