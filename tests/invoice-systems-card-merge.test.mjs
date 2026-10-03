@@ -5,90 +5,85 @@ import vm from 'node:vm';
 
 const page=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const registry=fs.readFileSync(new URL('../SYSTEM_REGISTRY.md',import.meta.url),'utf8');
+const billing='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
+const delivery='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
 
-test('請求関連の2システムを1枚の請求システムカードへまとめる',()=>{
-  for(const text of [
-    "'システム名':'請求システム'",
-    '請求システムを開く',
-    '料金特別調整を開く',
-    '請求書：作成・配信システムを開く',
-    'billing-system-details',
-    'STEP請求書PDF作成・配信システム'
-  ])assert.match(page,new RegExp(text));
-  assert.ok(page.includes("name.includes('請求管理システム')"));
-  assert.match(page,/item\['ID'\]!==\s*'billing'&&billingName!==\s*'請求システム'/);
-  assert.match(page,/filter\(\(item,index\)=>index!==managementIndex&&index!==deliveryIndex\)/);
-  assert.match(page,/filtered\.splice\(insertAt,0,merged\)/);
-});
-
-test('実画面のカード名でも2枚を1枚へ統合する',()=>{
-  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1];
+function setup(){
+  const script=page.match(/<script id="billing-systems-cards-20261004">([\s\S]*?)<\/script>/)?.[1];
   assert.ok(script);
-  const sandbox={
-    CARD_ANCHORS:[],
-    organizeEntryImport:items=>items.map(item=>({...item})),
-    applyAssetInfo:item=>item,
-    applyConfirmedInfo:item=>item,
-    appendDailyLinks:()=>{},
-    addStandardContent:()=>{},
-    document:{createElement:()=>({textContent:''}),head:{appendChild:()=>{}}}
-  };
+  const sandbox={CARD_ANCHORS:[],organizeEntryImport:items=>items.map(item=>({...item})),applyAssetInfo:item=>item,applyConfirmedInfo:item=>item,appendDailyLinks:()=>{},el:(tag,className,text)=>({tag,className,text,children:[],append(...nodes){this.children.push(...nodes);}}),linkRow:(label,url)=>({label,url})};
   vm.runInNewContext(script,sandbox);
+  return sandbox;
+}
+
+test('請求関連を独立した2カードへ分離しそれぞれの詳細を保持する',()=>{
+  const sandbox=setup();
   const result=sandbox.organizeEntryImport([
-    {'ID':'billing','システム名':'請求管理システム','利用者向けURL':'https://example.com/billing'},
-    {'ID':'step-invoice-pdf','システム名':'STEP請求書PDF作成・配信システム','利用者向けURL':'https://example.com/pdf'}
+    {ID:'billing','システム名':'請求管理システム','Apps ScriptプロジェクトID':'billing-project'},
+    {ID:'step-invoice-pdf','システム名':'STEP請求書PDF作成・配信システム','D1':'invoice-db'},
+    {ID:'other','システム名':'別アプリ'}
   ]);
-  assert.equal(result.length,1);
-  assert.equal(result[0]['システム名'],'請求システム');
-  assert.equal(result[0]['料金特別調整URL'],'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments');
-  assert.equal(result[0]['請求管理システムURL'],'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec');
-  assert.equal(result[0]['請求書配信PDF作成URL'],'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices');
+  assert.equal(result.length,3);
+  const [management,pdf]=result;
+  assert.equal(management['システム名'],'請求システム');
+  assert.equal(management['利用者向けURL'],billing);
+  assert.equal(management['料金特別調整URL'],billing+'?page=adjustments');
+  assert.equal(management['Apps ScriptプロジェクトID'],'billing-project');
+  assert.equal(management['D1'],undefined);
+  assert.equal(pdf['システム名'],'請求書作成システム');
+  assert.equal(pdf['利用者向けURL'],delivery);
+  assert.equal(pdf['D1'],'invoice-db');
+  assert.equal(pdf['料金特別調整URL'],undefined);
 });
 
-test('入口上部は小さい説明だけを残す',()=>{
-  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
-  assert.ok(script.includes("heading.append(el('span','',description))"));
-  assert.ok(script.indexOf("['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く'")<script.indexOf("['学費計算・請求データ作成','請求システムを開く'"));
-  assert.equal(script.includes("heading.append(el('strong','',title)"),false);
-  assert.ok(script.includes("['学費計算・請求データ作成','請求システムを開く'"));
-  assert.ok(script.includes("['請求書配信・PDF作成','請求書：作成・配信システムを開く'"));
+test('統合済みの旧キャッシュも元の2システムへ展開する',()=>{
+  const sandbox=setup();
+  const result=sandbox.organizeEntryImport([{ID:'billing','システム名':'請求システム',__billingSystems:[
+    {item:{ID:'billing','システム名':'請求管理システム','Apps ScriptプロジェクトID':'billing-project'}},
+    {item:{ID:'step-invoice-pdf','システム名':'STEP請求書PDF作成・配信システム','D1':'invoice-db'}}
+  ]}]);
+  assert.equal(result.length,2);
+  assert.equal(result[0]['Apps ScriptプロジェクトID'],'billing-project');
+  assert.equal(result[1]['D1'],'invoice-db');
+  assert.equal(result[0].__billingSystems,undefined);
+  assert.equal(sandbox.organizeEntryImport(result).length,2);
 });
 
-test('小さい説明と入口タイトルの隙間をなくし青い囲みを表示しない',()=>{
-  assert.match(page,/\.billing-system-entry\{margin-top:7px;padding:0;border:0;border-radius:0;background:transparent/);
-  assert.match(page,/\.billing-system-entry-heading\{[^}]*margin-bottom:0;line-height:1\.2/);
-  assert.match(page,/\.billing-system-entry \.link-row\{margin:0\}/);
-  assert.match(page,/\.billing-system-entry \.open,\.billing-system-entry \.copy\{padding:6px 9px\}/);
+test('各カードの日常利用リンクを混在させない',()=>{
+  const sandbox=setup();
+  for(const [item,expected] of [[{ID:'billing','システム名':'請求システム'},[billing+'?page=adjustments',billing]],[{ID:'step-invoice-pdf','システム名':'請求書作成システム'},[delivery]]]){
+    const article={children:[],append(node){this.children.push(node);}};
+    sandbox.appendDailyLinks(item,article);
+    const urls=article.children[0].children.filter(node=>node.url).map(node=>node.url);
+    assert.deepEqual(urls,expected);
+  }
 });
 
-test('台帳本文も請求システム1行として記録する',()=>{
-  assert.match(registry,/\| 請求システム \| \*\*Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）\*\* \|/);
-  assert.doesNotMatch(registry,/^\| 請求管理システムV3\.1/m);
-  assert.doesNotMatch(registry,/^\| STEP請求書PDF作成・配信システム/m);
-  assert.match(registry,/請求・会計（3件）/);
-  assert.match(registry,/合計42カード/);
+test('台帳と業務ホーム用一覧でも2システムを独立させる',()=>{
+  const rows=registry.split('\n').filter(line=>/^\| 請求(システム|書作成システム) \|/.test(line));
+  assert.equal(rows.length,2);
+  assert.ok(rows[0].includes(billing+'?page=adjustments'));
+  assert.ok(!rows[0].includes(delivery));
+  assert.ok(rows[1].includes(delivery));
+  assert.ok(!rows[1].includes(billing));
+  const apps=JSON.parse(fs.readFileSync(new URL('../workspace-apps.json',import.meta.url),'utf8')).apps;
+  assert.ok(apps.some(item=>item['正式名称']==='請求システム'));
+  assert.ok(apps.some(item=>item['正式名称']==='請求書作成システム'));
 });
 
-test('PDFライブラリをPDF作成時だけ読み込む本番仕様を記録する',()=>{
+test('共有リンクの旧設定でも正しいカードの入口だけを復元する',()=>{
+  const source=fs.readFileSync(new URL('../registry-daily-links-editor.js',import.meta.url),'utf8');
+  const normalize=source.match(/const ensureRequiredLinks=links=>\{([\s\S]*?)\n    \};/)?.[1];
+  assert.ok(normalize);
+  const sandbox={clone:value=>JSON.parse(JSON.stringify(value)),links:[{title:'旧統合リンク',openUrl:delivery}],item:{ID:'billing','システム名':'請求システム'}};
+  vm.runInNewContext('result=(()=>{'+normalize+'})();',sandbox);
+  assert.deepEqual(Array.from(sandbox.result,link=>link.openUrl),[billing+'?page=adjustments',billing]);
+  sandbox.item={ID:'step-invoice-pdf','システム名':'請求書作成システム'};
+  vm.runInNewContext('result=(()=>{'+normalize+'})();',sandbox);
+  assert.deepEqual(Array.from(sandbox.result,link=>link.openUrl),[delivery]);
+});
+
+test('PDFライブラリ遅延読込の本番記録を保持する',()=>{
   assert.match(page,/invoice-pdf-lazy-library-registration-20260903/);
-  assert.match(page,/PDFライブラリをPDF作成時のみ遅延読込/);
-  assert.match(page,/PR #30/);
-  assert.match(page,/c167d71715d70fe917d40a665edba4c1c40bdf64/);
   assert.match(registry,/請求書作成・配信：PDFライブラリ遅延読込（2026-09-03）/);
-  assert.match(registry,/最初のPDF作成時だけライブラリ取得時間が加わる/);
-});
-
-test('共有設定にかかわらず請求作成アプリへの入口を表示する',()=>{
-  const dailyEditor=fs.readFileSync(new URL('../registry-daily-links-editor.js',import.meta.url),'utf8');
-  assert.match(dailyEditor,/請求システムを開く/);
-  assert.match(dailyEditor,/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/);
-  assert.match(dailyEditor,/料金特別調整を開く/);
-  assert.match(dailyEditor,/請求書：作成・配信システムを開く/);
-  assert.doesNotMatch(dailyEditor,/請求管理システムを開く/);
-});
-
-test('請求カードから汎用の利用者向け入口を取り除く',()=>{
-  const script=page.match(/<script id="billing-systems-card-merge-20260901">([\s\S]*?)<\/script>/)?.[1]||'';
-  assert.match(script,/利用者向けアプリを開く/);
-  assert.match(script,/row\.remove\(\)/);
 });

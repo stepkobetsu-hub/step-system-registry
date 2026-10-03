@@ -3088,107 +3088,54 @@ appendDailyLinks=function(item,article){
 };
 </script>
 
-<script id="billing-systems-card-merge-20260901">
-CARD_ANCHORS.unshift(['請求システム','billing']);
-
-const organizeBillingSystemsCard20260901Base=organizeEntryImport;
-organizeEntryImport=function(items){
-  const out=organizeBillingSystemsCard20260901Base(items);
-  const managementIndex=out.findIndex(item=>{
-    const name=String(item['システム名']||item['正式名称']||'');
-    return name.includes('請求管理システム');
-  });
-  const deliveryIndex=out.findIndex(item=>{
-    const name=String(item['システム名']||item['正式名称']||'');
-    return item['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム');
-  });
-  if(managementIndex<0||deliveryIndex<0)return out;
-
-  const management=applyAssetInfo(applyConfirmedInfo(out[managementIndex]));
-  const delivery=applyAssetInfo(applyConfirmedInfo(out[deliveryIndex]));
-  const insertAt=Math.min(managementIndex,deliveryIndex);
-  const merged={
-    'ID':'billing',
-    'システム名':'請求システム',
-    '正式名称':'請求システム（請求管理／請求書配信・PDF作成）',
-    '分類':'請求・会計',
-    '状態':'本番',
-    '利用者':'STEPスタッフ',
-    '運用担当':'管理者',
-    '概要':'料金特別調整、学費計算・請求データ作成、請求書配信・PDF作成をまとめた請求業務の入口。',
-    '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
-    '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
-    '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
-    '__billingSystems':[
-      {title:'請求管理システム',description:'学費計算・請求データ作成',item:management},
-      {title:'STEP請求書PDF作成・配信システム',description:'請求書配信・PDF作成',item:delivery}
-    ]
+<script id="billing-systems-cards-20261004">
+(() => {
+  const billingUrl='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
+  const deliveryUrl='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
+  CARD_ANCHORS.unshift(['請求システム','billing'],['請求書作成システム','invoice-creation']);
+  const isManagement=item=>item['ID']==='billing'||String(item['システム名']||'')==='請求システム'||String(item['システム名']||'').includes('請求管理システム');
+  const isDelivery=item=>item['ID']==='step-invoice-pdf'||String(item['システム名']||'')==='請求書作成システム'||String(item['システム名']||'').includes('STEP請求書PDF作成・配信システム');
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=previousOrganize(items);
+    // Expand previously merged cached records, keeping each system's own details.
+    const candidates=list.flatMap(item=>Array.isArray(item['__billingSystems'])?item['__billingSystems'].map(system=>system.item):[item]);
+    const management=candidates.find(isManagement);
+    const delivery=candidates.find(isDelivery);
+    const separated=[];
+    if(management){
+      const record=applyAssetInfo(applyConfirmedInfo(Object.assign({},management,{'ID':'billing','システム名':'請求管理システムV3.1'})));
+      Object.assign(record,{'ID':'billing','システム名':'請求システム','正式名称':'請求システム（学費計算・請求データ作成）','分類':'請求・会計','利用者':'管理者・スタッフ','状態':'本番使用中','概要':'学費計算・請求データ作成を行うシステム。イレギュラーな割引・加算は「料金特別調整を開く」から入力できます。','利用者向けURL':billingUrl,'請求管理システムURL':billingUrl,'料金特別調整URL':billingUrl+'?page=adjustments','関連カード':['請求書作成システム','生徒マスタ'],'確認日':'2026年10月4日'});
+      delete record['__billingSystems'];
+      delete record['請求書配信PDF作成URL'];
+      separated.push(record);
+    }
+    if(delivery){
+      const record=applyAssetInfo(applyConfirmedInfo(Object.assign({},delivery,{'ID':'step-invoice-pdf','システム名':'STEP請求書PDF作成・配信システム'})));
+      Object.assign(record,{'ID':'step-invoice-pdf','システム名':'請求書作成システム','正式名称':'請求書作成システム（PDF作成・配信）','分類':'請求・会計','利用者':'管理者・スタッフ','概要':'請求データから請求書・領収書のPDFを作成し、保護者へ配信するシステム。送信・閲覧状況と不達を確認できます。','利用者向けURL':deliveryUrl,'GitHub Pages URL':deliveryUrl,'関連カード':['請求システム','生徒マスタ','不達メール管理'],'確認日':'2026年10月4日'});
+      delete record['請求管理システムURL'];
+      delete record['料金特別調整URL'];
+      delete record['料金特別調整専用URL'];
+      separated.push(record);
+    }
+    const index=list.findIndex(item=>isManagement(item)||isDelivery(item));
+    const remaining=list.filter(item=>!isManagement(item)&&!isDelivery(item));
+    remaining.splice(index<0?remaining.length:index,0,...separated);
+    return remaining;
   };
-  const filtered=out.filter((item,index)=>index!==managementIndex&&index!==deliveryIndex);
-  filtered.splice(insertAt,0,merged);
-  return filtered;
-};
-
-const appendBillingSystemsLinks20260901Base=appendDailyLinks;
-appendDailyLinks=function(item,article){
-  appendBillingSystemsLinks20260901Base(item,article);
-  const billingName=String(item['システム名']||item['正式名称']||'');
-  if(item['ID']!=='billing'&&billingName!=='請求システム')return;
-  let section=article.querySelector('.daily-links');
-  if(!section){
-    section=el('section','daily-links');
+  const previousAppend=appendDailyLinks;
+  appendDailyLinks=function(item,article){
+    if(!isManagement(item)&&!isDelivery(item)){previousAppend(item,article);return;}
+    const section=el('section','daily-links');
     section.append(el('h3','','日常利用'));
-    const toggle=article.querySelector('.toggle');
-    article.insertBefore(section,toggle||null);
-  }
-  section.querySelectorAll('.link-row').forEach(row=>{
-    if(row.querySelector('.link-name')?.textContent.trim()==='利用者向けアプリを開く')row.remove();
-  });
-  const entries=[
-    ['重要・よく使う：イレギュラーな割引・加算','料金特別調整を開く',item['料金特別調整URL']],
-    ['学費計算・請求データ作成','請求システムを開く',item['請求管理システムURL']],
-    ['請求書配信・PDF作成','請求書：作成・配信システムを開く',item['請求書配信PDF作成URL']]
-  ];
-  entries.forEach(([description,label,url])=>{
-    if(!url)return;
-    const entry=el('div','billing-system-entry');
-    const heading=el('div','billing-system-entry-heading');
-    heading.append(el('span','',description));
-    entry.append(heading,linkRow(label,url));
-    section.append(entry);
-  });
-};
-
-const addBillingSystemsDetails20260901Base=addStandardContent;
-addStandardContent=function(item,body){
-  if(item['ID']!=='billing'||!Array.isArray(item['__billingSystems'])){
-    addBillingSystemsDetails20260901Base(item,body);
-    return;
-  }
-  item['__billingSystems'].forEach(system=>{
-    const panel=el('section','billing-system-details');
-    const heading=el('div','billing-system-details-heading');
-    heading.append(el('h3','',system.title),el('p','',system.description));
-    panel.append(heading);
-    addBillingSystemsDetails20260901Base(system.item,panel);
-    body.append(panel);
-  });
-};
-
-const billingSystemsCardStyle=document.createElement('style');
-billingSystemsCardStyle.textContent=`
-  .billing-system-entry{margin-top:7px;padding:0;border:0;border-radius:0;background:transparent}
-  .billing-system-entry-heading{display:flex;align-items:baseline;flex-wrap:wrap;margin-bottom:0;line-height:1.2;color:#102a43}
-  .billing-system-entry-heading span{font-size:12px;color:#627d98}
-  .billing-system-entry .link-row{margin:0}
-  .billing-system-entry .open,.billing-system-entry .copy{padding:6px 9px}
-  .billing-system-details{margin:12px 0 18px;padding:14px;border:2px solid #c7d9ee;border-radius:14px;background:#fbfdff}
-  .billing-system-details-heading{padding-bottom:10px;margin-bottom:8px;border-bottom:2px solid #dbe7f4}
-  .billing-system-details-heading h3{margin:0!important;font-size:18px!important;color:#102a43!important}
-  .billing-system-details-heading p{margin:4px 0 0;color:#627d98;font-weight:700}
-  .billing-system-details>.group{margin-left:0;margin-right:0}
-`;
-document.head.appendChild(billingSystemsCardStyle);
+    if(isManagement(item)){
+      section.append(linkRow('料金特別調整を開く',billingUrl+'?page=adjustments'),linkRow('請求システムを開く',billingUrl));
+    }else{
+      section.append(linkRow('請求書作成システムを開く',deliveryUrl));
+    }
+    article.append(section);
+  };
+})();
 </script>
 
 <script id="grade-management-admin-supabase-links-20260902">
@@ -3350,7 +3297,7 @@ appendDailyLinks=function(item,article){
     const base=applyInvoicePdfLazyLibraryBase(item);
     const id=String(base['ID']||'');
     const name=String(base['システム名']||base['正式名称']||'');
-    if(!(id==='step-invoice-pdf'||id==='billing-systems'||name.includes('STEP請求書PDF作成・配信システム')||name==='請求システム'))return base;
+    if(!(id==='step-invoice-pdf'||id==='billing-systems'||name.includes('STEP請求書PDF作成・配信システム')||name==='請求書作成システム'))return base;
     const confirmed=Array.isArray(base['確認済み事項'])?base['確認済み事項']:[];
     const note='2026年9月3日：請求書作成・配信画面の初期表示から html2canvas と jsPDF（合計約563KB）を除外。請求書または領収書のPDFを初めて作成するときだけ2ライブラリを並行読込し、2回目以降は読み込み済みのものを再利用する。invoice-pdf PR #30、merge commit c167d71715d70fe917d40a665edba4c1c40bdf64。';
     return Object.assign({},base,{
@@ -3410,13 +3357,11 @@ appendDailyLinks=function(item,article){
       });
     }
 
-    if(name.includes('請求管理')||name.includes('請求システム')){
+    if(base['ID']==='step-invoice-pdf'||name.includes('STEP請求書PDF作成・配信システム')||name==='請求書作成システム'){
       const note='2026年9月4日：請求書の「1件ずつ個別作成」を「1個ずつ作成」へ変更。生徒選択時は生徒コードを基準に生徒マスタを正本として、氏名・フリガナ・郵便番号・住所・保護者メール・学年を取引先マスタへ同期する。敬称・支払期限・電話番号・CCメール・請求用メモなど取引先独自項目は維持し、「生徒マスタ更新」／「生徒マスタから更新」で手動同期も可能。取引先側メール欠落時は生徒マスタから送信前に補完して保存する。PDF閲覧URLの過剰レート制限を修正し、請求書不達を中央の不達メール管理へ連携。請求書側の送信済み・開封・URL閲覧・PDF閲覧／ダウンロード表示は維持し、未開封は不達扱いにしない。実運用送信元は admin@educrest.jp、返信先は stepkobetsu@gmail.com。';
       return Object.assign({},base,{
         '状態':'本番使用中（D1/R2正本・Apps Script/Brevo実送信・不達管理連携）',
         '利用者向けURL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
-        '請求管理システムURL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec',
-        '料金特別調整URL':'https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments',
         '請求書配信PDF作成URL':'https://stepkobetsu-hub.github.io/invoice-pdf/#invoices',
         '保存基盤':'Cloudflare D1＋非公開R2（正本）＋Apps Script／Brevoメール送信',
         '正本ファイル':['index.html','assets/app.js','assets/receipt-pdf.js','apps-script/Code.gs','cloudflare/src/index.js'],
@@ -3517,7 +3462,7 @@ appendDailyLinks=function(item,article){
 })();
 </script>
 <script src="registry-editor.js?v=20260928-admin-db"></script>
-<script src="registry-daily-links-editor.js?v=20260914-billing-link"></script>
+<script src="registry-daily-links-editor.js?v=20261004-separated-billing"></script>
 <script src="registry-detail-editor.js?v=20260914-stable-load"></script>
 <script>document.getElementById('usageButton').addEventListener('click',()=>document.getElementById('usageDialog').showModal());document.getElementById('usageCloseButton').addEventListener('click',()=>document.getElementById('usageDialog').close());document.getElementById('usageDoneButton').addEventListener('click',()=>document.getElementById('usageDialog').close());</script>
 
@@ -3804,14 +3749,14 @@ applyAssetInfo=function(item){
 <script id="registry-canonical-32-card-view-20260914">
 (() => {
   const pinCanonicalCards=cards=>{
-    const priority=new Map([['請求システム',0],['仕訳・経理：URL管理',1]]);
-    return cards.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??2)-(priority.get(String(b.item['システム名']||''))??2)||a.index-b.index).map(entry=>entry.item);
+    const priority=new Map([['請求システム',0],['請求書作成システム',1],['仕訳・経理：URL管理',2]]);
+    return cards.map((item,index)=>({item,index})).sort((a,b)=>(priority.get(String(a.item['システム名']||''))??3)-(priority.get(String(b.item['システム名']||''))??3)||a.index-b.index).map(entry=>entry.item);
   };
   const previousOrganize=organizeEntryImport;
   organizeEntryImport=function(items){
     const list=previousOrganize(items);
-    const excludedIds=new Set(['step-invoice-pdf','teacher-timetable-master-input']);
-    const excludedNames=new Set(['エントリーシート読み取り','STEP請求書PDF作成・配信システム','STEP統合管理ポータル','時間割マスタ入力']);
+    const excludedIds=new Set(['teacher-timetable-master-input']);
+    const excludedNames=new Set(['エントリーシート読み取り','STEP統合管理ポータル','時間割マスタ入力']);
     const seenNames=new Set();
     const kept=list.filter(item=>{
       const id=String(item['ID']||'').trim();

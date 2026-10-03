@@ -61,12 +61,14 @@
       if(String(item?.['システム名']||'').trim()==='請求システム'){
         const adjustment='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments';
         const billing='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
-        const delivery='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
         return [
           {title:'料金特別調整を開く',openUrl:adjustment,copyUrl:adjustment},
-          {title:'請求システムを開く',openUrl:billing,copyUrl:billing},
-          {title:'請求書：作成・配信システムを開く',openUrl:delivery,copyUrl:delivery}
+          {title:'請求システムを開く',openUrl:billing,copyUrl:billing}
         ];
+      }
+      if(item?.['ID']==='step-invoice-pdf'||String(item?.['システム名']||'').trim()==='請求書作成システム'){
+        const delivery='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
+        return [{title:'請求書作成システムを開く',openUrl:delivery,copyUrl:delivery}];
       }
       return normalized;
     };
