@@ -51,7 +51,7 @@ describe("Issue 80 room routing",()=>{
     expect(c.sent).toEqual([]); expect(a.sent.at(-1)).toEqual({type:"wake-result",to:"b",status:"requested"});
     r.send(a,{type:"wake-device",to:"b"}); expect(b.sent).toHaveLength(1);
   });
-  it.each(["standby","closed","stale","unregistered","unauthenticated"])("rejects %s sender for both directory and wake",mode=>{
+  it.each(["closed","stale","unregistered","unauthenticated"])("rejects %s sender for both directory and wake",mode=>{
     const r=room(),a=r.socket("a"),b=r.socket("b","standby");
     if(mode==="standby")a.info.mode="standby";
     if(mode==="closed")a.close();
@@ -89,19 +89,19 @@ describe("Issue 80 room routing",()=>{
 });
 
 function client() {
-  const elements=new Map<string,any>(), timers=new Map<number,{fn:()=>void,delay:number}>();let seq=0,sessionCount=0;
-  const el=(id: string): any=>{if(!elements.has(id)){const classes=new Set(["hidden"]);let text="";const e:any={children:[],style:{},dataset:{},classList:{add:(c:string)=>classes.add(c),remove:(c:string)=>classes.delete(c),contains:(c:string)=>classes.has(c),toggle:(c:string,on:boolean)=>on?classes.add(c):classes.delete(c)},setAttribute(){},removeAttribute(){},append(...nodes:any[]){this.children.push(...nodes)},querySelector:(s:string)=>el(id+s)};Object.defineProperty(e,"textContent",{get:()=>text,set:v=>{text=v;e.children=[]}});elements.set(id,e);}return elements.get(id);};
+  const windowEvents=new Map<string,any>(),documentEvents=new Map<string,any>();const elements=new Map<string,any>(), timers=new Map<number,{fn:()=>void,delay:number}>();let seq=0,sessionCount=0;
+  const el=(id: string): any=>{if(!elements.has(id)){const classes=new Set(["hidden"]);let text="";const e:any={children:[],style:{},dataset:{},addEventListener(){},classList:{add:(c:string)=>classes.add(c),remove:(c:string)=>classes.delete(c),contains:(c:string)=>classes.has(c),toggle:(c:string,on:boolean)=>on?classes.add(c):classes.delete(c)},setAttribute(){},removeAttribute(){},append(...nodes:any[]){this.children.push(...nodes)},querySelector:(s:string)=>el(id+s)};Object.defineProperty(e,"textContent",{get:()=>text,set:v=>{text=v;e.children=[]}});elements.set(id,e);}return elements.get(id);};
   const stored=new Map<string,string>([["step-video-device",JSON.stringify({deviceId:"b",token:"test",tabletName:"B",registrationVersion:2,durationHours:6,controlsTimeout:5,qualityMode:"smooth",showSelf:true})],["step-video-operation",JSON.stringify({resting:true})]]);
   const sockets:any[]=[];
   class Socket {static OPEN=1;readyState=0;sent:any[]=[];onopen?:()=>void;onmessage?:(e:any)=>void;onclose?:()=>void;url:string;constructor(url:string){this.url=url;sockets.push(this)}send(raw:string){this.sent.push(JSON.parse(raw))}close(){this.readyState=3;this.onclose?.()}open(){this.readyState=1;this.onopen?.()}message(data:any){this.onmessage?.({data:JSON.stringify(data)})}}
-  const context=vm.createContext({document:{getElementById:el,createElement:()=>el("new"+(++seq)),createTextNode:(text:string)=>text,documentElement:el("html"),visibilityState:"visible",addEventListener(){}},window:{addEventListener(){}},navigator:{onLine:true,mediaDevices:{getUserMedia:async()=>({getTracks:()=>[],getAudioTracks:()=>[],getVideoTracks:()=>[]})}},location:{protocol:"https:",host:"local.test"},performance:{now:()=>0},crypto:webcrypto,console,WebSocket:Socket,
+  const context=vm.createContext({document:{getElementById:el,createElement:()=>el("new"+(++seq)),createTextNode:(text:string)=>text,documentElement:el("html"),visibilityState:"visible",addEventListener:(name:string,fn:any)=>documentEvents.set(name,fn)},window:{addEventListener:(name:string,fn:any)=>windowEvents.set(name,fn)},navigator:{onLine:true,mediaDevices:{getUserMedia:async()=>({getTracks:()=>[],getAudioTracks:()=>[],getVideoTracks:()=>[]})}},location:{protocol:"https:",host:"local.test"},performance:{now:()=>0},crypto:webcrypto,console,WebSocket:Socket,
     localStorage:{getItem:(k:string)=>stored.get(k)||null,setItem:(k:string,v:string)=>stored.set(k,v),removeItem:(k:string)=>stored.delete(k)},
     fetch:async()=>({ok:true,json:async()=>({device:{id:"b",name:"B"},ticket:"fresh-"+(++sessionCount),serverNow:Date.now(),expiresAt:Date.now()+900000,iceServers:[]})}),
     setTimeout:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearTimeout:(id:number)=>timers.delete(id),setInterval:(fn:()=>void,delay:number)=>{const id=++seq;timers.set(id,{fn,delay});return id;},clearInterval:(id:number)=>timers.delete(id),requestAnimationFrame:()=>1,
   });
-  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,renderUrgentTargets,bind};"),context);
+  vm.runInContext(app.replace("  init();","  globalThis.api={state,openMedia,startStandby,receiveDeviceList,wakeDevice,openWakePicker,finishWake,handlePeerState,connectSocket,invalidateDeviceDirectory,renderUrgentTargets,bind,bindTargetingAndNames};"),context);
   const api=context.api;
-  return {api,el,sockets,stored,timers,context,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
+  return {api,el,sockets,stored,timers,context,windowEvents,documentEvents,sessionCount:()=>sessionCount,tick:async()=>{for(let i=0;i<30;i++)await Promise.resolve()},expire:(delay:number)=>{for(const [id,t] of [...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
 
 describe("Issue 80 standby recovery",()=>{
@@ -219,4 +219,36 @@ describe("exclusive direct video room",()=>{
   it("ends the phone session when the receiver disconnects and releases stale reservations",()=>{
     const r=room(),a=r.socket("a"),phone=r.socket("phone");phone.info.urgentTarget="a";a.readyState=3;r.instance.broadcastPresence();expect(phone.readyState).toBe(3);expect(r.instance.directPeerFor("a")).toBeUndefined();
   });
+});
+
+
+describe("phone standby wake and abandoned direct calls",()=>{
+  it("lets an authenticated live standby phone list and wake exactly one tablet without joining media",()=>{
+    const r=room(),phone=r.socket("phone","standby"),a=r.socket("a","standby"),b=r.socket("b","standby");r.send(phone,{type:"list-devices"});expect(phone.sent[0].type).toBe("device-list");r.send(phone,{type:"wake-device",to:"a"});expect(a.sent).toEqual([{type:"wake",from:{id:"phone",name:"PHONE"},manual:true}]);expect(b.sent).toEqual([]);expect(phone.info.mode).toBe("standby");
+  });
+  it("releases the receiver even if the phone keeps sending signaling pings without media",()=>{
+    const r=room(),a=r.socket("a"),phone=r.socket("phone");phone.info.urgentTarget="a";phone.info.connectedAt-=46000;r.send(phone,{type:"ping"});r.instance.broadcastPresence();expect(phone.readyState).toBe(3);expect(r.instance.directPeerFor("a")).toBeUndefined();expect(a.sent.some((m:any)=>m.type==="presence"&&!m.directPeer)).toBe(true);
+  });
+  it("keeps a working direct call reserved and does not let disconnected media extend its lease",()=>{
+    const r=room();r.socket("a");const phone=r.socket("phone");phone.info.urgentTarget="a";phone.info.connectedAt-=46000;r.send(phone,{type:"direct-media",connected:true});const at=phone.info.directMediaAt;r.instance.broadcastPresence();expect(phone.readyState).toBe(1);r.send(phone,{type:"direct-media",connected:false});expect(phone.info.directMediaAt).toBe(at);phone.info.directMediaAt-=46000;r.instance.broadcastPresence();expect(phone.readyState).toBe(3);
+  });
+  it("sends wake commands over the standby socket and confirms wake from active presence",async()=>{
+    const c=client();await c.api.startStandby();c.sockets[0].open();c.sockets[0].message({type:"device-list",devices:[{id:"a",name:"大手2",status:"standby"}]});expect(c.el("wake-list").children[0].disabled).toBe(false);c.el("wake-list").children[0].onclick();expect(c.sockets[0].sent.at(-1)).toEqual({type:"wake-device",to:"a"});c.sockets[0].message({type:"presence",peers:[{id:"a",name:"大手2"}]});expect(c.api.state.pendingWake).toBeNull();expect(c.el("wake-status").textContent).toBe("大手2が接続しました");expect(c.api.state.local).toBeNull();
+  });
+});
+
+it("releases a direct phone session on hidden/pagehide without stopping a classroom tablet",async()=>{
+  for(const event of ["hidden","pagehide"]){const c=client();c.api.bind();c.api.state.urgentTarget="a";const sent:any[]=[];c.api.state.ws={readyState:1,send:(raw:string)=>sent.push(JSON.parse(raw)),close(){}};
+    if(event==="hidden"){c.context.document.visibilityState="hidden";c.documentEvents.get("visibilitychange")();}else c.windowEvents.get("pagehide")();
+    expect(sent[0]).toEqual({type:"urgent-end",to:"a"});expect(c.api.state.urgentTarget).toBeNull();expect(c.api.state.manualStop).toBe(true);
+    const tablet=client();tablet.api.bind();tablet.context.document.visibilityState="hidden";tablet.documentEvents.get("visibilitychange")();expect(tablet.api.state.manualStop).toBe(false);
+  }
+});
+it("opens the home wake picker using the standby connection",async()=>{
+  const c=client();c.api.bind();c.api.bindTargetingAndNames();await c.api.startStandby();c.sockets[0].open();c.el("home-wake-device").onclick();expect(c.el("wake-picker").classList.contains("hidden")).toBe(false);expect(c.sockets[0].sent.at(-1)).toEqual({type:"list-devices"});
+});
+
+it("shows a direct reservation separately from an ordinary classroom connection",()=>{
+  const r=room();r.socket("a");const phone=r.socket("phone");phone.info.urgentTarget="a";const directory=r.instance.deviceDirectory();expect(directory.find((d:any)=>d.id==="a").direct).toBe(true);
+  const c=client();c.api.state.ws={readyState:1,send(){}};c.api.receiveDeviceList({devices:[{id:"a",name:"大手2",status:"active",direct:true}]});expect(c.el("wake-list").children[0].textContent).toContain("携帯との直通中");expect(c.el("wake-list").children[0].disabled).toBe(true);
 });
