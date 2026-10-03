@@ -28,11 +28,19 @@
       <div class="brand">STEP 教室ビデオ</div>
       <div id="device-name" class="device-name"></div>
       <button id="connect" class="connect-button">教室をつなぐ</button>
+      <button id="home-wake-device">休止端末を起こす</button>
       <p>直通通話中は、選んだ端末の教室間接続を一時停止します。</p>
       <div id="urgent-list" class="target-list hidden" aria-live="polite"></div>
       <p id="home-message">1回押すだけで相手教室につながります</p>
     </section>
 
+      <section id="wake-picker" class="target-picker hidden" aria-labelledby="wake-title">
+        <h2 id="wake-title">休止端末を起こす</h2>
+        <p>休止中の端末を1台選んでください。完全終了・電源OFF・Wi-Fi切断・OS停止中は復旧できません。</p>
+        <p id="wake-status" role="status" aria-live="polite"></p>
+        <div id="wake-list" class="target-list"></div>
+        <button id="wake-close">閉じる</button>
+      </section>
     <section id="call" class="call hidden">
       <div id="empty-state" class="empty-state">接続相手を待っています</div>
       <div id="remote-grid" class="remote-grid" aria-label="相手映像"></div>
@@ -48,13 +56,7 @@
         <div id="call-target-list" class="target-list"></div>
         <button id="call-target-cancel">キャンセル</button>
       </section>
-      <section id="wake-picker" class="target-picker hidden" aria-labelledby="wake-title">
-        <h2 id="wake-title">休止端末を起こす</h2>
-        <p>休止中の端末を1台選んでください。完全終了・電源OFF・Wi-Fi切断・OS停止中は復旧できません。</p>
-        <p id="wake-status" role="status" aria-live="polite"></p>
-        <div id="wake-list" class="target-list"></div>
-        <button id="wake-close">閉じる</button>
-      </section>
+
       <nav id="controls" aria-label="通話操作">
         <button id="mic" aria-pressed="false"><span>🎙</span><b>マイク OFF</b></button>
         <button id="camera" aria-pressed="true"><span class="video-icon" aria-hidden="true"></span><b>カメラ ON</b></button>
