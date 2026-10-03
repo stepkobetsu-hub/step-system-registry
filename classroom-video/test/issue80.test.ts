@@ -145,7 +145,7 @@ describe("Issue 80 standby recovery",()=>{
     c.api.receiveDeviceList({devices:[{id:"a",name:"A",status:"standby"}]});c.api.wakeDevice("a");
     c.api.receiveDeviceList({devices:[{id:"a",name:"A",status:"active"}]});expect(c.api.state.pendingWake).not.toBeNull();
     c.api.handlePeerState({info:{id:"a"},pc:{iceConnectionState:"connected"}});
-    expect(c.api.state.pendingWake).toBeNull();expect(c.el("wake-status").textContent).toBe("Aが接続しました");
+    expect(c.api.state.pendingWake).toBeNull();expect(c.el("wake-status").textContent).toBe("Aから起動応答がありました（映像は未確認）");
   });
   it("invalidates stale choices and pending recovery after sender disconnects",()=>{
     const c=client();c.api.state.ws={readyState:1,send(){}};c.api.receiveDeviceList({devices:[{id:"a",name:"A",status:"standby"}]});c.api.wakeDevice("a");
@@ -247,7 +247,7 @@ describe("phone standby wake and abandoned direct calls",()=>{
     const r=room();r.socket("a");const phone=r.socket("phone");phone.info.urgentTarget="a";phone.info.connectedAt-=46000;r.send(phone,{type:"direct-media",connected:true});const at=phone.info.directMediaAt;r.instance.broadcastPresence();expect(phone.readyState).toBe(1);r.send(phone,{type:"direct-media",connected:false});expect(phone.info.directMediaAt).toBe(at);phone.info.directMediaAt-=46000;r.instance.broadcastPresence();expect(phone.readyState).toBe(3);
   });
   it("sends wake commands over the standby socket and confirms wake from active presence",async()=>{
-    const c=client();await c.api.startStandby();c.sockets[0].open();c.sockets[0].message({type:"device-list",devices:[{id:"a",name:"大手2",status:"standby"}]});expect(c.el("wake-list").children[0].disabled).toBe(false);c.el("wake-list").children[0].onclick();expect(c.sockets[0].sent.at(-1)).toEqual({type:"wake-device",to:"a"});c.sockets[0].message({type:"presence",peers:[{id:"a",name:"大手2"}]});expect(c.api.state.pendingWake).toBeNull();expect(c.el("wake-status").textContent).toBe("大手2が接続しました");expect(c.api.state.local).toBeNull();
+    const c=client();await c.api.startStandby();c.sockets[0].open();c.sockets[0].message({type:"device-list",devices:[{id:"a",name:"大手2",status:"standby"}]});expect(c.el("wake-list").children[0].disabled).toBe(false);c.el("wake-list").children[0].onclick();expect(c.sockets[0].sent.at(-1)).toEqual({type:"wake-device",to:"a"});c.sockets[0].message({type:"presence",peers:[{id:"a",name:"大手2"}]});expect(c.api.state.pendingWake).toBeNull();expect(c.el("wake-status").textContent).toBe("大手2から起動応答がありました（映像は未確認）");expect(c.api.state.local).toBeNull();
   });
 });
 
@@ -266,3 +266,13 @@ it("shows a direct reservation separately from an ordinary classroom connection"
   const r=room();r.socket("a");const phone=r.socket("phone");phone.info.urgentTarget="a";const directory=r.instance.deviceDirectory();expect(directory.find((d:any)=>d.id==="a").direct).toBe(true);
   const c=client();c.api.state.ws={readyState:1,send(){}};c.api.receiveDeviceList({devices:[{id:"a",name:"大手2",status:"active",direct:true}]});expect(c.el("wake-list").children[0].textContent).toContain("携帯との直通中");expect(c.el("wake-list").children[0].disabled).toBe(true);
 });
+
+ it("hides unwanted devices from wake and direct lists and allows restoring them",()=>{
+ const c=client();c.api.bindTargetingAndNames();c.api.state.ws={readyState:1,send(){}};
+ c.api.state.presence=new Map([["demo",{id:"demo",name:"STEP端末13"}]]);
+ c.api.receiveDeviceList({devices:[{id:"demo",name:"STEP端末13",status:"standby"}]});
+ c.el("device-visibility-list").children[0].onclick();
+ expect(c.el("wake-list").children).toHaveLength(0);expect(c.el("urgent-list").children).toHaveLength(0);
+ expect(c.el("device-visibility-list").children[0].textContent).toContain("再表示する");
+ c.el("device-visibility-list").children[0].onclick();expect(c.el("wake-list").children).toHaveLength(1);expect(c.el("urgent-list").children).toHaveLength(1);
+ });

@@ -45,6 +45,9 @@
         <p>休止中の端末を1台選んでください。完全終了・電源OFF・Wi-Fi切断・OS停止中は復旧できません。</p>
         <p id="wake-status" role="status" aria-live="polite"></p>
         <div id="wake-list" class="target-list"></div>
+        <div id="device-visibility-list" class="target-list hidden" aria-label="端末の表示設定"></div>
+        <p class="visibility-help">非表示はこの携帯・ブラウザに保存されます。端末の登録は残り、再表示できます。</p>
+        <button id="device-visibility-toggle" class="picker-close">端末の表示を管理</button>
         <button id="wake-close">閉じる</button>
       </section>
     <section id="call" class="call hidden">
