@@ -4683,5 +4683,27 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="student-qr-recovery-history-20261003">
+(() => {
+ const patch={
+  "確認日": "2026年10月3日",
+  "復旧記録URL": "https://github.com/stepkobetsu-hub/student-QR/issues/48",
+  "ログ修復記録URL": "https://github.com/stepkobetsu-hub/student-QR/issues/49",
+  "Apps Scriptバージョン": "91",
+  "作業メモ": "2026-10-02〜03：Issue #48でQR受付後の正式ログ・保護者通知の約47分遅延を復旧。Google側処理が20秒を超えると受付側が打ち切って再試行し、最大15分バックオフで遅延が拡大。待機上限300秒、Alarmの複数件ドレイン、BUSY再試行15秒、受付状況照会時の失効Alarm自己修復へ変更。production-interimの最終Version aa77e8a5-cd51-45ab-b4bd-8f394ff2b5a0。反映コミット681ddd2、9f40264、bf6b698、8320f5f。復旧報告時Cloudflare未処理は神領0・大手町0、GoogleメールキューはSENT3498・稼働中残件0。無関係な9月のFAILED履歴1件は残存。受付ID・順序・写真を保全し、削除・再スキャン・疑似受付なし。38テスト・型検査・dry-run成功。\nIssue #49で送信済みなのにログが送信待ちのまま残る不整合を修復。キューSENT保存後のログ書き戻しが完了しないと、SENT行が通常処理から除外され自己修復されない弱点を対処。個別実行の書き戻し失敗理由は本チャットでは未確定。Apps Scriptを既存URL維持でv91へ更新、コミット5b9bcf33058b1afd979251b66b940ff5eb0ba6b4。ログ3095を送信成功1/1件・送信受付1/1件へ修復。キュー3494のSENT・試行1・メッセージID・照合ID・送信完了情報を維持、再送なし。500件走査・50件修復・当該実行内の未解決0、関連13テスト成功。Webhookの配信完了・不達状態を上書きしない保護を追加。これらの本番反映・残件数・テストは管理接続済みCodexのユーザー提示報告に基づく。",
+  "仕様メモ": "受付画面の成功表示はCloudflare受付保存の成功を示す。Google正式ログ・メールは非同期連携。SENTはメール事業者への送信成功であり、保護者受信箱への最終配達完了とは区別する。送信待ち表示だけを根拠に再送や確認用再スキャンをしない。ログ不整合は受付IDで送信キューと照合し、メールを再送せず保存済み結果から修復する。既存Webhookの配達・不達状態を保持する。",
+  "確認根拠": "本チャットでログ3095とキュー3494の同一受付IDを直接照合し、キューSENT・試行1・19:38:35送信成功とログ送信待ちの不一致を確認。その後ユーザーからIssue #49本番v91・再送なし修復完了の報告を受領。全履歴の未解決0を意味せず、500件走査した実行範囲内の未解決0。修正後の新規受付から通知までの実運用時間は今後確認。"
+};
+ const base=organizeEntryImport;
+ organizeEntryImport=function(items){return base(items).map(item=>{
+  if(item["ID"]!=="qr-register"&&!String(item["システム名"]||item["正式名称"]||"").includes("出退くんQR"))return item;
+  const result=Object.assign({},item,patch);
+  ["作業メモ","仕様メモ","確認根拠"].forEach(key=>{result[key]=[item[key],patch[key]].filter(Boolean).join("\n\n")});
+  return result;
+ });};
+})();
+</script>
+
 </body>
 </html>
