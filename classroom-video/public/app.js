@@ -169,7 +169,7 @@
     const hidden=hiddenDevices();
     for(const device of [...state.deviceDirectory.values()].sort((a,b)=>a.name.localeCompare(b.name,"ja"))){
       const button=document.createElement("button");button.type="button";
-      button.textContent=`${device.name} — ${hidden.has(device.id)?"再表示する":"非表示にする"}`;
+      button.textContent=`${device.name} — ${hidden.has(device.id)?"再表示する":"非表示にする"}`;button.className=hidden.has(device.id)?"device-hidden":"";
       button.onclick=()=>{const next=hiddenDevices();if(next.has(device.id))next.delete(device.id);else next.add(device.id);localStorage.setItem(HIDDEN_DEVICES_KEY,JSON.stringify([...next]));renderWakeList();renderUrgentTargets();};
       list.append(button);
     }
@@ -185,6 +185,7 @@
       const available = online && device.status === "standby";
       button.type = "button";
       button.textContent = `${device.name} — ${!online ? "現在復旧できません" : device.status === "standby" ? "休止中・復旧する" : device.status === "active" ? (device.direct ? "携帯との直通中" : "接続中") : "オフライン・復旧不可"}`;
+      button.className = online && device.status === "active" ? "device-active" : "";
       button.disabled = !available || Boolean(state.pendingWake);
       button.onclick = () => wakeDevice(device.id);
       list.append(button);
