@@ -228,7 +228,7 @@ function cleanPublicCell(value,key){
 }
 function hasStoredCredentials(){return !!((localStorage.getItem(STAFF_CODE_KEY)||'').trim()&&localStorage.getItem(STAFF_PASSWORD_KEY))}
 function savePortalCache(items){try{portalCacheSavedAt=Date.now();localStorage.setItem(SYSTEMS_CACHE_KEY,JSON.stringify({items,savedAt:new Date(portalCacheSavedAt).toISOString()}))}catch(e){}}
-function showPortal(items){baseSystems=organizeEntryImport(items).map((item,index)=>Object.assign({},item,{__cardKey:cardCustomizationKey(item,index),__sourceIndex:index}));systems=sortCustomizedCards(baseSystems);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');document.getElementById('openCardSettings').classList.toggle('hidden',!canCustomizeCards());render()}
+function showPortal(items){baseSystems=organizeEntryImport(items).map((item,index)=>Object.assign({},item,{__cardKey:cardCustomizationKey(item,index),__sourceIndex:index}));systems=sortCustomizedCards(baseSystems);fillFilters();document.getElementById('loginPanel').classList.add('hidden');document.getElementById('denied').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');document.getElementById('logoutBtn').classList.remove('hidden');document.getElementById('openCardSettings').classList.toggle('hidden',!canCustomizeCards());render()}
 function loadPortalCache(){try{const cached=JSON.parse(localStorage.getItem(SYSTEMS_CACHE_KEY)||'null');if(!cached||!Array.isArray(cached.items))return false;portalCacheSavedAt=Date.parse(cached.savedAt||'')||0;showPortal(cached.items);return true}catch(e){return false}}
 async function loadPortal(){const out=await api('getSystemRegistry');if(!out.success)throw new Error(out.error||'台帳を取得できませんでした。');const items=Array.isArray(out.systems)?out.systems:[];savePortalCache(items);showPortal(items)}
 async function refreshPortalInBackground(){try{await loadPortal()}catch(firstError){try{if(await restoreStoredLogin())return}catch(e){}console.warn('台帳のバックグラウンド更新を次回へ延期しました。')}}
@@ -262,6 +262,7 @@ function keepPortalOnAuthFailure(message){
 function showLogin(message,force){
   if(!force&&keepPortalOnAuthFailure(message))return;
   document.getElementById('portal').classList.add('hidden');
+  document.getElementById('logoutBtn').classList.add('hidden');
   document.getElementById('openCardSettings').classList.add('hidden');
   document.getElementById('loginPanel').classList.remove('hidden');
   const error=document.getElementById('loginError');
