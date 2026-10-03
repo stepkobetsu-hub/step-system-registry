@@ -33,3 +33,16 @@ nav{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height
 .target-picker{display:flex;flex-direction:column;max-height:90vh;overflow:auto}.target-picker .target-list{flex:1;min-height:0}.picker-close{margin-top:18px;padding:16px;border-radius:14px;background:#475569;font-size:22px;font-weight:800;flex-shrink:0}.target-list button{min-height:64px;overflow-wrap:anywhere}.target-list button:disabled{background:#475569;color:#cbd5e1;cursor:default}@media(orientation:portrait){.target-picker .target-list button{font-size:22px;padding:18px}.target-picker h2{font-size:26px}.target-picker p{margin:0 0 16px}}
 
 .target-picker{background:#102a43;overflow:hidden}.target-picker>h2,.target-picker>p,.target-picker>button{flex-shrink:0}.target-picker .target-list{grid-auto-rows:max-content;align-content:start;overflow-y:auto;max-height:none;min-height:0;flex:1 1 0}.target-picker .target-list button{flex-shrink:0}.target-picker .visibility-help{font-size:12px;margin:8px 0}#device-visibility-toggle{padding:10px;font-size:16px;margin-top:8px}#device-visibility-list button{text-align:left;font-size:18px}@media(max-height:600px){#wake-picker{inset:2% 4%;padding:12px}#wake-picker h2{font-size:22px}#wake-picker p{font-size:12px;margin:3px 0 6px}#wake-list button{min-height:56px;padding:12px}#wake-close{margin-top:6px;padding:10px}}
+
+/* Keep most of the phone picker available for device choices. */
+#wake-picker{inset:2% 3%;max-height:none;padding:12px;gap:0}
+#wake-picker h2{font-size:20px;margin:0 0 5px}
+#wake-picker>p{font-size:12px;line-height:1.3;margin:3px 0 6px}
+#wake-picker #wake-status{font-size:13px;min-height:1.3em;margin:2px 0 6px}
+#wake-picker .visibility-help{font-size:11px;margin:5px 0}
+#wake-picker #wake-close,#wake-picker #device-visibility-toggle{min-height:34px;padding:7px 10px;margin-top:5px;font-size:14px;border-radius:8px}
+#wake-picker .target-list{gap:9px}
+#wake-picker .target-list button{min-height:64px;padding:16px 14px;font-size:21px;line-height:1.35}
+#wake-picker #wake-list button.device-active:disabled{background:#1d4ed8;color:#fff}
+#wake-picker #device-visibility-list button.device-hidden{background:#475569;color:#cbd5e1}
+@media(max-height:520px){#wake-picker{inset:1% 2%;padding:8px}#wake-picker>p{font-size:11px;margin:2px 0 4px}#wake-picker h2{font-size:18px}#wake-picker .target-list button{min-height:56px;padding:12px;font-size:19px}}
