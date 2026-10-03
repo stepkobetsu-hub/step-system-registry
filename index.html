@@ -43,7 +43,7 @@
   <main class="shell">
     <header>
       <div class="brand"><img class="brand-icon" src="https://stepkobetsu-hub.github.io/seiseki-kanri/images/system-portal/app-icon-192.png?v=20260722-fix" alt="STEPシステム資産管理台帳"><div><h1>STEPシステム資産管理台帳</h1><p class="lead">本番システム・旧システム・GitHub・Apps Script・Google Sheet・Supabaseの統合管理</p><span class="former-name">旧称：STEP総合管理ポータル</span></div></div>
-      <div class="top-actions"><button class="btn" id="usageButton" type="button">使い方</button><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="https://stepkobetsu-hub.github.io/step-workspace/" style="display:inline-flex;align-items:center;gap:7px"><img src="https://stepkobetsu-hub.github.io/step-workspace/favicon-32x32.png" alt="" width="18" height="18" style="border-radius:3px">STEP業務ホームへ</a><button class="btn hidden" id="logoutBtn" type="button">ログアウト</button></div>
+      <div class="top-actions"><a class="btn" id="permissionManagementLink" href="https://step-permissions.mintcocoajasmine.chatgpt.site" target="_blank" rel="noopener noreferrer" style="background:#075c51;color:white">権限管理（塾長用）</a><button class="btn" id="usageButton" type="button">使い方</button><button class="btn hidden" id="openCardSettings" type="button">カード設定</button><a class="btn" href="https://stepkobetsu-hub.github.io/step-workspace/" style="display:inline-flex;align-items:center;gap:7px"><img src="https://stepkobetsu-hub.github.io/step-workspace/favicon-32x32.png" alt="" width="18" height="18" style="border-radius:3px">STEP業務ホームへ</a><button class="btn hidden" id="logoutBtn" type="button">ログアウト</button></div>
     </header>
     <dialog class="usage-dialog" id="usageDialog"><div class="usage-content"><div class="usage-head"><h2>カード情報の変更方法</h2><button class="btn" id="usageCloseButton" type="button">閉じる</button></div><p>カードの基本情報は「STEPシステム資産管理台帳」を正本として、STEP業務ホームへ自動反映します。</p><table class="usage-table"><tbody><tr><th>使う人・何のアプリか</th><td>STEPシステム資産管理台帳で変更</td></tr><tr><th>カード名・説明・URL</th><td>STEPシステム資産管理台帳で変更</td></tr><tr><th>カードの追加・削除・非表示</th><td>STEPシステム資産管理台帳で変更</td></tr><tr><th>並び順・お気に入り・PC／スマホ設定</th><td>STEP業務ホームで変更</td></tr></tbody></table><p class="usage-note">資産台帳にあるカードは、資産台帳の内容が優先されます。業務ホームだけに追加したカードは、資産台帳へ自動登録されません。</p><div class="usage-actions"><button class="open" id="usageDoneButton" type="button">わかりました</button></div></div></dialog>
     <section id="denied" class="notice hidden" role="alert"></section>
@@ -4707,5 +4707,12 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="permission-management-20261004">
+(() => {
+ const record={'ID':'step-permission-management','システム名':'STEP 権限管理','分類':'管理・運営','状態':'本番（既存アプリへの連携前）','利用者':'塾長（職員権限4）','利用者向けURL':'https://step-permissions.mintcocoajasmine.chatgpt.site','概要':'台帳の38項目を対象に利用・閲覧・入力編集・承認・削除・設定変更の権限、対象校舎、利用者別の停止・禁止、新規アプリ追加と変更履歴を管理。共通設定に未接続の既存アプリには制限は反映されません。','管理':'ChatGPT所有者限定＋共通スタッフ認証の権限4','保存基盤':'Sites Worker＋D1','確認日':'2026年10月4日','作業メモ':'管理画面の公開完了。型チェック・権限判定29ケース成功。実ログイン・保存の利用者確認は未実施。既存アプリ連携済み0件。設定保存のみで既存講師マスタや各アプリの権限を変更するものではありません。','関連ドキュメント':'https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/permission-management-20261004.md'};
+ const base=organizeEntryImport;
+ organizeEntryImport=function(items){const list=base(items);if(!list.some(x=>x.ID===record.ID))list.push(Object.assign({},record));return list;};
+})();
+</script>
 </body>
 </html>
