@@ -197,6 +197,20 @@ describe("urgent phone client interaction",()=>{
   });
 });
 
+describe("complete phone target list",()=>{
+  it("shows 神領-玄関 and both 大手 tablets even when one is in a direct call",async()=>{
+    const c=client();await c.api.startStandby();c.sockets[0].open();
+    c.sockets[0].message({type:"presence",peers:[{id:"entrance",name:"神領-玄関"},{id:"ote1",name:"大手１"},{id:"ote2",name:"大手２",directPeer:"phone"},{id:"phone",name:"携帯",urgentTarget:"ote2"},{id:"reception",name:"受付"}]});
+    const buttons=c.el("urgent-list").children;
+    expect(buttons.map((b:any)=>b.textContent)).toEqual(expect.arrayContaining(["神領-玄関","大手１","大手２（通話中）","受付"]));
+    expect(buttons).toHaveLength(4);const busy=buttons.find((b:any)=>b.textContent.includes("大手２"));expect(busy.disabled).toBe(true);busy.onclick();expect(c.api.state.urgentTarget).toBeNull();
+  });
+  it("prevents calling a target that became busy after its button was rendered",async()=>{
+    const c=client();c.api.state.presence=new Map([["a",{id:"a",name:"神領-玄関"}]]);c.api.renderUrgentTargets();const button=c.el("urgent-list").children[0];
+    c.api.state.presence.get("a").directPeer="other-phone";button.onclick();expect(c.api.state.urgentTarget).toBeNull();expect(c.el("urgent-list").children[0].disabled).toBe(true);
+  });
+});
+
 describe("exclusive direct video room",()=>{
   it("reserves one receiver, rejects a second caller, and never wakes other tablets",async()=>{
     const r=room(),receiver=r.socket("a"),other=r.socket("b"),rest=r.socket("rest","standby");
