@@ -2,6 +2,8 @@
 
 対象資産ID：`teacher-payroll-processing`。既存カードに履歴を追加し、別の給与アプリカードは作成しない。
 
+過去の給与アプリ仕様：[teacher-portal/docs/payroll-gas.md](https://github.com/stepkobetsu-hub/teacher-portal/blob/main/docs/payroll-gas.md)。今回のCSV共通化の正本・履歴は以下を参照。
+
 ## 本番・管理先
 - 本番アプリ：https://script.google.com/macros/s/AKfycbxCpmgFEPaEl7EykKO1MrXDCQqg_-ww8AgfVLa6WSpD6sYuUj4pG07DwI0KizIUI7Z9/exec?app=payroll
 - Apps Script編集：https://script.google.com/u/0/home/projects/1kDea6Mg9dhPLFiFjRJ9ynNyYTTG5YOgW7mg0mHXX9V3fecZjLxe3c9Tn/edit
