@@ -4688,5 +4688,28 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script id="payroll-yuucho-csv-history-20261004">
+(() => {
+ const patch={
+  "確認日": "2026年10月4日",
+  "Apps Scriptバージョン": "v67（2026年10月4日 16:43 JST）",
+  "CSV修正記録URL": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/payroll-yuucho-csv-20261004.md",
+  "作業メモ": "2026-10-04：v65で従業員登録CSVの13列行生成を共通化、漢字氏名・金融機関漢字名を全角化し桁数・Shift_JIS文字コードを事前検査。v66で講師登録欄に「全銀ファイル」ではなく「CSVファイル」を選ぶ注意書きを黄色枠・CSVファイル赤字で追加。v67で登録CSVと振込CSVのカナ氏名変換を共通化し、半角・全角スペース等を除去。GAS既存デプロイID・URL維持。詳細はCSV修正記録URL。",
+  "仕様メモ": "カナ氏名は空白なしの半角カナ。登録と振込は共通のtoYuchoBizKana_を使用し、directHalfKana_は同関数へ委譲。漢字氏名は全角文字・全角スペース。登録の2入口はdirectEmployeeMasterRow_へ統一。登録はヘッダー付き13列・Shift_JIS、振込はヘッダーなし4列（従業員コード1／2、カナ氏名、金額）。氏名変換の修正は共通処理で行う。",
+  "確認根拠": "2026-10-04：GAS testYuuchoEmployeeMasterCsvで38項目合格。登録・振込のカナ一致、全半角空白・タブ・改行・NBSP、漢字名・文字コード・桁数・合成口座変換を確認。本番アプリで9月分28件の生成完了と講師登録注意書きを確認。銀行側のCSV取込受付は未確認。",
+  "確認状況": "GAS v67を本番反映。CSV共通処理38項目合格、本番アプリの生成完了を確認。銀行側での再取込結果は未確認。",
+  "CSV正本の場所": "本番GAS「講師給与処理.gs」（CSV共通処理）、同プロジェクト「給与処理アプリ画面.html」（登録注意書き）。今回の変更とGitHubの以前の保存ソースの一致は未確認。"
+};
+ const base=organizeEntryImport;
+ organizeEntryImport=function(items){return base(items).map(item=>{
+  if(item['ID']!=='teacher-payroll-processing')return item;
+  const result=Object.assign({},item,patch);
+  ['作業メモ','仕様メモ','確認根拠'].forEach(key=>{result[key]=[item[key],patch[key]].filter(Boolean).join('\n\n');});
+  return result;
+ });};
+})();
+</script>
+
 </body>
 </html>
