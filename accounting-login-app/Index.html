@@ -66,7 +66,7 @@
       <button type="button" class="invoice-launch" id="invoiceLaunchBtn" onclick="openInvoices()"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><span>請求書を探す</span><span aria-hidden="true">→</span></button>
     </section>
     <div class="toolbar">
-      <div class="searchrow"><div class="search">🔎<input aria-label="検索" id="search" placeholder="サービス名、ID、勘定科目、メモなどを検索" autocomplete="off"></div><span class="count" id="count"></span></div>
+      <div class="searchrow"><div class="search">🔎<input aria-label="検索" id="search" placeholder="サービス名・ID・メモを検索（漢字・かな・ローマ字）" autocomplete="off"></div><span class="count" id="count"></span></div>
       <div class="chips" id="chips"></div>
       <div class="reorderHint" id="reorderHint">並べ替え中：名前で検索し、「先頭へ」または「移動先」の番号を入力して移動できます。変更は自動保存されます。</div>
     </div>
@@ -244,12 +244,39 @@
   }
   function setCategory(c){if(reorderMode){toast('並べ替えを終了してから絞り込んでください');return}activeCategory=c;renderChips();render()}
 
+  // Local reading aliases: never send account IDs or memos to a conversion service.
+  const accountingSearch=(()=>{
+    const readings={
+      '三井住友':'みついすみとも','三菱UFJ':'みつびしゆーえふじぇい','三菱':'みつびし','大垣共立':'おおがききょうりつ','愛知':'あいち','名古屋':'なごや','十六':'じゅうろく','百五':'ひゃくご','中京':'ちゅうきょう','東春':'とうしゅん','東濃':'とうのう','瀬戸':'せと','岐阜':'ぎふ','信用金庫':'しんようきんこ','信用組合':'しんようくみあい','銀行':'ぎんこう','郵便':'ゆうびん','ゆうちょ':'ゆうちょ','日本政策金融公庫':'にほんせいさくきんゆうこうこ','日本年金機構':'にほんねんきんきこう','日本':'にほん',
+      '中部電力':'ちゅうぶでんりょく','東邦ガス':'とうほうがす','電力':'でんりょく','電気':'でんき','水道':'すいどう','光熱費':'こうねつひ','水道光熱費':'すいどうこうねつひ','通信':'つうしん','電話':'でんわ','携帯':'けいたい','回線':'かいせん','光':'ひかり','料金':'りょうきん',
+      '経理':'けいり','会計':'かいけい','勘定科目':'かんじょうかもく','請求書':'せいきゅうしょ','請求':'せいきゅう','領収書':'りょうしゅうしょ','口座':'こうざ','振込':'ふりこみ','振替':'ふりかえ','決済':'けっさい','支払':'しはらい','支払い':'しはらい','引落':'ひきおとし','引き落とし':'ひきおとし','手数料':'てすうりょう','仕入':'しいれ','仕入れ':'しいれ','事務用品':'じむようひん','消耗品':'しょうもうひん','教材':'きょうざい','教具':'きょうぐ','通販':'つうはん','採用':'さいよう','求人':'きゅうじん','広告':'こうこく','宣伝':'せんでん','給与':'きゅうよ','給料':'きゅうりょう','報酬':'ほうしゅう','保険':'ほけん','年金':'ねんきん','税金':'ぜいきん','納税':'のうぜい','家賃':'やちん','地代':'ちだい','賃借料':'ちんしゃくりょう','借入':'かりいれ','返済':'へんさい','共済':'きょうさい','管理':'かんり','登録':'とうろく','検索':'けんさく','保存':'ほぞん','設定':'せってい','回収':'かいしゅう','配信':'はいしん','取引先':'とりひきさき','購入':'こうにゅう','契約':'けいやく','更新':'こうしん','その他':'そのた','事務':'じむ','用品':'ようひん',
+      '教育開発出版':'きょういくかいはつしゅっぱん','学書':'がくしょ','明治図書':'めいじとしょ','文理':'ぶんり','森塾':'もりじゅく','教育':'きょういく','出版':'しゅっぱん','図書':'としょ','個別指導':'こべつしどう','神領':'じんりょう','大手町':'おおてまち','生徒':'せいと','講師':'こうし','学校':'がっこう','教室':'きょうしつ',
+      'amazon':'あまぞん','google':'ぐーぐる','gmail':'じーめーる','microsoft':'まいくろそふと','moneyforward':'まねーふぉわーど','money forward':'まねーふぉわーど','楽天':'らくてん','rakuten':'らくてん','yahoo':'やふー','line':'らいん','biz':'びず','cloud':'くらうど','アスクル':'あすくる','askul':'あすくる','たのめーる':'たのめーる','大塚商会':'おおつかしょうかい','カウネット':'かうねっと','kaunet':'かうねっと','ヨドバシ':'よどばし','yodobashi':'よどばし','エクシード':'えくしーど','exceed':'えくしーど','フォレスタ':'ふぉれすた','foresta':'ふぉれすた','ステップ':'すてっぷ','step':'すてっぷ','gmo':'じーえむおー','okb':'おーけーびー','ntt':'えぬてぃーてぃー','kddi':'けーでぃーでぃーあい','au':'えーゆー','softbank':'そふとばんく','docomo':'どこも','plala':'ぷらら','smbc':'えすえむびーしー'
+    };
+    const base=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96));
+    const normalize=value=>base(value).replace(/\s+/g,'');
+    const aliases=Object.fromEntries(Object.entries(readings).map(([term,value])=>[base(term),normalize(value)]));
+    const pattern=new RegExp(Object.keys(aliases).sort((a,b)=>b.length-a.length).map(s=>/^[a-z ]+$/.test(s)?'\\b'+s+'\\b':s).join('|'),'g');
+    const reading=value=>base(value).replace(pattern,term=>aliases[term]);
+    const kana='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔぁぃぅぇぉゃゅょゎ';
+    const latin='a i u e o ka ki ku ke ko sa si su se so ta ti tu te to na ni nu ne no ha hi hu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n ga gi gu ge go za zi zu ze zo da zi zu de do ba bi bu be bo pa pi pu pe po vu a i u e o ya yu yo wa'.split(' ');
+    const single=Object.fromEntries([...kana].map((c,i)=>[c,latin[i]]));
+    const pairs={きゃ:'kya',きゅ:'kyu',きょ:'kyo',しゃ:'sya',しゅ:'syu',しょ:'syo',ちゃ:'tya',ちゅ:'tyu',ちょ:'tyo',にゃ:'nya',にゅ:'nyu',にょ:'nyo',ひゃ:'hya',ひゅ:'hyu',ひょ:'hyo',みゃ:'mya',みゅ:'myu',みょ:'myo',りゃ:'rya',りゅ:'ryu',りょ:'ryo',ぎゃ:'gya',ぎゅ:'gyu',ぎょ:'gyo',じゃ:'zya',じゅ:'zyu',じょ:'zyo',びゃ:'bya',びゅ:'byu',びょ:'byo',ぴゃ:'pya',ぴゅ:'pyu',ぴょ:'pyo',ふぁ:'fa',ふぃ:'fi',ふぇ:'fe',ふぉ:'fo',てぃ:'ti',でぃ:'di',うぃ:'wi',うぇ:'we',うぉ:'wo',ゔぁ:'va',ゔぃ:'vi',ゔぇ:'ve',ゔぉ:'vo'};
+    function toLatin(value){let out='',text=reading(value);for(let i=0;i<text.length;i++){const pair=pairs[text.slice(i,i+2)];if(pair){out+=pair;i++;}else if(text[i]==='っ'){const next=pairs[text.slice(i+1,i+3)]||single[text[i+1]]||'';out+=/^[a-z]/.test(next)?next[0]:'';}else if(text[i]!=='ー')out+=single[text[i]]||text[i];}return out.replace(/\s+/g,'');}
+    // Hepburn / Kunrei spellings, long vowels, and partially typed romaji share an index.
+    const fold=value=>value.replace(/sha/g,'sya').replace(/shu/g,'syu').replace(/sho/g,'syo').replace(/cha/g,'tya').replace(/chu/g,'tyu').replace(/cho/g,'tyo').replace(/jya|ja/g,'zya').replace(/jyu|ju/g,'zyu').replace(/jyo|jo/g,'zyo').replace(/shi/g,'si').replace(/chi/g,'ti').replace(/tsu/g,'tu').replace(/ji/g,'zi').replace(/fu/g,'hu').replace(/n'/g,'n').replace(/ou/g,'o').replace(/([aiueo])\1+/g,'$1');
+    const cache=new WeakMap();
+    function index(entry){const source=[entry.category,entry.serviceName,entry.account,entry.passwordManager,entry.accountTitle,entry.amountNote,entry.memo,entry.url].join(' ');let hit=cache.get(entry);if(!hit||hit.source!==source){hit={source,raw:normalize(source),phonetic:fold(toLatin(source))};cache.set(entry,hit);}return hit;}
+    function matches(entry,query){const words=String(query??'').trim().split(/\s+/).filter(Boolean);if(!words.length)return true;const hit=index(entry);return words.every(word=>{const phonetic=fold(toLatin(word));return hit.raw.includes(normalize(word))||Boolean(phonetic&&hit.phonetic.includes(phonetic));});}
+    return {matches};
+  })();
+
   function filtered(){
     const q=norm($('search').value);
     return entries.filter(e=>{
       if(!reorderMode&&activeCategory!=='すべて'&&e.category!==activeCategory)return false;
       if(!q)return true;
-      return norm([e.category,e.serviceName,e.account,e.passwordManager,e.accountTitle,e.amountNote,e.memo,e.url].join(' ')).includes(q);
+      return accountingSearch.matches(e,q);
     });
   }
 
@@ -294,7 +321,7 @@
   function toggleReorder(){
     if(pending)return;
     reorderMode=!reorderMode;
-    if(reorderMode){activeCategory='すべて';$('search').value='';$('search').placeholder='並べ替えるカード名を検索';}else{$('search').value='';$('search').placeholder='サービス名、ID、勘定科目、メモなどを検索';draggedId='';}
+    if(reorderMode){activeCategory='すべて';$('search').value='';$('search').placeholder='並べ替えるカード名を検索（漢字・かな・ローマ字）';}else{$('search').value='';$('search').placeholder='サービス名・ID・メモを検索（漢字・かな・ローマ字）';draggedId='';}
     $('orderModeBtn').classList.toggle('active',reorderMode);$('orderModeBtn').textContent=reorderMode?'✓ 並べ替え終了':'↕ 並べ替え';$('reorderHint').classList.toggle('show',reorderMode);renderChips();render();
   }
 
@@ -511,6 +538,7 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
+
 
 
 
