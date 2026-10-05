@@ -256,7 +256,7 @@
     const base=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96));
     const normalize=value=>base(value).replace(/\s+/g,'');
     const aliases=Object.fromEntries(Object.entries(readings).map(([term,value])=>[base(term),normalize(value)]));
-    const pattern=new RegExp(Object.keys(aliases).sort((a,b)=>b.length-a.length).map(s=>{const escaped=s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return /^[a-z ]+$/.test(s)?'\\b'+escaped+'\\b':escaped;}).join('|'),'g');
+    const pattern=new RegExp(Object.keys(aliases).sort((a,b)=>b.length-a.length).map(s=>/^[a-z ]+$/.test(s)?'\\b'+s+'\\b':s).join('|'),'g');
     const reading=value=>base(value).replace(pattern,term=>aliases[term]);
     const kana='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔぁぃぅぇぉゃゅょゎ';
     const latin='a i u e o ka ki ku ke ko sa si su se so ta ti tu te to na ni nu ne no ha hi hu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n ga gi gu ge go za zi zu ze zo da zi zu de do ba bi bu be bo pa pi pu pe po vu a i u e o ya yu yo wa'.split(' ');
