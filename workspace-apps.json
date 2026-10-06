@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "STEP広報窓口",
+      "状態": "本番公開・週次連携設定済み",
+      "利用者向けURL": "https://step-publicity-desk.mintcocoajasmine.chatgpt.site"
+    },
+    {
       "正式名称": "STEPシステム資産管理台帳",
       "状態": "本番使用中（2026-09-28検索改善）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-system-registry/"
