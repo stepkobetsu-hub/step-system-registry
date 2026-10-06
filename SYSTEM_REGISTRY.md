@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-10-04
+最終更新: 2026-10-07
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -79,6 +79,7 @@
 | 請求システム | **本番使用中（学費計算・請求データ作成）** | https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec<br>**料金特別調整:** https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec?page=adjustments | Apps Script正本（下記詳細参照） | 既存本番デプロイ | `BillingV31_Index.html`、`コード.gs`、`BillingV31_Auth.gs` | Apps Script「請求システム2026NEW」＋Google Sheet。学費計算・請求データ・料金特別調整を管理 | Apps Scriptプロジェクト `1FQElz87j5yB-FNwuDE9LJ3_nD8rzF_vIGTTWKDr15KDygGxXnZLlXhIp` の既存デプロイIDを維持して更新 | 2026-10-04（台帳分離） | 学費計算・請求データ作成の独立カード。「料金特別調整を開く」を同カード内に残す。PDF作成・メール配信は隣の「請求書作成システム」カードから開く |
 | 請求書作成システム | **Cloudflare完全統合・本番稼働中（Apps Script／Brevo実送信・不達管理連携）** | https://stepkobetsu-hub.github.io/invoice-pdf/#invoices | [invoice-pdf](https://github.com/stepkobetsu-hub/invoice-pdf) | `main`（2026-09-04反映済み） | `index.html`、`assets/app.js`、`assets/receipt-pdf.js`、`apps-script/Code.gs`、`cloudflare/src/index.js`、D1 `step-invoice-db`、R2 `step-invoice-pdfs` | GitHub Pages＋Worker `step-invoice-api`＋D1＋非公開R2＋Apps Script＋Brevo。請求業務データはD1、PDFはR2を正本とし、メール送信は認証済みApps Script／Brevo経路 | 生徒選択時に生徒マスタを正本として氏名・フリガナ・郵便番号・住所・保護者メール・学年を取引先マスタへ同期。取引先独自項目は維持。手動「生徒マスタ更新」も可能。PDF閲覧URLの過剰レート制限を緩和し、請求書不達を中央の不達メール管理へ連携 | 2026-10-04（台帳分離） | 「1個ずつ作成」へ名称変更。取引先メール欠落時は生徒マスタから補完して保存。実運用送信元は `admin@educrest.jp`、返信先は `stepkobetsu@gmail.com`。請求書側の送信済み・開封・URL閲覧・PDF閲覧／ダウンロード表示は維持し、不達管理には対応が必要な失敗だけを集約。「未開封」は不達扱いにしない。Cloudflareの単独 `/api/send` 保護は維持し、実送信はApps Script／Brevo経路。詳細 `docs/invoice-delivery-bounce-management-20260904.md` |
 | お問い合わせ管理 | 本番使用中（反応リストJ・K列ハイフン対応済み） | https://stepkobetsu-hub.github.io/step-form/contact_form.html | [step-form](https://github.com/stepkobetsu-hub/step-form) | `main`（現行 `19da862`） | `contact_form.html`、`問い合わせ.gs` | GitHub Pages＋Google SheetバインドApps Script | 画面変更はGitHub `main`へ反映。保存処理を変える場合は既存GASデプロイと整合させる | 2026-09-07 | 顧客は電話番号・郵便番号をハイフンなしで入力。送信直前に電話番号（反応リストJ列）と郵便番号（K列）をハイフン付きへ整形して保存する。全角数字にも対応。生徒管理側の連絡先を優先する現行設計は維持 |
+| 反応リスト | 本番使用中（Google連絡先へ自動登録） | https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit | [step-system-registry](https://github.com/stepkobetsu-hub/step-system-registry) | Google Apps Script Head／台帳はmain | Apps Script「問い合わせ.gs」・syncAutomaticInquiryContacts | Google Sheet「反応リスト」の「お問い合わせ」シート＋People API | Head保存で定期処理へ反映。時間主導型・1分おき | 2026-10-07 | 新規追加・氏名や電話番号等の変更だけを自動登録／更新。同じ電話番号の重複防止、生徒管理名を優先、失敗は次回再試行。手動登録メニューは維持 |
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・43カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-23 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、証憑自動回収を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
@@ -1508,3 +1509,36 @@
 - 本番v67、既存URL・デプロイID維持。38項目合格と本番9月分28件の生成完了を確認。銀行側の再取込受付は未確認。
 - 個別給与・口座・CSV実体は公開せず、修正版CSVは利用者へ非公開提供。
 - 正本GAS・対象関数・両入口の経路・v65〜v67履歴・保守手順：[詳細記録](docs/payroll-yuucho-csv-20261004.md)。
+
+
+## 反応リスト（2026-10-07 自動連絡先登録）
+
+- **利用者**：塾長・管理者
+- **利用者向けURL**：https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit
+- **Google Sheet URL**：https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit
+- **入力フォームURL**：https://stepkobetsu-hub.github.io/step-form/contact_form.html
+- **Apps Script編集URL**：https://script.google.com/u/0/home/projects/1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj/edit
+- **GitHubドキュメントURL**：https://github.com/stepkobetsu-hub/step-system-registry/blob/main/SYSTEM_REGISTRY.md
+- **概要**：お問い合わせを記録する反応リスト。追加・氏名や電話番号等の変更を1分間隔で確認し、Google連絡先へ自動登録・更新します。通常は「連絡先登録」ボタンを押す必要はありません。
+- **保存基盤**：Google Sheet＋Google Apps Script＋People API（Google連絡先）
+- **Google Sheet名**：反応リスト
+- **正式Spreadsheet名**：反応リスト
+- **使用シート名**：お問い合わせ
+- **保存先Spreadsheet ID**：18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA
+- **Apps ScriptプロジェクトID**：1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj
+- **Apps Script概要**：問い合わせ受付・反応リスト保存・自動返信・管理者通知・週次確認・Google連絡先の手動登録と自動登録
+- **正本ファイル**：Apps Script「問い合わせ.gs」（Google連絡先の自動登録処理）。問い合わせ画面は step-form/contact_form.html。
+- **最新版の場所**：https://script.google.com/u/0/home/projects/1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj/edit
+- **関連カード**：お問い合わせ管理／生徒マスタ
+- **連携メモ**：お問い合わせフォーム → 反応リストの「お問い合わせ」シート → Google連絡先／同じ電話番号の既存連絡先は重複追加せず更新／生徒管理の表示名（優先度200）は反応リスト（優先度100）から上書きしない
+- **確認日**：2026年10月7日
+- **仕様メモ**：1分ごとに追加・変更の有無を確認。処理済み内容と同じなら連絡先への登録・更新を実行しない。変更判定は受付日時・名前・フリガナ・正規化した電話番号。氏名・受付日時・電話番号が不足または不正なら「未登録：データ不足」と表示し、修正後に再確認する。エラー行は次回再試行。同じ電話番号の複数行は最下行を最新版として扱う。初期設定時の既存行は一括登録せず記録済みとして扱う。手動登録メニューは維持。メールアドレス・住所だけの変更は自動連絡先更新の判定対象ではない。
+- **連絡先運用**：表示名は「（反）お名前yyyy-MM-dd」。今回の自動処理で登録・更新するのは表示名と電話番号。氏名はG列、フリガナH列、電話番号J列、受付日時A列、処理結果O列という現行保存処理の列位置を使用する。
+- **更新方法**：Apps Scriptの「問い合わせ.gs」を保存すると、Headを実行する時間トリガーへ反映される。自動実行関数はsyncAutomaticInquiryContacts、設定は時間主導型・分ベースのタイマー・1分おき。停止はこのトリガーだけを削除／無効化する。フォームの受信処理を変更するときは既存Webアプリデプロイを更新する。今回の自動登録追加ではフォームURLと既存Webアプリデプロイを変更していない。
+- **作業メモ**：2026-10-07：registerContactsの本体をregisterContactsManual_へ移し、手動・自動の共通ロックを追加。syncAutomaticInquiryContactsと内容の指紋による処理済み管理を追加。setupAutomaticInquiryContactsで既存行を初期記録し、1分おきの時間トリガーを設定。設定再実行で初期記録を上書きしない。Googleの既存権限で初期設定成功。フォーム保存処理・自動返信・管理者通知・既存dailyCheckトリガー2件は維持。
+- **確認根拠**：Apps Script保存内容を照合。2026-10-07 06:08:47 JSTの初期設定が完了。トリガー編集画面でHead・syncAutomaticInquiryContacts・分ベース・1分おきを確認。06:12:38 JSTの時間主導型実行は4.041秒で完了。ローカルの模擬検証で初期記録・重複防止・並べ替え・更新・生徒名保護・再試行・不足修正・電話番号正規化・手動登録を確認。
+- **確認済み事項**：反応リスト・フォーム・Apps Scriptの対応／自動登録コード保存／1分おきの時間トリガー／初回の定期実行が正常終了／電話番号での重複防止・生徒管理名の保護（模擬検証）
+- **未確認項目**：設定後の新しい実問い合わせによるGoogle連絡先の作成・更新結果
+- **確認状況**：本番の自動実行設定と正常終了を確認済み。新しい実問い合わせ1件での作成・更新は未確認。
+
+保守上の注意：処理済みの内容はScript PropertiesのSTEP_AUTO_CONTACT_V1_で管理する。既存キーを不用意に削除すると再処理されるため、記録を消して再設定しない。トリガー所有者は設定を行ったGoogleアカウント。問い合わせ元の個人情報・電話番号実体・認証情報は公開台帳に掲載しない。
