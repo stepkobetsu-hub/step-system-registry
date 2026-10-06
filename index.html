@@ -4712,5 +4712,85 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="inquiry-list-auto-contacts-20261007">
+(() => {
+  const record={
+  "ID": "inquiry-list",
+  "システム名": "反応リスト",
+  "正式名称": "反応リスト",
+  "分類": "受付・事務",
+  "状態": "本番使用中",
+  "利用者": "塾長・管理者",
+  "利用者向けURL": "https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit",
+  "Google Sheet URL": "https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit",
+  "入力フォームURL": "https://stepkobetsu-hub.github.io/step-form/contact_form.html",
+  "Apps Script編集URL": "https://script.google.com/u/0/home/projects/1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj/edit",
+  "GitHubドキュメントURL": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/SYSTEM_REGISTRY.md",
+  "概要": "お問い合わせを記録する反応リスト。追加・氏名や電話番号等の変更を1分間隔で確認し、Google連絡先へ自動登録・更新します。通常は「連絡先登録」ボタンを押す必要はありません。",
+  "保存基盤": "Google Sheet＋Google Apps Script＋People API（Google連絡先）",
+  "Google Sheet名": "反応リスト",
+  "正式Spreadsheet名": "反応リスト",
+  "使用シート名": "お問い合わせ",
+  "保存先Spreadsheet ID": "18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA",
+  "Apps ScriptプロジェクトID": "1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj",
+  "Apps Script概要": "問い合わせ受付・反応リスト保存・自動返信・管理者通知・週次確認・Google連絡先の手動登録と自動登録",
+  "正本ファイル": "Apps Script「問い合わせ.gs」（Google連絡先の自動登録処理）。問い合わせ画面は step-form/contact_form.html。",
+  "最新版の場所": "https://script.google.com/u/0/home/projects/1sEY10HLN9Wux9dgpH7WvK7h6dC8wsXm4nKEHv7r-CTiZlgj75alvxgUj/edit",
+  "関連カード": [
+    "お問い合わせ管理",
+    "生徒マスタ"
+  ],
+  "連携メモ": [
+    "お問い合わせフォーム → 反応リストの「お問い合わせ」シート → Google連絡先",
+    "同じ電話番号の既存連絡先は重複追加せず更新",
+    "生徒管理の表示名（優先度200）は反応リスト（優先度100）から上書きしない"
+  ],
+  "確認日": "2026年10月7日",
+  "仕様メモ": "1分ごとに追加・変更の有無を確認。処理済み内容と同じなら連絡先への登録・更新を実行しない。変更判定は受付日時・名前・フリガナ・正規化した電話番号。氏名・受付日時・電話番号が不足または不正なら「未登録：データ不足」と表示し、修正後に再確認する。エラー行は次回再試行。同じ電話番号の複数行は最下行を最新版として扱う。初期設定時の既存行は一括登録せず記録済みとして扱う。手動登録メニューは維持。メールアドレス・住所だけの変更は自動連絡先更新の判定対象ではない。",
+  "連絡先運用": "表示名は「（反）お名前yyyy-MM-dd」。今回の自動処理で登録・更新するのは表示名と電話番号。氏名はG列、フリガナH列、電話番号J列、受付日時A列、処理結果O列という現行保存処理の列位置を使用する。",
+  "更新方法": "Apps Scriptの「問い合わせ.gs」を保存すると、Headを実行する時間トリガーへ反映される。自動実行関数はsyncAutomaticInquiryContacts、設定は時間主導型・分ベースのタイマー・1分おき。停止はこのトリガーだけを削除／無効化する。フォームの受信処理を変更するときは既存Webアプリデプロイを更新する。今回の自動登録追加ではフォームURLと既存Webアプリデプロイを変更していない。",
+  "作業メモ": "2026-10-07：registerContactsの本体をregisterContactsManual_へ移し、手動・自動の共通ロックを追加。syncAutomaticInquiryContactsと内容の指紋による処理済み管理を追加。setupAutomaticInquiryContactsで既存行を初期記録し、1分おきの時間トリガーを設定。設定再実行で初期記録を上書きしない。Googleの既存権限で初期設定成功。フォーム保存処理・自動返信・管理者通知・既存dailyCheckトリガー2件は維持。",
+  "確認根拠": "Apps Script保存内容を照合。2026-10-07 06:08:47 JSTの初期設定が完了。トリガー編集画面でHead・syncAutomaticInquiryContacts・分ベース・1分おきを確認。06:12:38 JSTの時間主導型実行は4.041秒で完了。ローカルの模擬検証で初期記録・重複防止・並べ替え・更新・生徒名保護・再試行・不足修正・電話番号正規化・手動登録を確認。",
+  "確認済み事項": [
+    "反応リスト・フォーム・Apps Scriptの対応",
+    "自動登録コード保存",
+    "1分おきの時間トリガー",
+    "初回の定期実行が正常終了",
+    "電話番号での重複防止・生徒管理名の保護（模擬検証）"
+  ],
+  "未確認項目": [
+    "設定後の新しい実問い合わせによるGoogle連絡先の作成・更新結果"
+  ],
+  "確認状況": "本番の自動実行設定と正常終了を確認済み。新しい実問い合わせ1件での作成・更新は未確認。"
+};
+  CARD_ANCHORS.unshift(['反応リスト','inquiry-list']);
+  const organizeBefore=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=organizeBefore(items);
+    const index=list.findIndex(item=>item['ID']===record.ID||item['システム名']==='反応リスト'||item['正式名称']==='反応リスト');
+    if(index<0){
+      const contactIndex=list.findIndex(item=>String(item['システム名']||'').includes('お問い合わせ管理'));
+      list.splice(contactIndex<0?list.length:contactIndex+1,0,Object.assign({},record));
+    }else list[index]=Object.assign({},list[index],record);
+    return list;
+  };
+  const assetBefore=applyAssetInfo;
+  applyAssetInfo=function(item){
+    const result=assetBefore(item);
+    return item['ID']===record.ID?Object.assign({},result,record):result;
+  };
+  const labelBefore=linkLabel;
+  linkLabel=function(item,field,fallback){
+    if(item['ID']===record.ID){
+      if(field==='利用者向けURL'||field==='Google Sheet URL')return '反応リストを開く';
+      if(field==='入力フォームURL')return 'お問い合わせフォームを開く';
+      if(field==='Apps Script編集URL')return '反応リストのApps Scriptを編集';
+      if(field==='GitHubドキュメントURL')return '自動連絡先登録の仕様・保守記録';
+    }
+    return labelBefore(item,field,fallback);
+  };
+})();
+</script>
+
 </body>
 </html>
