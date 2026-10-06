@@ -4792,5 +4792,107 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="step-publicity-desk-20261007">
+(() => {
+  const record={
+  "ID": "step-publicity-desk",
+  "システム名": "STEP広報窓口",
+  "正式名称": "STEP広報窓口",
+  "分類": "管理・運営",
+  "状態": "本番公開・週次連携設定済み",
+  "利用者": "塾長・ChatGPT所有者",
+  "利用者向けURL": "https://step-publicity-desk.mintcocoajasmine.chatgpt.site",
+  "概要": "週1回の広報提案と、先生からの話題・回答・希望をまとめる窓口。媒体別の掲載状況と未読通知を確認できます。毎週月曜8時（日本時間）に準備し、Blogger2種と神領のGoogleビジネスへ予約公開。Instagram・Facebookは原稿・下書きまで。",
+  "管理": "ChatGPT所有者限定（窓口アプリ）。台帳は公開情報のみ。",
+  "保存基盤": "ChatGPT Sites Worker＋D1（DB）",
+  "保存仕様": "提案・先生の入力・媒体の状態・通知・設定をD1に保存。入力は次回の週次処理で取り込み。同じIDで再送しても重複登録を防ぐ。",
+  "データシート一覧": "desk_channels／desk_ideas／desk_notices／desk_reports／desk_settings",
+  "利用者向けアプリ名": "STEP 広報窓口",
+  "起動方法": "「STEP広報窓口を開く」から所有者のChatGPTアカウントで開く。スマートフォンはホーム画面に追加可能。",
+  "対象サービス": [
+    "Blogger広告宣伝 → 公式ホームページのトップに表示",
+    "Blogger塾生告知 → ホームページのLINE用お知らせページに表示",
+    "Googleビジネスプロフィール（個別指導ステップ神領）：Metricool予約公開",
+    "Instagram・Facebook：原稿・下書き",
+    "大手の個別指導および大手・神領のプログラミング教室のGoogleプロフィール：未接続、原稿準備まで",
+    "Wixの独立したTOPICS欄：週次は原稿準備まで"
+  ],
+  "主要機能": [
+    "AIから題材3件と短い質問を提案",
+    "先生が話題・回答・希望する題材を入力",
+    "文章・画像・媒体ごとの掲載状況をまとめて確認",
+    "未読通知と週間レポートを保存"
+  ],
+  "トリガー": "既存ChatGPTタスク「STEPの週間発信準備」。毎週月曜08:00（Asia/Tokyo）。次回2026-10-12。Bloggerの公開処理は既存の5分間隔トリガー。",
+  "連携メモ": [
+    "広告Bloggerは火曜18:30以降、塾生Bloggerは火曜18:35以降に予約公開（日本時間）",
+    "神領の個別指導Googleビジネスは火曜18:30にMetricoolで予約公開",
+    "Instagram・Facebookの新しい週次投稿は下書きまで。公開は対象の原稿について指示を受けた場合",
+    "先生の入力は次回週次処理で確認。即時の自動応答ではない"
+  ],
+  "Google Sheet URL": "https://docs.google.com/spreadsheets/d/13b2w8ibKoS2f73GAFeeGVkYxqpvPYZizHTmC0E2XsmA/edit",
+  "Google Sheet名": "STEP Blogger定期公開管理",
+  "使用シート名": "投稿キュー／運用案内",
+  "Apps Script編集URL": "https://script.google.com/home/projects/13ySUluRt8i1GKSfcyGPKSmPJjXicE8vcjo3UfAY-l7DWiV2n6UHGIYiN/edit",
+  "Apps Scriptプロジェクト名": "STEP メール定期公開",
+  "Apps ScriptプロジェクトID": "13ySUluRt8i1GKSfcyGPKSmPJjXicE8vcjo3UfAY-l7DWiV2n6UHGIYiN",
+  "Apps Script概要": "メール投稿方式で広告宣伝・塾生告知のBloggerへ予約公開。秘密の投稿先はScript Propertiesに保存し、台帳へ記載しない。",
+  "認証・セッション": "窓口は所有者限定のChatGPT認証。連携処理はSitesの正式なサービス経路を利用。外部媒体の認証は各連携側で管理。秘密値・個人情報は公開台帳に記載しない。",
+  "正本ファイル": "ChatGPT SitesのSTEP 広報窓口管理ソース。主要ファイル：app/desk.tsx、lib/desk-store.ts、lib/desk-contract.ts、app/api/*/route.ts、app/mcp/route.ts。",
+  "最新版の場所": "Sitesプロジェクト appgprj_6ac56743dac081919afbd49f22ddab91。2026-10-07確認時は公開版2。アプリのコードを台帳リポジトリへ複製しない。",
+  "更新方法": "窓口はSites管理ソースを修正し、同じプロジェクトへ保存・公開。週次処理は既存タスクを更新し、重複するタスクを作らない。Blogger公開処理は既存Apps Scriptと投稿キューを維持。",
+  "公開手順": "Sitesの保存・デプロイ完了後、同じ本番URLの状態取得と保存済み入力を確認。媒体の公開予約は各サービスの実データで確認。",
+  "確認手順": "所有者で窓口を開き、未読通知・週間レポート・媒体の状態を確認。入力後に保存できたことを確認。週次タスク実行後はレポートと媒体側の実予約／公開結果を照合。",
+  "障害時の確認": "窓口の認証・本番デプロイ・D1保存、週次タスクの有効状態、Bloggerキュー／Apps Script実行履歴、Metricoolの接続先・予約状態の順に確認。再実行時は既存IDを使い重複投稿を防ぐ。",
+  "変更時の注意": "広告宣伝と塾生告知の内容・投稿先を分ける。生徒の成果は実際の情報と外部公開の可否を確認して使用。未接続媒体の自動公開を有効と表示しない。",
+  "作業メモ": "2026-10-07：STEP 広報窓口を所有者限定で公開（版2）。既存の週次タスクへ窓口の入力取得・結果保存を追加。通知1件・レポート1件・媒体9件の状態を登録。Blogger2種の実公開と2026-10-13の予約、神領Googleビジネスの予約を確認し、台帳カードを追加。",
+  "仕様メモ": "窓口内の未読通知＋ChatGPTタスク通知を使用。ブラウザ通知はページを開いている間の補助。閉じたアプリへの独立したスマホプッシュ配信は未実装。",
+  "GitHubドキュメントURL": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/step-publicity-desk-20261007.md",
+  "GitHubドキュメント": "docs/step-publicity-desk-20261007.md",
+  "バックアップ場所": "Sitesの保存バージョンとGit管理ソース。台帳の仕様・運用記録はstep-system-registry/main。",
+  "確認日": "2026年10月7日",
+  "確認根拠": "Sites公開版2と本番APIの読み取り・書き込み・再読込を確認。更新後も通知・レポート・媒体状態を保持。同じIDの再適用で重複なし。既存週次タスクの有効設定と10月12日開始を確認。",
+  "確認済み事項": [
+    "所有者限定の本番公開・版2",
+    "本番APIの状態取得・保存・再読込と重複防止",
+    "週間レポート1件・通知1件・媒体の状態9件",
+    "既存の週次タスクの有効設定",
+    "Blogger2種の実公開と10月13日の予約",
+    "神領Googleビジネスの10月13日予約"
+  ],
+  "未確認項目": [
+    "10月12日の初回週次連携の実行結果",
+    "スマートフォン実機の画面と通知",
+    "専用MCPツール経由の呼出し（インストール済みだが当該ツールがこの会話に未表示）"
+  ],
+  "確認状況": "公開・保存・予約設定を確認済み。最初の週次実行、スマートフォン実機、専用MCP呼出しは未確認。"
+};
+  CARD_ANCHORS.unshift(['STEP広報窓口','step-publicity-desk']);
+  const organizeBefore=organizeEntryImport;
+  organizeEntryImport=function(items){
+    const list=organizeBefore(items);
+    const index=list.findIndex(item=>item['ID']===record.ID||item['システム名']===record['システム名']||item['正式名称']===record['正式名称']);
+    if(index<0)list.push(Object.assign({},record));
+    else list[index]=Object.assign({},list[index],record);
+    return list;
+  };
+  const assetBefore=applyAssetInfo;
+  applyAssetInfo=function(item){
+    const result=assetBefore(item);
+    return item['ID']===record.ID?Object.assign({},result,record):result;
+  };
+  const labelBefore=linkLabel;
+  linkLabel=function(item,field,fallback){
+    if(item['ID']===record.ID){
+      if(field==='利用者向けURL')return 'STEP広報窓口を開く';
+      if(field==='Google Sheet URL')return 'Blogger定期公開のキューを開く';
+      if(field==='Apps Script編集URL')return 'Bloggerメール定期公開を編集';
+      if(field==='GitHubドキュメントURL')return '広報窓口の仕様・保守記録';
+    }
+    return labelBefore(item,field,fallback);
+  };
+})();
+</script>
+
 </body>
 </html>

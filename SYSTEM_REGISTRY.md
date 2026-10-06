@@ -50,6 +50,7 @@
 
 | 正式名称 | 状態 | 利用者向け本番URL | リポジトリ | 本番ブランチ | ソース・主要ファイル | 管理 | 更新方法 | 本番確認日 | 旧版・試作版との区別 |
 |---|---|---|---|---|---|---|---|---|---|
+| STEP広報窓口 | 本番公開・週次連携設定済み | https://step-publicity-desk.mintcocoajasmine.chatgpt.site | ChatGPT Sites管理ソース＋[運用・保守記録](docs/step-publicity-desk-20261007.md) | Sites公開版2（台帳記録は `main`） | `app/desk.tsx`、`lib/desk-store.ts`、`app/api/`、`app/mcp/route.ts`、D1 | 所有者限定のChatGPT認証＋Sites Worker＋D1 | 毎週月曜08:00（日本時間）の既存タスクで提案・入力取り込み・結果保存。窓口の改修はSitesで同じURLに公開 | 2026-10-07 | Blogger2種と個別指導神領のGoogleビジネスは予約公開。Instagram・Facebookは下書きまで。大手・プログラミング3プロフィールは未接続。Wix独立TOPICSは原稿準備。詳細は運用・保守記録を参照 |
 | STEPシステム資産管理台帳 | 本番使用中（2026-09-28検索改善） | https://stepkobetsu-hub.github.io/step-system-registry/ | [step-system-registry](https://github.com/stepkobetsu-hub/step-system-registry) | `main` | `index.html`、`registry-search.js`、`SYSTEM_REGISTRY.md` | GitHub Pages＋STEPスタッフ認証＋台帳共有設定 | 本リポジトリの`main`へ反映し、Pages公開と検索結果を確認 | 2026-09-28 | 旧調査状況セレクトを削除し、カード名専用と詳細を含む検索窓を追加。左メニュー検索を保持。主要な漢字語の読み・かな・ローマ字、および「生徒 検索」のようなスペース区切りの複数語AND検索に対応。詳細は本書「台帳画面の検索」を参照 |
 | STEP 教室ビデオ通話 | **本番使用中（Fire APK v0.3.9・固定release署名）** | https://stepkobetsu-hub.github.io/step-system-registry/classroom-video-install.html<br>**インストール用QR:** https://stepkobetsu-hub.github.io/step-system-registry/images/classroom-video-install-qr.png<br>**固定APK:** https://github.com/stepkobetsu-hub/step-system-registry/releases/download/classroom-video-fire/STEP-Classroom-Video-Fire.apk<br>**本番Worker:** https://step-classroom-video.stepkobetsu.workers.dev/ | [step-system-registry/classroom-video](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/classroom-video) | `main` | `classroom-video/public/`、`classroom-video/src/`、`classroom-video/android/`、固定GitHub Release APK | Cloudflare Worker／Durable Object／Realtime TURN＋Fire APK | **固定APKをインストールして初回起動するだけで端末固有IDとcredentialを自動登録。** 端末別設定QR、端末ID、長いトークンの入力は不要。既存端末も上書き更新時に新方式へ自動移行 | 2026-10-03 | 2026-10-03、利用者からPR #97・71a4ba0cfc01577db0bfb6685aad6ab2e82097d8の本番デプロイ完了報告。Version ID f5ee149a-6e22-4094-a770-7f631485490d。122テスト、型チェック・dry-run成功、公開5ファイル一致、既存URL・Durable Object・Secrets維持。携帯の休止解除、全接続先表示、選択画面拡大、不要端末のブラウザ内非表示・再表示、接続中青／非表示灰を反映。自動接続アラームなし、手動呼び出し音は維持。起動応答は映像未確認と表示。双方向映像・終了後復帰・最新版UIの実機確認は未報告。 [更新・引継ぎ記録](docs/classroom-video-history-20261002.md) |
 | デジタルカレンダー | 本番公開中（Sites版54・Fire 7／Windows 10・11） | https://fire-digital-calendar.mintcocoajasmine.chatgpt.site | ChatGPT Sites管理ソース＋[step-system-registry/windows-calendar](https://github.com/stepkobetsu-hub/step-system-registry/tree/main/windows-calendar) | `main` | ChatGPT Sites管理ソース、`dist/`一式、`dist/server/index.js`、`scripts/build-worker.mjs`、Windows版の検証用ソース | ChatGPT Sites Worker＋Googleカレンダー閲覧専用Apps Script連携 | Web版はSites管理ソースを更新し、Workerを再生成して新版を公開。更新番号を上げ、Fire 7実機で予定・点・ヘッドラインを確認。WindowsはEdgeのサイトアプリを使用 | 2026-09-23 | 更新54。FireからGoogleへ直接接続せず、同一サイト内APIを経由。応答を45秒まで待ち、更新失敗時は既存予定を保持する。Fire 7実機で復旧確認済み |
@@ -1542,3 +1543,12 @@
 - **確認状況**：本番の自動実行設定と正常終了を確認済み。新しい実問い合わせ1件での作成・更新は未確認。
 
 保守上の注意：処理済みの内容はScript PropertiesのSTEP_AUTO_CONTACT_V1_で管理する。既存キーを不用意に削除すると再処理されるため、記録を消して再設定しない。トリガー所有者は設定を行ったGoogleアカウント。問い合わせ元の個人情報・電話番号実体・認証情報は公開台帳に掲載しない。
+
+## STEP広報窓口（2026-10-07 登録）
+
+- 本番入口：https://step-publicity-desk.mintcocoajasmine.chatgpt.site
+- 台帳カード：[STEP広報窓口](https://stepkobetsu-hub.github.io/step-system-registry/#system-step-publicity-desk)
+- [仕様・運用・保守記録](docs/step-publicity-desk-20261007.md)に、窓口の使い方、媒体ごとの掲載範囲、週次タスク、保存先、修正・確認方法を記録。
+- 毎週月曜08:00（日本時間）に既存タスク「STEPの週間発信準備」を実行。次回は2026-10-12。新しい週次タスクは追加していない。
+- Blogger広告宣伝・塾生告知、および個別指導神領のGoogleビジネスは予約公開の設定済み。Instagram・Facebookは新しい週次投稿の下書きまで。大手とプログラミング教室のGoogleプロフィールは未接続、Wixの独立TOPICS欄は週次の直接編集を自動化していない。
+- 本番APIの保存・再読込・重複防止を確認。最初の週次実行、スマートフォン実機、専用MCPツール経由の呼出しは未確認。
