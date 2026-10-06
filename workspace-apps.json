@@ -147,6 +147,11 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-form/contact_form.html"
     },
     {
+      "正式名称": "反応リスト",
+      "状態": "本番使用中（Google連絡先へ自動登録）",
+      "利用者向けURL": "https://docs.google.com/spreadsheets/d/18VKKfPZ_AE-j-mz995Aru0KLLsWsFdoizBXH9PTYyaA/edit"
+    },
+    {
       "正式名称": "STEP業務ホーム",
       "状態": "本番（全端末共有・版競合防止）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-workspace/"
