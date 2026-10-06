@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**2**
-- 公開ソースコミット：`895ebf8b70862e2eb135f35d55e648f963a98daa`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_ba67b52ac6b88191bc74a7e57594fb32`
+- 公開確認版：**3**
+- 公開ソースコミット：`9f2290246598dbfc61889e70a0ca8a932eb4bbab`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_de9dceafd6ac8191b08d613c08edb6b3`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -116,3 +116,23 @@
 5. 不具合時は、Sitesのデプロイと認証、D1保存、週次タスクの有効状態、Apps Scriptの実行履歴・投稿キュー、Metricoolの接続と予約状態を確認する。
 6. 再実行は既存のIDと処理済み記録を使用し、同じ記事・通知を二重に作らない。
 7. 掲載範囲・確認日・未接続項目が変わったら、本書、`SYSTEM_REGISTRY.md`、`index.html`のカード記録を更新する。台帳は`step-system-registry/main`へ反映してGitHub Pages公開を確認する。
+
+## 2026-10-07：ホーム画面アイコン修正（公開版3）
+
+携帯のホーム画面へショートカットを置いた際、アイコンが表示されないという報告に対応。既存の青いSTEP階段マークを維持し、SVGだけだった設定にスマートフォン用の画像を追加した。
+
+| ファイル | 用途 |
+|---|---|
+| `public/icons/step-publicity-192.png` | Android・ショートカット用192×192 PNG |
+| `public/icons/step-publicity-512.png` | インストール表示用512×512 PNG |
+| `public/icons/step-publicity-maskable-512.png` | 端末による丸・角丸の切り抜きに対応する不透明背景の512×512 PNG |
+| `public/apple-touch-icon.png` | iPhone用180×180 PNG |
+| `public/favicon.ico` | 16・32・48のブラウザ用アイコン |
+
+`app/layout.tsx`にPNGのicon／shortcutとApple touch指定を追加。`public/manifest.webmanifest`にPNG3件とid・scopeを設定。所有者限定のアプリなので、manifestリンクに`crossOrigin="use-credentials"`を指定。アプリの公開範囲は変更していない。
+
+確認済み：画像の形式と寸法、maskable画像の不透明背景、manifestの参照先、TypeScript型チェック、Workerビルド、公開アーカイブへの画像6ファイル同梱、公開版3のデプロイ成功。携帯実機での追加・表示と、ブラウザごとのインストール可否は未確認。
+
+以前に作成したショートカットは端末側に画像を保持する場合があるため、ホーム画面の古いショートカットを削除し、同じ本番URLを開き直して「ホーム画面に追加」を実行する。ホーム画面からショートカットだけを削除しても、窓口のD1データは削除されない。
+
+本変更のソースコミット：`9f2290246598dbfc61889e70a0ca8a932eb4bbab`。週次タスク、外部媒体の掲載設定、D1のスキーマ・保存処理は変更していない。
