@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**3**
-- 公開ソースコミット：`9f2290246598dbfc61889e70a0ca8a932eb4bbab`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_de9dceafd6ac8191b08d613c08edb6b3`
+- 公開確認版：**4**
+- 公開ソースコミット：`8b6f38da1357d492751b1dbbbc130f32c777ab06`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_10a74ff6ae50819190b7d29a94e6e80f`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -136,3 +136,17 @@
 以前に作成したショートカットは端末側に画像を保持する場合があるため、ホーム画面の古いショートカットを削除し、同じ本番URLを開き直して「ホーム画面に追加」を実行する。ホーム画面からショートカットだけを削除しても、窓口のD1データは削除されない。
 
 本変更のソースコミット：`9f2290246598dbfc61889e70a0ca8a932eb4bbab`。週次タスク、外部媒体の掲載設定、D1のスキーマ・保存処理は変更していない。
+
+## 2026-10-07：教室からの良い事・行事予定の報告（公開版4）
+
+面談メモの上部に「良い事や行事予定」を追加。[報告画面](https://stepkobetsu-hub.github.io/seiseki-kanri/classroom_reports.html)は共通講師ログインを引き継ぎ、報告を保存して下部に一覧表示する。本人は自分の報告、権限4の塾長は全員分を確認・編集できる。校舎・操作の共通権限もサーバーで確認する。
+
+保存正本はSupabase `step_publicity_reports`。関数`step-publicity-report-runtime-v1`で認証・権限・本人条件を確認する。既存のスタッフ認証関数は変更していない。読み取り専用連携キーはSitesのsecret `STEP_REPORT_READER_KEY`、SupabaseにはSHA256だけを保存する。両テーブルはRLS有効、anon／authenticatedにアクセス権を与えない。
+
+窓口の`lib/classroom-report-import.ts`で新規・編集を読み、`desk_ideas`へ最新内容、`desk_notices`へ版ごとのお知らせを保存する。取り込み済みの版番号とカーソルは`desk_settings`。窓口を開いている間は30秒更新。閉じている間も報告の正本は保存され、次回起動や既存週次タスクで取り込む。
+
+外向け利用のチェックがない内容は、本人・塾長への確認が必要として窓口へ渡す。記事・SNSを直接公開する処理は報告画面に追加していない。
+
+[報告画面・APIの仕様と保守記録](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/classroom-reports-20261007.md)
+
+確認：公開版4のデプロイ完了、窓口本番APIで報告連携connected・既存通知と媒体状態の保持、報告APIで無認証／不正キーの拒否、テーブルRLSと公開ロールの権限なし。保存・一覧・編集・認証・再送・競合・権限など10件の模擬テスト、および実装の取り込み関数とSQLiteによる新規・編集・再送・旧版・障害時保持の検証が成功。本番にテスト報告は追加していない。実際の講師による初回送信と窓口での表示は未確認。
