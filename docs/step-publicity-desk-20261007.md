@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**7**
-- 公開ソースコミット：`64e7dd4f44c8104d5a1c8d7f3dbad84e80f23d9f`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_baf3d86b0528819196599c92aa8642bc`
+- 公開確認版：**8**
+- 公開ソースコミット：`8f589d2fcda993fc9294b855cd181c34135ea27b`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_6a1d9fc333788191a19f932023b43f95`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`、`desk_staff_sessions`、`desk_login_limits`、`desk_notice_reads`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -191,3 +191,21 @@ commonStaffはstaffLoginだけ待機上限を90秒に延長。既存セッショ
 確認：窓口10件の模擬検証（初回のみ90秒、セッション確認45秒を含む）、型チェック、Workerビルド成功。7001の修正後の再ログインは利用者確認待ち。
 
 ソースコミット：`64e7dd4f44c8104d5a1c8d7f3dbad84e80f23d9f`。
+
+## 2026-10-07：報告削除・面談メモのアイコン（公開版8）
+
+7001も入れたと利用者が確認。認証の追加変更やパスワード変更は実施していない。
+
+面談メモの「良い事や行事予定」をオレンジ色と★印で強調。報告履歴に確認付き「削除」を追加。本人または権限4、中央のdelete操作・校舎範囲・現在の版をサーバーで確認する。元の件名・本文・日付・外部利用可否は消去し、Supabaseに削除ID・版・時刻等を保持する。古い編集や再送で復活しない。
+
+窓口のlib/classroom-report-import.tsは削除を取り込んでdesk_ideasの題材、desk_noticesの該当報告通知、desk_notice_readsの既読を除去し、内容を含まない削除通知を1件表示する。desk_settingsの版番号を保持し、古い報告を再取り込みしても題材・通知を再作成しない。窓口を開いている間の30秒更新、次回起動・週次準備での取り込みを維持。生成済みの週間レポートや外部公開済みの記事を自動削除するものではない。
+
+面談メモは専用manifest（id=meeting_memo.html）、青地にメモ・鉛筆・STEPのSVGとPNG192・512・maskable512・Apple touch180を追加。ログイン画面「ホーム画面に追加」と上部「アプリ追加」から、対応するブラウザのインストール確認またはChrome／Safariの手順を表示する。Service Workerは面談メモのページだけを制御し、アイコンのみをキャッシュする。認証・面談・報告・APIデータをキャッシュしない。端末での追加操作は利用者が行う。
+
+確認：報告API16テスト、実取り込み関数＋Drizzleスキーマ＋SQLite3テスト（削除、旧通知／既読消去、二重処理・再出現防止、競合、障害時保持）、型チェック・Workerビルド成功。広報窓口の公開版8成功、読み取り連携connected、既存レポート・媒体保持を確認。本番へ試験報告を追加・削除していない。スマートフォン実機の追加は未確認。
+
+報告API：step-publicity-report-runtime-v1 v2。Supabaseマイグレーション：step_publicity_report_deletion（deleted_at追加、RLSと公開ロールの権限なしを確認）。画面・API・アイコンの正本はseiseki-kanri/main。[報告仕様](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/classroom-reports-20261007.md)。
+
+ソースコミット：`8f589d2fcda993fc9294b855cd181c34135ea27b`。
+保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_6a1d9fc333788191a19f932023b43f95`。
+デプロイ：`appgdep_6ac5f1ba7de88191bb4b6716070f50d8`（succeeded、env revision 2）。
