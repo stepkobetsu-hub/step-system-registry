@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**9**
-- 公開ソースコミット：`cf7397f52516a1870f2fb0f5fc9c166bdfc49f8c`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_e263db4d8774819181821de983150444`
+- 公開確認版：**10**
+- 公開ソースコミット：`bb5371bae6bbeaed59c9081d5f91281e37c6090a`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_68e7e59d1b888191b97a74ac297d7e16`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`、`desk_staff_sessions`、`desk_login_limits`、`desk_notice_reads`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -219,3 +219,23 @@ commonStaffはstaffLoginだけ待機上限を90秒に延長。既存セッショ
 ソースコミット：`cf7397f52516a1870f2fb0f5fc9c166bdfc49f8c`。
 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_e263db4d8774819181821de983150444`。
 デプロイ：`appgdep_6ac5f3caff48819183155a17652f8538`。
+
+
+## 2026-10-07：写真・PDF添付、発信チェックの撤去（公開版10）
+
+良い事や行事予定の発信利用チェックを画面から削除し、報告一覧・窓口の本文から結果表示も撤去。既存のexternal_use列は互換用に保持し、新しい画面はその値を送らない。今回の撤去は外部媒体への自動公開条件を広げる変更ではない。
+
+写真／PDFを最大5点・各10MB添付する。送信時に保存し、失敗時は選択を保持して再送できる。報告一覧は別タブ閲覧、編集時は追加・取り外しが可能。取り外しは変更送信で確定。報告削除時はStorage実体とメタデータも除去する。未提出の孤立ファイル、取り外したが報告が残るファイルは非公開領域に保持し、同じ報告を削除するとまとめて除去。孤立ファイルの定期削除は未追加。
+
+Supabase project wisedgcgwaebtkprdhth、非公開bucket step-publicity-report-files、RLS有効のstep_publicity_report_files、公開APIロールの権限なし。マイグレーションstep_publicity_report_attachments。Storageは匿名／authenticatedの当該bucketアクセスを拒否する制限ポリシーを追加し、共通講師認証後にAPI内のservice_roleで操作する。画像／PDFの実際の先頭形式・サイズ・内容ハッシュを検証、固定UUIDパスで日本語ファイル名の制限を回避。同じ添付ID・ハッシュで再送し、既存のファイルを重複・上書きしない。
+
+報告API step-publicity-report-runtime-v1 v3：uploadは中央write・校舎・報告本人／権限4、attachmentUrlはviewと本人／権限4を確認。窓口専用のownerAttachmentUrlも既存の読み取りキーを必須とする。署名URLは10分、都度発行し永続保存しない。
+
+窓口のclassroom-report-import.tsは固定の認証付き閲覧URLと添付メタデータをdesk_settingsへ取り込み、desk-store.tsは話題・通知に結合して返す。D1の新規テーブルは不要。画面のお知らせと送った話題に添付リンクを表示する。api/classroom-attachmentは現在の共通講師権限3以上または既存のAI更新認証を確認し、短期署名URLへ移動。AIからは同じ固定URLにformat=jsonを追加して認証付きで取得し、URLの期限が切れたら取得し直す。公開原稿へこの私的な短期URLをそのまま掲載しない。
+
+検証：バックエンド／UI25件（旧機能含む）、実取り込み関数＋SQLite4件、型チェック・Workerビルド成功。本番bucket非公開・RLS・公開ロール権限なしを確認。API v3の取得ソースは正本一致、公開版10成功。未ログインの添付署名と不正キーを拒否。新しい実ファイルの本番投稿は利用者の初回送信で確認する。
+
+面談メモ側のソース：`1bb78b56a2f0b97c16102ce8d764e5e1cb4995c5`（seiseki-kanri/main）。
+窓口ソース：`bb5371bae6bbeaed59c9081d5f91281e37c6090a`。
+保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_68e7e59d1b888191b97a74ac297d7e16`。
+デプロイ：`appgdep_6ac61b5e130c8191995da8ba1a8e3bb3`（succeeded、env revision 2）。
