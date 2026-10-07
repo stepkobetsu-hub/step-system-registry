@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**5**
-- 公開ソースコミット：`dacf901bba6e8b808cfe274b9c4af14172beb94f`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_5f2cfa7b692081919b709f04558bd3bd`
+- 公開確認版：**6**
+- 公開ソースコミット：`2827d9ac55b5e8441ab27b819dae851c8723ebad`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_a9a52344ede48191abdf8934c524c369`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`、`desk_staff_sessions`、`desk_login_limits`、`desk_notice_reads`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -165,3 +165,16 @@ STEP共通の講師番号・パスワードでログインし、権限3以上を
 主要実装：lib/staff-access.ts、app/api/auth/*、app/desk.tsx、app/api/notices、lib/desk-store.ts。追加スキーマはDrizzle生成migration 0001_tan_echo.sql。STEP共通認証のSupabase機能は変更せず利用した。テストはtests/staff-access.test.cjs。
 
 確認：型チェック、Workerビルド、公開版5成功、8項目の模擬検証と実SQLiteでの個人別既読・再送重複防止。匿名HTTPでログインページ200、auth/session・state・sync・contractが401。所有者MCPとサービス認証は本番200で既存レポート1件・通知1件・媒体9件と報告連携connectedを確認。無認証の入力・既読操作は拒否。他サイトからのログイン操作も拒否。専用MCP呼出しは今回確認できた。実講師IDでの初回ログイン・スマートフォンのベル操作・10月12日の初回週次実行は未確認。
+
+
+## 2026-10-07：7001のログイン拒否への修正（公開版6）
+
+報告された権限4・7001のログインは本番で約35～45秒後に401となった。Siteと共通認証の記録では、初回の200応答後に401となる例があり、発行直後のセッションを旧認証先へ再照会する経路が原因として疑われた。実パスワードを取得せず調査したため、個別の失敗原因は断定していない。
+
+共通認証`seiseki-admin-runtime-v1` v19は、信頼する既存staffLoginが成功した場合だけ発行トークンのSHA256・講師番号・権限・有効期限をseiseki_admin_sessionsへ保存し、直後のverifyStaffSessionをその記録で確認する。パスワード不一致・講師番号の不一致・無効な期限では保存しない。権限1のgrade-onlyセッションと管理用トークンの分離は維持。認証後は従来どおり中央権限を毎回確認する。
+
+窓口は旧認証先の権限による先行拒否をやめ、verifyStaffSessionが返す現在の中央権限3・4を判定する。権限2以下は窓口セッションを発行しない。失敗時の記録は操作名・HTTP状態・エラーコード・所要時間のみで、パスワード・トークン・入力本文は記録しない。
+
+確認：共通認証4件と窓口9件の模擬検証、型チェック・Workerビルド成功、公開版6成功、共通認証v19の取得ソースが変更ファイルと一致。7001の実際のパスワードを使ったログインは未確認。利用者にページ更新後の再ログインを案内する。
+
+窓口ソース：`2827d9ac55b5e8441ab27b819dae851c8723ebad`。共通認証正本：seiseki-kanri/main `f60db2359c195230b1ee90d4f30b1aa523afd77e`。共通認証テスト：supabase/functions/seiseki-admin-runtime-v1/tests/login-cache.test.cjs（TypeScriptモジュールを利用）。DBスキーマ・週次タスク・媒体の予約は変更していない。
