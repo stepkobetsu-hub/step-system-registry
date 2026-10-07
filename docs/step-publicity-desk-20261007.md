@@ -8,7 +8,7 @@
 - アプリ名：STEP 広報窓口
 - 本番URL：https://step-publicity-desk.mintcocoajasmine.chatgpt.site
 - [システム管理台帳のカード](https://stepkobetsu-hub.github.io/step-system-registry/#system-step-publicity-desk)
-- 利用者：塾長・ChatGPT所有者。アプリは所有者限定。公開台帳には設定・仕様だけを載せ、先生の入力内容や個人情報を載せない。
+- 利用者：STEP共通権限3・4のスタッフ（塾長・教室責任者）。共通講師ログインが必須。公開台帳には設定・仕様だけを載せ、先生の入力内容や個人情報を載せない。
 
 近隣塾の発信や季節の話題を調べ、STEPに合う題材を週1回提案する。先生から「点数が伸びた生徒」「教室での頑張り」「プログラミングの作品」などの情報を受け取り、文章・画像・媒体ごとの掲載状況を一か所で確認できるようにする。近隣塾の文章や画像を転載せず、STEPの実際の情報をもとに作成する。
 
@@ -59,11 +59,11 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**4**
-- 公開ソースコミット：`8b6f38da1357d492751b1dbbbc130f32c777ab06`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_10a74ff6ae50819190b7d29a94e6e80f`
+- 公開確認版：**5**
+- 公開ソースコミット：`dacf901bba6e8b808cfe274b9c4af14172beb94f`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_5f2cfa7b692081919b709f04558bd3bd`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
-- テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`
+- テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`、`desk_staff_sessions`、`desk_login_limits`、`desk_notice_reads`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
 
 | 主要ファイル | 役割 |
@@ -150,3 +150,18 @@
 [報告画面・APIの仕様と保守記録](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/classroom-reports-20261007.md)
 
 確認：公開版4のデプロイ完了、窓口本番APIで報告連携connected・既存通知と媒体状態の保持、報告APIで無認証／不正キーの拒否、テーブルRLSと公開ロールの権限なし。保存・一覧・編集・認証・再送・競合・権限など10件の模擬テスト、および実装の取り込み関数とSQLiteによる新規・編集・再送・旧版・障害時保持の検証が成功。本番にテスト報告は追加していない。実際の講師による初回送信と窓口での表示は未確認。
+
+
+## 2026-10-07：権限3以上のログインとベル通知（公開版5）
+
+STEP共通の講師番号・パスワードでログインし、権限3以上をサーバーで毎回確認する。自分でログアウトするまでログインを維持。ログアウトはD1の窓口セッションを失効した後に共通セッションも解除する。ブラウザCookieを削除した場合は再ログインが必要。講師パスワードは保存しない。
+
+ベルを押すと通知一覧が開く。お知らせ画面・ベル一覧で画面内に50%以上が1秒間表示された通知、または提案を確認した通知は既読に保存する。保存成功後に件数を減らす。「すべて確認済みにする」も残す。desk_notice_readsで講師番号ごとに保存し、別の人の未読を消さない。
+
+権限3・4のスタッフがログイン画面に到達できるようSitesの配信設定を変更した。これは広報の記録を一般公開する設定ではなく、ページには記録を含めず、データAPIにはSTEP認証を必須とする。AI連携のsync・contract・MCPも所有者のChatGPT認証またはSite限定サービス認証を必須とした。サービスHTTPは正式なSite認証とアプリ認証の両ヘッダーを使い、秘密値はこの文書や公開台帳に記録しない。
+
+既存週次タスクは同じID・日時・有効状態を維持し、窓口への接続手順だけを更新した。所有者MCPのread_step_desk／update_step_deskを優先し、HTTPは最新のget_siteのサービス情報をこのSiteだけに使う。媒体の公開範囲、記事や予約、既存報告、URLとアイコンは維持。
+
+主要実装：lib/staff-access.ts、app/api/auth/*、app/desk.tsx、app/api/notices、lib/desk-store.ts。追加スキーマはDrizzle生成migration 0001_tan_echo.sql。STEP共通認証のSupabase機能は変更せず利用した。テストはtests/staff-access.test.cjs。
+
+確認：型チェック、Workerビルド、公開版5成功、8項目の模擬検証と実SQLiteでの個人別既読・再送重複防止。匿名HTTPでログインページ200、auth/session・state・sync・contractが401。所有者MCPとサービス認証は本番200で既存レポート1件・通知1件・媒体9件と報告連携connectedを確認。無認証の入力・既読操作は拒否。他サイトからのログイン操作も拒否。専用MCP呼出しは今回確認できた。実講師IDでの初回ログイン・スマートフォンのベル操作・10月12日の初回週次実行は未確認。
