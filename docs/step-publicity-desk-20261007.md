@@ -59,9 +59,9 @@
 ## 本番の保存先と管理ソース
 
 - SitesプロジェクトID：`appgprj_6ac56743dac081919afbd49f22ddab91`
-- 公開確認版：**8**
-- 公開ソースコミット：`8f589d2fcda993fc9294b855cd181c34135ea27b`
-- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_6a1d9fc333788191a19f932023b43f95`
+- 公開確認版：**9**
+- 公開ソースコミット：`cf7397f52516a1870f2fb0f5fc9c166bdfc49f8c`
+- 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_e263db4d8774819181821de983150444`
 - 保存基盤：Sites Worker＋D1。論理バインディング：`DB`
 - テーブル：`desk_channels`、`desk_ideas`、`desk_notices`、`desk_reports`、`desk_settings`、`desk_staff_sessions`、`desk_login_limits`、`desk_notice_reads`
 - 正本：Sitesの管理ソース。台帳リポジトリにはアプリのコードを複製しない。
@@ -209,3 +209,13 @@ commonStaffはstaffLoginだけ待機上限を90秒に延長。既存セッショ
 ソースコミット：`8f589d2fcda993fc9294b855cd181c34135ea27b`。
 保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_6a1d9fc333788191a19f932023b43f95`。
 デプロイ：`appgdep_6ac5f1ba7de88191bb4b6716070f50d8`（succeeded、env revision 2）。
+
+## 2026-10-07：面談メモへの移動ボタン（公開版9）
+
+広報窓口のヘッダーで、氏名表示（加瀬俊介など）のすぐ左に「面談メモへ」ボタンを追加。既存のhttps://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.htmlを同じタブで開く。URLへ認証トークンを含めない。スマホでもボタン名を表示し、狭い画面ではヘッダーを折り返す。app/desk.tsxとapp/globals.cssを変更。型チェックとWorkerビルド成功、公開版9の成功を確認。面談メモの既存ログインを使用する。
+
+面談メモ側のGitHub Pages公開成功と本番HTTP200、オレンジ色設定、報告削除スクリプト、manifest（application/manifest+json）、PNGアイコンの配信を確認。報告API v2の無認証deleteは401、配備ソースは正本と一致。画面操作の模擬テスト2件で確認取り消し・通信失敗後の同じIDによる再試行を確認。
+
+ソースコミット：`cf7397f52516a1870f2fb0f5fc9c166bdfc49f8c`。
+保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_e263db4d8774819181821de983150444`。
+デプロイ：`appgdep_6ac5f3caff48819183155a17652f8538`。
