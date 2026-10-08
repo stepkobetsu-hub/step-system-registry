@@ -277,3 +277,12 @@ Supabase project wisedgcgwaebtkprdhth、非公開bucket step-publicity-report-fi
 デプロイ：`appgdep_6ac773ad2594819180aff23edd923fae`（succeeded、env revision 2）。
 
 新しいSQL機能＋既存AI転送の検証12件、型チェック・Workerビルド成功。所有者MCPで公開リンク5件と既存の話題の保持を確認。実講師の訂正・削除操作、10月12日の画像付き週次制作、Blogger画像自動添付、プログラミング独立Googleプロフィールの直通URLは未確認。
+
+
+## 2026-10-08：スマホのタブ名表示と削除確認（公開版13）
+
+2026-10-08：公開版13で、削除確認を開いた時点の更新日時を保持し、確認中の別更新を削除しないように調整。スマホの3タブを均等に並べ、掲載状況・リンクのボタン名を表示。型チェック・Workerビルド・公開成功。
+
+ソース：`c0311186e8c0f72d94ab39ab6a8b2befb127cb6f`。
+保存版：`appgprj_6ac56743dac081919afbd49f22ddab91~appgver_77e12331ff5c819180f5df6376db21a0`。
+デプロイ：`appgdep_6ac774c7176c819194e42fa4c33b8982`（succeeded、env revision 2）。
