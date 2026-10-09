@@ -1607,3 +1607,13 @@
 2026-10-07：公開版11。面談メモの「良い事や行事予定」をグラデーション・下側の影・押し込む動作付きボタンへ変更。報告一覧と窓口のお知らせ・履歴に「AIへ転送」、元の報告・添付表示、加瀬先生の制作リクエスト欄を追加。現在の権限3以上で保存し、報告の版番号を照合、再送の重複を防止。元の編集をAIの参照へ反映し、削除時は関連依頼・通知を除去。週次タスクへ転送依頼の優先確認と要望反映・結果保存を追加。転送／取り込み9件、認証10件、報告UI4件、型チェック・Workerビルド・公開成功を確認。
 
 実際の教室報告の読み取りと最新版参照を所有者MCPで確認。外部媒体へは制作依頼だけで即時公開せず、既存の週次準備と媒体ごとの公開設定に従う。[保守記録](docs/step-publicity-desk-20261007.md)。
+
+### 生徒情報検索：志望校・テスト成績・通知表の新規表示（2026-10-10 JST）
+
+- 対象：[生徒情報検索](https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html)。[本番コミット 30da064](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/30da06431b6c355fd99c7e143ea67039b2666ae1)。GitHub Pages build/deploy成功。
+- 利用者指示：10月8日時点の台帳を基準に追加。参照版は [6cffbe9](https://github.com/stepkobetsu-hub/step-system-registry/blob/6cffbe9ca6ef6a75f6a9c51b10a6b33ea77ac838/SYSTEM_REGISTRY.md)。同版には成績管理のSupabase正本・管理者Runtimeと生徒情報検索の構成はあるが、検索画面内の3項目表示追加の記録は確認できなかったため、新規に実装。
+- 実装：`student_directory.html` 内の `DirectoryAcademic`。撤去済みの `assets/js/directory-records-v2.js` を再接続せず、新しい読み取り専用表示を追加。
+- 取得先：Supabase `wisedgcgwaebtkprdhth` の `seiseki-admin-runtime-v1`。既存職員セッションで選択生徒の `getWish` / `getStudentScores` / `getReports` を並列読取。Google Sheetミラーは成績の取得元に使わない。
+- 表示：基本情報の下に志望校、テスト成績、通知表。志望校は未登録なら枠ごと非表示。9教科、5科・9科合計、テスト順位、年度・回／学期を新しい順で表示。各項目の再取得ボタンと通信エラーを表示。
+- 取得制御：1項目15秒のタイムアウト、同一生徒・同一セッションの取得を共有（60秒）、選択切替・検索再開・ログアウト時は読取を中止。応答の生徒番号が一致しない場合は表示しない。
+- 検証：新表示の9シナリオ試験、JavaScript構文検査、差分チェック成功。本番で実生徒2名のテスト・通知表、および志望校登録あり／なし、詳細画面再描画後の保持を確認。既存の `seiseki-runtime-contract.test.mjs` は6件成功。管理者端末セッション試験の文字列照合1件は元のadmin.htmlでも不一致（今回の変更対象外）。
