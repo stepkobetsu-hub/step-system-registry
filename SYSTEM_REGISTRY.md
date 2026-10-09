@@ -1608,7 +1608,7 @@
 
 実際の教室報告の読み取りと最新版参照を所有者MCPで確認。外部媒体へは制作依頼だけで即時公開せず、既存の週次準備と媒体ごとの公開設定に従う。[保守記録](docs/step-publicity-desk-20261007.md)。
 
-### 生徒情報検索：志望校・テスト成績・通知表の新規表示（2026-10-10 JST）
+### 生徒情報検索：志望校・テスト成績・通知表の新規表示（2026-10-09 JST）
 
 - 対象：[生徒情報検索](https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html)。[本番コミット 30da064](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/30da06431b6c355fd99c7e143ea67039b2666ae1)。GitHub Pages build/deploy成功。
 - 利用者指示：10月8日時点の台帳を基準に追加。参照版は [6cffbe9](https://github.com/stepkobetsu-hub/step-system-registry/blob/6cffbe9ca6ef6a75f6a9c51b10a6b33ea77ac838/SYSTEM_REGISTRY.md)。同版には成績管理のSupabase正本・管理者Runtimeと生徒情報検索の構成はあるが、検索画面内の3項目表示追加の記録は確認できなかったため、新規に実装。
