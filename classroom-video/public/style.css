@@ -8,7 +8,7 @@ nav{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height
 @media(orientation:portrait){.remote-tile.thumbnail{right:10px;bottom:10px;width:24vw;min-width:105px;max-width:150px;border-radius:10px}.local-tile{left:10px;bottom:10px;width:24vw;min-width:96px;max-width:150px}.local-tile .mic-off{top:4px;right:4px;width:22px;height:22px}.remote-tile figcaption,.local-tile figcaption{left:6px;bottom:6px;padding:3px 6px;font-size:12px}.call header{padding:10px 12px;gap:6px;flex-wrap:wrap;font-size:14px}.call header strong{font-size:16px}.call header .featured-name{margin-left:3px;padding:3px 7px}.call header .featured-mic-off{top:64px;right:10px;padding:5px 8px;font-size:14px}nav{bottom:8px;width:calc(100% - 16px);min-height:64px;gap:5px;padding:6px;border-radius:16px}nav button{flex:1;min-width:0;padding:7px 3px;font-size:12px}nav button span{font-size:19px;margin-right:1px}nav button small{font-size:8px}.settings{inset:2% 4%;padding:14px 16px}.target-picker{inset:8% 6%;padding:18px}.target-list{grid-template-columns:1fr;gap:9px}.target-list button,#call-target-cancel{padding:14px;font-size:18px}}
 
 /* Keep the five existing controls in their own row at every orientation. */
-#controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:min(720px,calc(100% - 16px))}
+#controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:min(612px,calc(85% - 13.6px))}
 #controls>button{min-width:0}
 #controls button small{white-space:normal}
 .remote-mic-controls{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0}
