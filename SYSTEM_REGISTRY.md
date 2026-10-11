@@ -1801,3 +1801,10 @@
 - 通塾時間割の見出し右側と最下部の「時間割マスタへ」を「時間割マスタアプリへ」に変更。Googleシートgid829117795へのリンクから、台帳とスタッフ用アプリに記録されている時間割マスタ入力Webアプリへ変更。いずれも別タブ・noopenerを維持。
 - 共通定数 `TIMETABLE_APP` のURL：`https://script.google.com/macros/s/AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA/exec`。対応Apps Scriptは生徒名簿 `16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45`。生徒マスタ本体のリンク・保存認証・Google共有権限は変更しない。
 - 実装 `student_directory.html`、コミット `2f4d1d8a18f662d0bd0ef5e3b5dcc91e0b1f13d0`、Pages run `38130841111` 成功。JS構文検証、2か所の文言と共通URLを確認。本番配信ソースの両リンクを確認し、移動先の時間割マスタ入力画面・生徒一覧・更新／シート表示ボタンが正常に表示されることを確認。生徒検索側は未ログインのため実生徒の2ボタン押下は行っていない。
+
+## 生徒情報検索→時間割マスタ入力：選択生徒の自動検索（2026-10-11）
+
+- 生徒検索の通塾時間割ヘッダー・最下部の2リンクとも、選択生徒の番号を `?studentId=` で時間割入力Webアプリへ渡す。
+- Apps Script `16AP-Q7ySiFZJe5NC4uFbD5ymZjXOjQwS6XfUYnkldE95vDvRHrYLdr45` の現行 `時間割入力Web4.html` の初回bootstrap完了後、`google.script.url.getLocation` で番号を取得。1〜10桁数字だけ採用し、一覧のコードと一致を確認。検索欄へ番号を入れ、一覧を絞り、当該生徒を選択して `loadStudent` で編集内容を表示。指定なしは従来動作、不在はエラー案内。自動保存・権限変更は行わない。
+- 時間割入力の既存デプロイ `AKfycbyB2DdfN6Xdz0mq0vDs37sqNxtbTz5Mh085zdDB5HvVFIfOK1JjfbVCC6oQZ9j0NCeA` をバージョン47（2026-10-11 19:22 JST）へ更新。既存公開URL・アクセス中のユーザー実行・Googleアカウント制限を維持。他のデプロイは更新しない。
+- 検索画面コミット `a4829ce277df7658199e85f0a3040006e3eaec90`、Pages run `38131721905` 成功。GAS HTMLの構文と正常・不正・不在番号の選択分岐をVM確認。本番リンクの両 `studentId` を確認し、1332指定URLで検索欄1332／候補1件／選択1332／当該生徒名・学年・時間割編集内容・入力可能を確認。保存操作は行わない。
