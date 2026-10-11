@@ -3090,7 +3090,7 @@ appendDailyLinks=function(item,article){
 
 <script id="billing-systems-cards-20261004">
 (() => {
-  const billingUrl='https://script.google.com/macros/s/AKfycbxzkE1tQRyB_Ca4bfPKYWIkpTukIVPMWKf2ETE7yN7qROJk0VyOlvxaJ9GGI5p-6pGb/exec';
+  const billingUrl='https://step-billing.mintcocoajasmine.chatgpt.site';
   const deliveryUrl='https://stepkobetsu-hub.github.io/invoice-pdf/#invoices';
   CARD_ANCHORS.unshift(['請求システム','billing'],['請求書作成システム','invoice-creation']);
   const isManagement=item=>item['ID']==='billing'||String(item['システム名']||'')==='請求システム'||String(item['システム名']||'').includes('請求管理システム');
@@ -3105,7 +3105,7 @@ appendDailyLinks=function(item,article){
     const separated=[];
     if(management){
       const record=applyAssetInfo(applyConfirmedInfo(Object.assign({},management,{'ID':'billing','システム名':'請求管理システムV3.1'})));
-      Object.assign(record,{'ID':'billing','システム名':'請求システム','正式名称':'請求システム（学費計算・請求データ作成）','分類':'請求・会計','利用者':'管理者・スタッフ','状態':'本番使用中','概要':'学費計算・請求データ作成を行うシステム。イレギュラーな割引・加算は「料金特別調整を開く」から入力できます。','利用者向けURL':billingUrl,'請求管理システムURL':billingUrl,'料金特別調整URL':billingUrl+'?page=adjustments','関連カード':['請求書作成システム','生徒マスタ'],'確認日':'2026年10月4日'});
+      Object.assign(record,{'ID':'billing','システム名':'請求システム','正式名称':'請求システム（学費計算・請求データ作成）','分類':'請求・会計','利用者':'管理者・スタッフ','状態':'高速版公開（所有者限定）','概要':'画面・閲覧データをGASから分離した請求管理。計算・保存・出力は既存GASを継続。高速版は現在、所有者限定で公開。イレギュラーな割引・加算は「料金特別調整を開く」から入力できます。','利用者向けURL':billingUrl,'請求管理システムURL':billingUrl,'料金特別調整URL':billingUrl+'?page=adjustments','関連カード':['請求書作成システム','生徒マスタ'],'確認日':'2026年10月11日'});
       delete record['__billingSystems'];
       delete record['請求書配信PDF作成URL'];
       separated.push(record);
