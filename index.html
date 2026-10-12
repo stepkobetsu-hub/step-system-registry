@@ -4931,6 +4931,31 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+<script id="student-roster-history-20261012">
+(() => {
+  const note="2026年10月12日：生徒名簿の操作・印刷を改善。印刷と同期を同じ大きさの青系・線画アイコン付きボタンにそろえ、在籍生／退塾生の右へ配置。校舎選択は学年・個別の2行にまたがる左側、全学校は高3の右へ移動。初期の学年ボタンは全て未選択で、そのまま印刷すると全学年、高校生等を選ぶと対象学年だけを印刷。校舎・在籍区分・学校・検索の条件は引き続き反映。退塾予定者は氏名の後に（※）を付け、表の下の欄外へ「（※）は退塾予定者です。」を表示。生徒情報検索の「最新情報を取得」の行の右端にリストアイコン付き「生徒名簿」を追加し、admin.html#studentsへリンク。最終反映コミットea9ec04fcc3f394bb72cc1c0d8535c8715990b3c。各Pages公開成功・公開ファイル一致、印刷生成と学年選択の分岐を確認。 同日の追加変更：左メニューと画面見出しの「生徒一覧」を「生徒一覧・印刷」へ変更（コミット431b54aa15f2623c0d86ba07248e6b257edc43b1）。";
+  const rosterUrl='https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html#students';
+  const append=(value,text)=>String(value||'').includes(text)?String(value||''):[String(value||'').trim(),text].filter(Boolean).join('\n\n');
+  const unique=(value,text)=>[...new Set([...(Array.isArray(value)?value:value?[String(value)]:[]),text])];
+  const enrich=item=>{
+    const name=String(item['システム名']||item['正式名称']||'');
+    if(name!=='成績管理'&&name!=='生徒情報検索'&&item.ID!=='student-directory')return item;
+    return Object.assign({},item,{
+      '生徒名簿URL':rosterUrl,
+      '作業メモ':append(item['作業メモ'],note),
+      '仕様メモ':append(item['仕様メモ'],note),
+      '更新履歴':unique(item['更新履歴'],note),
+      '確認日':'2026-10-12（生徒名簿UI・印刷）',
+      '確認済み事項':unique(item['確認済み事項'],'生徒名簿改善：Pages公開成功・公開HTML一致。印刷生成・実在籍フラグ判定・学年選択分岐を確認。最終コミットea9ec04。')
+    });
+  };
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return enrich(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
+})();
+</script>
+
 </body>
 </html>
 

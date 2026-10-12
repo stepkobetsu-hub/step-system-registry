@@ -1,6 +1,6 @@
 # STEPシステム資産管理台帳
 
-最終更新: 2026-10-07
+最終更新: 2026-10-12
 正式な資産管理ポータル: https://stepkobetsu-hub.github.io/step-system-registry/  
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
@@ -62,7 +62,7 @@
 | フォレスタ進捗管理 | **V3本番稼働中（管理者一覧高速化・テスト範囲同期保存）** | https://stepkobetsu-hub.github.io/foresta-progress-v2/ | [foresta-progress-v2](https://github.com/stepkobetsu-hub/foresta-progress-v2) | `main`（本番 `f6e138a455e6ca2b8e36c0ff04c9c9d3a405815f`） | `app.js`、`config.js`、`apps-script/Code.gs`、Supabase Edge Functions `foresta-runtime-v3` / `foresta-timetable-sync`、`foresta_v3_*` テーブル | GitHub Pages＋Supabase V3 Runtime v8＋Apps Script v20＋旧Google Sheet（ロールバック・ミラー用） | 通常読込はSupabaseスナップショット、通常保存はmutation queue。ただし管理者の `saveRange` は信頼性優先でGAS同期保存とし、実保存完了後だけ画面を閉じる。queuedを完了扱いせず、直列latest-wins、selector/testId整合性、旧キュー再適用拒否を実装。`?legacy=1` は旧GAS経路 | 2026-09-01 | 緊急時のみ `https://stepkobetsu-hub.github.io/foresta-progress-v2/?legacy=1` を使用。 PR #12をmainへマージ。Apps Script v20→Runtime v8→stale cleanup migration→Pages run 33500353501（#475）の順で本番反映。旧saveRangeはcancelled_stale 66件、mirrored 253件、再試行対象0件。`npm test` 全件成功、GAS health・公開app.jsを確認。詳細 `docs/foresta-progress-v3-production-20260831.md` |
 | 定期テスト進捗管理 | 本番 | https://beautiful-blini-37eee7.netlify.app/ | 要確認 | 要確認 | 公開Webアプリ（詳細要確認） | 要確認 | 正本確認後に更新 | 要確認 | 既存登録を維持 |
 | スタッフ用アプリ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/ | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `index.html`、`gas_code.js` | GitHub＋Apps Script | GitHub Pagesを更新し、GAS変更時は既存デプロイを更新 | 2026-07-22 | `index.html` はスタッフ用ポータル。成績管理の直接入口ではなく、成績管理へ入る場合は `admin.html` へ進む |
-| 成績管理 | **Supabase完全移行準備完了（管理者Runtime本番稼働・画面切替PR確認待ち）** | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main`（生徒用PR [#14](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/14)反映済み／管理者用PR [#16](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/16)未マージ） | `admin.html`、`juku_app.html`、Edge Functions `seiseki-runtime-v1` / `seiseki-admin-runtime-v1`、Supabase migrations、Google Sheetミラー | GitHub Pages＋Supabase Edge Functions＋Postgres/RLS＋Google Sheet非同期ミラー | 生徒・管理者ともSupabaseを正本経路とし、書込はmutation IDで冪等化。管理者APIはSTEP職員セッションをサーバー側で再検証し、権限2・3・4だけを許可。ミラー失敗は永続キューから順序保証付きで再試行 | 2026-09-02 | 稼働プロジェクト `wisedgcgwaebtkprdhth`。管理者Runtime v6とDB移行は本番反映済み。生徒337、成績180、通知表126、志望校14、学校6を移行・重複排除済み。1320でE2E確認後、テストデータを復元。画面切替はPR #16のレビュー・マージ後にmainへ反映 |
+| 成績管理 | **Supabase完全移行準備完了（管理者Runtime本番稼働・画面切替PR確認待ち）** | **講師・管理者用:** https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html<br>**生徒用:** https://stepkobetsu-hub.github.io/seiseki-kanri/juku_app.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main`（生徒用PR [#14](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/14)反映済み／管理者用PR [#16](https://github.com/stepkobetsu-hub/seiseki-kanri/pull/16)未マージ） | `admin.html`、`juku_app.html`、Edge Functions `seiseki-runtime-v1` / `seiseki-admin-runtime-v1`、Supabase migrations、Google Sheetミラー | GitHub Pages＋Supabase Edge Functions＋Postgres/RLS＋Google Sheet非同期ミラー | 生徒・管理者ともSupabaseを正本経路とし、書込はmutation IDで冪等化。管理者APIはSTEP職員セッションをサーバー側で再検証し、権限2・3・4だけを許可。ミラー失敗は永続キューから順序保証付きで再試行 | 2026-10-12（生徒名簿・画面変更） | 稼働プロジェクト `wisedgcgwaebtkprdhth`。管理者Runtime v6とDB移行は本番反映済み。生徒337、成績180、通知表126、志望校14、学校6を移行・重複排除済み。1320でE2E確認後、テストデータを復元。画面切替はPR #16のレビュー・マージ後にmainへ反映 2026-10-12：生徒名簿の操作・印刷を更新。詳細は本書「成績管理・生徒情報検索：生徒名簿の操作と印刷」を参照。 |
 | 面談メモ | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/meeting_memo.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `meeting_memo.html`、`meeting-memo.webmanifest`、`classroom_reports.html`、`assets/js/classroom-reports.js`、成績管理共通GAS・Supabase報告API | GitHub Pages＋Apps Script＋STEP配信システム生徒検索情報 | Pages更新。検索索引は同一Pages内を先に読み込み、STEP配信システムの最新フリガナを非同期で補完。GAS変更時は成績管理への影響も確認 | 2026-10-07 | 立体感と押し込む動きのある「良い事や行事予定」、報告から「AIへ転送」、写真・PDF、確認付き削除、専用ホーム画面アイコン・追加案内。[報告仕様](https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/classroom-reports-20261007.md)。漢字・ひらがな・カタカナ・ローマ字・生徒番号で検索可能。検索欄の下へ生徒一覧を表示し、名前を1回押して選択。検索結果は薄いクリーム色、選択後は青色＋チェック表示 |
 | エントリーシート読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/entry_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `entry_import.html`、成績管理リポジトリ内一式 | GitHub＋Google Sheet | Pages更新後、対象Sheetとの接続確認 | 2026-08-15 | `entry_import.html`が現行版。受付カード読み取りとは別カードで表示する |
 | お友達紹介カード読み取り | 本番使用中 | https://stepkobetsu-hub.github.io/seiseki-kanri/referral_card_import.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `referral_card_import.html`、スタッフ用入口 `index.html`、成績管理共通GAS | GitHub Pages＋既存AI読取サーバー＋Apps Script＋Google Drive＋Google Sheet | Pages更新後、空欄カードでAI接続、スマホ撮影、原本画像、取込日時、3特典チェック、一覧更新を確認 | 2026-08-18 | ChatGPT Sites試作版ではなくGitHub Pages版を本番とする。新しいログイン・利用者APIキー入力なし。互換識別子 `REFERRAL_CARD_V1` を維持 |
@@ -84,7 +84,7 @@
 | STEP業務ホーム | 本番（全端末共有・版競合防止） | https://stepkobetsu-hub.github.io/step-workspace/ | [step-workspace](https://github.com/stepkobetsu-hub/step-workspace) | `main`（現行 `22aa02b`） | `index.html`、`styles.css`、`core.js`、`app.v20260818-32.js`、`app-catalog.json`、`rebuild-workspace.html`、`tests/` | GitHub Pages＋既存スタッフ共通認証＋共有設定API＋localStorageキャッシュ | `main`へ反映してPages、認証、共有版番号、版競合拒否、7項目・43カード、検索、編集、並べ替え、全リンクを確認 | 2026-08-23 | 共有設定版5を基礎に、お友達紹介カード読み取り、全県模試受験票作成、V-code ID＆Pass 印刷、証憑自動回収を管理・運営へ必須追加。古い版・版番号なしの保存要求は拒否し、最新版を再読込する |
 | STEP統合管理ポータル | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/system/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `system/index.html`、`system/data.js` | GitHub Pages | `main`へ反映してPages確認 | 2026-07-22 | 資産台帳の正本は本リポジトリへ移転。統合入口として継続 |
 | STEP塾生アプリ（step-hub） | 本番使用中 | https://stepkobetsu-hub.github.io/step-hub/ | [step-hub](https://github.com/stepkobetsu-hub/step-hub) | `main` | `index.html`、`my_qr.html`、`manifest.webmanifest`、`sw.js` | GitHub Pages＋各機能の既存本番基盤 | `main`へ反映し、共通ログイン・本人限定表示・PWA・各リンクを確認 | 2026-08-01 | 本項目はデザイン変更開始前までの確定仕様。以後のデザイン試作・画像・画面レイアウト履歴とは分離 |
-| 生徒情報検索 | 本番使用中（詳細取得一括化・GAS v70） | https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `student_directory.html`、`gas_code.js` | GitHub Pages＋Apps Script＋Google Sheet／面談記録はSupabase | 画面更新とGAS再デプロイを区別し、本番の表示・所要時間を確認 | 2026-09-28（表示は利用者確認、GAS v70公開） | ★ボタン・口座振替行60％は確認済み。詳細読取を一括化し、比較で旧2624/2822ms→新1478/1478ms、内容一致。認証・通信を含む画面全体の実測は未確認。詳細は docs/student-directory-20260928.md |
+| 生徒情報検索 | 本番使用中（詳細取得一括化・GAS v70） | https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html | [seiseki-kanri](https://github.com/stepkobetsu-hub/seiseki-kanri) | `main` | `student_directory.html`、`gas_code.js` | GitHub Pages＋Apps Script＋Google Sheet／面談記録はSupabase | 画面更新とGAS再デプロイを区別し、本番の表示・所要時間を確認 | 2026-10-12（生徒名簿・画面変更） | ★ボタン・口座振替行60％は確認済み。詳細読取を一括化し、比較で旧2624/2822ms→新1478/1478ms、内容一致。認証・通信を含む画面全体の実測は未確認。詳細は docs/student-directory-20260928.md 2026-10-12：生徒名簿の操作・印刷を更新。詳細は本書「成績管理・生徒情報検索：生徒名簿の操作と印刷」を参照。 |
 
 ## デジタルカレンダー：本番仕様
 
@@ -1838,3 +1838,25 @@
 - v50の同一囲み内余白では通常3枠目が大きく見えるとの利用者指摘を受け訂正。
 - `時間割入力Web4.html` の描画を変更し、曜日見出し＋通常3枠を `.day-main` の囲みに収め、最後のプロ枠を兄弟要素 `.program-slot` の独立した囲みにした。二つの囲みの外側に14pxの隙間を配置。旧最後行の余白ルールは除去。
 - 公開版v51（2026-10-11 20:08 JST）で全6列の通常3行が各67pxで等しいこと、通常授業囲みとプロ囲み間14px、別々の角丸枠が実際に見えることを確認。インラインJS構文確認済み。生徒保存は実行せず。
+
+## 成績管理・生徒情報検索：生徒名簿の操作と印刷（2026-10-12）
+
+- 生徒名簿：[管理画面の生徒一覧](https://stepkobetsu-hub.github.io/seiseki-kanri/admin.html#students)。
+- 検索画面：[生徒情報検索](https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html)。検索欄と「最新情報を取得」の行の右端に、リストの線画アイコン付き「生徒名簿」ボタンを追加。同じタブで上記の生徒一覧へ移動。
+- 印刷・同期：高さ48px・最小幅116pxの同じ大きさに統一。印刷は濃い青のグラデーション、同期は淡い青。いずれも線画アイコン付き。在籍生／退塾生の選択の右へ配置。
+- 表示名称：左メニューと画面見出しは「生徒一覧・印刷」。追加コミット [431b54a](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/431b54aa15f2623c0d86ba07248e6b257edc43b1)、Pages run 38258884832。
+- 全校舎：学年・個別の2行にまたがる左側へ配置。全学校は個別学年「高3」の右側。
+- 初期状態：学年ボタンは全て未選択で、表示は「未選択（全員）」。未選択は学年の絞り込みなしとして扱い、そのまま印刷すると全学年が対象。「高校生」は高1～高3だけを選択して印刷する。小学生・中学生・個別学年も同様。クリアすると未選択へ戻る。
+- ほかの条件：校舎、在籍生／退塾生、学校、氏名等の検索、並び順を引き続き反映。初期の在籍区分は在籍生で、退塾予定者を含む。未選択だから退塾済みまで自動的に含める仕様ではない。
+- 印刷表記：退塾予定者の氏名は「氏名（※）」とし、表の下の欄外に「（※）は退塾予定者です。」を掲載。実際の退塾済みは従来の「（退塾）」表記を維持。画面の退塾予定バッジは維持。
+- 正本：`stepkobetsu-hub/seiseki-kanri` の `main`、`admin.html` と `student_directory.html`。今回の変更は画面と印刷のみ。
+
+| 反映 | 本番コミット | Pages run |
+|---|---|---|
+| 操作ボタン配置と生徒名簿リンク | [fa9b4cc](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/fa9b4cc255e56ed809bf983642e10ded3ac79653) | 38255010135 |
+| ボタンデザイン・退塾予定者の印刷表記 | [942b522](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/942b522e4ce6215ecb92cc440a4b75da01e7081f) | 38256642600 |
+| 学年未選択からの絞り込み | [0e87f85](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/0e87f854594711949098c2ca40fabf897df95c99) | 38257120539 |
+| 校舎選択を2行の左側へ移動（最終版） | [ea9ec04](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/ea9ec04fcc3f394bb72cc1c0d8535c8715990b3c) | 38257994063 |
+
+- 確認：各Pages build／deploy成功と、公開HTMLの変更内容一致。インラインJavaScript構文、印刷生成時の在籍・退塾予定・退塾済みの表記、氏名のHTMLエスケープ、欄外注記の配置を確認。学年未選択→全学年、高校生→高校だけ、クリア→全学年、個別学年の分岐も確認。最終レイアウト変更では既存JavaScriptが変わっていないことを照合。
+- 今回の検証では、生徒データの書き換え・本番同期実行・実プリンターへの印刷は行っていない。
