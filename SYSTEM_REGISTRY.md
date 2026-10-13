@@ -1860,3 +1860,15 @@
 
 - 確認：各Pages build／deploy成功と、公開HTMLの変更内容一致。インラインJavaScript構文、印刷生成時の在籍・退塾予定・退塾済みの表記、氏名のHTMLエスケープ、欄外注記の配置を確認。学年未選択→全学年、高校生→高校だけ、クリア→全学年、個別学年の分岐も確認。最終レイアウト変更では既存JavaScriptが変わっていないことを照合。
 - 今回の検証では、生徒データの書き換え・本番同期実行・実プリンターへの印刷は行っていない。
+
+
+## 2026-10-13 時間割アプリ新規作成
+
+- 本番URL: https://stepkobetsu-hub.github.io/seiseki-kanri/timetable.html 。スタッフ用アプリに「時間割」カードを追加。権限1～4、ログアウトまで共通セッション保持、最後に選択した教室を記憶。
+- 2～5週間の未作成の日だけを追加生成。既存日の振替・欠席・担当変更・メッセージは上書きしない。生徒マスタ時間割は既存の高速DB同期を利用し、講師配置は別の曜日別基本配置。添付から93件を取り込み、一致しない授業は担当未定として明示。
+- 日付・時間・担当・班・科目・欠席等を編集。通常2名、プロ10名、特訓・土曜特訓・監督の区分を設置。時間の重複を検知し、振替の両日を原子的に保存。版競合があれば上書きを拒否。
+- 日々の案内はA4横、日付・曜日・日本時間の出力時刻・改訂番号を大きく表示。講師ポータルQR、生徒向け・講師向けメッセージ。印刷時は授業なしの時間帯を省略する。
+- 特訓部屋の実送信履歴を3分ごとに連携（画面を閉じても動作）。予約は配信後に登録。未作成日への先行イベント保存、履歴ID＋生徒IDで重複防止。氏名が一意に照合できない場合は自動推測しない。配信フロントの送信成功後にも確認を開始。
+- Backend: learning-progress Supabase / step-timetable-runtime-v1、RLS・一般クライアントアクセス禁止、サーバー共通セッション検証。source: seiseki-kanri の timetable.* / supabase/step_timetable*.sql / supabase/functions/step-timetable-runtime-v1。詳細: https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/timetable.md
+- Commit: https://github.com/stepkobetsu-hub/seiseki-kanri/commit/2f09438607874c36a1a624eac9e7e74a672b6fea 。配信連携: https://github.com/stepkobetsu-hub/step-message-center/commit/7ff2982b022a1473b0900dd4adc87daeebee29df
+- 確認: ドメインテスト5件、両校現マスタ1週間の生成・講師割当検証、SQL生成上書き防止・版競合・特訓先行登録・重複防止、未認証401、権限1の読込200、実送信特訓1件の取込と再実行0件。初回Pages build/deploy成功、公開HTML200。実ブラウザーの画面と実プリンターの印刷は未確認。
