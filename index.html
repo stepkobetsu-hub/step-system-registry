@@ -4961,6 +4961,22 @@ applyAssetInfo=function(item){
 })();
 </script>
 
+
+<script>
+/* 2026-10-17 reception card sheet link */
+const applyReceptionCardSheetLinkBase = applyAssetInfo;
+applyAssetInfo = function(item) {
+  const base = applyReceptionCardSheetLinkBase(item);
+  const name = String(base['システム名'] || '');
+  if (name !== '受付カード読み取り') return base;
+  return Object.assign({}, base, {
+    'Google Sheet URL': 'https://docs.google.com/spreadsheets/d/16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I/edit#gid=388967979',
+    'Google Sheet名': '受付カード管理',
+    '使用シート名': '受付カード一覧',
+    '保存先Spreadsheet ID': '16K335J5meUGgGPFBZzRnDfFQb_Pzh8WtwmKZjWC1e9I'
+  });
+};
+</script>
 </body>
 </html>
 
