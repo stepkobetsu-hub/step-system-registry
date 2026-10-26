@@ -25,7 +25,7 @@ assert.equal(vm.runInContext('invoiceExternal',ui),true);
 assert.ok(d.getElementById('invoiceDestination').textContent.includes('second@example.test'));
 assert.equal(requests.length,1);
 w.searchInvoices();assert.equal(requests.length,1,'other mailbox never searches the connected mailbox');
-const u=new URL(opened[0][0]);assert.equal(u.searchParams.get('authuser'),'second@example.test');
+const login=new URL(opened[0][0]);assert.equal(login.origin,'https://accounts.google.com');assert.equal(login.pathname,'/AddSession');assert.equal(login.searchParams.get('Email'),'second@example.test');const u=new URL(login.searchParams.get('continue'));assert.equal(u.searchParams.get('authuser'),'second@example.test');
 const q=decodeURIComponent(u.hash.slice('#search/'.length));assert.ok(q.includes('from:googleplay-noreply@google.com'));assert.ok(q.includes('subject:ご注文明細'));assert.ok(q.includes('after:2026/09/01 before:2026/10/01'));
 w.closeInvoices();w.openInvoices();success(settings);assert.equal(vm.runInContext('invoiceExternal',ui),false,'header clears previous account mode');
 dom.window.close();
