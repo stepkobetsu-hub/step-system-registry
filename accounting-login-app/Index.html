@@ -40,6 +40,7 @@
     .extension-download h2{margin:0 0 4px;font-size:18px;line-height:1.5;color:#1e3a8a}.extension-download-copy p{margin:0;color:#475569;font-size:14px;line-height:1.7}
     .extension-download-actions{flex-shrink:0;text-align:center}.extension-download-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:800;font-size:15px;line-height:1.5}.extension-download-link:hover{background:#1e40af}.extension-download-link:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}.extension-download-actions p{margin:6px 0 0;font-size:12px;line-height:1.5;color:#64748b}
     @media(max-width:980px){.extension-download{align-items:stretch;flex-direction:column;gap:12px}.extension-download-link{width:100%}} 
+    .invoice-card-tools{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;margin-left:auto}.invoice-card-import{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid #165f78;border-radius:9px;background:#165f78;color:#fff;font-size:12px;font-weight:700;line-height:1.4;white-space:nowrap}.invoice-card-import:hover{background:#124d61}.invoice-card-import:disabled{opacity:.5;cursor:wait}
   </style>
 </head>
 <body>
@@ -312,6 +313,7 @@
   }
 
   function cardHtml(e,index){
+    const importVendor=invoiceCardVendor(e);
     const target=safeUrl(e.url) || (e.passwordManager==='Gmail'?'https:\x2f\x2fmail.google.com/':'');
     const logo=logoSrc(e);
     const initial=esc((e.serviceName||'?').trim().slice(0,1).toUpperCase());
@@ -321,7 +323,7 @@
     const pwState=e.hasPassword?'<span class="pwok">● PW登録済み</span>':'<span class="pwnone">○ PW未登録</span>';
     const headTools=reorderMode
       ? `<div class="orderTools"><span class="orderNo">#${index+1}</span><button class="orderBtn" ${index===0?'disabled':''} onclick="event.stopPropagation();moveCardTo(${jsArg(e.id)},0)">先頭へ</button><button class="orderBtn" ${index===0?'disabled':''} onclick="event.stopPropagation();moveCard(${jsArg(e.id)},-1)">↑</button><button class="orderBtn" ${index===entries.length-1?'disabled':''} onclick="event.stopPropagation();moveCard(${jsArg(e.id)},1)">↓</button><span class="dragHandle" title="ドラッグして移動">☰</span></div>`
-      : `<button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button>`;
+      : importVendor ? `<div class="invoice-card-tools"><button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button><button type="button" class="invoice-card-import" title="${attr(importVendor)}のGmail請求書・領収書を検索" ${invoiceWaiting?'disabled':''} onclick="openInvoices(${jsArg(importVendor)})">領収書取込</button></div>` : `<button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button>`;
     const dragAttrs=reorderMode?` draggable="true" ondragstart="dragStart(event,${jsArg(e.id)})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondrop="dropCard(event,${jsArg(e.id)})"`:'';
     return `<article class="card ${reorderMode?'reordering':''}" data-id="${attr(e.id)}"${dragAttrs}>
       <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img referrerpolicy="no-referrer" loading="lazy" src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div>${headTools}</div>
@@ -471,13 +473,19 @@
 let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false;
 function invoiceStatus(text){$('invoiceStatus').textContent=text;}
 function showInvoiceSearching(on){const box=$('invoiceSearching');if(box)box.classList.toggle('show',!!on);}
-function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn'].forEach(id=>$(id).disabled=on);}
+function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn','invoiceVendor','invoiceMonth'].forEach(id=>$(id).disabled=on);document.querySelectorAll('.invoice-card-import').forEach(button=>button.disabled=on);}
 function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
-function openInvoices(){
-  $('invoiceDialog').showModal();$('invoiceVendorSettingsBtn').disabled=true;
+function invoiceCardVendor(entry){return ['エクシード','イージア','伊神切手社'].find(name=>norm(name)===norm(entry.serviceName))||'';}
+function openInvoices(vendorName=''){
+  $('invoiceDialog').showModal();if(invoiceWaiting)return;
+  const previousVendor=$('invoiceVendor').value;$('invoiceVendor').value='';
+  clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);$('invoiceResults').textContent='';invoiceStatus('取引先を確認しています…');invoiceWait(true);
   if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
   authenticatedRun().withSuccessHandler(s=>{
-    renderInvoiceVendors(s.vendors||[]);$('invoiceVendorSettingsBtn').disabled=invoiceWaiting;
+    const vendors=s.vendors||[],selected=vendorName?vendors.find(v=>norm(v.name)===norm(vendorName)):null;
+    renderInvoiceVendors(vendors,selected?.id||(!vendorName?previousVendor:''));invoiceWait(false);
+    if(vendorName&&!selected){$('invoiceVendor').value='';invoiceStatus('「'+vendorName+'」の検索設定が見つかりません。「＋ 取引先の追加・設定」を確認してください。');return;}
+    invoiceStatus('');
     $('invoiceFolder').value=s.folderUrl||'';$('invoiceDestination').textContent='検索するGmail：'+s.mailbox+'\n保存先：'+(s.folderName||'未設定');
     if(!s.ready)invoiceStatus('Gmail接続の初期設定がまだ完了していません。');
     else if(!s.healthy)invoiceStatus('Gmail接続の応答を待っています。長く続く場合は管理者に連絡してください。');
@@ -486,7 +494,7 @@ function openInvoices(){
 function closeInvoices(){ $('invoiceDialog').close(); }
 function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
 function searchInvoices(){
-  if(invoiceWaiting)return;invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
+  if(invoiceWaiting)return;if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
   authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value);
 }
 function saveInvoiceFolder(){
@@ -552,6 +560,7 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
+
 
 
 
