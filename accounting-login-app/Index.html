@@ -123,7 +123,7 @@
   <form onsubmit="event.preventDefault();searchInvoices()"><div class="formGrid">
     <div class="field"><label for="invoiceVendor">取引先名</label><select id="invoiceVendor"><option value="exseed">エクシード</option><option value="esia">イージア</option></select></div>
     <div class="field"><label for="invoiceMonth">支払い月</label><input id="invoiceMonth" type="month" required></div>
-  </div><p class="help">支払期限・支払予定日の月で照合します。検索範囲は支払い月の前3か月から翌月の受信分です。</p>
+  </div><p class="help">Google Playは注文日、その他は支払期限・支払予定日の月で照合します。検索するGmailに届いたメールが対象です。</p>
   <button id="invoiceSearchBtn" class="btn primary" type="submit">Gmailで請求書を探す</button></form>
   <button type="button" id="invoiceVendorSettingsBtn" class="btn" style="margin-top:14px" onclick="openInvoiceVendorSettings()">＋ 取引先の追加・設定</button>
   <details style="margin:18px 0"><summary>保存先の設定</summary><p class="help">指定Gmailアカウントが保存できるGoogle Driveフォルダを設定できます。このアプリの共通設定です。</p><div class="field"><label for="invoiceFolder">保存先フォルダのURL</label><input id="invoiceFolder" type="text" placeholder="https://drive.google.com/drive/folders/…"></div><button id="invoiceFolderBtn" class="btn" style="margin-top:8px" onclick="saveInvoiceFolder()">保存先を変更</button></details>
@@ -154,7 +154,7 @@
 <dialog id="invoiceConfirm" aria-labelledby="invoiceConfirmTitle"><div class="modal">
   <div class="modalHead"><h2 id="invoiceConfirmTitle">このタイトルで保存しますが、OKですか？</h2></div>
   <p id="invoiceConfirmName" style="font-weight:800;overflow-wrap:anywhere"></p><p id="invoiceConfirmFolder"></p>
-  <p class="help">元の請求書PDFを保存します。既に同じ内容・名前のPDFがある場合は、そのリンクを表示します。</p>
+  <p class="help">添付の元PDF、またはGoogle Playのメール本文をPDFで保存します。同じ内容・名前の保存済みPDFがある場合は、そのリンクを表示します。</p>
   <div class="rightBtns"><button class="btn" onclick="$('invoiceConfirm').close()">キャンセル</button><button id="invoiceConfirmBtn" class="btn primary" onclick="confirmInvoice()">OK・PDFを保存</button></div>
 </div></dialog>
 
@@ -333,7 +333,7 @@
     const pwState=e.hasPassword?'<span class="pwok">● PW登録済み</span>':'<span class="pwnone">○ PW未登録</span>';
     const headTools=reorderMode
       ? `<div class="orderTools"><span class="orderNo">#${index+1}</span><button class="orderBtn" ${index===0?'disabled':''} onclick="event.stopPropagation();moveCardTo(${jsArg(e.id)},0)">先頭へ</button><button class="orderBtn" ${index===0?'disabled':''} onclick="event.stopPropagation();moveCard(${jsArg(e.id)},-1)">↑</button><button class="orderBtn" ${index===entries.length-1?'disabled':''} onclick="event.stopPropagation();moveCard(${jsArg(e.id)},1)">↓</button><span class="dragHandle" title="ドラッグして移動">☰</span></div>`
-      : importVendor ? `<div class="invoice-card-tools"><button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button><button type="button" class="invoice-card-import" title="${attr(importVendor)}のGmail請求書・領収書を検索" ${invoiceWaiting?'disabled':''} onclick="openInvoices(${jsArg(importVendor)})">領収書取込</button></div>` : `<button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button>`;
+      : importVendor ? `<div class="invoice-card-tools"><button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button><button type="button" class="invoice-card-import" title="${attr(importVendor)}のGmail請求書・領収書を検索" ${invoiceWaiting?'disabled':''} onclick="${importVendor==='Google Play'?`openGooglePlayInvoices(${jsArg(e.id)})`:`openInvoices(${jsArg(importVendor)})`}">領収書取込</button></div>` : `<button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button>`;
     const dragAttrs=reorderMode?` draggable="true" ondragstart="dragStart(event,${jsArg(e.id)})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondrop="dropCard(event,${jsArg(e.id)})"`:'';
     return `<article class="card ${reorderMode?'reordering':''}" data-id="${attr(e.id)}"${dragAttrs}>
       <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img referrerpolicy="no-referrer" loading="lazy" src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div>${headTools}</div>
@@ -480,14 +480,17 @@
   function norm(s){return String(s||'').normalize('NFKC').toLocaleLowerCase('ja').replace(/\s+/g,' ').trim()}
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function attr(s){return esc(s).replace(/`/g,'&#96;')}
-let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false;
+let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false, invoiceAccount='', invoiceExternal=false;
 function invoiceStatus(text){$('invoiceStatus').textContent=text;}
 function showInvoiceSearching(on){const box=$('invoiceSearching');if(box)box.classList.toggle('show',!!on);}
 function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn','invoiceVendor','invoiceMonth'].forEach(id=>$(id).disabled=on);document.querySelectorAll('.invoice-card-import').forEach(button=>button.disabled=on);}
 function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
-function invoiceCardVendor(entry){return ['エクシード','イージア','伊神切手社'].find(name=>norm(name)===norm(entry.serviceName))||'';}
-function openInvoices(vendorName=''){
+function invoiceCardVendor(entry){if(/^google\s*play(?:\([^)]*\))?$/i.test(norm(entry.serviceName)))return 'Google Play';return ['エクシード','イージア','伊神切手社'].find(name=>norm(name)===norm(entry.serviceName))||'';}
+function openGooglePlayInvoices(id){const entry=findEntry(id);if(!entry)return;const value=String(entry.account||'').trim();openInvoices('Google Play',value.includes('@')?value:value+'@gmail.com');}
+function googlePlayGmailUrl(account,month){const [y,m]=month.split('-').map(Number),from=new Date(Date.UTC(y,m-1,1)),to=new Date(Date.UTC(y,m,1)),fmt=d=>d.toISOString().slice(0,10).replace(/-/g,'/');const query='from:googleplay-noreply@google.com subject:ご注文明細 after:'+fmt(from)+' before:'+fmt(to);return 'https://mail.google.com/mail/u/?authuser='+encodeURIComponent(account)+'#search/'+encodeURIComponent(query);}
+function openInvoices(vendorName='',account=''){
   $('invoiceDialog').showModal();if(invoiceWaiting)return;
+  invoiceAccount=String(account||'').trim().toLowerCase();invoiceExternal=false;$('invoiceSearchBtn').textContent='Gmailで請求書を探す';
   const previousVendor=$('invoiceVendor').value;$('invoiceVendor').value='';
   clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);$('invoiceResults').textContent='';invoiceStatus('取引先を確認しています…');invoiceWait(true);
   if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
@@ -496,6 +499,7 @@ function openInvoices(vendorName=''){
     renderInvoiceVendors(vendors,selected?.id||(!vendorName?previousVendor:''));invoiceWait(false);
     if(vendorName&&!selected){$('invoiceVendor').value='';invoiceStatus('「'+vendorName+'」の検索設定が見つかりません。「＋ 取引先の追加・設定」を確認してください。');return;}
     invoiceStatus('');
+    if(selected?.id==='googleplay'&&invoiceAccount){invoiceExternal=invoiceAccount!==String(s.mailbox||'').toLowerCase();$('invoiceSearchBtn').textContent=invoiceExternal?'このアカウントのGmailで探す':'Google Playの領収書を探す';if(invoiceExternal){$('invoiceDestination').textContent='対象アカウント：'+invoiceAccount+'\nこのアカウントのGmailを開いて、選択月のご注文明細を探します。';$('invoiceFolderBtn').disabled=true;return;}}
     $('invoiceFolder').value=s.folderUrl||'';$('invoiceDestination').textContent='検索するGmail：'+s.mailbox+'\n保存先：'+(s.folderName||'未設定');
     if(!s.ready)invoiceStatus('Gmail接続の初期設定がまだ完了していません。');
     else if(!s.healthy)invoiceStatus('Gmail接続の応答を待っています。長く続く場合は管理者に連絡してください。');
@@ -504,8 +508,8 @@ function openInvoices(vendorName=''){
 function closeInvoices(){ $('invoiceDialog').close(); }
 function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
 function searchInvoices(){
-  if(invoiceWaiting)return;if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
-  authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value);
+  if(invoiceWaiting)return;if(invoiceExternal&&$('invoiceVendor').value==='googleplay'){window.open(googlePlayGmailUrl(invoiceAccount,$('invoiceMonth').value),'_blank','noopener');invoiceStatus('対象アカウントのGmailを開きました。表示されたアカウントを確認してください。');return;}if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
+  authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value,...($('invoiceVendor').value==='googleplay'?[invoiceAccount]:[]));
 }
 function saveInvoiceFolder(){
   if(invoiceWaiting)return;showInvoiceSearching(false);invoiceWait(true);invoiceStatus('保存先フォルダを確認しています。通常1分ほどかかります。');
@@ -523,7 +527,7 @@ function pollInvoice(id){
   }).withFailureHandler(invoiceError).getInvoiceJob(id);
 }
 function renderInvoiceResults(){
-  $('invoiceResults').innerHTML=invoiceItems.map((c,i)=>`<section class="card" style="margin-top:14px"><h3 style="margin-top:0">${esc(c.vendor)}</h3><p>${esc(c.subject)}</p><p class="help">${esc(c.sourceKind)}</p>${c.needsReview?'<p style="color:#b45309">日付または金額を確定できませんでした。元の請求書を確認して入力してください。</p>':''}<div class="formGrid"><div class="field"><label for="invDue${i}">支払日</label><input type="date" id="invDue${i}" value="${attr(c.due)}"></div><div class="field"><label for="invAmount${i}">請求金額（円）</label><input type="number" min="0" step="1" id="invAmount${i}" value="${attr(c.amount)}"></div></div><p><a href="${attr(safeUrl(c.sourceUrl))}" target="_blank" rel="noopener">元のメールを開く</a></p><details><summary>読み取った内容を確認</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(c.evidence)}</pre></details><button class="btn primary" style="margin-top:12px" onclick="prepareInvoice(${i})">保存名を確認</button></section>`).join('');
+  $('invoiceResults').innerHTML=invoiceItems.map((c,i)=>`<section class="card" style="margin-top:14px"><h3 style="margin-top:0">${esc(c.vendor)}</h3><p>${esc(c.subject)}</p><p class="help">${esc(c.sourceKind)}</p>${c.account?`<p class="help">Google Playアカウント：${esc(c.account)}</p>`:''}${c.needsReview?'<p style="color:#b45309">日付または金額を確定できませんでした。元の請求書を確認して入力してください。</p>':''}<div class="formGrid"><div class="field"><label for="invDue${i}">${c.order?'注文日／支払日':'支払日'}</label><input type="date" id="invDue${i}" value="${attr(c.due)}"></div><div class="field"><label for="invAmount${i}">請求金額（円）</label><input type="number" min="0" step="1" id="invAmount${i}" value="${attr(c.amount)}"></div></div><p><a href="${attr(safeUrl(c.sourceUrl))}" target="_blank" rel="noopener">元のメールを開く</a></p><details><summary>読み取った内容を確認</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(c.evidence)}</pre></details><button class="btn primary" style="margin-top:12px" onclick="prepareInvoice(${i})">保存名を確認</button></section>`).join('');
 }
 function prepareInvoice(i){
   if(invoiceWaiting)return;const c=invoiceItems[i];invoiceWait(true);
