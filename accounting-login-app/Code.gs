@@ -31,7 +31,7 @@ function getAdminRecord_(adminId) {
   return {id: adminId, password: String(values[0] || ''), level};
 }
 function eligibleAdmin_(record) {
-  return !!record && !!record.password && Number.isFinite(record.level) && record.level >= 2;
+  return !!record && !!record.password && Number.isFinite(record.level) && record.level >= 1;
 }
 function authDigest_(value) {
   return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value)
@@ -57,7 +57,7 @@ function appSessionKey_(token) {
   }
   return ADMIN_SESSION_PREFIX + authDigest_(token);
 }
-function requireAppSession_(token) {
+function verifyAppSession_(token) {
   const props = PropertiesService.getScriptProperties();
   const key = appSessionKey_(token);
   const stored = props.getProperty(key);
@@ -100,6 +100,7 @@ function loginApp(adminId, password) {
     PropertiesService.getScriptProperties().setProperty(appSessionKey_(token), JSON.stringify({
       adminId: record.id, credentialFingerprint: credentialFingerprint_(record), createdAt: new Date().toISOString()
     }));
+    try{centralAppPermission_(token,'enter');}catch(e){PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(token));throw e;}
     return {token, adminId: record.id};
   } finally { lock.releaseLock(); }
 }
@@ -187,7 +188,7 @@ function getAppData(sessionToken) {
 }
 
 function saveEntry(payload, sessionToken) {
-  requireAppSession_(sessionToken);
+  requireAppSession_(sessionToken,'write');
   payload = payload || {};
   const item = normalizeEntry_(payload);
   if (!item.serviceName) throw new Error('サービス名を入力してください。');
@@ -234,7 +235,7 @@ function saveEntry(payload, sessionToken) {
 }
 
 function saveCardOrder(ids, expectedIds, sessionToken) {
-  requireAppSession_(sessionToken);
+  requireAppSession_(sessionToken,'settings');
   if (!Array.isArray(ids) || !ids.length) throw new Error('並べ替えデータがありません。');
   ids = ids.map(id => clean_(id, 100)).filter(Boolean);
   if (new Set(ids).size !== ids.length) throw new Error('並べ替えデータが重複しています。');
@@ -286,7 +287,7 @@ function getPassword(id, sessionToken) {
 }
 
 function clearPassword(id, sessionToken) {
-  requireAppSession_(sessionToken);
+  requireAppSession_(sessionToken,'delete');
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
@@ -300,7 +301,7 @@ function clearPassword(id, sessionToken) {
 }
 
 function deleteEntry(id, revision, sessionToken) {
-  requireAppSession_(sessionToken);
+  requireAppSession_(sessionToken,'delete');
   id = clean_(id, 100);
   if (!id) throw new Error('管理IDがありません。');
   const lock = LockService.getScriptLock();
@@ -484,7 +485,8 @@ const INV_WORKER = 'INV_WORKER_V1';
 function invConfig_(){return invRead_(INV_CONFIG)||{folderId:'1GBJvElFr4Ynhv9ICcjncCYTUQnRTgy9B',folderName:'CamScanner',folderUrl:'https://drive.google.com/drive/folders/1GBJvElFr4Ynhv9ICcjncCYTUQnRTgy9B'};}
 const INV_VENDORS = {
   exseed: {name:'エクシード',sender:'noreply@misoca.jp',subject:'エクシード 請求書',kind:'misoca', query:'from:noreply@misoca.jp subject:エクシード subject:請求書'},
-  esia: {name:'イージア',sender:'e-sia.jp',subject:'請求',kind:'attachment', query:'from:e-sia.jp subject:請求'}
+  esia: {name:'イージア',sender:'e-sia.jp',subject:'請求',kind:'attachment', query:'from:e-sia.jp subject:請求'},
+  googleplay: {name:'Google Play',sender:'googleplay-noreply@google.com',subject:'Google Play のご注文明細',kind:'googleplay-email',query:'from:googleplay-noreply@google.com subject:"Google Play" subject:ご注文明細'}
 };
 const INV_VENDOR_PREFIX = 'INV_VENDOR_V1_';
 function invVendors_(){
@@ -495,7 +497,7 @@ function invVendors_(){
 }
 function invVendor_(id){const v=invVendors_().find(v=>v.id===id);if(!v)throw new Error('取引先の設定が見つかりません。画面を開き直してください。');return v;}
 function saveInvoiceVendor(input,token){
-  requireAppSession_(token);const p=input||{};
+  requireAppSession_(token,'settings');const p=input||{};
   const name=String(p.name||'').trim(),sender=String(p.sender||'').trim().toLowerCase(),subject=String(p.subject||'').trim();
   const dateLabel=String(p.dateLabel||'').trim(),amountLabel=String(p.amountLabel||'').trim();
   if(!name||name.length>60||/[\\/:*?"<>|\x00-\x1f]/.test(name)||/[. ]$/.test(name))throw new Error('取引先名は60文字以内で、ファイル名に使える文字を入力してください。');
@@ -512,7 +514,7 @@ function saveInvoiceVendor(input,token){
   });
 }
 function deleteInvoiceVendor(id,token){
-  requireAppSession_(token);if(!/^custom_[a-f0-9]{32}$/.test(String(id)))throw new Error('標準の取引先は削除できません。');
+  requireAppSession_(token,'settings');if(!/^custom_[a-f0-9]{32}$/.test(String(id)))throw new Error('標準の取引先は削除できません。');
   return invLock_(()=>{invProps_().deleteProperty(INV_VENDOR_PREFIX+id);return {vendors:invVendors_()};});
 }
 function invSenderMatches_(header,sender){
@@ -553,18 +555,20 @@ function invNewJob_(type,data,token){
     invWrite_(INV_JOB+j.id,j);return {jobId:j.id};
   });
 }
-function startInvoiceSearch(vendor,month,token){
-  requireAppSession_(token);const cfg=invVendor_(vendor);if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(String(month)))throw new Error('取引先と支払い月を選択してください。');
-  return invNewJob_('search',{vendor,month,vendorConfig:cfg},token);
+function startInvoiceSearch(vendor,month,accountOrToken,token){
+  const account=token===undefined?'':String(accountOrToken||'').trim().toLowerCase();if(token===undefined)token=accountOrToken;
+  if(account&&!/^[a-z0-9.!#$%&'*+\-/=?^_`{|}~]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(account))throw new Error('Google Playアカウントを確認してください。');
+  requireAppSession_(token,'view');const cfg=invVendor_(vendor);if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(String(month)))throw new Error('取引先と支払い月を選択してください。');
+  return invNewJob_('search',{vendor,month,vendorConfig:cfg,account},token);
 }
 function setInvoiceFolder(value,token){
-  requireAppSession_(token);const v=String(value||'').trim();const m=v.match(/^https:\/\/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([\w-]+)(?:[?#].*)?$/);const id=m?m[1]:v;
+  requireAppSession_(token,'settings');const v=String(value||'').trim();const m=v.match(/^https:\/\/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([\w-]+)(?:[?#].*)?$/);const id=m?m[1]:v;
   if(!/^[\w-]{10,150}$/.test(id))throw new Error('Google DriveのフォルダURLを入力してください。');
   return invNewJob_('folder',{folderId:id},token);
 }
 function getInvoiceJob(id,token){
   const j=invJobFor_(id,token);const result={id:j.id,type:j.type,status:j.status,message:j.message||'',errors:j.errors||0,scanned:j.scanned||0};
-  if(j.status==='done'&&j.type==='search')result.items=j.items.map(k=>invRead_(INV_ITEM+k)).filter(Boolean).map(c=>({id:c.id,vendor:(c.vendorName||invVendor_(c.vendor).name),subject:c.subject,due:c.due||'',amount:c.amount==null?'':c.amount,needsReview:!c.due||c.amount==null,evidence:c.evidence||'',sourceUrl:c.sourceUrl,sourceKind:c.source.kind==='misoca'?'Misocaの請求書PDF':'メール添付の請求書PDF'}));
+  if(j.status==='done'&&j.type==='search')result.items=j.items.map(k=>invRead_(INV_ITEM+k)).filter(Boolean).map(c=>({id:c.id,vendor:(c.vendorName||invVendor_(c.vendor).name),subject:c.subject,due:c.due||'',amount:c.amount==null?'':c.amount,needsReview:!c.due||c.amount==null,evidence:c.evidence||'',sourceUrl:c.sourceUrl,account:c.account||'',order:c.order||'',sourceKind:c.source.kind==='googleplay-email'?'Google Playのメール本文をPDF保存':c.source.kind==='misoca'?'Misocaの請求書PDF':'メール添付の請求書PDF'}));
   if(j.status==='done'&&j.result)result.result=j.result;
   return result;
 }
@@ -573,10 +577,11 @@ function previewInvoiceSave(jobId,itemId,due,amount,token){
   const c=invRead_(INV_ITEM+itemId);const d=invValidDate_(String(due));const a=String(amount).replace(/,/g,'');
   if(!d||d.slice(0,7)!==j.month||!/^\d{1,12}$/.test(a))throw new Error('選択月の支払日と、整数の請求金額を確認してください。');
   const cfg=invConfig_();if(!cfg||!cfg.folderId)throw new Error('保存先フォルダを設定してください。');
-  const p={nonce:invId_(),expires:Date.now()+600000,due:d,amount:Number(a),filename:d.replace(/-/g,'')+'_'+(c.vendorName||invVendor_(c.vendor).name)+'_'+Number(a)+'.pdf',folderId:cfg.folderId,folderName:cfg.folderName,folderUrl:cfg.folderUrl};
+  const p={nonce:invId_(),expires:Date.now()+600000,due:d,amount:Number(a),filename:d.replace(/-/g,'')+'_'+(c.vendorName||invVendor_(c.vendor).name)+'_'+Number(a)+(c.source.kind==='googleplay-email'&&c.order?'_'+c.order:'')+'.pdf',folderId:cfg.folderId,folderName:cfg.folderName,folderUrl:cfg.folderUrl};
   c.preview=p;invWrite_(INV_ITEM+itemId,c);return p;
 }
 function confirmInvoiceSave(jobId,itemId,nonce,token){
+  requireAppSession_(token,'write');
   const j=invJobFor_(jobId,token);if(!j.items.includes(itemId))throw new Error('検索結果が不正です。');
   return invLock_(()=>{
     const c=invRead_(INV_ITEM+itemId),p=c&&c.preview;
@@ -587,7 +592,7 @@ function confirmInvoiceSave(jobId,itemId,nonce,token){
   });
 }
 // Run once in the editor as INV_OWNER after authorizing Gmail read-only and Drive.
-function setupInvoiceConnection(){ invOwner_(); installInvoiceWorker_(); }
+function setupInvoiceConnection(token){requireAppSession_(token,'settings'); invOwner_(); installInvoiceWorker_(); }
 function installInvoiceWorker_(){
   invOwner_();const p=Gmail.Users.getProfile('me');if(p.emailAddress.toLowerCase()!==INV_OWNER)throw new Error('Gmailアカウントが一致しません。');
   if(!ScriptApp.getProjectTriggers().some(t=>t.getHandlerFunction()==='processInvoiceJobs_'))ScriptApp.newTrigger('processInvoiceJobs_').timeBased().everyMinutes(1).create();
@@ -652,6 +657,7 @@ function invReadMessage_(j,id){
   if(j.vendor==='esia'&&!/@e-sia\.jp\b/i.test(from))return;
   const cfg=j.vendorConfig||invVendor_(j.vendor);
   if(!cfg.builtin&&(!invSenderMatches_(from,cfg.sender)||(cfg.subject&&!subject.toLowerCase().includes(cfg.subject.toLowerCase()))))return;
+  if(j.vendor==='googleplay'){invReadGooglePlay_(j,id,msg,cfg);return;}
   const body=invText_(parts),sources=[];
   if(j.vendor==='exseed'){
     const links=[...new Set(body.match(/https:\/\/app\.misoca\.jp\/receive_documents\/[a-f0-9-]{36}\b/g)||[])];
@@ -670,6 +676,47 @@ function invReadMessage_(j,id){
     invWrite_(INV_ITEM+c.id,c);j.items.push(c.id);
   }
 }
+
+function invParseGooglePlay_(text,subject){
+  const t=String(text||'').normalize('NFKC').replace(/\r\n?/g,'\n'),dates=[],amounts=[];
+  const order=(t.match(/(?:注文番号|Order number)\s*[:：]\s*((?:GPA|SOP)\.[0-9][0-9.-]{8,80})/i)||[])[1]||'';
+  for(const m of t.matchAll(/(?:注文日|Order date)\s*[:：]\s*(20\d{2})[\/年.-](\d{1,2})[\/月.-](\d{1,2})日?/gi)){const d=invValidDate_(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0'));if(d)dates.push(d);}
+  for(const m of t.matchAll(/(?:^|\s)(?:合計|Total)\s*[:：]?\s*[¥￥]\s*((?:\d{1,3}(?:,\d{3})+|\d+))(?=\s|円|\/|$)/gi)){const n=Number(m[1].replace(/,/g,''));if(Number.isSafeInteger(n)&&n>=0&&n<=999999999999)amounts.push(n);}
+  const ds=[...new Set(dates)],as=[...new Set(amounts)];
+  const account=(t.match(/(?:お客様のアカウント|Your account)\s*[:：]\s*([a-z0-9.!#$%&'*+/=?^_~-]+@[a-z0-9.-]+\.[a-z]{2,})/i)||[])[1]||'';
+  return {due:ds.length===1?ds[0]:'',amount:as.length===1?as[0]:null,order,account,evidence:t.slice(0,1600)};
+}
+function invGooglePlayRecord_(msg){
+  const p=msg.payload,subject=invHeader_(p,'Subject'),from=invHeader_(p,'From');
+  if(!invSenderMatches_(from,'googleplay-noreply@google.com')||!/^Google\s*Play\s*のご注文明細(?:\s*[（(]|$)/i.test(subject.normalize('NFKC').trim()))throw new Error('Google Playのご注文明細メールではありません。');
+  const parts=invParts_(p),plain=parts.filter(p=>p.mimeType==='text/plain'&&p.body&&p.body.data);
+  const text=invText_(plain.length?plain:parts).replace(/\r\n?/g,'\n').trim();
+  if(!text||text.length>50000)throw new Error('Google Playのメール本文を読み込めません。');
+  const parsed=invParseGooglePlay_(text,subject);
+  if(!parsed.order)throw new Error('Google Playの注文番号を確認できません。');
+  return {subject,from,to:invHeader_(p,'To'),date:invHeader_(p,'Date'),text,parsed};
+}
+function invGooglePlayHash_(record){
+  return invBlobHash_(Utilities.newBlob(JSON.stringify([record.subject,record.from,record.to,record.date,record.text])));
+}
+function invReadGooglePlay_(j,id,msg,cfg){
+  const record=invGooglePlayRecord_(msg),parsed=record.parsed;
+  if(j.account&&parsed.account.toLowerCase()!==j.account.toLowerCase())return;
+  if(parsed.due&&parsed.due.slice(0,7)!==j.month)return;
+  const fingerprint=invGooglePlayHash_(record);
+  if(j.items.map(k=>invRead_(INV_ITEM+k)).some(c=>c&&c.fingerprint===fingerprint))return;
+  if(j.items.length>=20)throw new Error('候補が20件を超えました。');
+  const c={id:invId_(),vendor:j.vendor,vendorName:cfg.name,subject:record.subject.slice(0,250),source:{kind:'googleplay-email',messageId:id},fingerprint,due:parsed.due,amount:parsed.amount,order:parsed.order,account:parsed.account,evidence:parsed.evidence,created:Date.now(),sourceUrl:'https://mail.google.com/mail/u/?authuser='+encodeURIComponent(INV_OWNER)+'#all/'+id};
+  invWrite_(INV_ITEM+c.id,c);j.items.push(c.id);
+}
+function invGooglePlayPdf_(record){
+  const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const html='<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><style>@page{size:A4;margin:18mm}body{font-family:Arial,"Noto Sans JP",sans-serif;font-size:10pt;line-height:1.65;color:#172033}h1{font-size:17pt}p{overflow-wrap:anywhere}.body{white-space:pre-wrap;overflow-wrap:anywhere;border-top:1px solid #cbd5e1;padding-top:14px}</style></head><body><h1>Google Play ご注文明細（メール本文）</h1><p>メール本文をPDF化したものです。</p><p>件名：'+esc(record.subject)+'<br>差出人：'+esc(record.from)+'<br>宛先：'+esc(record.to)+'<br>メール日時：'+esc(record.date)+'</p><div class="body">'+esc(record.text)+'</div></body></html>';
+  const blob=Utilities.newBlob(html,'text/html','GooglePlay.html').getAs('application/pdf');
+  const bytes=blob.getBytes();if(bytes.length>10000000||bytes.length<5||String.fromCharCode(...bytes.slice(0,5))!=='%PDF-')throw new Error('Google PlayのメールをPDFに変換できませんでした。');
+  return blob.setContentType('application/pdf');
+}
+
 function invPdf_(source){
   let b;
   if(source.kind==='misoca'){
@@ -728,16 +775,35 @@ function invParse_(text,vendor,month){
 }
 function invSave_(j){
   const c=invRead_(INV_ITEM+j.itemId);if(!c)throw new Error('検索結果が期限切れです。');
-  const p=j.preview,cfg=invCheckFolder_(p.folderId),blob=invPdf_(c.source);
-  if(invBlobHash_(blob)!==c.fingerprint)throw new Error('確認後に請求書が変更されました。もう一度検索してください。');
+  const p=j.preview,cfg=invCheckFolder_(p.folderId),email=c.source.kind==='googleplay-email';let blob;
+  if(email){
+    const record=invGooglePlayRecord_(Gmail.Users.Messages.get('me',c.source.messageId,{format:'full'}));
+    if(invGooglePlayHash_(record)!==c.fingerprint)throw new Error('確認後にメールが変更されました。もう一度検索してください。');
+    blob=invGooglePlayPdf_(record);
+  }else{
+    blob=invPdf_(c.source);if(invBlobHash_(blob)!==c.fingerprint)throw new Error('確認後に請求書が変更されました。もう一度検索してください。');
+  }
   const folder=DriveApp.getFolderById(cfg.folderId),existing=folder.getFilesByName(p.filename);
   while(existing.hasNext()){
-    const f=existing.next();if(f.getMimeType()==='application/pdf'&&invBlobHash_(f.getBlob())===c.fingerprint)return {url:f.getUrl(),name:f.getName(),existing:true};
+    const f=existing.next(),description=email?String(f.getDescription()||''):'';
+    const same=email?description.includes('STEP_GOOGLEPLAY_SOURCE_SHA256='+c.fingerprint+'\n')&&description.includes('STEP_GOOGLEPLAY_PDF_SHA256='+invBlobHash_(f.getBlob())+'\n'):invBlobHash_(f.getBlob())===c.fingerprint;
+    if(f.getMimeType()==='application/pdf'&&same)return {url:f.getUrl(),name:f.getName(),existing:true};
     throw new Error('同じ名前で内容が異なるファイルがあります。保存先を変更して確認してください。');
   }
-  const f=folder.createFile(blob.setName(p.filename));return {url:f.getUrl(),name:f.getName(),existing:false};
+  const f=folder.createFile(blob.setName(p.filename));
+  if(email)f.setDescription('STEP_GOOGLEPLAY_SOURCE_SHA256='+c.fingerprint+'\nSTEP_GOOGLEPLAY_PDF_SHA256='+invBlobHash_(blob)+'\n');
+  return {url:f.getUrl(),name:f.getName(),existing:false};
 }
 
 
 
 
+
+function centralAppPermission_(token,action){
+ const r=UrlFetchApp.fetch('https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/staff-app-permission-v1',{method:'post',contentType:'application/json',payload:JSON.stringify({appId:'accounting-login-app',sessionKind:'accounting',sessionToken:String(token||''),action:action||'view'}),muteHttpExceptions:true});
+ let v;try{v=JSON.parse(r.getContentText());}catch(e){}
+ if(r.getResponseCode()!==200||!v||!v.allowed)throw new Error('PERMISSION_DENIED: '+(v&&v.reason||'共通権限を確認できません。'));return v;
+}
+
+function requireAppSession_(token,action){const id=verifyAppSession_(token);centralAppPermission_(token,action||'view');return id;}
+function doPost(e){try{const p=JSON.parse(e.postData.contents||'{}');if(p.action!=='centralAccountingSessionVerify')throw new Error('Unsupported action');const id=verifyAppSession_(p.sessionToken),record=getAdminRecord_(id);return ContentService.createTextOutput(JSON.stringify({success:true,code:id,permissionLevel:record.level})).setMimeType(ContentService.MimeType.JSON);}catch(e){return ContentService.createTextOutput(JSON.stringify({success:false})).setMimeType(ContentService.MimeType.JSON);}}
