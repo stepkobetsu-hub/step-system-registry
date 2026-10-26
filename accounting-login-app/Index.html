@@ -485,7 +485,12 @@ function invoiceStatus(text){$('invoiceStatus').textContent=text;}
 function showInvoiceSearching(on){const box=$('invoiceSearching');if(box)box.classList.toggle('show',!!on);}
 function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn','invoiceVendor','invoiceMonth'].forEach(id=>$(id).disabled=on);document.querySelectorAll('.invoice-card-import').forEach(button=>button.disabled=on);}
 function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
-function invoiceCardVendor(entry){if(/^google\s*play(?:\([^)]*\))?$/i.test(norm(entry.serviceName)))return 'Google Play';return ['エクシード','イージア','伊神切手社'].find(name=>norm(name)===norm(entry.serviceName))||'';}
+function invoiceCardVendor(entry){
+  const name=norm(entry.serviceName);
+  if(/^google\s*play(?:\([^)]*\))?$/i.test(name))return 'Google Play';
+  // Allow a descriptive suffix while keeping each button tied to its own vendor.
+  return ['エクシード','イージア','伊神切手社'].find(vendor=>name===norm(vendor)||name.startsWith(norm(vendor))&&/^[・･\s(/／:：–—-]/u.test(name.slice(norm(vendor).length)))||'';
+}
 function openGooglePlayInvoices(id){const entry=findEntry(id);if(!entry)return;const value=String(entry.account||'').trim();openInvoices('Google Play',value.includes('@')?value:value+'@gmail.com');}
 function googlePlayGmailUrl(account,month){const [y,m]=month.split('-').map(Number),from=new Date(Date.UTC(y,m-1,1)),to=new Date(Date.UTC(y,m,1)),fmt=d=>d.toISOString().slice(0,10).replace(/-/g,'/');const query='from:googleplay-noreply@google.com subject:ご注文明細 after:'+fmt(from)+' before:'+fmt(to);const gmail='https://mail.google.com/mail/u/?authuser='+encodeURIComponent(account)+'#search/'+encodeURIComponent(query);return 'https://accounts.google.com/AddSession?service=mail&Email='+encodeURIComponent(account)+'&continue='+encodeURIComponent(gmail);}
 function openInvoices(vendorName='',account=''){
@@ -574,6 +579,7 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
+
 
 
 
