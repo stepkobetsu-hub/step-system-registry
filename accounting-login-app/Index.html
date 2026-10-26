@@ -45,7 +45,7 @@
     .quick-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:18px;align-items:stretch}
     .quick-tools .extension-download,.quick-tools .invoice-feature{min-width:0;margin:0;padding:16px;gap:12px;border-radius:15px;align-items:center;flex-direction:row}
     .quick-tools .extension-download-copy{min-width:0;flex:1}.quick-tools h2{font-size:16px;line-height:1.5}.quick-tools .extension-download-copy p,.quick-tools .invoice-feature p{font-size:12px;line-height:1.7}
-    .quick-tools .extension-download-link{min-height:44px;font-size:13px;padding:10px 12px;gap:6px}.quick-tools .extension-download-actions p{font-size:11px}
+    .quick-tools .extension-download-link{min-height:74px;flex-direction:column;padding:13px 16px;gap:5px;font-size:15px;box-shadow:0 4px 12px rgba(29,78,216,.25)}.extension-download-main{display:block;font-weight:800;line-height:1.5}.extension-download-note{display:block;font-size:11.5px;font-weight:500;line-height:1.5;color:#eff6ff}
     .quick-tools .invoice-feature-copy{gap:10px;flex:1}.quick-tools .invoice-feature-icon{width:34px;height:42px;border-radius:9px}.quick-tools .invoice-feature-icon svg{width:22px;height:28px}
     .quick-tools .invoice-launch{min-height:44px;padding:10px 12px;font-size:15px;gap:7px;border-radius:10px;white-space:nowrap}.quick-tools .invoice-launch svg{width:18px;height:18px}
     @media(max-width:1100px){.quick-tools .extension-download,.quick-tools .invoice-feature{flex-direction:column;align-items:stretch}.quick-tools .extension-download-link,.quick-tools .invoice-launch{width:100%}}
@@ -79,8 +79,7 @@
         <p>Amazonビジネス・スプリックス対応。別のパソコンへの導入・更新はこちら。</p>
       </div>
       <div class="extension-download-actions">
-        <a id="extensionDownloadLink" class="extension-download-link" href="https://chatgpt.com/library?file_id=libfile_4132a92280d88191b308c6fd9e87c669&amp;account_id=personal" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↓</span> 拡張機能の最新版をダウンロード</a>
-        <p>ChatGPTのダウンロード画面が開きます。</p>
+        <a id="extensionDownloadLink" class="extension-download-link" href="https://chatgpt.com/library?file_id=libfile_4132a92280d88191b308c6fd9e87c669&amp;account_id=personal" target="_blank" rel="noopener noreferrer"><span class="extension-download-main"><span aria-hidden="true">↓</span> 拡張機能の最新版をダウンロード</span><span class="extension-download-note">ChatGPTのダウンロード画面が開きます。</span></a>
       </div>
     </section>
     <section class="invoice-feature" aria-labelledby="invoiceFeatureTitle">
