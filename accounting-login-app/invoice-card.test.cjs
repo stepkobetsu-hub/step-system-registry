@@ -42,6 +42,23 @@ for(const [i,name] of names.entries()){
   w.closeInvoices();
 }
 assert.equal(d.querySelector('[data-id="other"] .invoice-card-import'),null);
+for(const [serviceName,vendor] of [
+  ['エクシード・ロブロックス','エクシード'],
+  ['イージア・マインクラフト','イージア'],
+  ['エクシード（ロブロックス）','エクシード'],
+  ['イージア / V-code','イージア'],
+  ['伊神切手社・図書カード','伊神切手社']
+]){
+  const box=d.createElement('div');box.innerHTML=w.cardHtml({id:'suffix',serviceName},0);
+  const button=box.querySelector('.invoice-card-import');
+  assert.equal(button?.textContent,'領収書取込',serviceName);
+  evaluate(button.getAttribute('onclick'));settingsSuccess(settings);
+  assert.equal(d.getElementById('invoiceVendor').selectedOptions[0].textContent,vendor,serviceName);
+  w.closeInvoices();
+}
+for(const serviceName of ['エクシード別会社','イージアム','別会社・エクシード']){
+  assert.equal(w.invoiceCardVendor({serviceName}),'',serviceName);
+}
 evaluate('reorderMode=true');
 assert.ok(!w.cardHtml(entries[0],0).includes('invoice-card-import'));
 evaluate('reorderMode=false');
