@@ -36,6 +36,10 @@
     @keyframes invoiceSearchSweep{0%,20%{transform:translateX(-65%)}70%,100%{transform:translateX(65%)}}
     @media(prefers-reduced-motion:reduce){.invoice-searching img,.invoice-searching::after{animation:none}}
     @media(max-width:650px){.invoice-feature{align-items:stretch;flex-direction:column;gap:16px;padding:18px 16px}.invoice-feature h2{font-size:18px}.invoice-feature-copy{gap:12px}.invoice-launch{width:100%;min-height:58px}}
+    .extension-download{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 18px;padding:18px 22px;border:1px solid #bfdbfe;border-radius:15px;background:#eff6ff}
+    .extension-download h2{margin:0 0 4px;font-size:18px;line-height:1.5;color:#1e3a8a}.extension-download-copy p{margin:0;color:#475569;font-size:14px;line-height:1.7}
+    .extension-download-actions{flex-shrink:0;text-align:center}.extension-download-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:800;font-size:15px;line-height:1.5}.extension-download-link:hover{background:#1e40af}.extension-download-link:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}.extension-download-actions p{margin:6px 0 0;font-size:12px;line-height:1.5;color:#64748b}
+    @media(max-width:980px){.extension-download{align-items:stretch;flex-direction:column;gap:12px}.extension-download-link{width:100%}} 
   </style>
 </head>
 <body>
@@ -58,6 +62,16 @@
       <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。登録するサービスのパスワードはアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
       <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
+    <section class="extension-download" aria-labelledby="extensionDownloadTitle">
+      <div class="extension-download-copy">
+        <h2 id="extensionDownloadTitle">経理書類保存 拡張機能</h2>
+        <p>Amazonビジネス・スプリックス対応。別のパソコンへの導入・更新はこちら。</p>
+      </div>
+      <div class="extension-download-actions">
+        <a id="extensionDownloadLink" class="extension-download-link" href="https://chatgpt.com/library?file_id=libfile_4132a92280d88191b308c6fd9e87c669&amp;account_id=personal" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↓</span> 拡張機能の最新版をダウンロード</a>
+        <p>ChatGPTのダウンロード画面が開きます。</p>
+      </div>
+    </section>
     <section class="invoice-feature" aria-labelledby="invoiceFeatureTitle">
       <div class="invoice-feature-copy">
         <span class="invoice-feature-icon" aria-hidden="true"><svg viewBox="0 0 32 36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h18v29l-3-2-3 2-3-2-3 2-3-2-3 2V3Z"/><path d="m12 10 4 5 4-5M16 15v8M11 16h10M11 20h10"/></svg></span>
@@ -538,7 +552,6 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
-
 
 
 
