@@ -41,6 +41,15 @@
     .extension-download-actions{flex-shrink:0;text-align:center}.extension-download-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:800;font-size:15px;line-height:1.5}.extension-download-link:hover{background:#1e40af}.extension-download-link:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}.extension-download-actions p{margin:6px 0 0;font-size:12px;line-height:1.5;color:#64748b}
     @media(max-width:980px){.extension-download{align-items:stretch;flex-direction:column;gap:12px}.extension-download-link{width:100%}} 
     .invoice-card-tools{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;margin-left:auto}.invoice-card-import{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid #165f78;border-radius:9px;background:#165f78;color:#fff;font-size:12px;font-weight:700;line-height:1.4;white-space:nowrap}.invoice-card-import:hover{background:#124d61}.invoice-card-import:disabled{opacity:.5;cursor:wait}
+
+    .quick-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:18px;align-items:stretch}
+    .quick-tools .extension-download,.quick-tools .invoice-feature{min-width:0;margin:0;padding:16px;gap:12px;border-radius:15px;align-items:center;flex-direction:row}
+    .quick-tools .extension-download-copy{min-width:0;flex:1}.quick-tools h2{font-size:16px;line-height:1.5}.quick-tools .extension-download-copy p,.quick-tools .invoice-feature p{font-size:12px;line-height:1.7}
+    .quick-tools .extension-download-link{min-height:44px;font-size:13px;padding:10px 12px;gap:6px}.quick-tools .extension-download-actions p{font-size:11px}
+    .quick-tools .invoice-feature-copy{gap:10px;flex:1}.quick-tools .invoice-feature-icon{width:34px;height:42px;border-radius:9px}.quick-tools .invoice-feature-icon svg{width:22px;height:28px}
+    .quick-tools .invoice-launch{min-height:44px;padding:10px 12px;font-size:15px;gap:7px;border-radius:10px;white-space:nowrap}.quick-tools .invoice-launch svg{width:18px;height:18px}
+    @media(max-width:1100px){.quick-tools .extension-download,.quick-tools .invoice-feature{flex-direction:column;align-items:stretch}.quick-tools .extension-download-link,.quick-tools .invoice-launch{width:100%}}
+    @media(max-width:650px){.quick-tools{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -63,6 +72,7 @@
       <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。登録するサービスのパスワードはアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
       <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
+    <div class="quick-tools">
     <section class="extension-download" aria-labelledby="extensionDownloadTitle">
       <div class="extension-download-copy">
         <h2 id="extensionDownloadTitle">経理書類保存 拡張機能</h2>
@@ -80,6 +90,7 @@
       </div>
       <button type="button" class="invoice-launch" id="invoiceLaunchBtn" onclick="openInvoices()"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><span>請求書を探す</span><span aria-hidden="true">→</span></button>
     </section>
+    </div>
     <div class="toolbar">
       <div class="searchrow"><div class="search">🔎<input aria-label="検索" id="search" placeholder="サービス名・ID・メモを検索（漢字・かな・ローマ字）" autocomplete="off"></div><span class="count" id="count"></span></div>
       <div class="chips" id="chips"></div>
