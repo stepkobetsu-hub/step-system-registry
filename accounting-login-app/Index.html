@@ -487,7 +487,7 @@ function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn
 function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
 function invoiceCardVendor(entry){if(/^google\s*play(?:\([^)]*\))?$/i.test(norm(entry.serviceName)))return 'Google Play';return ['エクシード','イージア','伊神切手社'].find(name=>norm(name)===norm(entry.serviceName))||'';}
 function openGooglePlayInvoices(id){const entry=findEntry(id);if(!entry)return;const value=String(entry.account||'').trim();openInvoices('Google Play',value.includes('@')?value:value+'@gmail.com');}
-function googlePlayGmailUrl(account,month){const [y,m]=month.split('-').map(Number),from=new Date(Date.UTC(y,m-1,1)),to=new Date(Date.UTC(y,m,1)),fmt=d=>d.toISOString().slice(0,10).replace(/-/g,'/');const query='from:googleplay-noreply@google.com subject:ご注文明細 after:'+fmt(from)+' before:'+fmt(to);return 'https://mail.google.com/mail/u/?authuser='+encodeURIComponent(account)+'#search/'+encodeURIComponent(query);}
+function googlePlayGmailUrl(account,month){const [y,m]=month.split('-').map(Number),from=new Date(Date.UTC(y,m-1,1)),to=new Date(Date.UTC(y,m,1)),fmt=d=>d.toISOString().slice(0,10).replace(/-/g,'/');const query='from:googleplay-noreply@google.com subject:ご注文明細 after:'+fmt(from)+' before:'+fmt(to);const gmail='https://mail.google.com/mail/u/?authuser='+encodeURIComponent(account)+'#search/'+encodeURIComponent(query);return 'https://accounts.google.com/AddSession?service=mail&Email='+encodeURIComponent(account)+'&continue='+encodeURIComponent(gmail);}
 function openInvoices(vendorName='',account=''){
   $('invoiceDialog').showModal();if(invoiceWaiting)return;
   invoiceAccount=String(account||'').trim().toLowerCase();invoiceExternal=false;$('invoiceSearchBtn').textContent='Gmailで請求書を探す';
@@ -499,7 +499,7 @@ function openInvoices(vendorName='',account=''){
     renderInvoiceVendors(vendors,selected?.id||(!vendorName?previousVendor:''));invoiceWait(false);
     if(vendorName&&!selected){$('invoiceVendor').value='';invoiceStatus('「'+vendorName+'」の検索設定が見つかりません。「＋ 取引先の追加・設定」を確認してください。');return;}
     invoiceStatus('');
-    if(selected?.id==='googleplay'&&invoiceAccount){invoiceExternal=invoiceAccount!==String(s.mailbox||'').toLowerCase();$('invoiceSearchBtn').textContent=invoiceExternal?'このアカウントのGmailで探す':'Google Playの領収書を探す';if(invoiceExternal){$('invoiceDestination').textContent='対象アカウント：'+invoiceAccount+'\nこのアカウントのGmailを開いて、選択月のご注文明細を探します。';$('invoiceFolderBtn').disabled=true;return;}}
+    if(selected?.id==='googleplay'&&invoiceAccount){invoiceExternal=invoiceAccount!==String(s.mailbox||'').toLowerCase();$('invoiceSearchBtn').textContent=invoiceExternal?'Googleにログインして領収書を探す':'Google Playの領収書を探す';if(invoiceExternal){$('invoiceDestination').textContent='対象アカウント：'+invoiceAccount+'\nこのアカウントでGoogleにログインしてから、選択月のご注文明細を探します。';$('invoiceFolderBtn').disabled=true;return;}}
     $('invoiceFolder').value=s.folderUrl||'';$('invoiceDestination').textContent='検索するGmail：'+s.mailbox+'\n保存先：'+(s.folderName||'未設定');
     if(!s.ready)invoiceStatus('Gmail接続の初期設定がまだ完了していません。');
     else if(!s.healthy)invoiceStatus('Gmail接続の応答を待っています。長く続く場合は管理者に連絡してください。');
@@ -508,7 +508,7 @@ function openInvoices(vendorName='',account=''){
 function closeInvoices(){ $('invoiceDialog').close(); }
 function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
 function searchInvoices(){
-  if(invoiceWaiting)return;if(invoiceExternal&&$('invoiceVendor').value==='googleplay'){window.open(googlePlayGmailUrl(invoiceAccount,$('invoiceMonth').value),'_blank','noopener');invoiceStatus('対象アカウントのGmailを開きました。表示されたアカウントを確認してください。');return;}if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
+  if(invoiceWaiting)return;if(invoiceExternal&&$('invoiceVendor').value==='googleplay'){window.open(googlePlayGmailUrl(invoiceAccount,$('invoiceMonth').value),'_blank','noopener');invoiceStatus('Googleのログイン画面を開きました。対象アカウントでログインすると、選択月の明細検索へ進みます。');return;}if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
   authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value,...($('invoiceVendor').value==='googleplay'?[invoiceAccount]:[]));
 }
 function saveInvoiceFolder(){
