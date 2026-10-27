@@ -1873,3 +1873,13 @@
 - Backend: learning-progress Supabase / step-timetable-runtime-v1、RLS・一般クライアントアクセス禁止、サーバー共通セッション検証。source: seiseki-kanri の timetable.* / supabase/step_timetable*.sql / supabase/functions/step-timetable-runtime-v1。詳細: https://github.com/stepkobetsu-hub/seiseki-kanri/blob/main/docs/timetable.md
 - Commit: https://github.com/stepkobetsu-hub/seiseki-kanri/commit/2f09438607874c36a1a624eac9e7e74a672b6fea 。配信連携: https://github.com/stepkobetsu-hub/step-message-center/commit/7ff2982b022a1473b0900dd4adc87daeebee29df
 - 確認: ドメインテスト5件、両校現マスタ1週間の生成・講師割当検証、SQL生成上書き防止・版競合・特訓先行登録・重複防止、未認証401、権限1の読込200、実送信特訓1件の取込と再実行0件。初回Pages build/deploy成功、公開HTML200。実ブラウザーの画面と実プリンターの印刷は未確認。
+
+
+## 経理ログイン管理：Apps Script編集先（2026-10-27追記）
+
+- 台帳カード名：仕訳・経理：URL管理（旧称：経理ログイン管理）
+- Apps Script編集URL：https://script.google.com/u/0/home/projects/1icAh38Pk7hdINs3CucB6uwyEy_uFighmfcqOOhkvvQZbh0ohkdAuTxSt/edit
+- Apps ScriptプロジェクトID：`1icAh38Pk7hdINs3CucB6uwyEy_uFighmfcqOOhkvvQZbh0ohkdAuTxSt`
+- 利用URL： https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec
+- ソース保管先：`accounting-login-app/Code.gs`、`accounting-login-app/Index.html`。本番を変更する前に編集プロジェクトの現行ソースとの一致を確認する。
+- 編集URLの根拠：2026-10-27に利用者が提示。台帳の「修正する」に編集リンクを追加。
