@@ -38,7 +38,7 @@
     },
     {
       "正式名称": "仕訳・経理：URL管理",
-      "状態": "本番使用中（Apps Script v46・ログイン高速化）",
+      "状態": "本番使用中（Apps Script v49・Supabase日常表示）",
       "利用者向けURL": "https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec"
     },
     {
