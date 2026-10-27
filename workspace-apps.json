@@ -2,6 +2,11 @@
   "generatedFrom": "SYSTEM_REGISTRY.md",
   "apps": [
     {
+      "正式名称": "CamScanner → Google Drive コピー",
+      "状態": "要確認（自動コピー未稼働）",
+      "利用者向けURL": "https://www.camscanner.com/file/recent"
+    },
+    {
       "正式名称": "STEP広報窓口",
       "状態": "本番公開・週次連携設定済み",
       "利用者向けURL": "https://step-publicity-desk.mintcocoajasmine.chatgpt.site"
