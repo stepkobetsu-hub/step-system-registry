@@ -112,13 +112,18 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-form/"
     },
     {
+      "正式名称": "Postmark導入・運用記録",
+      "状態": "**本番稼働中（無料枠・Yahoo通知・有料化検討）**",
+      "利用者向けURL": "https://account.postmarkapp.com"
+    },
+    {
       "正式名称": "STEP配信システム",
-      "状態": "本番使用中（Apps Script v63・Yahoo通知Postmark・Brevo併用）",
+      "状態": "**本番使用中（Apps Script v63・Yahoo通知Postmark・Brevo併用）**",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/step-message-center/"
     },
     {
       "正式名称": "不達メール管理",
-      "状態": "本番使用中（Apps Script v96・Postmark／Brevo共通不達管理）",
+      "状態": "**本番使用中（Apps Script v96・Postmark／Brevo共通不達管理）**",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html"
     },
     {
@@ -133,7 +138,7 @@
     },
     {
       "正式名称": "出退くんQR作成・読取",
-      "状態": "本番使用中（Apps Script v96・Yahoo通知Postmark・Brevo併用）",
+      "状態": "**本番使用中（Apps Script v96・Yahoo通知Postmark・Brevo併用）**",
       "利用者向けURL": "**管理者QR登録:** https://stepkobetsu-hub.github.io/student-QR/student_qr_register.html<br>**講師QR作成:** https://stepkobetsu-hub.github.io/student-QR/teacher_qr_create.html<br>**塾生用QR:** https://stepkobetsu-hub.github.io/student-QR/my_qr.html<br>**タブレット読取:** https://step-checkin-edge-staging.stepkobetsu.workers.dev/legacy-tablet<br>**不達メール管理:** https://stepkobetsu-hub.github.io/student-QR/delivery_failures.html<br>**Apps Script本番:** https://script.google.com/macros/s/AKfycbw8L36Fj8SKtvNHQBi41FMqAPvDLGAdu1bbLxvd-78A8dFUOkWGnYRE-8PRNq7QZOl70w/exec"
     },
     {
@@ -180,11 +185,6 @@
       "正式名称": "生徒情報検索",
       "状態": "本番使用中（詳細取得一括化・GAS v70）",
       "利用者向けURL": "https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html"
-    },
-    {
-      "正式名称": "Postmark導入・運用記録",
-      "状態": "本番稼働中（無料枠・Yahoo通知・有料化検討）",
-      "利用者向けURL": "https://account.postmarkapp.com"
     }
   ]
 }
