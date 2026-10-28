@@ -10,6 +10,7 @@
   "運用担当": "管理者",
   "概要": "Yahoo宛ての生徒QR入退室・STEP配信通知をPostmarkへ切替。QR v96／配信v63、既存URL・Brevo・不達管理・入退室・講師勤怠・ポイント等は維持。無料100通／月、アプリは累計90試行。9月146通・10月1〜28日103通・直近30日117通のため、有料化の見込みが高い。現在有料契約なし。",
   "利用者向けURL": "https://account.postmarkapp.com",
+  "GitHub URL": "https://github.com/stepkobetsu-hub/step-system-registry",
   "GitHubドキュメントURL": "https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/postmark-rollout-20261028.md",
   "GitHubドキュメント": "docs/postmark-rollout-20261028.md",
   "Apps Script編集URL": "https://script.google.com/home/projects/1ZFzVbJM15igFE7InsX1fu-FlNrYUY45vviozJP0k1uVXy_HvmGfseZ22/edit",
