@@ -27,7 +27,7 @@
   "仕様メモ": "現在の本番は有料全宛先モード。POSTMARK_PRODUCTION_ENABLED=true、POSTMARK_MC_PRODUCTION_ENABLED=true。送信予約の永続台帳は入退室ログ２／Postmark送信台帳。従来の試験カウンターは履歴として保持し、本番制限に使わない。二重送信を避けるため受付結果不明時に別業者へ自動再送しない。切替前の過去保留分の一斉再送なし。APIトークン・連携キーは既存のScript Propertiesで管理。",
   "確認日": "2026-10-29",
   "確認状況": "有料契約、QR v97／STEP配信v64の本番公開・既存URL維持、全宛先有効化、管理者Gmail・Yahooへの配信完了を確認。13件のモックテスト合格。",
-  "バックアップ場所": "QR導入前：https://chatgpt.com/library?file_id=libfile_ef5e31c5c798819198939edc1f2727d3&account_id=personal\nQR初期結果：https://chatgpt.com/library?file_id=libfile_1d1004be7d288191a9b7fccc5c608dd9&account_id=personal\nSTEP配信変更前：https://chatgpt.com/library?file_id=libfile_884e8797da848191af66874c3979d5d7&account_id=personal\n最終v96/v63差分：https://chatgpt.com/library?file_id=libfile_a72ab62bbdd881918ceb77992da9889c&account_id=personal\n配信のネイティブ複製：https://script.google.com/home/projects/1kiDzhEkrT3UA8Z_SpE3BQT9LBgWApx51SC6NrIN2GOpWBwjZRXlf-95O/edit",
+  "バックアップ場所": "2026-10-29有料移行の本番コード・結果：https://chatgpt.com/library?file_id=libfile_bc25bed19f248191931e359b7cf9b00f&account_id=personal\nQR導入前：https://chatgpt.com/library?file_id=libfile_ef5e31c5c798819198939edc1f2727d3&account_id=personal\nQR初期結果：https://chatgpt.com/library?file_id=libfile_1d1004be7d288191a9b7fccc5c608dd9&account_id=personal\nSTEP配信変更前：https://chatgpt.com/library?file_id=libfile_884e8797da848191af66874c3979d5d7&account_id=personal\n最終v96/v63差分：https://chatgpt.com/library?file_id=libfile_a72ab62bbdd881918ceb77992da9889c&account_id=personal\n配信のネイティブ複製：https://script.google.com/home/projects/1kiDzhEkrT3UA8Z_SpE3BQT9LBgWApx51SC6NrIN2GOpWBwjZRXlf-95O/edit",
   "確認済み事項": [
     "有料Basic 10,000通／月・US$15・次回11月29日",
     "QR v97／STEP配信v64・既存本番URL維持",
