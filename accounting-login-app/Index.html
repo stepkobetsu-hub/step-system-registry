@@ -132,6 +132,7 @@
   <p id="invoiceDestination" class="help"></p>
   <div id="invoiceSearching" class="invoice-searching" aria-hidden="true"><img src="https://stepkobetsu-hub.github.io/step-system-registry/images/invoice-search-loading.webp" alt=""></div>
   <div id="invoiceStatus" role="status" aria-live="polite" style="margin:16px 0;white-space:pre-wrap"></div>
+  <div id="invoiceDownloadResult" role="status" aria-live="polite" tabindex="-1" hidden></div>
   <div id="invoiceResults"></div>
 </div></dialog>
 <dialog id="invoiceVendorDialog" aria-labelledby="invoiceVendorTitle"><div class="modal">
@@ -197,7 +198,7 @@
       withSuccessHandler(fn){success=fn;return runner},
       withFailureHandler(fn){failure=fn;return runner}
     };
-    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave','saveInvoiceVendor','deleteInvoiceVendor'].forEach(name=>{
+    ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave','saveInvoiceVendor','deleteInvoiceVendor','downloadOfficeInvoice'].forEach(name=>{
       runner[name]=(...args)=>{
         if(!token){failure(new Error('APP_SESSION_REQUIRED'));return}
         if(['saveEntry','saveCardOrder','clearPassword','deleteEntry'].includes(name))clearPreview();
@@ -583,10 +584,11 @@
 let invoicePollTimer, invoiceItems=[], invoiceSearchJob='', invoiceConfirmation=null, invoiceWaiting=false, invoiceAccount='', invoiceExternal=false;
 function invoiceStatus(text){$('invoiceStatus').textContent=text;}
 function showInvoiceSearching(on){const box=$('invoiceSearching');if(box)box.classList.toggle('show',!!on);}
-function invoiceWait(on){invoiceWaiting=on;['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn','invoiceVendor','invoiceMonth'].forEach(id=>$(id).disabled=on);document.querySelectorAll('.invoice-card-import').forEach(button=>button.disabled=on);}
+function invoiceWait(on){invoiceWaiting=on;document.querySelectorAll('.invoice-pc-download').forEach(button=>button.disabled=on);['invoiceSearchBtn','invoiceFolderBtn','invoiceConfirmBtn','invoiceVendorSettingsBtn','invoiceVendor','invoiceMonth'].forEach(id=>$(id).disabled=on);document.querySelectorAll('.invoice-card-import').forEach(button=>button.disabled=on);}
 function invoiceError(e){showInvoiceSearching(false);invoiceWait(false);if(String(e.message||'').includes('APP_SESSION_REQUIRED')){fail(e);return;}invoiceStatus(e.message||'処理に失敗しました。');}
 function invoiceCardVendor(entry){
   const name=norm(entry.serviceName);
+  if(name==='オフィスサプライ カウンター料金'||name==='オフィスサプライカウンター料金')return 'オフィスサプライカウンター料金';
   if(/^google\s*play(?:\([^)]*\))?$/i.test(name))return 'Google Play';
   // Allow a descriptive suffix while keeping each button tied to its own vendor.
   return ['エクシード','イージア','伊神切手社'].find(vendor=>name===norm(vendor)||name.startsWith(norm(vendor))&&/^[・･\s(/／:：–—-]/u.test(name.slice(norm(vendor).length)))||'';
@@ -597,7 +599,7 @@ function openInvoices(vendorName='',account=''){
   $('invoiceDialog').showModal();if(invoiceWaiting)return;
   invoiceAccount=String(account||'').trim().toLowerCase();invoiceExternal=false;$('invoiceSearchBtn').textContent='Gmailで請求書を探す';
   const previousVendor=$('invoiceVendor').value;$('invoiceVendor').value='';
-  clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);$('invoiceResults').textContent='';invoiceStatus('取引先を確認しています…');invoiceWait(true);
+  clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);$('invoiceResults').textContent='';clearInvoiceDownload();invoiceStatus('取引先を確認しています…');invoiceWait(true);
   if(!$('invoiceMonth').value){const d=new Date();$('invoiceMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
   authenticatedRun().withSuccessHandler(s=>{
     const vendors=s.vendors||[],selected=vendorName?vendors.find(v=>norm(v.name)===norm(vendorName)):null;
@@ -611,9 +613,9 @@ function openInvoices(vendorName='',account=''){
   }).withFailureHandler(invoiceError).getInvoiceSettings();
 }
 function closeInvoices(){ $('invoiceDialog').close(); }
-function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';invoiceStatus('');}
+function resetInvoices(){clearTimeout(invoicePollTimer);invoiceItems=[];invoiceSearchJob='';invoiceConfirmation=null;showInvoiceSearching(false);invoiceWait(false);invoiceVendors=[];invoiceVendorBusy(false);['invoiceDialog','invoiceConfirm','invoiceVendorDialog'].forEach(id=>{if($(id).open)$(id).close();});$('invoiceResults').textContent='';clearInvoiceDownload();invoiceStatus('');}
 function searchInvoices(){
-  if(invoiceWaiting)return;if(invoiceExternal&&$('invoiceVendor').value==='googleplay'){window.open(googlePlayGmailUrl(invoiceAccount,$('invoiceMonth').value),'_blank','noopener');invoiceStatus('Googleのログイン画面を開きました。対象アカウントでログインすると、選択月の明細検索へ進みます。');return;}if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
+  if(invoiceWaiting)return;if(invoiceExternal&&$('invoiceVendor').value==='googleplay'){window.open(googlePlayGmailUrl(invoiceAccount,$('invoiceMonth').value),'_blank','noopener');invoiceStatus('Googleのログイン画面を開きました。対象アカウントでログインすると、選択月の明細検索へ進みます。');return;}if(!$('invoiceVendor').value){invoiceStatus('取引先を選択してください。');return;}invoiceWait(true);showInvoiceSearching(true);$('invoiceResults').textContent='';invoiceItems=[];clearInvoiceDownload();invoiceStatus('探しています… Gmailから請求書を検索・読み取り中です。通常1〜数分かかります。');
   authenticatedRun().withSuccessHandler(r=>{invoiceSearchJob=r.jobId;pollInvoice(r.jobId);}).withFailureHandler(invoiceError).startInvoiceSearch($('invoiceVendor').value,$('invoiceMonth').value,...($('invoiceVendor').value==='googleplay'?[invoiceAccount]:[]));
 }
 function saveInvoiceFolder(){
@@ -628,11 +630,33 @@ function pollInvoice(id){
     showInvoiceSearching(false);invoiceWait(false);
     if(j.type==='search'){invoiceItems=j.items||[];invoiceStatus(j.message);renderInvoiceResults();}
     else if(j.type==='folder'){$('invoiceDestination').textContent='保存先：'+j.result.folderName;$('invoiceFolder').value=j.result.folderUrl;invoiceStatus('保存先を変更しました。');}
-    else if(j.type==='save'){invoiceStatus(j.result.existing?'同じ請求書は保存済みです。':'PDFを保存しました。');const p=document.createElement('p'),a=document.createElement('a');a.href=safeUrl(j.result.url);a.target='_blank';a.rel='noopener';a.textContent=j.result.name+' をGoogle Driveで開く';p.appendChild(a);$('invoiceResults').prepend(p);}
+    else if(j.type==='save'){showInvoiceFileResult('✓ Google Driveに保存完了',j.result.name,'保存先フォルダへ保存しました。下のリンクでPDFを確認できます。',safeUrl(j.result.url));invoiceStatus(j.result.existing?'同じ請求書は保存済みです。':'PDFを保存しました。');const p=document.createElement('p'),a=document.createElement('a');a.href=safeUrl(j.result.url);a.target='_blank';a.rel='noopener';a.textContent=j.result.name+' をGoogle Driveで開く';p.appendChild(a);$('invoiceResults').prepend(p);}
   }).withFailureHandler(invoiceError).getInvoiceJob(id);
 }
 function renderInvoiceResults(){
-  $('invoiceResults').innerHTML=invoiceItems.map((c,i)=>`<section class="card" style="margin-top:14px"><h3 style="margin-top:0">${esc(c.vendor)}</h3><p>${esc(c.subject)}</p><p class="help">${esc(c.sourceKind)}</p>${c.account?`<p class="help">Google Playアカウント：${esc(c.account)}</p>`:''}${c.needsReview?'<p style="color:#b45309">日付または金額を確定できませんでした。元の請求書を確認して入力してください。</p>':''}<div class="formGrid"><div class="field"><label for="invDue${i}">${c.order?'注文日／支払日':'支払日'}</label><input type="date" id="invDue${i}" value="${attr(c.due)}"></div><div class="field"><label for="invAmount${i}">請求金額（円）</label><input type="number" min="0" step="1" id="invAmount${i}" value="${attr(c.amount)}"></div></div><p><a href="${attr(safeUrl(c.sourceUrl))}" target="_blank" rel="noopener">元のメールを開く</a></p><details><summary>読み取った内容を確認</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(c.evidence)}</pre></details><button class="btn primary" style="margin-top:12px" onclick="prepareInvoice(${i})">保存名を確認</button></section>`).join('');
+  $('invoiceResults').innerHTML=invoiceItems.map((c,i)=>`<section class="card" style="margin-top:14px"><h3 style="margin-top:0">${esc(c.vendor)}</h3><p>${esc(c.subject)}</p><p class="help">${esc(c.sourceKind)}</p>${c.account?`<p class="help">Google Playアカウント：${esc(c.account)}</p>`:''}${c.vendor==='オフィスサプライカウンター料金'?'<p class="help">日付は請求書の「お支払予定日」です。原本PDFを指定名で1件ずつダウンロードできます。</p>':''}${c.needsReview?'<p style="color:#b45309">日付または金額を確定できませんでした。元の請求書を確認して入力してください。</p>':''}<div class="formGrid"><div class="field"><label for="invDue${i}">${c.order?'注文日／支払日':'支払日'}</label><input type="date" id="invDue${i}" value="${attr(c.due)}"></div><div class="field"><label for="invAmount${i}">請求金額（円）</label><input type="number" min="0" step="1" id="invAmount${i}" value="${attr(c.amount)}"></div></div><p><a href="${attr(safeUrl(c.sourceUrl))}" target="_blank" rel="noopener">元のメールを開く</a></p><details><summary>読み取った内容を確認</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(c.evidence)}</pre></details>${c.vendor==='オフィスサプライカウンター料金'?`<button class="btn primary invoice-pc-download" style="margin-top:12px;background:#166534" onclick="downloadOfficePdf(${i})">↓ PDFをパソコンにダウンロード</button> `:''}<button class="btn primary" style="margin-top:12px" onclick="prepareInvoice(${i})">${c.vendor==='オフィスサプライカウンター料金'?'Google Driveへの保存名を確認':'保存名を確認'}</button></section>`).join('');
+}
+let invoiceDownloadUrl='';
+function clearInvoiceDownload(){if(invoiceDownloadUrl){URL.revokeObjectURL(invoiceDownloadUrl);invoiceDownloadUrl='';}const box=$('invoiceDownloadResult');box.hidden=true;box.textContent='';}
+function showInvoiceFileResult(title,filename,message,url){
+  clearInvoiceDownload();const box=$('invoiceDownloadResult');box.style.cssText='margin:18px 0;padding:22px;border:3px solid #15803d;border-radius:14px;background:#ecfdf5;color:#14532d;overflow-wrap:anywhere';
+  const h=document.createElement('h3');h.textContent=title;h.style.cssText='margin:0 0 12px;font-size:24px';const name=document.createElement('p');name.textContent=filename;name.style.fontWeight='800';const p=document.createElement('p');p.textContent=message;box.append(h,name,p);
+  if(url){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.textContent='保存したPDFをGoogle Driveで開く';box.append(a);}
+  box.hidden=false;box.scrollIntoView({block:'nearest',behavior:'smooth'});box.focus();
+}
+function downloadOfficePdf(i){
+  if(invoiceWaiting)return;const c=invoiceItems[i];if(!c||c.vendor!=='オフィスサプライカウンター料金')return;
+  const due=$('invDue'+i).value,amount=$('invAmount'+i).value,job=invoiceSearchJob;clearInvoiceDownload();invoiceWait(true);invoiceStatus('PDFの原本と保存名を確認しています…');
+  authenticatedRun().withSuccessHandler(r=>{
+    try{
+      if(!r||r.mimeType!=='application/pdf'||!/^20[0-9]{6}_オフィスサプライカウンター料金_[0-9]{1,12}\.pdf$/.test(r.filename)||typeof r.data!=='string'||r.data.length>14000000)throw new Error('ダウンロードするPDFを確認できません。');
+      const raw=atob(r.data);if(!raw.startsWith('%PDF-'))throw new Error('原本PDFではありません。');
+      const data=Uint8Array.from(raw,ch=>ch.charCodeAt(0)),url=URL.createObjectURL(new Blob([data],{type:'application/pdf'}));
+      showInvoiceFileResult('PDFの準備ができました',r.filename,'下の「保存する」を押してください。保存先はChromeのダウンロード設定に従います。');invoiceDownloadUrl=url;
+      const a=document.createElement('a');a.href=url;a.download=r.filename;a.className='btn primary';a.style.cssText='display:inline-block;background:#166534;font-size:18px;padding:14px 20px';a.textContent='↓ '+r.filename+' を保存する';
+      a.addEventListener('click',()=>{invoiceStatus('ダウンロードを開始しました。Chrome右上のダウンロードで完了と保存先を確認してください。');a.textContent='もう一度ダウンロードする';});$('invoiceDownloadResult').append(a);invoiceWait(false);invoiceStatus('保存するファイル名を確認してください。');
+    }catch(e){invoiceError(e);}
+  }).withFailureHandler(invoiceError).downloadOfficeInvoice(job,c.id,due,amount);
 }
 function prepareInvoice(i){
   if(invoiceWaiting)return;const c=invoiceItems[i];invoiceWait(true);
@@ -679,3 +703,4 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
+
