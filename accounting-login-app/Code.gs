@@ -2,7 +2,12 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-09-27-invoice-vendor-settings';
+const APP_VERSION = '2026-10-29-save-conflict-sync-v1';
+const APP_DATA_CACHE_KEY = 'ACCOUNTING_APP_DATA_V2';
+const CENTRAL_PERMISSION_CACHE_PREFIX = 'ACCOUNTING_PERMISSION_V1_';
+const ACCOUNTING_DATA_RUNTIME_URL = 'https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/accounting-data-runtime-v1';
+const ACCOUNTING_MIRROR_DIRTY_KEY = 'ACCOUNTING_MIRROR_DIRTY_V1';
+const ACCOUNTING_SESSION_RECHECK_MS = 180000;
 
 const FAVICON_SOURCE_URL =
   'https://stepkobetsu-hub.github.io/step-system-registry/images/accounting-calculator-yen-v3.png';
@@ -22,11 +27,11 @@ function getAdminRecord_(adminId) {
   if (!sheet) throw new Error('ログイン台帳を確認できません。管理者に連絡してください。');
   const count = sheet.getLastRow();
   if (!count) return null;
-  const ids = sheet.getRange(1, 1, count, 1).getDisplayValues();
-  const matches = [];
-  ids.forEach((row, index) => { if (String(row[0]).trim() === adminId) matches.push(index + 1); });
+  // Search on the Sheets service instead of transferring the entire ID column.
+  const matches = sheet.getRange(1, 1, count, 1)
+    .createTextFinder(adminId).matchEntireCell(true).matchCase(true).findAll();
   if (matches.length !== 1) return null;
-  const values = sheet.getRange(matches[0], 36, 1, 2).getDisplayValues()[0];
+  const values = sheet.getRange(matches[0].getRow(), 36, 1, 2).getDisplayValues()[0];
   const level = Number(String(values[1]).trim());
   return {id: adminId, password: String(values[0] || ''), level};
 }
@@ -64,48 +69,87 @@ function verifyAppSession_(token) {
   let session;
   try { session = stored ? JSON.parse(stored) : null; } catch (_) {}
   if (!session || !session.adminId) throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  const level = Number(session.permissionLevel);
+  if (Number.isInteger(level) && level >= 1 && level <= 4 && Date.now() - Number(session.verifiedAt || 0) < ACCOUNTING_SESSION_RECHECK_MS) {
+    return {id: String(session.adminId), password: '', level};
+  }
   const record = getAdminRecord_(session.adminId);
   if (!eligibleAdmin_(record) || !equalDigest_(credentialFingerprint_(record), session.credentialFingerprint || '')) {
     props.deleteProperty(key);
     throw new Error('APP_SESSION_REQUIRED: ログイン情報または利用権限が変更されました。');
   }
-  return record.id;
+  session.permissionLevel = record.level;
+  session.verifiedAt = Date.now();
+  props.setProperty(key, JSON.stringify(session));
+  return record;
 }
-function loginApp(adminId, password) {
-  const invalid = '管理者IDまたはパスワードが正しくないか、利用権限がありません。';
-  if (typeof adminId !== 'string' || typeof password !== 'string' || !adminId.trim() || adminId.length > 200 || !password || password.length > 512) {
-    throw new Error(invalid);
-  }
-  adminId = adminId.trim();
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    const cache = CacheService.getScriptCache();
-    const failureKey = 'ACCOUNTING_LOGIN_FAILURE_' + authDigest_(adminId);
-    const globalKey = 'ACCOUNTING_LOGIN_FAILURE_GLOBAL';
-    const failures = Number(cache.get(failureKey) || 0);
-    const totalFailures = Number(cache.get(globalKey) || 0);
-    if (failures >= 8 || totalFailures >= 200) {
-      throw new Error('ログインの試行回数が多いため、10分ほど待ってからお試しください。');
+function refreshAccountingSessions_() {
+  const props = PropertiesService.getScriptProperties();
+  const all = props.getProperties();
+  const sessions = Object.keys(all).filter(k => k.startsWith(ADMIN_SESSION_PREFIX)).map(key => {
+    let value; try { value = JSON.parse(all[key]); } catch (_) {}
+    return {key, value};
+  }).filter(x => x.value && x.value.adminId);
+  const records = {};
+  sessions.forEach(x => {
+    const id = String(x.value.adminId);
+    if (!Object.prototype.hasOwnProperty.call(records, id)) records[id] = getAdminRecord_(id);
+  });
+  sessions.forEach(x => {
+    const record = records[String(x.value.adminId)];
+    if (!eligibleAdmin_(record) || !equalDigest_(credentialFingerprint_(record), x.value.credentialFingerprint || '')) {
+      props.deleteProperty(x.key);
+      return;
     }
-    const record = getAdminRecord_(adminId);
-    const passwordMatches = equalDigest_(authDigest_(password), authDigest_(record ? record.password : ''));
+    x.value.permissionLevel = record.level;
+    x.value.verifiedAt = Date.now();
+    props.setProperty(x.key, JSON.stringify(x.value));
+  });
+}
+function createAppSession_(adminId, password) {
+  const invalid = '管理者IDまたはパスワードが正しくないか、利用権限がありません。';
+  if (typeof adminId !== 'string' || typeof password !== 'string' || !adminId.trim() || adminId.length > 200 || !password || password.length > 512) throw new Error(invalid);
+  adminId = adminId.trim();
+  const cache = CacheService.getScriptCache();
+  const failureKey = 'ACCOUNTING_LOGIN_FAILURE_' + authDigest_(adminId);
+  const globalKey = 'ACCOUNTING_LOGIN_FAILURE_GLOBAL';
+  if (Number(cache.get(failureKey) || 0) >= 8 || Number(cache.get(globalKey) || 0) >= 200) throw new Error('ログインの試行回数が多いため、10分ほど待ってからお試しください。');
+  const record = getAdminRecord_(adminId);
+  const passwordMatches = equalDigest_(authDigest_(password), authDigest_(record ? record.password : ''));
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  let token;
+  try {
+    const failures = Number(cache.get(failureKey) || 0), totalFailures = Number(cache.get(globalKey) || 0);
+    if (failures >= 8 || totalFailures >= 200) throw new Error('ログインの試行回数が多いため、10分ほど待ってからお試しください。');
     if (!eligibleAdmin_(record) || !passwordMatches) {
-      cache.put(failureKey, String(failures + 1), 600);
-      cache.put(globalKey, String(totalFailures + 1), 600);
-      throw new Error(invalid);
+      cache.put(failureKey, String(failures + 1), 600); cache.put(globalKey, String(totalFailures + 1), 600); throw new Error(invalid);
     }
     cache.remove(failureKey);
-    const token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').toLowerCase();
+    token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').toLowerCase();
     PropertiesService.getScriptProperties().setProperty(appSessionKey_(token), JSON.stringify({
-      adminId: record.id, credentialFingerprint: credentialFingerprint_(record), createdAt: new Date().toISOString()
+      adminId: record.id, credentialFingerprint: credentialFingerprint_(record), permissionLevel: record.level,
+      verifiedAt: Date.now(), createdAt: new Date().toISOString()
     }));
-    try{centralAppPermission_(token,'enter');}catch(e){PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(token));throw e;}
-    return {token, adminId: record.id};
   } finally { lock.releaseLock(); }
+  return {token, adminId: record.id};
+}
+function loginApp(adminId, password) {
+  const auth = createAppSession_(adminId, password);
+  try { centralAppPermission_(auth.token, 'enter'); }
+  catch (e) { PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(auth.token)); throw e; }
+  return auth;
+}
+function loginAndGetAppData(adminId, password) {
+  const auth = createAppSession_(adminId, password);
+  try { return {token: auth.token, adminId: auth.adminId, data: getAppData(auth.token)}; }
+  catch (e) { PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(auth.token)); throw e; }
 }
 function logoutApp(token) {
   PropertiesService.getScriptProperties().deleteProperty(appSessionKey_(token));
+  const cache = CacheService.getScriptCache();
+  ['enter','view','write','approve','delete','settings'].forEach(action =>
+    cache.remove(CENTRAL_PERMISSION_CACHE_PREFIX + authDigest_(String(token || '') + ':' + action))
+  );
   return {ok: true};
 }
 
@@ -130,15 +174,74 @@ function doGet() {
     .setFaviconUrl(getFaviconUrl_())
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
+function accountingDataRuntime_(sessionToken, operation, data) {
+  const payload = Object.assign({sessionToken: String(sessionToken || ''), operation}, data || {});
+  const response = UrlFetchApp.fetch(ACCOUNTING_DATA_RUNTIME_URL, {
+    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload), muteHttpExceptions: true
+  });
+  let value; try { value = JSON.parse(response.getContentText()); } catch (_) {}
+  if (response.getResponseCode() !== 200 || !value || !value.ok || !/^\d{4,8}$/.test(String(value.staffCode || ''))) {
+    throw new Error('ACCOUNTING_DATA_UNAVAILABLE: ' + (value && value.reason || '表示データを取得できません。'));
+  }
+  return value;
+}
+function markAccountingMirrorDirty_() {
+  PropertiesService.getScriptProperties().setProperty(ACCOUNTING_MIRROR_DIRTY_KEY, new Date().toISOString());
+}
+function mergePasswordState_(entries) {
+  const props = PropertiesService.getUserProperties().getProperties();
+  return (entries || []).map(entry => Object.assign({}, entry, {
+    hasPassword: Object.prototype.hasOwnProperty.call(props, secretKey_(entry.id))
+  }));
+}
 function getAppData(sessionToken) {
-  const adminId = requireAppSession_(sessionToken);
+  const scriptProps = PropertiesService.getScriptProperties();
+  if (scriptProps.getProperty(ACCOUNTING_MIRROR_DIRTY_KEY)) {
+    try {
+      // A prior Sheet snapshot may still be cached briefly. A conflict means
+      // the Sheet is authoritative, so discard that snapshot before resyncing.
+      clearAppDataCache_();
+      const sheetData = getAppDataForAdmin_('');
+      // Strip UI-only metadata before sending the Sheet snapshot. The runtime rejects
+// password-related fields, including the hasPassword display flag.
+const syncEntries = sheetData.entries.map(entry => ({
+  category: entry.category, serviceName: entry.serviceName, url: entry.url,
+  account: entry.account, passwordManager: entry.passwordManager,
+  accountTitle: entry.accountTitle, amountNote: entry.amountNote,
+  memo: entry.memo, id: entry.id, logoUrl: entry.logoUrl,
+  sortOrder: entry.sortOrder
+}));
+const synced = accountingDataRuntime_(sessionToken, 'replace', {entries: syncEntries});
+      scriptProps.deleteProperty(ACCOUNTING_MIRROR_DIRTY_KEY);
+      return {entries: mergePasswordState_(sheetData.entries), sheetUrl: sheetData.sheetUrl, version: APP_VERSION,
+        adminId: String(synced.staffCode), dataSource: 'google-sheet-resync', syncedAt: new Date().toISOString()};
+    } catch (error) {
+      console.warn('Accounting mirror resync failed: ' + String(error && error.message || error).slice(0, 240));
+    }
+  }
+  const value = accountingDataRuntime_(sessionToken, 'read');
+  return {entries: mergePasswordState_(value.entries),
+    sheetUrl: 'https://docs.google.com/spreadsheets/d/' + (PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || DEFAULT_SPREADSHEET_ID) + '/edit',
+    version: APP_VERSION, adminId: String(value.staffCode), dataSource: 'supabase', syncedAt: value.syncedAt || ''};
+}
+function getAppDataForAdmin_(adminId) {
+  const cache = CacheService.getScriptCache();
+  const cached = readCachedAppData_(cache);
+  if (cached) return Object.assign(cached, {adminId});
+
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
+    const afterWait = readCachedAppData_(cache);
+    if (afterWait) return Object.assign(afterWait, {adminId});
     const ss = getSpreadsheet_();
     const sheet = getSheet_(ss);
     const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return { entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION, adminId };
+    if (lastRow < 2) {
+      const result = {entries: [], sheetUrl: ss.getUrl(), version: APP_VERSION};
+      cache.put(APP_DATA_CACHE_KEY, JSON.stringify(result), 120);
+      return Object.assign(result, {adminId});
+    }
 
     ensureOrderHeader_(sheet);
     const values = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
@@ -180,11 +283,24 @@ function getAppData(sessionToken) {
 
     entries.sort((a, b) => (a.sortOrder - b.sortOrder) || (a._sheetRow - b._sheetRow));
     entries.forEach(e => delete e._sheetRow);
-    return { entries, sheetUrl: ss.getUrl(), version: APP_VERSION, adminId };
+    SpreadsheetApp.flush();
+    const result = {entries, sheetUrl: ss.getUrl(), version: APP_VERSION};
+    cache.put(APP_DATA_CACHE_KEY, JSON.stringify(result), 120);
+    return Object.assign(result, {adminId});
   } finally {
     SpreadsheetApp.flush();
     lock.releaseLock();
   }
+}
+
+function readCachedAppData_(cache) {
+  try {
+    const value = cache.get(APP_DATA_CACHE_KEY);
+    return value ? JSON.parse(value) : null;
+  } catch (_) { return null; }
+}
+function clearAppDataCache_() {
+  CacheService.getScriptCache().remove(APP_DATA_CACHE_KEY);
 }
 
 function saveEntry(payload, sessionToken) {
@@ -192,46 +308,28 @@ function saveEntry(payload, sessionToken) {
   payload = payload || {};
   const item = normalizeEntry_(payload);
   if (!item.serviceName) throw new Error('サービス名を入力してください。');
-  validateUrl_(item.url, 'URL');
-  validateUrl_(item.logoUrl, 'ロゴURL');
-
+  validateUrl_(item.url, 'URL'); validateUrl_(item.logoUrl, 'ロゴURL');
   const passwordAction = clean_(payload.passwordAction, 20) || 'keep';
   if (!['keep', 'set', 'clear'].includes(passwordAction)) throw new Error('パスワード操作が不正です。');
   const password = String(payload.password == null ? '' : payload.password);
   if (passwordAction === 'set' && !password) throw new Error('パスワードを入力してください。');
   if (password.length > 500) throw new Error('パスワードが長すぎます。');
-
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  let entry;
   try {
-    const ss = getSpreadsheet_();
-    const sheet = getSheet_(ss);
-    ensureOrderHeader_(sheet);
+    const ss = getSpreadsheet_(), sheet = getSheet_(ss); ensureOrderHeader_(sheet);
     let row = item.id ? findRowById_(sheet, item.id) : 0;
     if (item.id && !row) throw new Error('この項目は削除されています。再読み込みしてください。');
-
-    if (row) {
-      checkRevision_(sheet, row, payload.revision);
-      const current = sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0];
-      item.sortOrder = parseOrder_(current[11]) || nextSortOrder_(sheet);
-    } else {
-      row = Math.max(sheet.getLastRow() + 1, 2);
-      item.id = makeId_();
-      item.sortOrder = nextSortOrder_(sheet);
-      prepareNewRow_(sheet, row);
-    }
-
+    if (row) { checkRevision_(sheet, row, payload.revision); const current = sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0]; item.sortOrder = parseOrder_(current[11]) || nextSortOrder_(sheet); }
+    else { row = Math.max(sheet.getLastRow() + 1, 2); item.id = makeId_(); item.sortOrder = nextSortOrder_(sheet); prepareNewRow_(sheet, row); }
     if (passwordAction === 'set') item.passwordManager = 'アプリ内保存';
-    writeRow_(sheet, row, item);
-    updateSecret_(item.id, passwordAction, password);
-    SpreadsheetApp.flush();
-
-    const entry = rowToEntry_(sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0]);
-    entry.hasPassword = hasSecret_(entry.id);
-    return { ok: true, entry };
-  } finally {
-    lock.releaseLock();
-  }
+    writeRow_(sheet, row, item); updateSecret_(item.id, passwordAction, password); SpreadsheetApp.flush();
+    entry = rowToEntry_(sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0]); entry.hasPassword = hasSecret_(entry.id); clearAppDataCache_();
+  } finally { lock.releaseLock(); }
+  let syncPending = false;
+  try { accountingDataRuntime_(sessionToken, 'upsert', {entry}); }
+  catch (_) { markAccountingMirrorDirty_(); syncPending = true; }
+  return {ok:true, entry, syncPending};
 }
 
 function saveCardOrder(ids, expectedIds, sessionToken) {
@@ -239,40 +337,32 @@ function saveCardOrder(ids, expectedIds, sessionToken) {
   if (!Array.isArray(ids) || !ids.length) throw new Error('並べ替えデータがありません。');
   ids = ids.map(id => clean_(id, 100)).filter(Boolean);
   if (new Set(ids).size !== ids.length) throw new Error('並べ替えデータが重複しています。');
-
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  const lock = LockService.getScriptLock(); lock.waitLock(10000); let needsResync=false;
   try {
-    const sheet = getSheet_(getSpreadsheet_());
-    ensureOrderHeader_(sheet);
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return { ok: true };
-
-    const rows = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues();
-    const idToRow = new Map();
-    rows.forEach((r, i) => {
-      const meaningful = [r[0], r[1], r[3], r[4], r[8]].some(Boolean);
-      if (meaningful && r[9]) idToRow.set(r[9], i + 2);
-    });
-
-    if (idToRow.size !== ids.length || ids.some(id => !idToRow.has(id))) {
-      throw new Error('別の画面で項目が追加・削除されています。再読み込みしてから並べ替えてください。');
+    const sheet = getSheet_(getSpreadsheet_()); ensureOrderHeader_(sheet); const lastRow = sheet.getLastRow();
+    if (lastRow >= 2) {
+      const rows = sheet.getRange(2, 1, lastRow - 1, COLS).getDisplayValues(); const idToRow = new Map();
+      rows.forEach((r, i) => { const meaningful = [r[0], r[1], r[3], r[4], r[8]].some(Boolean); if (meaningful && r[9]) idToRow.set(r[9], i + 2); });
+      const currentIds = rows.map((r,i) => ({id:r[9], order:parseOrder_(r[11]) || 999999, row:i})).filter(x=>idToRow.has(x.id)).sort((a,b)=>a.order-b.order || a.row-b.row).map(x=>x.id);
+      const membershipChanged = idToRow.size !== ids.length || ids.some(id => !idToRow.has(id));
+      if (!membershipChanged && (!Array.isArray(expectedIds) || JSON.stringify(currentIds) !== JSON.stringify(expectedIds))) {
+        markAccountingMirrorDirty_();
+        throw new Error('別の画面で並び順が更新されています。再読み込みしてください。');
+      }
+      // Keep the user's requested order for items that still exist, drop deleted
+      // items, and append items added elsewhere in their current order.
+      const orderedIds = membershipChanged
+        ? ids.filter(id => idToRow.has(id)).concat(currentIds.filter(id => !ids.includes(id)))
+        : ids;
+      needsResync=membershipChanged;
+      const nextOrders = rows.map(r => [parseOrder_(r[11]) || '']); orderedIds.forEach((id, index) => { nextOrders[idToRow.get(id) - 2][0] = index + 1; });
+      sheet.getRange(2, 12, nextOrders.length, 1).setValues(nextOrders); SpreadsheetApp.flush(); clearAppDataCache_();
     }
-
-    const currentIds = rows.map((r,i) => ({id:r[9], order:parseOrder_(r[11]) || 999999, row:i}))
-      .filter(x=>idToRow.has(x.id)).sort((a,b)=>a.order-b.order || a.row-b.row).map(x=>x.id);
-    if (!Array.isArray(expectedIds) || JSON.stringify(currentIds) !== JSON.stringify(expectedIds)) {
-      throw new Error('別の画面で並び順が更新されています。再読み込みしてください。');
-    }
-
-    const nextOrders = rows.map(r => [parseOrder_(r[11]) || '']);
-    ids.forEach((id, index) => { nextOrders[idToRow.get(id) - 2][0] = index + 1; });
-    sheet.getRange(2, 12, nextOrders.length, 1).setValues(nextOrders);
-    SpreadsheetApp.flush();
-    return { ok: true };
-  } finally {
-    lock.releaseLock();
-  }
+  } finally { lock.releaseLock(); }
+  let syncPending=needsResync;
+  if (needsResync) markAccountingMirrorDirty_();
+  else { try { accountingDataRuntime_(sessionToken,'reorder',{ids}); } catch (_) { markAccountingMirrorDirty_(); syncPending=true; } }
+  return {ok:true, syncPending};
 }
 
 function getPassword(id, sessionToken) {
@@ -296,29 +386,22 @@ function clearPassword(id, sessionToken) {
     const sheet = getSheet_(getSpreadsheet_());
     if (!findRowById_(sheet, id)) throw new Error('対象データが見つかりません。');
     PropertiesService.getUserProperties().deleteProperty(secretKey_(id));
+    clearAppDataCache_();
     return { ok: true };
   } finally { lock.releaseLock(); }
 }
 
 function deleteEntry(id, revision, sessionToken) {
-  requireAppSession_(sessionToken,'delete');
-  id = clean_(id, 100);
-  if (!id) throw new Error('管理IDがありません。');
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  requireAppSession_(sessionToken,'delete'); id = clean_(id, 100); if (!id) throw new Error('管理IDがありません。');
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
   try {
-    const sheet = getSheet_(getSpreadsheet_());
-    const row = findRowById_(sheet, id);
+    const sheet = getSheet_(getSpreadsheet_()); const row = findRowById_(sheet, id);
     if (!row) throw new Error('対象データが見つかりません。再読み込みしてください。');
-    checkRevision_(sheet, row, revision);
-    sheet.deleteRow(row);
-    PropertiesService.getUserProperties().deleteProperty(secretKey_(id));
-    compactSortOrders_(sheet);
-    SpreadsheetApp.flush();
-    return { ok: true };
-  } finally {
-    lock.releaseLock();
-  }
+    checkRevision_(sheet, row, revision); sheet.deleteRow(row); PropertiesService.getUserProperties().deleteProperty(secretKey_(id));
+    compactSortOrders_(sheet); SpreadsheetApp.flush(); clearAppDataCache_();
+  } finally { lock.releaseLock(); }
+  let syncPending=false; try { accountingDataRuntime_(sessionToken,'delete',{id}); } catch (_) { markAccountingMirrorDirty_(); syncPending=true; }
+  return {ok:true, syncPending};
 }
 
 function getSpreadsheet_() {
@@ -357,6 +440,9 @@ function revision_(row) {
 function checkRevision_(sheet, row, revision) {
   const current = sheet.getRange(row, 1, 1, COLS).getDisplayValues()[0];
   if (!revision || revision !== revision_(current)) {
+    // A stale Supabase snapshot can keep returning the same old revision after
+    // a direct Sheet edit. Mark it for reconciliation before returning the conflict.
+    markAccountingMirrorDirty_();
     throw new Error('別の画面またはシートで更新されています。再読み込みしてから編集してください。');
   }
 }
@@ -600,6 +686,7 @@ function installInvoiceWorker_(){
   console.log('請求書検索の接続設定が完了しました。');
 }
 function processInvoiceJobs_(){
+  try { refreshAccountingSessions_(); } catch (e) { console.warn('Accounting session refresh failed: ' + String(e && e.message || e)); }
   invOwner_();const l=LockService.getUserLock();if(!l.tryLock(1000))return;
   try{
     invWrite_(INV_WORKER,{installed:true,lastRun:Date.now()});
@@ -799,11 +886,43 @@ function invSave_(j){
 
 
 
-function centralAppPermission_(token,action){
- const r=UrlFetchApp.fetch('https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/staff-app-permission-v1',{method:'post',contentType:'application/json',payload:JSON.stringify({appId:'accounting-login-app',sessionKind:'accounting',sessionToken:String(token||''),action:action||'view'}),muteHttpExceptions:true});
- let v;try{v=JSON.parse(r.getContentText());}catch(e){}
- if(r.getResponseCode()!==200||!v||!v.allowed)throw new Error('PERMISSION_DENIED: '+(v&&v.reason||'共通権限を確認できません。'));return v;
+function centralAppPermission_(token, action) {
+  token = String(token || '');
+  action = action || 'view';
+  const sessionKey = appSessionKey_(token);
+  if (!PropertiesService.getScriptProperties().getProperty(sessionKey)) {
+    throw new Error('APP_SESSION_REQUIRED: ログインしてください。');
+  }
+  const cache = CacheService.getScriptCache();
+  const cacheKey = CENTRAL_PERMISSION_CACHE_PREFIX + authDigest_(token + ':' + action);
+  const cached = cache.get(cacheKey);
+  if (cached) { try { return JSON.parse(cached); } catch (_) {} }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const afterWait = cache.get(cacheKey);
+    if (afterWait) { try { return JSON.parse(afterWait); } catch (_) {} }
+    const r = UrlFetchApp.fetch('https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/staff-app-permission-v1', {
+      method: 'post', contentType: 'application/json',
+      payload: JSON.stringify({appId:'accounting-login-app', sessionKind:'accounting', sessionToken:token, action}),
+      muteHttpExceptions: true
+    });
+    let v; try { v = JSON.parse(r.getContentText()); } catch (_) {}
+    if (r.getResponseCode() !== 200 || !v || !v.allowed || !/^\d{4,8}$/.test(String(v.staffCode || ''))) {
+      throw new Error('PERMISSION_DENIED: ' + (v && v.reason || '共通権限を確認できません。'));
+    }
+    cache.put(cacheKey, JSON.stringify(v), 60);
+    return v;
+  } finally { lock.releaseLock(); }
 }
 
-function requireAppSession_(token,action){const id=verifyAppSession_(token);centralAppPermission_(token,action||'view');return id;}
-function doPost(e){try{const p=JSON.parse(e.postData.contents||'{}');if(p.action!=='centralAccountingSessionVerify')throw new Error('Unsupported action');const id=verifyAppSession_(p.sessionToken),record=getAdminRecord_(id);return ContentService.createTextOutput(JSON.stringify({success:true,code:id,permissionLevel:record.level})).setMimeType(ContentService.MimeType.JSON);}catch(e){return ContentService.createTextOutput(JSON.stringify({success:false})).setMimeType(ContentService.MimeType.JSON);}}
+// The central service validates this session by calling doPost(), which runs
+// verifyAppSession_ and rechecks the administrator record. Avoid doing the same
+// spreadsheet verification twice in one request.
+function requireAppSession_(token, action) {
+  const permission = centralAppPermission_(token, action || 'view');
+  return String(permission.staffCode);
+}
+function passwordEntryIds_(){const props=PropertiesService.getUserProperties().getProperties();return Object.keys(props).filter(key=>key.indexOf(SECRET_PREFIX)===0).map(key=>key.slice(SECRET_PREFIX.length)).filter(Boolean).slice(0,500);}
+function doPost(e){try{const p=JSON.parse(e.postData.contents||'{}');if(p.action!=='centralAccountingSessionVerify')throw new Error('Unsupported action');const record=verifyAppSession_(p.sessionToken);return ContentService.createTextOutput(JSON.stringify({success:true,code:record.id,permissionLevel:record.level,passwordEntryIds:passwordEntryIds_()})).setMimeType(ContentService.MimeType.JSON);}catch(e){return ContentService.createTextOutput(JSON.stringify({success:false})).setMimeType(ContentService.MimeType.JSON);}}

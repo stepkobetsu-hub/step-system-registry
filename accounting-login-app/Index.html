@@ -3,6 +3,7 @@
 <head>
   <base target="_top">
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://wisedgcgwaebtkprdhth.supabase.co" crossorigin>
   <style>
     :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--blue2:#1d4ed8;--green:#15803d;--danger:#dc2626;--amber:#b45309;--shadow:0 8px 24px rgba(15,23,42,.08)}
     *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
@@ -70,7 +71,7 @@
   <div class="wrap" id="appView" hidden>
     <div class="top">
       <div class="title"><h1>経理ログイン管理</h1><p>仕訳・領収書・請求確認の入口。登録するサービスのパスワードはアプリの非公開領域に保存し、Google SheetやGitHubには保存しません。</p></div>
-      <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load()">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
+      <div class="top-actions"><button class="btn" id="logoutBtn" onclick="logout()">ログアウト</button><button class="btn" onclick="load(true)">再読み込み</button><button class="btn order" id="orderModeBtn" onclick="toggleReorder()">↕ 並べ替え</button><button class="btn" id="sheetBtn">Google Sheet</button><button class="btn primary" onclick="openEditor()">＋ 追加</button></div>
     </div>
     <div class="quick-tools">
     <section class="extension-download" aria-labelledby="extensionDownloadTitle">
@@ -161,7 +162,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
   const CATEGORIES=['教材・仕入','IT・クラウド','事務用品','リース・回収','カード・決済','採用・求人','光熱費','通信','銀行','通販','メール配信','その他'];
-  let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', pending=false, shownPassword='', reorderMode=false, draggedId='';
+  let entries=[], activeCategory='すべて', sheetUrl='', editingId='', editingRevision='', editingBase={}, pending=false, shownPassword='', reorderMode=false, draggedId='';
   let loadedOrder=[], secretTimer;
   const $=id=>document.getElementById(id);
   const memoDialog=$('memoDialog'), editDialog=$('editDialog'), secretDialog=$('secretDialog');
@@ -179,6 +180,12 @@
 
 
   const SESSION_STORAGE_KEY='accounting-login-app.admin-session.v2';
+  const DATA_RUNTIME_URL='https:\x2f\x2fwisedgcgwaebtkprdhth.supabase.co/functions/v1/accounting-data-runtime-v1';
+  const MANAGEMENT_SHEET_URL='https:\x2f\x2fdocs.google.com/spreadsheets/d/1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw/edit';
+  const DISPLAY_VERSION='2026-10-30-fast-start-v1';
+  const PREVIEW_STORAGE_KEY='accounting-login-app.preview.v1';
+  const PREVIEW_MAX_AGE_MS=24*60*60*1000;
+  let previewActive=false, previewWrite=0;
   let sessionToken='', sessionEpoch=0, loginAccountReady=true;
 
   // All data RPCs require the browser token. Ignore callbacks from a session
@@ -192,6 +199,7 @@
     ['getAppData','saveEntry','saveCardOrder','getPassword','clearPassword','deleteEntry','getInvoiceSettings','startInvoiceSearch','setInvoiceFolder','getInvoiceJob','previewInvoiceSave','confirmInvoiceSave','saveInvoiceVendor','deleteInvoiceVendor'].forEach(name=>{
       runner[name]=(...args)=>{
         if(!token){failure(new Error('APP_SESSION_REQUIRED'));return}
+        if(['saveEntry','saveCardOrder','clearPassword','deleteEntry'].includes(name))clearPreview();
         google.script.run
           .withSuccessHandler(data=>{if(epoch===sessionEpoch&&token===sessionToken)success(data)})
           .withFailureHandler(err=>{if(epoch===sessionEpoch&&token===sessionToken)failure(err)})
@@ -201,10 +209,10 @@
     return runner;
   }
   function storedSession(){try{return localStorage.getItem(SESSION_STORAGE_KEY)||''}catch{return ''}}
-  function clearStoredSession(){try{localStorage.removeItem(SESSION_STORAGE_KEY)}catch{}}
+  function clearStoredSession(){clearPreview();try{localStorage.removeItem(SESSION_STORAGE_KEY)}catch{}}
   function showLogin(message=''){
-    resetInvoices();
-    sessionEpoch++;sessionToken='';entries=[];loadedOrder=[];sheetUrl='';editingId='';editingRevision='';shownPassword='';
+    previewActive=false;clearPreview();resetInvoices();
+    sessionEpoch++;sessionToken='';entries=[];loadedOrder=[];sheetUrl='';editingId='';editingRevision='';editingBase={};shownPassword='';
     clearTimeout(secretTimer);clearTimeout(tt);
     [editDialog,memoDialog,secretDialog].forEach(d=>{if(d.open)d.close()});
     $('adminLoginPassword').value='';$('adminLoginId').value='';$('editForm').reset();$('fSecret').value='';$('fSecret').type='password';
@@ -213,26 +221,64 @@
     $('orderModeBtn').classList.remove('active');$('orderModeBtn').textContent='↕ 並べ替え';$('reorderHint').classList.remove('show');
     $('appView').hidden=true;$('loginView').hidden=false;$('loginMessage').textContent=message;busy(false);
   }
+  function clearPreview(){previewWrite++;try{localStorage.removeItem(PREVIEW_STORAGE_KEY)}catch{}}
+  async function previewKey(token){
+    const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('accounting-preview-v1:'+token));
+    return crypto.subtle.importKey('raw',bytes,'AES-GCM',false,['encrypt','decrypt']);
+  }
+  async function savePreview(data){
+    const token=sessionToken,epoch=sessionEpoch,write=++previewWrite;
+    try{
+      // Explicit allowlist: never cache passwords, form input, or invoice results.
+      const fields=['id','category','serviceName','url','account','passwordManager','accountTitle','amountNote','memo','logoUrl','sortOrder','revision','hasPassword'];
+      const snapshot={adminId:String(data.adminId||''),entries:(data.entries||[]).map(e=>Object.fromEntries(fields.filter(k=>k in e).map(k=>[k,e[k]])))};
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv},await previewKey(token),new TextEncoder().encode(JSON.stringify({savedAt:Date.now(),data:snapshot})));
+      if(token!==sessionToken||epoch!==sessionEpoch||write!==previewWrite||storedSession()!==token)return;
+      localStorage.setItem(PREVIEW_STORAGE_KEY,JSON.stringify({iv:Array.from(iv),cipher:Array.from(new Uint8Array(encrypted))}));
+    }catch{} // Unsupported/blocked storage must not prevent normal startup.
+  }
+  async function restorePreview(token,epoch){
+    try{
+      const raw=localStorage.getItem(PREVIEW_STORAGE_KEY);if(!raw)return;
+      const envelope=JSON.parse(raw),key=await previewKey(token);
+      const bytes=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(envelope.iv)},key,new Uint8Array(envelope.cipher));
+      const cached=JSON.parse(new TextDecoder().decode(bytes)),age=Date.now()-cached.savedAt;
+      if(!Number.isFinite(age)||age<0||age>PREVIEW_MAX_AGE_MS||!Array.isArray(cached.data?.entries))return;
+      if(epoch!==sessionEpoch||token!==sessionToken||!pending||!$('appView').hidden)return;
+      applyAppData({...cached.data,sheetUrl:MANAGEMENT_SHEET_URL,version:DISPLAY_VERSION},true);
+    }catch{} // Corrupt, expired, or other-session cache: use authenticated loading.
+  }
   function initializeSession(){
     sessionToken=storedSession();
-    if(sessionToken){$('loginMessage').textContent='ログイン状態を確認しています…';load()}
+    if(sessionToken){
+      $('loginMessage').textContent='ログイン状態を確認しています…';
+      const token=sessionToken,epoch=sessionEpoch;
+      load();restorePreview(token,epoch);
+    }
+  }
+  function applyAppData(data,preview=false){
+    previewActive=preview;
+    $('appView').hidden=false;$('loginView').hidden=true;$('sessionUser').textContent=preview?'前回の一覧を表示しています。最新の内容を確認中…':'ログイン中：管理者ID '+(data.adminId||'');
+    entries=(data.entries||[]).sort((a,b)=>(Number(a.sortOrder)||999999)-(Number(b.sortOrder)||999999));loadedOrder=entries.map(e=>e.id);sheetUrl=data.sheetUrl||'';$('appVersion').textContent=DISPLAY_VERSION;busy(preview);renderChips();render();
+    if(!preview)savePreview(data);
   }
   function login(){
     if(pending)return;
     const adminId=$('adminLoginId').value.trim(),password=$('adminLoginPassword').value;
     if(!adminId||!password){$('loginMessage').textContent='管理者IDとパスワードを入力してください。';return}
     busy(true);$('loginMessage').textContent='ログインしています…';
-    google.script.run.withSuccessHandler(data=>{
+    google.script.run.withSuccessHandler(result=>{
       $('adminLoginPassword').value='';
-      try{localStorage.setItem(SESSION_STORAGE_KEY,data.token)}
+      try{localStorage.setItem(SESSION_STORAGE_KEY,result.token)}
       catch{
-        google.script.run.withSuccessHandler(()=>{}).withFailureHandler(()=>{}).logoutApp(data.token);
+        google.script.run.withSuccessHandler(()=>{}).withFailureHandler(()=>{}).logoutApp(result.token);
         showLogin('ログイン状態を保存できません。ブラウザのサイトデータ保存を許可してください。');return;
       }
-      sessionEpoch++;sessionToken=data.token;busy(false);load();
+      sessionEpoch++;sessionToken=result.token;applyAppData(result.data);
     }).withFailureHandler(err=>{
       $('adminLoginPassword').value='';busy(false);$('loginMessage').textContent=(err&&err.message)||'ログインできませんでした。';
-    }).loginApp(adminId,password);
+    }).loginAndGetAppData(adminId,password);
   }
   function logout(){
     if(pending||!sessionToken)return;busy(true);const token=sessionToken;
@@ -249,16 +295,25 @@
   });
   window.addEventListener('pagehide',()=>{$('appView').hidden=true});
   window.addEventListener('pageshow',event=>{
-    if(event.persisted){sessionEpoch++;busy(false);sessionToken=storedSession();if(sessionToken)load();else showLogin()}
+    if(event.persisted){sessionEpoch++;busy(false);sessionToken=storedSession();if(sessionToken){load();restorePreview(sessionToken,sessionEpoch)}else showLogin()}
   });
 
-  function load(){
+  async function load(forceServer=false){
     if(!sessionToken){showLogin();return}
-    if(pending)return; busy(true);
-    authenticatedRun().withSuccessHandler(data=>{
-      $('appView').hidden=false;$('loginView').hidden=true;$('sessionUser').textContent='ログイン中：管理者ID '+(data.adminId||'');
-      entries=(data.entries||[]).sort((a,b)=>(Number(a.sortOrder)||999999)-(Number(b.sortOrder)||999999)); loadedOrder=entries.map(e=>e.id);sheetUrl=data.sheetUrl||''; $('appVersion').textContent=data.version||''; busy(false); renderChips(); render();
-    }).withFailureHandler(fail).getAppData();
+    if(pending)return;busy(true);
+    if(forceServer){authenticatedRun().withSuccessHandler(applyAppData).withFailureHandler(fail).getAppData();return}
+    const token=sessionToken,epoch=sessionEpoch,controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),6000);
+    try{
+      const response=await fetch(DATA_RUNTIME_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({operation:'read',sessionToken:token}),cache:'no-store',credentials:'omit',signal:controller.signal});
+      const value=await response.json().catch(()=>({}));
+      if(!response.ok||!value.ok)throw new Error(value.reason||'表示データを取得できません。');
+      if(epoch!==sessionEpoch||token!==sessionToken)return;
+      applyAppData({entries:value.entries||[],sheetUrl:MANAGEMENT_SHEET_URL,version:DISPLAY_VERSION,adminId:String(value.staffCode||''),dataSource:'supabase-direct',syncedAt:value.syncedAt||''});
+    }catch(err){
+      if(epoch!==sessionEpoch||token!==sessionToken)return;
+      authenticatedRun().withSuccessHandler(applyAppData).withFailureHandler(fail).getAppData();
+    }finally{clearTimeout(timeout)}
   }
 
   function renderChips(){
@@ -336,7 +391,7 @@
       : importVendor ? `<div class="invoice-card-tools"><button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button><button type="button" class="invoice-card-import" title="${attr(importVendor)}のGmail請求書・領収書を検索" ${invoiceWaiting?'disabled':''} onclick="${importVendor==='Google Play'?`openGooglePlayInvoices(${jsArg(e.id)})`:`openInvoices(${jsArg(importVendor)})`}">領収書取込</button></div>` : `<button class="editIcon" title="編集" onclick="openEditor(${jsArg(e.id)})">✎</button>`;
     const dragAttrs=reorderMode?` draggable="true" ondragstart="dragStart(event,${jsArg(e.id)})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondrop="dropCard(event,${jsArg(e.id)})"`:'';
     return `<article class="card ${reorderMode?'reordering':''}" data-id="${attr(e.id)}"${dragAttrs}>
-      <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img referrerpolicy="no-referrer" loading="lazy" src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div>${headTools}</div>
+      <div class="cardhead"><div class="logo"><span class="fallback">${initial}</span>${logo?`<img loading="lazy" decoding="async" referrerpolicy="no-referrer" loading="lazy" src="${attr(logo)}" alt="" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`:''}</div><div class="namebox"><div class="name">${esc(e.serviceName)}</div><span class="badge">${esc(e.category||'その他')}</span></div>${headTools}</div>
       <div class="account"><span class="val">${idText}</span><button class="mini ${e.account?'':'disabled'}" ${e.account?'':'disabled'} onclick="copyId(${jsArg(e.id)})">IDコピー</button></div>
       <div class="pwline">${pwState}${e.hasPassword?`<button class="mini" onclick="showPassword(${jsArg(e.id)})">表示</button>`:''}</div>
       <div class="meta">${meta}</div><div class="memoPreview">${preview||' '}</div>
@@ -396,7 +451,7 @@
   }
   function persistOrder(){
     if(pending)return;busy(true);const ids=entries.map(e=>e.id);
-    authenticatedRun().withSuccessHandler(()=>{busy(false);toast('カード順を保存しました');load()}).withFailureHandler(err=>{fail(err);load();}).saveCardOrder(ids,loadedOrder);
+    authenticatedRun().withSuccessHandler(result=>{busy(false);toast('カード順を保存しました');load(!!result?.syncPending)}).withFailureHandler(err=>{fail(err);load(true)}).saveCardOrder(ids,loadedOrder);
   }
 
   function logoSrc(e){
@@ -435,6 +490,7 @@
 
   function openEditor(id=''){
     if(pending)return;if(reorderMode)toggleReorder();editingId=id;const e=id?findEntry(id):null;editingRevision=e?.revision||'';
+    editingBase=e?{category:e.category||'その他',serviceName:e.serviceName||'',url:e.url||'',account:e.account||'',accountTitle:e.accountTitle||'',amountNote:e.amountNote||'',memo:e.memo||'',logoUrl:e.logoUrl||''}:{};
     $('editTitle').textContent=e?'登録内容を編集':'新しい項目を追加';$('deleteBtn').style.visibility=e?'visible':'hidden';
     $('fCategory').value=e?.category||'その他';$('fService').value=e?.serviceName||'';$('fUrl').value=e?.url||'';$('fAccount').value=e?.account||'';$('fAccountTitle').value=e?.accountTitle||'';$('fAmount').value=e?.amountNote||'';$('fMemo').value=e?.memo||'';$('fLogo').value=e?.logoUrl||'';$('fSecret').value='';$('fSecret').type='password';
     $('fSecret').placeholder=e?.hasPassword?'登録済み（変更する場合だけ入力）':'パスワードを入力';$('secretState').textContent=e?.hasPassword?'PW登録済み':'PW未登録';$('secretState').className='secretState '+(e?.hasPassword?'ok':'none');$('clearSecretBtn').style.display=e?.hasPassword?'inline-block':'none';editDialog.showModal();setTimeout(()=>$('fService').focus(),50);
@@ -444,12 +500,52 @@
     if(!editingId||pending||!confirm('登録済みパスワードを削除しますか？'))return;busy(true);
     authenticatedRun().withSuccessHandler(()=>{busy(false);const e=findEntry(editingId);if(e)e.hasPassword=false;$('secretState').textContent='PW未登録';$('secretState').className='secretState none';$('clearSecretBtn').style.display='none';$('fSecret').value='';$('fSecret').type='password';$('fSecret').placeholder='パスワードを入力';toast('パスワードを削除しました');render();}).withFailureHandler(fail).clearPassword(editingId);
   }
+  function sendEntryPayload(payload,allowConflictSync=true){
+    busy(true);
+    authenticatedRun().withSuccessHandler(result=>{busy(false);editDialog.close();toast(payload.passwordAction==='set'?'保存しました（PWも更新）':'保存しました');load(!!result?.syncPending)})
+      .withFailureHandler(err=>{
+        if(allowConflictSync&&String(err?.message||'').includes('別の画面またはシートで更新されています')){syncEntryAfterConflict(payload);return}
+        fail(err);
+      }).saveEntry(payload);
+  }
+  function syncEntryAfterConflict(payload){
+    const base={...editingBase};
+    const fields=[
+      ['fCategory','category','カテゴリ'],['fService','serviceName','サービス名'],['fUrl','url','URL'],['fAccount','account','ログインID / アカウント'],
+      ['fAccountTitle','accountTitle','勘定科目・用途'],['fAmount','amountNote','金額・補足'],['fMemo','memo','メモ'],['fLogo','logoUrl','ロゴURL']
+    ];
+    busy(true);
+    authenticatedRun().withSuccessHandler(data=>{
+      if(data?.dataSource!=='google-sheet-resync'){
+        fail(new Error('Googleシートの最新内容を同期できませんでした。入力内容は画面に残しています。少し待ってから再読み込みしてください。'));
+        return;
+      }
+      applyAppData(data);
+      const fresh=findEntry(editingId);
+      if(!fresh){fail(new Error('この項目は別の画面で削除されています。入力内容は画面に残しています。'));return}
+      const conflicts=[];
+      for(const [inputId,key,label] of fields){
+        const original=String(base[key]??(key==='category'?'その他':''));
+        const entered=String(payload[key]??'');
+        const latest=String(fresh[key]??(key==='category'?'その他':''));
+        if(entered===original){payload[key]=latest;$(inputId).value=latest}
+        else if(latest!==original&&latest!==entered)conflicts.push(label);
+      }
+      editingBase=Object.fromEntries(fields.map(([,key])=>[key,String(fresh[key]??(key==='category'?'その他':''))]));
+      editingRevision=fresh.revision||'';payload.revision=editingRevision;payload.sortOrder=fresh.sortOrder||0;payload.passwordManager=fresh.passwordManager||'アプリ内保存';
+      if(conflicts.length){
+        alert('最新データに同期しました。入力内容は保持しています。別画面でも変更された項目があります：'+conflicts.join('、')+'。内容を確認して、保存をもう一度押してください。');
+        return;
+      }
+      sendEntryPayload(payload,false);
+    }).withFailureHandler(fail).getAppData();
+  }
   function submitEntry(ev){
     ev.preventDefault();if(pending)return;const password=$('fSecret').value;const e=findEntry(editingId);const payload={revision:editingRevision,id:editingId,sortOrder:e?.sortOrder||0,category:$('fCategory').value,serviceName:$('fService').value,url:$('fUrl').value,account:$('fAccount').value,passwordManager:e?.passwordManager||'アプリ内保存',accountTitle:$('fAccountTitle').value,amountNote:$('fAmount').value,memo:$('fMemo').value,logoUrl:$('fLogo').value,passwordAction:password?'set':'keep',password};
-    busy(true);authenticatedRun().withSuccessHandler(()=>{busy(false);editDialog.close();toast(password?'保存しました（PWも更新）':'保存しました');load()}).withFailureHandler(fail).saveEntry(payload);
+    sendEntryPayload(payload,true);
   }
   function removeEntry(){
-    if(pending||!editingId||!confirm('この項目を削除しますか？'))return;busy(true);authenticatedRun().withSuccessHandler(()=>{busy(false);editDialog.close();toast('削除しました');load()}).withFailureHandler(fail).deleteEntry(editingId,editingRevision);
+    if(pending||!editingId||!confirm('この項目を削除しますか？'))return;busy(true);authenticatedRun().withSuccessHandler(result=>{busy(false);editDialog.close();toast('削除しました');load(!!result?.syncPending)}).withFailureHandler(fail).deleteEntry(editingId,editingRevision);
   }
 
   async function copyText(text){
@@ -465,11 +561,13 @@
     if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return}
     throw new Error('copy failed');
   }
-  function busy(v){pending=!!v;$('logoutBtn').disabled=pending;$('loginBtn').disabled=pending||!loginAccountReady;document.querySelectorAll('#editDialog button').forEach(b=>b.disabled=pending);$('loading').classList.toggle('show',pending);$('grid').setAttribute('aria-busy',String(pending))}
+  function busy(v){pending=!!v;$('logoutBtn').disabled=pending;$('loginBtn').disabled=pending||!loginAccountReady;document.querySelectorAll('#editDialog button').forEach(b=>b.disabled=pending);$('loading').classList.toggle('show',pending&&!previewActive);$('grid').setAttribute('aria-busy',String(pending))}
   function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
   function jsArg(value){return esc(JSON.stringify(String(value)))}
   function fail(err){
-    busy(false);const message=(err&&err.message)||'処理に失敗しました。';
+    const message=(err&&err.message)||'処理に失敗しました。';
+    if(previewActive&&!message.includes('APP_SESSION_REQUIRED')&&!message.includes('利用権限')){showLogin('最新のログイン状態を確認できません。通信を確認してページを再読み込みしてください。');return}
+    busy(false);
     if(message.includes('APP_SESSION_REQUIRED')||message.includes('利用権限')){
       clearStoredSession();showLogin('ログイン状態を確認できませんでした。もう一度ログインしてください。');return;
     }
@@ -579,8 +677,3 @@ function deleteInvoiceVendorSettings(){
 </script>
 </body>
 </html>
-
-
-
-
-
