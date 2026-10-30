@@ -572,7 +572,8 @@ function invConfig_(){return invRead_(INV_CONFIG)||{folderId:'1GBJvElFr4Ynhv9ICc
 const INV_VENDORS = {
   exseed: {name:'エクシード',sender:'noreply@misoca.jp',subject:'エクシード 請求書',kind:'misoca', query:'from:noreply@misoca.jp subject:エクシード subject:請求書'},
   esia: {name:'イージア',sender:'e-sia.jp',subject:'請求',kind:'attachment', query:'from:e-sia.jp subject:請求'},
-  googleplay: {name:'Google Play',sender:'googleplay-noreply@google.com',subject:'Google Play のご注文明細',kind:'googleplay-email',query:'from:googleplay-noreply@google.com subject:"Google Play" subject:ご注文明細'}
+  googleplay: {name:'Google Play',sender:'googleplay-noreply@google.com',subject:'Google Play のご注文明細',kind:'googleplay-email',query:'from:googleplay-noreply@google.com subject:"Google Play" subject:ご注文明細'},
+  officesupply: {name:'オフィスサプライカウンター料金',sender:'info@gigacc.com',subject:'オフィス桃太郎 請求書',kind:'officesupply-gigacc',query:'from:info@gigacc.com subject:オフィス桃太郎 subject:請求書 -subject:Password'}
 };
 const INV_VENDOR_PREFIX = 'INV_VENDOR_V1_';
 function invVendors_(){
@@ -654,7 +655,7 @@ function setInvoiceFolder(value,token){
 }
 function getInvoiceJob(id,token){
   const j=invJobFor_(id,token);const result={id:j.id,type:j.type,status:j.status,message:j.message||'',errors:j.errors||0,scanned:j.scanned||0};
-  if(j.status==='done'&&j.type==='search')result.items=j.items.map(k=>invRead_(INV_ITEM+k)).filter(Boolean).map(c=>({id:c.id,vendor:(c.vendorName||invVendor_(c.vendor).name),subject:c.subject,due:c.due||'',amount:c.amount==null?'':c.amount,needsReview:!c.due||c.amount==null,evidence:c.evidence||'',sourceUrl:c.sourceUrl,account:c.account||'',order:c.order||'',sourceKind:c.source.kind==='googleplay-email'?'Google Playのメール本文をPDF保存':c.source.kind==='misoca'?'Misocaの請求書PDF':'メール添付の請求書PDF'}));
+  if(j.status==='done'&&j.type==='search')result.items=j.items.map(k=>invRead_(INV_ITEM+k)).filter(Boolean).map(c=>({id:c.id,vendor:(c.vendorName||invVendor_(c.vendor).name),subject:c.subject,due:c.due||'',amount:c.amount==null?'':c.amount,needsReview:!c.due||c.amount==null,evidence:c.evidence||'',sourceUrl:c.sourceUrl,account:c.account||'',order:c.order||'',sourceKind:c.source.kind==='officesupply-gigacc'?'別送パスワードを照合して取得したGigaCCの原本PDF':c.source.kind==='googleplay-email'?'Google Playのメール本文をPDF保存':c.source.kind==='misoca'?'Misocaの請求書PDF':'メール添付の請求書PDF'}));
   if(j.status==='done'&&j.result)result.result=j.result;
   return result;
 }
@@ -687,7 +688,7 @@ function installInvoiceWorker_(){
 }
 function processInvoiceJobs_(){
   try { refreshAccountingSessions_(); } catch (e) { console.warn('Accounting session refresh failed: ' + String(e && e.message || e)); }
-  invOwner_();const l=LockService.getUserLock();if(!l.tryLock(1000))return;
+  invOwner_();officeCleanup_();const l=LockService.getUserLock();if(!l.tryLock(1000))return;
   try{
     invWrite_(INV_WORKER,{installed:true,lastRun:Date.now()});
     const all=invProps_().getProperties();const jobs=Object.keys(all).filter(k=>k.startsWith(INV_JOB)).map(k=>JSON.parse(all[k])).filter(j=>['queued','working'].includes(j.status)).sort((a,b)=>a.created-b.created);
@@ -745,6 +746,7 @@ function invReadMessage_(j,id){
   const cfg=j.vendorConfig||invVendor_(j.vendor);
   if(!cfg.builtin&&(!invSenderMatches_(from,cfg.sender)||(cfg.subject&&!subject.toLowerCase().includes(cfg.subject.toLowerCase()))))return;
   if(j.vendor==='googleplay'){invReadGooglePlay_(j,id,msg,cfg);return;}
+  if(j.vendor==='officesupply'){officeReadMessage_(j,id,msg);return;}
   const body=invText_(parts),sources=[];
   if(j.vendor==='exseed'){
     const links=[...new Set(body.match(/https:\/\/app\.misoca\.jp\/receive_documents\/[a-f0-9-]{36}\b/g)||[])];
@@ -806,6 +808,7 @@ function invGooglePlayPdf_(record){
 
 function invPdf_(source){
   let b;
+  if(source.kind==='officesupply-gigacc')return officeSourcePdf_(source);
   if(source.kind==='misoca'){
     if(!/^https:\/\/app\.misoca\.jp\/receive_documents\/[a-f0-9-]{36}\/pdf$/.test(source.url))throw new Error('請求書URLが不正です。');
     const r=UrlFetchApp.fetch(source.url,{followRedirects:false,muteHttpExceptions:true});
@@ -926,3 +929,4 @@ function requireAppSession_(token, action) {
 }
 function passwordEntryIds_(){const props=PropertiesService.getUserProperties().getProperties();return Object.keys(props).filter(key=>key.indexOf(SECRET_PREFIX)===0).map(key=>key.slice(SECRET_PREFIX.length)).filter(Boolean).slice(0,500);}
 function doPost(e){try{const p=JSON.parse(e.postData.contents||'{}');if(p.action!=='centralAccountingSessionVerify')throw new Error('Unsupported action');const record=verifyAppSession_(p.sessionToken);return ContentService.createTextOutput(JSON.stringify({success:true,code:record.id,permissionLevel:record.level,passwordEntryIds:passwordEntryIds_()})).setMimeType(ContentService.MimeType.JSON);}catch(e){return ContentService.createTextOutput(JSON.stringify({success:false})).setMimeType(ContentService.MimeType.JSON);}}
+
