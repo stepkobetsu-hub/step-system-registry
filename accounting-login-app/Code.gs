@@ -2,7 +2,7 @@ const SHEET_NAME = '経理ログイン管理';
 const COLS = 12;
 const DEFAULT_SPREADSHEET_ID = '1RvxEOW2HFrWO32GikDeRWRbMhH9IyA0VdVtNb2G9Rdw';
 const SECRET_PREFIX = 'ACCOUNTING_SECRET_';
-const APP_VERSION = '2026-10-29-save-conflict-sync-v1';
+const APP_VERSION = '2026-11-02-permission-lock-fix-v1';
 const APP_DATA_CACHE_KEY = 'ACCOUNTING_APP_DATA_V2';
 const CENTRAL_PERMISSION_CACHE_PREFIX = 'ACCOUNTING_PERMISSION_V1_';
 const ACCOUNTING_DATA_RUNTIME_URL = 'https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/accounting-data-runtime-v1';
@@ -901,23 +901,20 @@ function centralAppPermission_(token, action) {
   const cached = cache.get(cacheKey);
   if (cached) { try { return JSON.parse(cached); } catch (_) {} }
 
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    const afterWait = cache.get(cacheKey);
-    if (afterWait) { try { return JSON.parse(afterWait); } catch (_) {} }
-    const r = UrlFetchApp.fetch('https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/staff-app-permission-v1', {
-      method: 'post', contentType: 'application/json',
-      payload: JSON.stringify({appId:'accounting-login-app', sessionKind:'accounting', sessionToken:token, action}),
-      muteHttpExceptions: true
-    });
-    let v; try { v = JSON.parse(r.getContentText()); } catch (_) {}
-    if (r.getResponseCode() !== 200 || !v || !v.allowed || !/^\d{4,8}$/.test(String(v.staffCode || ''))) {
-      throw new Error('PERMISSION_DENIED: ' + (v && v.reason || '共通権限を確認できません。'));
-    }
-    cache.put(cacheKey, JSON.stringify(v), 60);
-    return v;
-  } finally { lock.releaseLock(); }
+  // Permission checks perform a network round trip (including a callback to
+  // this deployment). Never hold the shared write lock while waiting for it.
+  // Concurrent cache misses may verify twice; only allowed responses are cached.
+  const r = UrlFetchApp.fetch('https://wisedgcgwaebtkprdhth.supabase.co/functions/v1/staff-app-permission-v1', {
+    method: 'post', contentType: 'application/json',
+    payload: JSON.stringify({appId:'accounting-login-app', sessionKind:'accounting', sessionToken:token, action}),
+    muteHttpExceptions: true
+  });
+  let v; try { v = JSON.parse(r.getContentText()); } catch (_) {}
+  if (r.getResponseCode() !== 200 || !v || !v.allowed || !/^\d{4,8}$/.test(String(v.staffCode || ''))) {
+    throw new Error('PERMISSION_DENIED: ' + (v && v.reason || '共通権限を確認できません。'));
+  }
+  cache.put(cacheKey, JSON.stringify(v), 60);
+  return v;
 }
 
 // The central service validates this session by calling doPost(), which runs
