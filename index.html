@@ -4983,6 +4983,29 @@ applyAssetInfo = function(item) {
 </script>
 <script src="camscanner-card.js?v=20261027-1"></script>
 <script src="postmark-card.js?v=20261028-1"></script>
+
+<script id="past-exam-followup-20261105">
+(() => {
+  const notes={
+  "作業メモ": "2026-11-03〜11-05：資産管理台帳の過去問カードの「利用者向けアプリを開く」を「過去問DBを開く」に変更。スタッフ用アプリの旧「過去問アップロード」を「過去問スキャン・アップロード」に差し替え、Android・iPhoneの共通案内（past_exam_scanner_install.html）へ接続。2026-11-05：DBに表示されないとの報告を調査し、Web版のテスト回保存値（1）とDB表示キー（第1回）の不一致を修正。DBに登録済みファイルの全年度検索・最新情報取得・画面復帰時の再取得を追加し、Web登録完了後は該当校・年度を最新データで開くよう変更。最終報告の「南城中学・2026年度・中1・第2回・社会」は調査時点でDBと保存フォルダに到着していなかったが、その後、本人より『アップロードした人が別のアプリを使っていた。今のところ問題ありません』との確認あり。この報告を現行過去問スキャナーの未解決障害として扱わない。テスト回の不一致修正と今回報告の原因を区別する。",
+  "仕様メモ": "2026-11-05追記：正しいDBは https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html 。スタッフ用カードから端末別案内へ進む。Android専用APKは撮影・補正・PDF作成・DB登録を一体で実行。iPhoneは「ファイル」でスキャンしたPDFを共通Web版で選択・登録（AndroidもWeb版を選択可）。QR／インストール案内はこの2方式への入口であり、3つ全部を導入する必要はない。Webのテスト回は第N回形式へ統一。登録待ちデータも同じ正規化を通す。DB画面の最新取得・画面復帰時の取得は未保存変更・保存中・入力モーダル表示中を避ける。",
+  "確認根拠": "2026-11-05：GAS・高速API・Supabase正本がrevision 12／57ファイルで一致することを読取確認。数値のみのテスト回キーは実DBに存在しなかった。差分保存・競合・再送・テスト回キーの一致・更新時の未保存保護を含む12テスト成功。GitHub Pages公開成功、公開ブラウザで57件表示・複数条件検索・最新取得の同期完了を確認。実際のスマホ撮影から今回対象ファイル登録までの再試験は行っていない。本人確認：別アプリを使っていたことが判明し、現時点では問題なし。修正ソース： https://github.com/stepkobetsu-hub/seiseki-kanri/commit/7073b5e9642bf4ff8818cbe68a1c86591fbbfe09"
+};
+  const append=(value,note)=>String(value||'').includes(note)?String(value||''):[String(value||'').trim(),note].filter(Boolean).join('\n\n');
+  const enrich=item=>{
+    if(item['ID']!=='past-exams')return item;
+    const result=Object.assign({},item);
+    Object.entries(notes).forEach(([field,note])=>{result[field]=append(result[field],note);});
+    result['確認日']='2026年11月5日';
+    result['確認状況']='現時点で問題なし（本人確認）。今回の未表示報告は別アプリ使用と判明。';
+    return result;
+  };
+  const previousApply=applyAssetInfo;
+  applyAssetInfo=function(item){return enrich(previousApply(item));};
+  const previousOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
+})();
+</script>
 </body>
 </html>
 
