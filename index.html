@@ -5006,6 +5006,33 @@ applyAssetInfo = function(item) {
   organizeEntryImport=function(items){return previousOrganize(items).map(enrich);};
 })();
 </script>
+
+<script id="step-message-postmark-brevo-review-20261108">
+(() => {
+  const docUrl='https://github.com/stepkobetsu-hub/step-system-registry/blob/main/docs/step-message-brevo-postmark-review-20261108.md';
+  const note='2026-11-08：Brevo Starterの有料契約は利用者により解約予約済み（終了予定2026-11-12 07:00 JST、アカウントは削除しない）。STEP配信の未到着メールは11/7にPostmarkで両校とも配信完了を確認。特訓部屋のお知らせは10/28・10/29にPostmark配信完了を確認。GitHubのCode.gsには旧MAILAPP/BREVO経路が残るが、本番Apps ScriptのPostmarkMessageCenter.gsはGitHub未同期。旧コードの本番上書きは禁止。本番の全宛先の設定・Brevo切り戻し・予約送信・トリガー・API参照は未確認のため、解約期限より前に本番Apps Scriptで最終照合が必要。今回、本番設定やデプロイは変更していない。';
+  const append=(v,t)=>String(v||'').includes(t)?String(v||''):[String(v||'').trim(),t].filter(Boolean).join('\n\n');
+  const unique=(v,t)=>[...new Set([...(Array.isArray(v)?v:v?[String(v)]:[]),t])];
+  const enrich=item=>{
+    if(item.ID!=='step-message' && String(item['システム名']||'')!=='STEP配信システム')return item;
+    return Object.assign({},item,{
+      '確認日':'2026年11月8日',
+      '状態':'本番使用中（Postmark送信実績確認／Brevo契約終了前の本番設定照合待ち）',
+      'Postmark・Brevo移行記録':docUrl,
+      'GitHubドキュメントURL':docUrl,
+      '作業メモ':append(item['作業メモ'],note),
+      '仕様メモ':append(item['仕様メモ'],note),
+      '確認済み事項':unique(item['確認済み事項'],'2026-11-07 STEP配信・未到着通知 Postmark配信完了、2026-10-28〜29 特訓部屋通知 Postmark配信完了、Brevo有料プラン解約予約済み'),
+      '未確認項目':unique(item['未確認項目'],'2026-11-12までに本番Apps ScriptでBrevo依存・全宛先・フォールバック・予約配信を直接確認'),
+      '確認状況':'2026-11-08：Postmark送信ログとBrevo解約予約は確認済み。本番Apps Script設定の直接確認・変更・再デプロイは未実施。詳細は移行記録参照。'
+    });
+  };
+  const oldApply=applyAssetInfo;
+  applyAssetInfo=function(item){return enrich(oldApply(item));};
+  const oldOrganize=organizeEntryImport;
+  organizeEntryImport=function(items){return oldOrganize(items).map(enrich);};
+})();
+</script>
 </body>
 </html>
 
