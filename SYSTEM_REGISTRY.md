@@ -5,6 +5,14 @@
 管理リポジトリ: https://github.com/stepkobetsu-hub/step-system-registry  
 公開ブランチ: `main`（GitHub Pages、リポジトリ直下）
 
+## STEP配信とBrevo有料契約終了の確認（2026-11-08）
+
+- Brevo Starterの月額契約について、利用者が解約予約を確定。終了予定は **2026-11-12 07:00 JST**。Brevoアカウントは削除しない。
+- 「入退室ログ２」の送信履歴で、STEP配信の未到着通知について **2026-11-07にPostmark経由の配信完了**（神領校・大手町校）を確認。「特訓部屋のお知らせ」は2026-10-28・10-29にPostmark経由で配信完了。入退室通知も2026-11-07にPostmark経由の配信完了。
+- GitHubの旧 `Code.gs` はMAILAPP/BREVO送信方式を保持しており、本番Apps Scriptへ導入された `PostmarkMessageCenter.gs` と未同期。**GitHubの旧GASを本番へ上書きしない。**
+- 本番Apps Scriptの全宛先のPostmark使用、Brevoフォールバック、予約送信、実際の設定値・デプロイは直接確認できていない。2026-11-12の契約終了前に本番Apps Scriptで照合する。今回は本番コード・設定・デプロイを変更していない。
+- 検証根拠、復旧上の注意点、未確認事項の記録: [2026-11-08 STEP配信・Brevo/Postmark移行確認](docs/step-message-brevo-postmark-review-20261108.md)
+
 ## Postmark導入と利用量（2026-10-28）
 
 Yahoo宛ての生徒QR入退室・STEP配信通知をPostmarkに移行。本番QR v96／配信v63、既存URL維持。無料100通／月、アプリは累計90試行（8使用・残82、20:52確認）。実績から月110〜150通程度の見込みで、全件継続には有料化の可能性が高い。課金変更は未実施。詳細は [導入・検証・契約・バックアップ・復旧記録](docs/postmark-rollout-20261028.md)。
