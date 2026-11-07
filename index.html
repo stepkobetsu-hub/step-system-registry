@@ -5016,8 +5016,9 @@ applyAssetInfo = function(item) {
   const enrich=item=>{
     if(item.ID!=='step-message' && String(item['システム名']||'')!=='STEP配信システム')return item;
     return Object.assign({},item,{
+      '最重要注意事項（Brevo解約・要対応）':'【未完了・期限：2026年11月12日 午前7時（日本時間）】Brevo Starter有料契約は解約予約済み。本番Apps Scriptの実設定について、(1)すべての宛先がPostmark送信か、(2)Postmark送信失敗時にBrevoへ戻らないか、(3)未到着・特訓・自由記述・添付・予約配信がPostmarkで継続するか、(4)予約配信トリガーと送信ログ・不達通知が有効か、を最終確認する。まだ直接確認・設定変更・本番再デプロイしていない。GitHubのCode.gsは旧MAILAPP/BREVO方式のため、本番Apps Scriptへの上書き厳禁。現状の本番送信処理を保護する。Brevoアカウントは削除しない。確認できるまで「完全移行完了」と扱わない。',
       '確認日':'2026年11月8日',
-      '状態':'本番使用中（Postmark送信実績確認／Brevo契約終了前の本番設定照合待ち）',
+      '状態':'要対応：Brevo契約終了11/12 07:00までに本番送信設定を最終確認（現行Postmark配信は稼働中）',
       'Postmark・Brevo移行記録':docUrl,
       'GitHubドキュメントURL':docUrl,
       '作業メモ':append(item['作業メモ'],note),
