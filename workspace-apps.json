@@ -37,6 +37,16 @@
       "利用者向けURL": "https://stepkobetsu-hub.github.io/print-handwriting-cleaner/"
     },
     {
+      "正式名称": "問題切貼りアプリ",
+      "状態": "本番公開中（スマートフォン対応・PWA）",
+      "利用者向けURL": "https://step-cut-paste.mintcocoajasmine.chatgpt.site"
+    },
+    {
+      "正式名称": "問題切貼りアプリQRコード",
+      "状態": "アプリ起動用QR画像（PNG）",
+      "利用者向けURL": "https://api.qrserver.com/v1/create-qr-code/?size=600x600&ecc=H&data=https%3A%2F%2Fstep-cut-paste.mintcocoajasmine.chatgpt.site"
+    },
+    {
       "正式名称": "仕訳・経理：URL管理",
       "状態": "本番使用中（Apps Script v49・Supabase日常表示）",
       "利用者向けURL": "https://script.google.com/macros/s/AKfycbzPMsfBR4XkOqqQJrt-JCc-ALjI7Pha2XEq80DVtyd3-OCBRwdMbuDUq_vmL57yMhql7A/exec"
