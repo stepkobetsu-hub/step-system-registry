@@ -5102,6 +5102,42 @@ applyAssetInfo = function(item) {
   };
 })();
 </script>
+<script>
+// 2026-11-13: canonical teacher portal card and obsolete QR-card link cleanup.
+// Display-level normalization; the Apps Script source registry is left unchanged.
+(function(){
+  const portalUrl='https://stepkobetsu-hub.github.io/teacher-portal/';
+  const portalId='teacher-portal-main-20261113';
+  const normalizeItems=(items)=>{
+    const entries=Array.isArray(items)?items.slice():[];
+    const exists=entries.some(x=>String(x['ID']||'')===portalId||
+      (String(x['システム名']||'').trim()==='講師ポータル' &&
+       String(x['利用者向けURL']||x['GitHub Pages URL']||'').replace(/\/$/,'')===portalUrl.replace(/\/$/,'')));
+    if(!exists)entries.push({
+      'ID':portalId,'システム名':'講師ポータル','正式名称':'個別指導STEP 講師ポータル',
+      '分類':'講師','状態':'本番使用中','利用者':'スタッフ・講師',
+      '運用担当':'管理者',
+      '概要':'講師向けポータル。出勤・授業報告、登録・変更などの各種講師用機能へアクセスする入口。現行の利用先はこのGitHub Pages URLです。',
+      '利用者向けURL':portalUrl,'GitHub Pages URL':portalUrl,
+      'GitHub URL':'https://github.com/stepkobetsu-hub/teacher-portal',
+      '更新方法':'2026-11-13：講師ポータルを独立カードとして登録表示。出退くんQRカード内の使用終了した「講師ポータルアプリ」リンクは表示しない。'
+    });
+    return entries;
+  };
+  const originalShowPortal=showPortal;
+  showPortal=function(items){return originalShowPortal(normalizeItems(items));};
+  const originalCard=card;
+  card=function(item){
+    const node=originalCard(item);
+    if(isQrRegister(item)){
+      node.querySelectorAll('.link-row').forEach(row=>{
+        if(row.querySelector('.link-name')?.textContent.trim()==='講師ポータルアプリ')row.remove();
+      });
+    }
+    return node;
+  };
+})();
+</script>
 </body>
 </html>
 
