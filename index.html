@@ -5138,6 +5138,32 @@ applyAssetInfo = function(item) {
   };
 })();
 </script>
+
+<script id="past-exam-academic-year-labels-20261118">
+(() => {
+  // 2026-11-18: Scanner (Android / iPhone Web) and DB academic year labels.
+  const notes = {
+    '仕様メモ': '2026-11-18：過去問保管DBの学校詳細画面左上にある直近3年度タブを「2026（今年度）／2025（昨年度）／2024（おととし）」の形式で表示（括弧の補足は赤字、選択中の濃色タブでは視認性確保のため明るい赤）。年度は4月始まりで、2027年4月1日から「2027（今年度）／2026（昨年度）／2025（おととし）」に自動切替。Androidネイティブ版の年度選択肢も補足部分のみ赤字、iPhone・Android共通Web版は選択肢に補足を加え、選択中の補足を赤字で別表示。登録値・DBキー・PDFファイル名の年度は従来どおり数字のみ。',
+    '作業メモ': '2026-11-18：年度誤選択防止のためAndroid専用スキャナー（MainActivity.kt）、iPhone・Android共通Web版（past-exam-web/index.html・app.mjs・app.css）、過去問保管DB（past_exam_db.html）を更新。変更は表示部分が中心。既存の年度選択・スキャン・登録・過去問DB保存データは変更しない。Androidの固定配布APKは別途CIビルド成功と署名済み配布への反映を確認し、利用端末でAPK更新する必要がある。',
+    '確認根拠': '2026-11-18：GitHub mainへのソース更新を確認。過去問DB年度タブ：seiseki-kanri commit a5ec0b8548fcc3da06a19c91657453a5c5b32252。Android年度選択：commit 45cfb05e6acf60948e918284132f20bbb2990e9b。共通Web版：index 10c2da5e9a8e380775014d1790ee792865af6196／app.mjs ddc66e660e7bf12e42e2b67f9736000f750b1824／app.css 696181399b45f3b3221dffbc699e086b2b17e5b6。公開ページの実機表示、Android署名APK更新配布・実機動作は未確認。'
+  };
+  const append = (oldText, note) => String(oldText || '').includes(note)
+    ? String(oldText || '')
+    : [String(oldText || '').trim(), note].filter(Boolean).join('\n\n');
+  const enrich = item => {
+    if (item['ID'] !== 'past-exams') return item;
+    const result = {...item};
+    for (const [field, note] of Object.entries(notes)) result[field] = append(result[field], note);
+    result['確認日'] = '2026年11月18日';
+    result['確認状況'] = '年度表示のソース修正をGitHub mainへ反映。公開画面での表示・Android署名APK配布・実機動作は未確認。';
+    return result;
+  };
+  const oldApply = applyAssetInfo;
+  applyAssetInfo = function(item) { return enrich(oldApply(item)); };
+  const oldOrganize = organizeEntryImport;
+  organizeEntryImport = function(items) { return oldOrganize(items).map(enrich); };
+})();
+</script>
 </body>
 </html>
 
