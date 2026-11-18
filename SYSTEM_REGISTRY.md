@@ -1926,3 +1926,12 @@ Yahoo宛ての生徒QR入退室・STEP配信通知をPostmarkに移行。本番Q
 - 原本は変更しない。PDFはダイアログ内の標準PDFツールバーで操作。非対応画像は「元のファイルを開く」へ案内。
 - `assets/js/meeting-files.js`、`assets/css/meeting-files.css`、3画面の参照バージョンを更新（commit `dfcf0b4be28e8329f4bfffd7d564b24cfaee179c`）。認証・校舎権限・短期署名URLを維持。
 - 保存・関連確認の既存4テストに加え、画像フィット・回転時の寸法・拡大縮小・ドラッグ・閉じる操作を追加し、合計5テスト成功。
+
+
+## 2026-11-18 過去問スキャナー・保管DBの年度表示（4月自動更新）
+
+- 対象：Android専用「過去問スキャナー」APK、iPhone・Android共通の[Web版](https://stepkobetsu-hub.github.io/seiseki-kanri/past-exam-web/)、[過去問保管DB](https://stepkobetsu-hub.github.io/seiseki-kanri/past_exam_db.html)。
+- 変更内容：年度の誤選択を防ぐため、2026年11月時点の直近3年を **2026（今年度）／2025（昨年度）／2024（おととし）** と表示。括弧内を赤字にする。DBの選択中（濃紺）タブは視認性を保つため明るい赤を使用。Webの標準selectでは選択肢内の部分色分けができないため、選択中の相対年度を独立した赤い補足としても表示。
+- 年度の基準：毎年 **4月1日** で自動切り替え。2027年4月1日以降は **2027（今年度）／2026（昨年度）／2025（おととし）**。年度ラベルは表示のみ。保存する年度値、DBキー、生成PDF名は従来どおり4桁の数字を維持。
+- GitHub修正：DB [a5ec0b8](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/a5ec0b8548fcc3da06a19c91657453a5c5b32252)、Android [45cfb05e](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/45cfb05e6acf60948e918284132f20bbb2990e9b)、Web [10c2da5e](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/10c2da5e9a8e380775014d1790ee792865af6196)、[ddc66e66](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/ddc66e660e7bf12e42e2b67f9736000f750b1824)、[69618139](https://github.com/stepkobetsu-hub/seiseki-kanri/commit/696181399b45f3b3221dffbc699e086b2b17e5b6)。
+- 確認状況：GitHub mainのソース修正・コード再確認済み。Web公開実画面での表示、Android固定署名APKのビルド・最新配布への反映と端末での上書き・実機表示は未確認。**APKが新しく配布され利用端末で更新されるまでは、Android専用アプリには反映されない可能性がある**。既存のAPK配布・署名・QR導線は変更しない。
