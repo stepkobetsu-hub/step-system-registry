@@ -5164,6 +5164,30 @@ applyAssetInfo = function(item) {
   organizeEntryImport = function(items) { return oldOrganize(items).map(enrich); };
 })();
 </script>
+
+<script id="entry-sheet-storage-links-20261119">
+(() => {
+  const folderUrl = 'https://drive.google.com/drive/folders/1SBwFvsBXxvngzSdIWzGtQqj9LcIjXlGY';
+  function enrich(item) {
+    const name = String(item['システム名'] || '');
+    if (item['ID'] !== 'entry-sheet-import' && !name.includes('エントリーシート読み取り')) return item;
+    return Object.assign({}, item, {
+      'DriveフォルダURL': folderUrl,
+      '保存仕様': [String(item['保存仕様'] || '').trim(), '原本PDFは上記Google Driveフォルダへ保存。読み取り後の構造化データの保存先とは別。'].filter(Boolean).join('\n'),
+      '確認日': '2026年11月19日'
+    });
+  }
+  const oldApply = applyAssetInfo;
+  applyAssetInfo = function(item) { return enrich(oldApply(item)); };
+  const oldOrganize = organizeEntryImport;
+  organizeEntryImport = function(items) { return oldOrganize(items).map(enrich); };
+  const oldLabel = linkLabel;
+  linkLabel = function(item, field, fallback) {
+    if (field === 'DriveフォルダURL' && (item['ID'] === 'entry-sheet-import' || String(item['システム名'] || '').includes('エントリーシート読み取り'))) return 'エントリーシート原本PDF保存先を開く';
+    return oldLabel(item, field, fallback);
+  };
+})();
+</script>
 </body>
 </html>
 
