@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>権限調査一覧｜STEP</title>
+<style>
+:root{font-family:system-ui,"Noto Sans JP",sans-serif;color:#19344a;background:#f4f8fb}*{box-sizing:border-box}body{margin:0}main{max-width:960px;margin:25px auto;padding:0 15px 50px}h1{margin:0;font-size:28px}.muted{color:#597083;line-height:1.7}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.btn{display:inline-block;text-decoration:none;padding:10px 14px;border-radius:10px;background:#155343;color:white;font-weight:700}.btn.alt{background:#e2edf3;color:#14536c}.warning{padding:14px;border-left:5px solid #e3a22a;border-radius:10px;background:#fff8e6;line-height:1.75}.card{background:#fff;border:1px solid #dae5ec;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 3px 15px #102a430a}.card[hidden]{display:none}.head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.tag{background:#fff1ca;color:#795400;border-radius:40px;padding:5px 10px;font-size:12px;font-weight:800}.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}.fields div{background:#eff5f8;padding:11px;border-radius:9px}.fields small{display:block;color:#5a7181}.fields b{display:block;margin-top:4px}input{font:inherit;width:100%;border:1px solid #aabec9;padding:12px;border-radius:9px}@media(max-width:600px){.fields{grid-template-columns:1fr}h1{font-size:24px}}
+</style></head><body><main>
+<h1>🔐 STEP アプリ別の権限調査</h1><p class="muted">必要権限・実際の制限・管理センターとの連携状況を区別して確認します。</p>
+<div class="warning"><b>大切なお知らせ</b><br>権限管理センターで設定を保存しても、未連携アプリの実際の利用権限は変わりません。この一覧はコードと運用記録に基づく確認結果です。未確認の設定を推測で埋めません。</div>
+<div class="actions"><a class="btn" href="https://step-permissions.mintcocoajasmine.chatgpt.site" target="_blank" rel="noopener noreferrer">権限管理センターを開く ↗</a><a class="btn alt" href="./">資産管理台帳に戻る</a></div>
+<label for="filter">アプリ名・機能名で検索</label><input id="filter" type="search" placeholder="生徒マスタ、編集、権限4 など">
+<article class="card" data-terms="生徒マスタ 生徒情報検索 編集 権限4"><div class="head"><h2>👥 生徒情報検索：生徒マスタの編集</h2><span class="tag">中央管理との連携未確認</span></div>
+<div class="fields"><div><small>現在の画面・ログイン判定</small><b>権限4</b></div><div><small>編集・保存API側</small><b>独立した検証が必要</b></div><div><small>管理センターからの変更</small><b>まだ保証できません</b></div></div>
+<p class="muted">生徒情報検索画面の編集用ログイン処理では権限4を直接判定しています。中央設定だけを変えても自動反映されるとは限りません。</p>
+<div class="actions"><a class="btn alt" href="https://stepkobetsu-hub.github.io/seiseki-kanri/student_directory.html" target="_blank" rel="noopener noreferrer">対象アプリを開く ↗</a><a class="btn alt" href="https://github.com/stepkobetsu-hub/seiseki-kanri/issues/54" target="_blank" rel="noopener noreferrer">改修仕様を確認 ↗</a></div></article>
+<article class="card" data-terms="その他 アプリ 未確認 台帳"><div class="head"><h2>📋 その他の登録アプリ</h2><span class="tag">順次調査</span></div><p class="muted">このページに未掲載のアプリは「権限なし」ではありません。権限管理センターの設定値と、実装コード・サーバー側の実効権限を照合してから追加します。</p><div class="actions"><a class="btn alt" href="./">資産管理台帳から確認 ↗</a></div></article>
+<p id="empty" class="muted" hidden>該当する確認結果はありません。未調査のアプリは資産管理台帳をご覧ください。</p>
+<script>const q=document.getElementById('filter'),cards=[...document.querySelectorAll('.card')],empty=document.getElementById('empty');q.addEventListener('input',()=>{const term=q.value.trim().toLowerCase();let n=0;for(const c of cards){const show=!term||(c.dataset.terms+' '+c.innerText).toLowerCase().includes(term);c.hidden=!show;if(show)n++}empty.hidden=!!n})</script>
+</main></body></html>
